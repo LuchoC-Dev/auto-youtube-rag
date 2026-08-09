@@ -21,9 +21,11 @@
 | Lenguaje | TypeScript estricto | Ruta integrada y soportada para ONNX en Windows |
 | Runtime | Node.js 24+ con ESM | Disponible localmente y compatible con Transformers.js |
 | Empaquetado | npm + `package-lock.json` | Instalación reproducible sin otro runtime |
+| Arquitectura | Dominio + puertos y adaptadores | Sustituir infraestructura sin alterar casos de uso |
 | Persistencia | SQLite | Simplicidad local y escala suficiente |
 | Texto | SQLite FTS5 | Búsqueda exacta y por relevancia |
-| Embeddings | Locales, pequeños y multilingües | Sin APIs externas ni hardware potente |
+| Embeddings | E5 Small multilingüe `q8` | Mejor equilibrio del benchmark local |
+| Acoplamiento | Modelo y DB sólo en infraestructura | Mantener dominio y aplicación reemplazables |
 | Vectores | Backend reemplazable | Poder migrar sin romper la CLI |
 | Recuperación | Híbrida y jerárquica | Combinar precisión con cobertura amplia |
 | Resultado | Contexto amplio y citado | Proveer hechos suficientes al agente |
@@ -44,17 +46,16 @@
 - Crecimiento medio: aproximadamente 4 videos diarios.
 - Picos: hasta 10 videos diarios.
 
-## Resultado preliminar de embeddings
+## Modelo de embeddings aprobado
 
 El benchmark inicial sobre 18 pasajes y 16 consultas dejó a
-`multilingual-e5-small` como candidato provisional: obtuvo `Hit@1 = 1.0` y
+`multilingual-e5-small` como modelo del MVP: obtuvo `Hit@1 = 1.0` y
 `MRR = 1.0`, igual que E5 Base, con 129 MB de caché y una latencia media de
-11.5 ms frente a 29 ms de E5 Base. La selección definitiva sigue pendiente de
-evaluaciones sobre el corpus completo.
+11.5 ms frente a 29 ms de E5 Base. Puede sustituirse si las evaluaciones futuras
+lo justifican; esa sustitución afectará al adaptador y al índice, no al dominio.
 
 ## Pendientes de decisión
 
-- Modelo local de embeddings.
 - Estrategia vectorial inicial concreta.
 - Pesos de búsqueda híbrida y reranking.
 - Presupuestos de contexto por profundidad.

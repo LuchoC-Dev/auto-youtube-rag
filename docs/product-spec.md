@@ -99,9 +99,10 @@ archivos dentro de esos paquetes.
 - Lenguaje: TypeScript estricto.
 - Runtime: Node.js 24 o superior, módulos ESM.
 - Empaquetado: npm con `package-lock.json`.
-- Persistencia: SQLite.
+- Arquitectura: dominio central con puertos y adaptadores.
+- Persistencia inicial: SQLite detrás de un puerto reemplazable.
 - Búsqueda textual: SQLite FTS5.
-- Búsqueda semántica: embeddings multilingües locales y pequeños.
+- Búsqueda semántica: E5 Small multilingüe local, implementado como adaptador.
 - Vectores: almacenamiento versionado detrás de una interfaz reemplazable.
 - Integración: CLI y una única skill portable.
 
@@ -133,29 +134,45 @@ apruebe el lenguaje y la herramienta de empaquetado. La CLI usa `0` para éxito,
 para una interrupción mediante `Ctrl+C`; las causas concretas se expresan con
 códigos simbólicos en JSON.
 
-## Estructura conceptual
+## Arquitectura y estructura conceptual
+
+El dominio define el vocabulario, las invariantes y los contratos que necesitan
+los casos de uso. No conoce Transformers.js, E5 Small, SQLite, FTS5, formatos de
+archivos ni frameworks de CLI. Esos detalles se implementan como adaptadores y
+se conectan exclusivamente desde el composition root.
 
 ```text
-skill/          skill portable que enseña a usar la CLI
-src/            núcleo de dominio, indexación, recuperación y ensamblado
-tests/          pruebas unitarias e integración
-evals/          evaluaciones de calidad de recuperación
-docs/           especificaciones, decisiones y progreso
+skill/                    skill portable que enseña a usar la CLI
+src/domain/               entidades, value objects y reglas puras
+src/application/          casos de uso y puertos requeridos
+src/infrastructure/       adaptadores de modelos, búsqueda y persistencia
+src/interfaces/cli/       comandos, validación y presentación
+src/main/                 composition root y configuración
+tests/                    pruebas unitarias, contratos e integración
+evals/                    evaluaciones de calidad de recuperación
+docs/                     especificaciones, decisiones y progreso
 ```
 
 Esta estructura es conceptual y no autoriza todavía la creación de `src/`.
 
+Los puertos deben permitir sustituir como mínimo el generador de embeddings, el
+repositorio persistente, la búsqueda textual y la búsqueda vectorial. Un cambio
+de adaptador puede exigir migrar o reconstruir índices, pero no puede alterar el
+dominio, los casos de uso ni el contrato público de la CLI.
+
 ## Estilo de código
 
-Pendiente de la elección del lenguaje. Se exigirán nombres explícitos, tipos en
-los límites públicos, funciones pequeñas, dependencias invertidas para
-persistencia y ausencia de lógica específica de proveedores dentro del núcleo.
+TypeScript estricto, nombres explícitos, tipos en todos los límites públicos y
+funciones pequeñas. Las dependencias siempre apuntan hacia el dominio: los
+adaptadores implementan puertos internos y el núcleo nunca importa paquetes de
+infraestructura ni tipos específicos de proveedores.
 
 ## Estrategia de pruebas
 
 ### Durante el desarrollo
 
 - Pruebas unitarias del dominio y ranking.
+- Pruebas de contrato reutilizables para cada adaptador.
 - Pruebas de integración con una base SQLite temporal.
 - Pruebas de CLI.
 - Indexación repetida sin duplicados.
@@ -187,6 +204,7 @@ persistencia y ausencia de lógica específica de proveedores dentro del núcleo
 - Validar entradas y hashes.
 - Ejecutar pruebas antes de cada commit.
 - Mantener la CLI neutral respecto del agente.
+- Mantener el dominio libre de dependencias de infraestructura.
 
 ### Preguntar antes
 
@@ -200,13 +218,11 @@ persistencia y ausencia de lógica específica de proveedores dentro del núcleo
 - Indexar secretos o archivos `.env`.
 - Sobrescribir paquetes fuente.
 - Presentar un resultado sin procedencia.
-- Acoplar el dominio a Codex, Claude o una base vectorial específica.
+- Acoplar el dominio a Codex, Claude, E5, SQLite o una base vectorial específica.
 - Eliminar pruebas fallidas para permitir una entrega.
 
 ## Asuntos abiertos
 
-1. Modelo local de embeddings; E5 Small es el candidato provisional tras el
-   benchmark inicial y debe confirmarse con evaluaciones del corpus completo.
-2. Búsqueda vectorial exacta en aplicación o adaptador `sqlite-vec` fijado.
-3. Framework de CLI y comandos definitivos de build, test y lint.
-4. Política de combinación y reranking de resultados.
+1. Búsqueda vectorial exacta en aplicación o adaptador `sqlite-vec` fijado.
+2. Framework de CLI y comandos definitivos de build, test y lint.
+3. Política de combinación y reranking de resultados.
