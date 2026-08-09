@@ -11,7 +11,7 @@
 | Fase | N° | Etapa | Estado | % | Descripción |
 | --- | --- | --- | :---: | :---: | --- |
 | **1 — Definición** | 1.1 | Repositorio y contexto inicial | ✅ | 100% | Git y decisiones documentadas |
-|  | 1.2 | Contrato de CLI y salidas | 🔵 | 50% | Contrato aprobado; códigos pendientes |
+|  | 1.2 | Contrato de CLI y salidas | ✅ | 100% | Comandos, formatos y códigos definidos |
 |  | 1.3 | Stack y estrategia vectorial | ⚪ | 0% | Lenguaje, modelo y adaptador |
 | **2 — Implementación MVP** | 2.1 | Indexación incremental | ⚪ | 0% | Fuentes, hashes y jerarquía |
 |  | 2.2 | Recuperación híbrida | ⚪ | 0% | FTS5, vectores y ranking |
@@ -37,7 +37,7 @@
 #### 1.2 Contrato de CLI y salidas
 
 - [x] Definir comandos y argumentos
-- [ ] Definir códigos de salida
+- [x] Definir códigos de salida
 - [x] Definir formato Markdown
 - [x] Definir esquema JSON versionado
 

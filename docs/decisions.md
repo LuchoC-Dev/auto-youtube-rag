@@ -15,6 +15,7 @@
 | Profundidades | 12k / 32k / 64k | Presets ajustables por evaluación |
 | Citaciones | `[S01]` resuelto en JSON | Lectura compacta con procedencia completa |
 | Idioma | Contenido original; claves inglesas | Neutralidad entre proveedores |
+| Códigos de proceso | `0`, `1`, `2` y `130` | Convención portable; detalle mediante códigos JSON |
 | Skills | Una fuente canónica | Evitar variantes para Codex y Claude |
 | Agentes iniciales | Codex y Claude | Compatibilidad mínima requerida |
 | Persistencia | SQLite | Simplicidad local y escala suficiente |
@@ -43,7 +44,6 @@
 ## Pendientes de decisión
 
 - Lenguaje de implementación.
-- Códigos numéricos de salida de la CLI.
 - Modelo local de embeddings.
 - Estrategia vectorial inicial concreta.
 - Pesos de búsqueda híbrida y reranking.

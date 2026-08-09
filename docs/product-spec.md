@@ -126,8 +126,10 @@ Los presets iniciales son `focused` = 12k, `balanced` = 32k y `deep` = 64k
 tokens estimados, reemplazables mediante `--max-tokens`.
 
 Los comandos de desarrollo, pruebas, lint y build se definirán cuando se
-apruebe el lenguaje y la herramienta de empaquetado. Los códigos numéricos de
-salida de la CLI permanecen pendientes.
+apruebe el lenguaje y la herramienta de empaquetado. La CLI usa `0` para éxito,
+`1` para fallo operativo o resultado parcial, `2` para uso inválido y `130`
+para una interrupción mediante `Ctrl+C`; las causas concretas se expresan con
+códigos simbólicos en JSON.
 
 ## Estructura conceptual
 
@@ -202,7 +204,6 @@ persistencia y ausencia de lógica específica de proveedores dentro del núcleo
 ## Asuntos abiertos
 
 1. Lenguaje y herramienta de empaquetado.
-2. Códigos numéricos de salida de la CLI.
-3. Modelo local de embeddings, elegido mediante benchmark.
-4. Búsqueda vectorial exacta en aplicación o adaptador `sqlite-vec` fijado.
-5. Política de combinación y reranking de resultados.
+2. Modelo local de embeddings, elegido mediante benchmark.
+3. Búsqueda vectorial exacta en aplicación o adaptador `sqlite-vec` fijado.
+4. Política de combinación y reranking de resultados.
