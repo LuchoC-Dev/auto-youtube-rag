@@ -2,8 +2,7 @@
 
 ## Estado
 
-Contrato aprobado para el MVP. Los códigos numéricos de salida permanecen
-pendientes y deberán añadirse antes de completar la etapa 1.2.
+Contrato aprobado y completo para el MVP.
 
 ## Principios
 
@@ -258,4 +257,29 @@ búsqueda. Las rutas visuales se conservan como evidencia verificable.
 - Sin color cuando la salida no es interactiva.
 - Los comandos administrativos podrán aceptar `--json`.
 - La skill utilizará siempre opciones no interactivas.
-- Los códigos numéricos de salida se definirán antes de cerrar la etapa 1.2.
+
+### Códigos de salida
+
+La CLI utiliza un contrato pequeño y convencional, portable entre shells,
+agentes y herramientas de automatización.
+
+| Código | Significado |
+| ---: | --- |
+| `0` | Ejecución válida y completa |
+| `1` | Fallo operativo o resultado parcial |
+| `2` | Uso inválido de la CLI o argumentos incorrectos |
+| `130` | Interrupción solicitada por el usuario mediante `Ctrl+C` |
+
+El código `0` incluye estados terminales válidos que no producen trabajo o
+evidencia: `no_results`, `no_changes` y `already_initialized`. Un resultado
+parcial utiliza el código `1`, declara `status: "partial"` y puede conservar el
+bundle o los registros utilizables que haya producido antes del fallo.
+
+Los códigos numéricos no describen cada causa concreta. Las salidas JSON
+incluyen un código simbólico estable, por ejemplo `SOURCE_NOT_FOUND`,
+`PACKAGE_INVALID`, `DATABASE_BUSY`, `SCHEMA_INCOMPATIBLE`,
+`EMBEDDING_MODEL_MISSING` u `OUTPUT_WRITE_FAILED`, además de `retryable` cuando
+corresponda.
+
+La aplicación no emite internamente `126`, `127` ni códigos de la familia
+`128 + señal`, porque están reservados para el shell o el entorno de ejecución.
