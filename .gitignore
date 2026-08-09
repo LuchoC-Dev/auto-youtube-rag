@@ -1,0 +1,22 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Local databases and generated indexes
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# Runtime caches
+__pycache__/
+*.py[cod]
+.cache/
+.pytest_cache/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
