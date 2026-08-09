@@ -8,6 +8,13 @@
 | Ejecución | Exclusivamente local | Privacidad y ausencia de servicios externos |
 | Cerebro generativo | Agente consultante | Evitar duplicar razonamiento dentro del RAG |
 | Integración | Skill general + CLI | Portabilidad entre proveedores |
+| Ejecutable | `auto-youtube-rag` | Nombre explícito y neutral |
+| Indexación | Un único comando `sync` | Evitar duplicar `index` y `sync` |
+| Recuperación CLI | Comando `retrieve` | Ensambla contexto, no sólo coincidencias |
+| Salida | Bundle Markdown + JSON | Evitar truncamiento y permitir integración |
+| Profundidades | 12k / 32k / 64k | Presets ajustables por evaluación |
+| Citaciones | `[S01]` resuelto en JSON | Lectura compacta con procedencia completa |
+| Idioma | Contenido original; claves inglesas | Neutralidad entre proveedores |
 | Skills | Una fuente canónica | Evitar variantes para Codex y Claude |
 | Agentes iniciales | Codex y Claude | Compatibilidad mínima requerida |
 | Persistencia | SQLite | Simplicidad local y escala suficiente |
@@ -36,7 +43,7 @@
 ## Pendientes de decisión
 
 - Lenguaje de implementación.
-- Contrato definitivo de comandos y salidas.
+- Códigos numéricos de salida de la CLI.
 - Modelo local de embeddings.
 - Estrategia vectorial inicial concreta.
 - Pesos de búsqueda híbrida y reranking.

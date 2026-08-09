@@ -99,7 +99,20 @@ consulta
 ```
 
 Los modos previstos son `focused`, `balanced` y `deep`. Sus presupuestos y
-umbrales quedan pendientes de evaluación.
+umbrales iniciales son 12k, 32k y 64k tokens estimados. Las evaluaciones podrán
+ajustar esas cifras sin cambiar los nombres públicos.
+
+## Bundle de recuperación
+
+`retrieve` escribe `context.md` y `result.json` en un directorio temporal o en
+la ruta indicada por `--out`. La terminal recibe sólo un JSON compacto con las
+rutas, métricas y advertencias. Esto evita truncar contexto extenso en shells o
+herramientas de agentes.
+
+El Markdown contiene unidades citadas mediante `[S01]` y equivalentes. El JSON
+resuelve cada cita a fuente, video, archivo, sección, timestamp opcional y
+evidencia visual. El RAG organiza evidencia, pero no responde ni infiere por el
+agente.
 
 ## Evolución prevista
 

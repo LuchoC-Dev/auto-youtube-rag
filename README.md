@@ -29,5 +29,6 @@ para que el agente consultante razone y redacte la respuesta.
 
 - [`docs/product-spec.md`](docs/product-spec.md): objetivo, alcance y criterios.
 - [`docs/architecture.md`](docs/architecture.md): arquitectura acordada.
+- [`docs/cli-contract.md`](docs/cli-contract.md): comandos y formatos aprobados.
 - [`docs/decisions.md`](docs/decisions.md): decisiones y asuntos pendientes.
 - [`docs/build.md`](docs/build.md): progreso de construcción.
