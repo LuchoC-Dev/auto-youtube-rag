@@ -3,6 +3,15 @@
 .env.*
 !.env.example
 
+# Local model weights and runtime caches
+.cache/
+node_modules/
+
+# Generated benchmark runs; keep only reviewed baselines
+benchmarks/embeddings/results/*
+!benchmarks/embeddings/results/baseline.json
+!benchmarks/embeddings/results/baseline.md
+
 # Local databases and generated indexes
 *.db
 *.db-*

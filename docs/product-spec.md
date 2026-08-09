@@ -96,14 +96,16 @@ archivos dentro de esos paquetes.
 
 ## Stack confirmado
 
+- Lenguaje: TypeScript estricto.
+- Runtime: Node.js 24 o superior, módulos ESM.
+- Empaquetado: npm con `package-lock.json`.
 - Persistencia: SQLite.
 - Búsqueda textual: SQLite FTS5.
 - Búsqueda semántica: embeddings multilingües locales y pequeños.
 - Vectores: almacenamiento versionado detrás de una interfaz reemplazable.
 - Integración: CLI y una única skill portable.
 
-El lenguaje de implementación, el framework de CLI y el adaptador vectorial
-concreto permanecen pendientes.
+El framework de CLI y el adaptador vectorial concreto permanecen pendientes.
 
 ## Contrato de CLI aprobado
 
@@ -203,7 +205,8 @@ persistencia y ausencia de lógica específica de proveedores dentro del núcleo
 
 ## Asuntos abiertos
 
-1. Lenguaje y herramienta de empaquetado.
-2. Modelo local de embeddings, elegido mediante benchmark.
-3. Búsqueda vectorial exacta en aplicación o adaptador `sqlite-vec` fijado.
+1. Modelo local de embeddings; E5 Small es el candidato provisional tras el
+   benchmark inicial y debe confirmarse con evaluaciones del corpus completo.
+2. Búsqueda vectorial exacta en aplicación o adaptador `sqlite-vec` fijado.
+3. Framework de CLI y comandos definitivos de build, test y lint.
 4. Política de combinación y reranking de resultados.

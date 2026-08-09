@@ -18,6 +18,9 @@
 | Códigos de proceso | `0`, `1`, `2` y `130` | Convención portable; detalle mediante códigos JSON |
 | Skills | Una fuente canónica | Evitar variantes para Codex y Claude |
 | Agentes iniciales | Codex y Claude | Compatibilidad mínima requerida |
+| Lenguaje | TypeScript estricto | Ruta integrada y soportada para ONNX en Windows |
+| Runtime | Node.js 24+ con ESM | Disponible localmente y compatible con Transformers.js |
+| Empaquetado | npm + `package-lock.json` | Instalación reproducible sin otro runtime |
 | Persistencia | SQLite | Simplicidad local y escala suficiente |
 | Texto | SQLite FTS5 | Búsqueda exacta y por relevancia |
 | Embeddings | Locales, pequeños y multilingües | Sin APIs externas ni hardware potente |
@@ -41,9 +44,16 @@
 - Crecimiento medio: aproximadamente 4 videos diarios.
 - Picos: hasta 10 videos diarios.
 
+## Resultado preliminar de embeddings
+
+El benchmark inicial sobre 18 pasajes y 16 consultas dejó a
+`multilingual-e5-small` como candidato provisional: obtuvo `Hit@1 = 1.0` y
+`MRR = 1.0`, igual que E5 Base, con 129 MB de caché y una latencia media de
+11.5 ms frente a 29 ms de E5 Base. La selección definitiva sigue pendiente de
+evaluaciones sobre el corpus completo.
+
 ## Pendientes de decisión
 
-- Lenguaje de implementación.
 - Modelo local de embeddings.
 - Estrategia vectorial inicial concreta.
 - Pesos de búsqueda híbrida y reranking.

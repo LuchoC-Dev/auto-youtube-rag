@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "description": "Curated retrieval fixture derived from validated design-video context packages.",
+  "passages": [
+    {
+      "id": "neo-frutiger-aero",
+      "source": "15-more-design-styles-you-ve-never-heard-of",
+      "text": "Neo-Frutiger Aero recupera la estética tecnológica, brillante y optimista de comienzos de los años 2000. Combina gradientes luminosos, cielos azules, agua o cromo, iluminación suave, transparencias, tipografía sans serif y elementos flotantes como burbujas o nubes."
+    },
+    {
+      "id": "dark-academia",
+      "source": "15-more-design-styles-you-ve-never-heard-of",
+      "text": "Dark academia es una estética intelectual y melancólica inspirada en literatura clásica, universidades europeas y objetos vintage. Usa marrones, verde oscuro, borgoña, tipografías serif y texturas de pergamino, tweed, cuero o mármol, junto con libros, velas y estatuas."
+    },
+    {
+      "id": "wabi-sabi",
+      "source": "15-more-design-styles-you-ve-never-heard-of",
+      "text": "Wabi-sabi encuentra belleza en la imperfección, el envejecimiento y la naturaleza. Emplea paletas orgánicas de arcilla y verde musgo, texturas de piedra, lino o madera, composiciones minimalistas, formas irregulares y espaciado deliberadamente imperfecto."
+    },
+    {
+      "id": "rebus",
+      "source": "15-more-design-styles-you-ve-never-heard-of",
+      "text": "El diseño rebus funciona como un acertijo visual: reemplaza partes de una palabra o frase con una imagen o icono. Mezcla letras e iconos, juegos conceptuales y layouts legibles que invitan a decodificar el mensaje."
+    },
+    {
+      "id": "glassmorphism",
+      "source": "15-more-design-styles-you-ve-never-heard-of",
+      "text": "Glassmorphism hace que una interfaz parezca construida con vidrio esmerilado. Sus rasgos son capas borrosas y semitransparentes, sombras suaves, bordes luminosos, gradientes visibles detrás del cristal y tipografía sans serif limpia."
+    },
+    {
+      "id": "modular-typography",
+      "source": "15-more-design-styles-you-ve-never-heard-of",
+      "text": "La tipografía modular construye letras a partir de formas básicas repetibles como círculos, cuadrados, puntos o líneas. Una retícula consistente sostiene alfabetos geométricos, layouts futuristas y estructuras visuales de pocos colores."
+    },
+    {
+      "id": "receiptcore",
+      "source": "15-more-design-styles-you-ve-never-heard-of",
+      "text": "Receiptcore imita recibos y tickets: tipografía monoespaciada tipo Courier, texto negro sobre papel blanco o crema, códigos de barras, casillas, timestamps y layouts verticales largos y estrechos."
+    },
+    {
+      "id": "narrative-neo-brutalism",
+      "source": "15-more-design-styles-you-ve-never-heard-of",
+      "text": "Narrative neo-brutalism es ruidoso, crudo y centrado en texto. Usa colores pastel intensos, sans serif pesada, líneas de retícula, bordes y cajas afiladas; prioriza contar un mensaje por encima de una apariencia pulida."
+    },
+    {
+      "id": "serif-tone",
+      "source": "the-ultimate-guide-to-typography-for-beginners",
+      "text": "Las fuentes serif comunican tradición, estabilidad, autoridad y valor perdurable. Son apropiadas cuando una identidad necesita una voz clásica o editorial, siempre que su legibilidad y contexto acompañen ese tono."
+    },
+    {
+      "id": "display-type",
+      "source": "the-ultimate-guide-to-typography-for-beginners",
+      "text": "Las tipografías display están diseñadas para destacar en títulos o piezas breves, no para párrafos extensos. Su personalidad y detalle producen impacto a gran tamaño, pero reducen comodidad y legibilidad en texto continuo."
+    },
+    {
+      "id": "tracking-kerning",
+      "source": "the-ultimate-guide-to-typography-for-beginners",
+      "text": "Tracking modifica de forma uniforme el espaciado de un grupo completo de letras. Kerning corrige la distancia entre pares concretos de caracteres para compensar formas visuales problemáticas y lograr un ritmo tipográfico equilibrado."
+    },
+    {
+      "id": "color-functional",
+      "source": "the-real-2026-color-theory-knowledge-designers-need-to-know",
+      "text": "La capa funcional del color ayuda a usar una interfaz: distingue acciones, estados, categorías, advertencias y jerarquías. Antes de buscar emoción o diferenciación, una paleta debe permitir que el usuario comprenda qué puede hacer y qué está ocurriendo."
+    },
+    {
+      "id": "color-cultural",
+      "source": "the-real-2026-color-theory-knowledge-designers-need-to-know",
+      "text": "El significado cultural del color no es universal. Una misma tonalidad puede comunicar ideas diferentes según país, comunidad, época o categoría de producto; por eso el diseñador debe investigar a la audiencia en vez de aplicar asociaciones rígidas."
+    },
+    {
+      "id": "color-roles",
+      "source": "the-real-2026-color-theory-knowledge-designers-need-to-know",
+      "text": "Una paleta operativa asigna cuatro roles: color primario para la identidad, secundario para apoyo y variación, acento para atraer atención de forma escasa y neutral para fondos, texto y estructura."
+    },
+    {
+      "id": "hierarchy-contrast",
+      "source": "the-beginner-s-guide-to-visual-hierarchy",
+      "text": "La jerarquía visual define el orden en que se perciben los elementos. El contraste crea primacía mediante diferencias de movimiento, información relevante, espacio en blanco, color, tamaño, peso o posición; si todo destaca, nada guía la mirada."
+    },
+    {
+      "id": "hierarchy-uniformity",
+      "source": "the-beginner-s-guide-to-visual-hierarchy",
+      "text": "La uniformidad aporta una estructura predecible que permite que el contraste funcione. Tarjetas equivalentes deben compartir tamaño de imagen, fuente, peso, altura, borde y radio; cambiar un valor exige cambiarlo en todo el grupo."
+    },
+    {
+      "id": "scan-patterns",
+      "source": "the-beginner-s-guide-to-visual-hierarchy",
+      "text": "El patrón Z funciona bien en composiciones minimalistas: recorre de izquierda a derecha y luego desciende en diagonal. El patrón F es más común en páginas con mucho texto, donde la lectura baja verticalmente y realiza barridos horizontales."
+    },
+    {
+      "id": "minimalism-distraction",
+      "source": "the-art-of-minimalism",
+      "text": "El minimalismo busca reducir posesiones y distracciones para recuperar atención, creatividad y tiempo de calidad. No equivale simplemente a organizar objetos y tampoco debe transformarse en un hábito controlador."
+    }
+  ],
+  "queries": [
+    { "id": "q01", "text": "¿Qué estilo usa vidrio esmerilado, transparencias y bordes luminosos?", "relevant": ["glassmorphism"] },
+    { "id": "q02", "text": "Which aesthetic combines parchment, worn leather, serif type and European university imagery?", "relevant": ["dark-academia"] },
+    { "id": "q03", "text": "¿Cómo se llama la técnica que construye letras con círculos, cuadrados y módulos repetidos?", "relevant": ["modular-typography"] },
+    { "id": "q04", "text": "What design style replaces letters or words with icons to create a visual puzzle?", "relevant": ["rebus"] },
+    { "id": "q05", "text": "Busco una estética de recibos con Courier, códigos de barras y timestamps.", "relevant": ["receiptcore"] },
+    { "id": "q06", "text": "How should interface colors distinguish actions, warnings and system states?", "relevant": ["color-functional"] },
+    { "id": "q07", "text": "¿Por qué no se puede asumir que un color significa lo mismo en todas las culturas?", "relevant": ["color-cultural"] },
+    { "id": "q08", "text": "What is the difference between tracking and kerning?", "relevant": ["tracking-kerning"] },
+    { "id": "q09", "text": "¿Por qué una fuente display no debería usarse para párrafos largos?", "relevant": ["display-type"] },
+    { "id": "q10", "text": "How does contrast establish the order in which viewers notice design elements?", "relevant": ["hierarchy-contrast"] },
+    { "id": "q11", "text": "¿Qué valores deben mantenerse iguales entre tarjetas equivalentes para crear cohesión?", "relevant": ["hierarchy-uniformity"] },
+    { "id": "q12", "text": "When should a designer use a Z scanning pattern instead of an F pattern?", "relevant": ["scan-patterns"] },
+    { "id": "q13", "text": "¿Qué estética japonesa valora las grietas, el envejecimiento y las formas imperfectas?", "relevant": ["wabi-sabi"] },
+    { "id": "q14", "text": "Which early-2000s optimistic tech aesthetic uses glossy gradients, blue skies and floating bubbles?", "relevant": ["neo-frutiger-aero"] },
+    { "id": "q15", "text": "¿Cómo se reparten los colores primario, secundario, de acento y neutrales?", "relevant": ["color-roles"] },
+    { "id": "q16", "text": "What raw text-heavy style uses pastel blocks, hard borders and a visible grid?", "relevant": ["narrative-neo-brutalism"] }
+  ]
+}
