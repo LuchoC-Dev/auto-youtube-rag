@@ -105,25 +105,29 @@ archivos dentro de esos paquetes.
 El lenguaje de implementación, el framework de CLI y el adaptador vectorial
 concreto permanecen pendientes.
 
-## Comandos previstos
+## Contrato de CLI aprobado
 
-La sintaxis definitiva se aprobará en la siguiente fase. La superficie funcional
-esperada es:
+La especificación completa se encuentra en [cli-contract.md](cli-contract.md).
+La superficie pública del MVP es:
 
 ```text
 auto-youtube-rag source add <ruta>
 auto-youtube-rag source list
-auto-youtube-rag index
 auto-youtube-rag sync
-auto-youtube-rag search <consulta> --depth <focused|balanced|deep>
+auto-youtube-rag retrieve <consulta> --depth <focused|balanced|deep>
 auto-youtube-rag status
-auto-youtube-rag validate
-auto-youtube-rag remove <fuente-o-paquete>
-auto-youtube-rag rebuild
+auto-youtube-rag doctor
+auto-youtube-rag rebuild --confirm
 ```
 
-Los comandos de desarrollo, pruebas, lint y build se definirán cuando se apruebe
-el lenguaje y la herramienta de empaquetado.
+`sync` cubre indexación inicial e incremental. `retrieve` genera un bundle con
+`context.md` y `result.json`, y emite en `stdout` únicamente un recibo compacto.
+Los presets iniciales son `focused` = 12k, `balanced` = 32k y `deep` = 64k
+tokens estimados, reemplazables mediante `--max-tokens`.
+
+Los comandos de desarrollo, pruebas, lint y build se definirán cuando se
+apruebe el lenguaje y la herramienta de empaquetado. Los códigos numéricos de
+salida de la CLI permanecen pendientes.
 
 ## Estructura conceptual
 
@@ -198,9 +202,7 @@ persistencia y ausencia de lógica específica de proveedores dentro del núcleo
 ## Asuntos abiertos
 
 1. Lenguaje y herramienta de empaquetado.
-2. Contrato definitivo de la CLI.
-3. Formato exacto del paquete Markdown y JSON.
-4. Presupuestos para `focused`, `balanced` y `deep`.
-5. Modelo local de embeddings, elegido mediante benchmark.
-6. Búsqueda vectorial exacta en aplicación o adaptador `sqlite-vec` fijado.
-7. Política de combinación y reranking de resultados.
+2. Códigos numéricos de salida de la CLI.
+3. Modelo local de embeddings, elegido mediante benchmark.
+4. Búsqueda vectorial exacta en aplicación o adaptador `sqlite-vec` fijado.
+5. Política de combinación y reranking de resultados.
