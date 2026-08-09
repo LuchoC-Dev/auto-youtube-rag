@@ -1,5 +1,37 @@
 # Arquitectura acordada
 
+## Principio rector
+
+El sistema usa una arquitectura centrada en el dominio con puertos y
+adaptadores. Las reglas de indexación, recuperación y ensamblado permanecen
+independientes de modelos, bases de datos, librerías y agentes concretos.
+
+```text
+interfaces/cli ──→ application ──→ domain
+                         ↑
+infrastructure/adapters ─┘
+```
+
+`domain` no importa ninguna capa externa. `application` orquesta el dominio y
+declara los puertos que necesita. `infrastructure` implementa esos puertos. La
+CLI recibe entradas y presenta salidas, mientras `main` selecciona y conecta
+los adaptadores concretos.
+
+## Límites de módulos
+
+| Módulo | Contiene | No puede conocer |
+| --- | --- | --- |
+| Dominio | entidades, value objects, reglas y políticas | SQLite, E5, ONNX, CLI |
+| Aplicación | casos de uso, DTO internos y puertos | implementaciones concretas |
+| Infraestructura | SQLite, FTS5, E5 Small y búsqueda vectorial | decisiones de presentación |
+| Interfaces | comandos, validación y formatos públicos | detalles internos de adaptadores |
+| Main | configuración y composition root | reglas de negocio nuevas |
+
+Los puertos mínimos previstos son `EmbeddingGenerator`, `KnowledgeRepository`,
+`TextSearchIndex` y `VectorSearchIndex`. Sus nombres y firmas definitivos se
+especificarán antes de implementar, pero su responsabilidad y dirección de
+dependencias son requisitos aprobados.
+
 ## Flujo general
 
 ```text
@@ -72,7 +104,8 @@ No se crean documentos intermedios en las carpetas de origen.
 ## Persistencia y portabilidad
 
 SQLite es la persistencia confirmada para el MVP. FTS5 constituye la capa
-textual estable. Los embeddings se almacenan junto con:
+textual inicial. Ambos se implementan fuera del dominio. Los embeddings se
+almacenan junto con:
 
 - identificador de modelo;
 - versión;
@@ -84,6 +117,19 @@ La búsqueda vectorial se oculta detrás de una interfaz reemplazable. Una prime
 implementación puede efectuar búsqueda exacta desde la aplicación o usar un
 adaptador fijado de `sqlite-vec`. Una migración futura a una base especializada
 no debe cambiar la CLI, la skill ni el modelo de dominio.
+
+E5 Small es el generador de embeddings aprobado para el MVP y vive en un
+adaptador de infraestructura. El identificador de modelo, versión y dimensión
+forman parte de la metadata del índice para detectar cuándo una sustitución
+requiere reindexación. Cambiar el modelo no modifica los casos de uso.
+
+## Verificación de desacoplamiento
+
+- El dominio se prueba sin cargar SQLite, ONNX ni Transformers.js.
+- Los casos de uso se prueban con implementaciones en memoria de los puertos.
+- Cada adaptador ejecuta una suite de contrato compartida.
+- Las pruebas de integración verifican el wiring real desde el composition root.
+- Ningún tipo de una dependencia externa cruza un puerto público.
 
 ## Recuperación y ensamblado
 
