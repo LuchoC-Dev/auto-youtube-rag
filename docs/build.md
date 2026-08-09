@@ -12,7 +12,7 @@
 | --- | --- | --- | :---: | :---: | --- |
 | **1 — Definición** | 1.1 | Repositorio y contexto inicial | ✅ | 100% | Git y decisiones documentadas |
 |  | 1.2 | Contrato de CLI y salidas | ✅ | 100% | Comandos, formatos y códigos definidos |
-|  | 1.3 | Stack y estrategia vectorial | ⚪ | 0% | Lenguaje, modelo y adaptador |
+|  | 1.3 | Stack y estrategia vectorial | 🔵 | 50% | TypeScript aprobado; benchmark ejecutado |
 | **2 — Implementación MVP** | 2.1 | Indexación incremental | ⚪ | 0% | Fuentes, hashes y jerarquía |
 |  | 2.2 | Recuperación híbrida | ⚪ | 0% | FTS5, vectores y ranking |
 |  | 2.3 | Ensamblado de contexto | ⚪ | 0% | Profundidad, citas y presupuesto |
@@ -43,8 +43,8 @@
 
 #### 1.3 Stack y estrategia vectorial
 
-- [ ] Elegir lenguaje y empaquetado
-- [ ] Evaluar modelos locales pequeños
+- [x] Elegir lenguaje y empaquetado
+- [x] Evaluar modelos locales pequeños
 - [ ] Elegir implementación vectorial inicial
 - [ ] Definir comandos de build, test y lint
 
