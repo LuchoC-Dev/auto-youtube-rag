@@ -19,10 +19,11 @@
 | Skills | Una fuente canónica | Evitar variantes para Codex y Claude |
 | Agentes iniciales | Codex y Claude | Compatibilidad mínima requerida |
 | Lenguaje | TypeScript estricto | Ruta integrada y soportada para ONNX en Windows |
-| Runtime | Node.js 24+ con ESM | Disponible localmente y compatible con Transformers.js |
+| Runtime | Node.js 24.19.0 LTS con ESM | Fijar una base reproducible validada localmente |
 | Empaquetado | npm + `package-lock.json` | Instalación reproducible sin otro runtime |
 | Arquitectura | Dominio + puertos y adaptadores | Sustituir infraestructura sin alterar casos de uso |
 | Persistencia | SQLite | Simplicidad local y escala suficiente |
+| Cliente SQLite | `node:sqlite` | Sin binding nativo y suficiente en el benchmark local |
 | Texto | SQLite FTS5 | Búsqueda exacta y por relevancia |
 | Embeddings | E5 Small multilingüe `q8` | Mejor equilibrio del benchmark local |
 | Acoplamiento | Modelo y DB sólo en infraestructura | Mantener dominio y aplicación reemplazables |
@@ -61,6 +62,17 @@ El MVP persistirá vectores `float32[384]` como BLOB en SQLite y construirá un
 cinco veces más rápido que `sqlite-vec`; su costo adicional de RAM fue pequeño
 para la escala inicial. El puerto `VectorSearchIndex` permite sustituirlo sin
 modificar el dominio ni los casos de uso.
+
+## Cliente SQLite aprobado
+
+El MVP utilizará `node:sqlite` sobre Node.js 24.19.0 LTS. El benchmark contra
+`better-sqlite3` validó transacciones, FTS5, BLOB, iteradores, reapertura,
+backup e integridad con resultados equivalentes. `node:sqlite` evita el binding
+nativo y funcionó con la configuración local que deshabilita scripts de npm.
+
+`better-sqlite3` queda únicamente como dependencia de desarrollo para reproducir
+el benchmark. El acceso a datos seguirá detrás de `KnowledgeRepository` y
+`TextSearchIndex`, por lo que cambiar de cliente no afectará al dominio.
 
 ## Pendientes de decisión
 

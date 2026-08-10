@@ -104,7 +104,8 @@ No se crean documentos intermedios en las carpetas de origen.
 ## Persistencia y portabilidad
 
 SQLite es la persistencia confirmada para el MVP. FTS5 constituye la capa
-textual inicial. Ambos se implementan fuera del dominio. Los embeddings se
+textual inicial. El adaptador inicial utilizará `node:sqlite` en Node.js 24.19.0
+LTS; el cliente no cruzará los puertos de aplicación. Los embeddings se
 almacenan junto con:
 
 - identificador de modelo;
@@ -122,6 +123,10 @@ al iniciar y se actualiza después de confirmar cambios persistidos.
 `sqlite-vec` no forma parte del runtime del MVP. Permanece como benchmark y como
 posible adaptador futuro si la memoria o el tiempo de carga se convierten en un
 problema. Una migración futura no debe cambiar la CLI, la skill ni el dominio.
+
+`better-sqlite3` tampoco forma parte del runtime del MVP. Se conserva como
+dependencia de desarrollo para el benchmark comparativo. Sustituir `node:sqlite`
+en el futuro sólo requerirá otro adaptador de infraestructura.
 
 E5 Small es el generador de embeddings aprobado para el MVP y vive en un
 adaptador de infraestructura. El identificador de modelo, versión y dimensión

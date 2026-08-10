@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=24.19.0 <25"
+  },
   "scripts": {
     "models:download": "tsx benchmarks/embeddings/run.ts --download-only",
     "benchmark:embeddings": "tsx benchmarks/embeddings/run.ts --local-only",
