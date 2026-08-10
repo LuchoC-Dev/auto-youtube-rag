@@ -39,7 +39,7 @@ Paquetes validados en varias raíces
               ↓
        indexador incremental
               ↓
-  SQLite + FTS5 + índice vectorial
+  SQLite + FTS5 + índice exacto en memoria
               ↓
  recuperación híbrida de alta cobertura
               ↓
@@ -113,10 +113,15 @@ almacenan junto con:
 - hash del contenido;
 - fecha de indexación.
 
-La búsqueda vectorial se oculta detrás de una interfaz reemplazable. Una primera
-implementación puede efectuar búsqueda exacta desde la aplicación o usar un
-adaptador fijado de `sqlite-vec`. Una migración futura a una base especializada
-no debe cambiar la CLI, la skill ni el modelo de dominio.
+La implementación aprobada de `VectorSearchIndex` carga los BLOB persistidos en
+un bloque contiguo `Float32Array` y ejecuta búsqueda exacta desde la aplicación.
+Los vectores de E5 Small están normalizados, por lo que ordenar por distancia L2
+produce el mismo ranking que similitud coseno. El índice en memoria se reconstruye
+al iniciar y se actualiza después de confirmar cambios persistidos.
+
+`sqlite-vec` no forma parte del runtime del MVP. Permanece como benchmark y como
+posible adaptador futuro si la memoria o el tiempo de carga se convierten en un
+problema. Una migración futura no debe cambiar la CLI, la skill ni el dominio.
 
 E5 Small es el generador de embeddings aprobado para el MVP y vive en un
 adaptador de infraestructura. El identificador de modelo, versión y dimensión

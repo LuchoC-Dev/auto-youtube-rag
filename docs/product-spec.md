@@ -103,10 +103,11 @@ archivos dentro de esos paquetes.
 - Persistencia inicial: SQLite detrás de un puerto reemplazable.
 - Búsqueda textual: SQLite FTS5.
 - Búsqueda semántica: E5 Small multilingüe local, implementado como adaptador.
-- Vectores: almacenamiento versionado detrás de una interfaz reemplazable.
+- Vectores: BLOB versionado en SQLite e índice exacto `Float32Array` en memoria.
 - Integración: CLI y una única skill portable.
 
-El framework de CLI y el adaptador vectorial concreto permanecen pendientes.
+El framework de CLI y los comandos definitivos de desarrollo permanecen
+pendientes.
 
 ## Contrato de CLI aprobado
 
@@ -128,8 +129,8 @@ auto-youtube-rag rebuild --confirm
 Los presets iniciales son `focused` = 12k, `balanced` = 32k y `deep` = 64k
 tokens estimados, reemplazables mediante `--max-tokens`.
 
-Los comandos de desarrollo, pruebas, lint y build se definirán cuando se
-apruebe el lenguaje y la herramienta de empaquetado. La CLI usa `0` para éxito,
+Los comandos de desarrollo, pruebas, lint y build se definirán al aprobar las
+herramientas correspondientes. La CLI usa `0` para éxito,
 `1` para fallo operativo o resultado parcial, `2` para uso inválido y `130`
 para una interrupción mediante `Ctrl+C`; las causas concretas se expresan con
 códigos simbólicos en JSON.
@@ -223,6 +224,5 @@ infraestructura ni tipos específicos de proveedores.
 
 ## Asuntos abiertos
 
-1. Búsqueda vectorial exacta en aplicación o adaptador `sqlite-vec` fijado.
-2. Framework de CLI y comandos definitivos de build, test y lint.
-3. Política de combinación y reranking de resultados.
+1. Framework de CLI y comandos definitivos de build, test y lint.
+2. Política de combinación y reranking de resultados.
