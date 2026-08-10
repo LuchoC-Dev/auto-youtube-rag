@@ -26,7 +26,7 @@
 | Texto | SQLite FTS5 | Búsqueda exacta y por relevancia |
 | Embeddings | E5 Small multilingüe `q8` | Mejor equilibrio del benchmark local |
 | Acoplamiento | Modelo y DB sólo en infraestructura | Mantener dominio y aplicación reemplazables |
-| Vectores | Backend reemplazable | Poder migrar sin romper la CLI |
+| Vectores | BLOB SQLite + índice exacto en memoria | Menor latencia en el benchmark local |
 | Recuperación | Híbrida y jerárquica | Combinar precisión con cobertura amplia |
 | Resultado | Contexto amplio y citado | Proveer hechos suficientes al agente |
 | Fuentes | Múltiples raíces registradas | Unificar `auto-design` y `catalog-design` |
@@ -54,8 +54,15 @@ El benchmark inicial sobre 18 pasajes y 16 consultas dejó a
 11.5 ms frente a 29 ms de E5 Base. Puede sustituirse si las evaluaciones futuras
 lo justifican; esa sustitución afectará al adaptador y al índice, no al dominio.
 
+## Backend vectorial aprobado
+
+El MVP persistirá vectores `float32[384]` como BLOB en SQLite y construirá un
+índice contiguo en memoria para búsqueda exacta. En el benchmark fue cerca de
+cinco veces más rápido que `sqlite-vec`; su costo adicional de RAM fue pequeño
+para la escala inicial. El puerto `VectorSearchIndex` permite sustituirlo sin
+modificar el dominio ni los casos de uso.
+
 ## Pendientes de decisión
 
-- Estrategia vectorial inicial concreta.
 - Pesos de búsqueda híbrida y reranking.
 - Presupuestos de contexto por profundidad.

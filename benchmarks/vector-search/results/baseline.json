@@ -73,6 +73,6 @@
     "reopen": "passed",
     "windows_install": "passed"
   },
-  "provisional_recommendation": "memory-exact",
-  "decision_status": "pending_user_approval"
+  "approved_backend": "memory-exact",
+  "decision_status": "approved"
 }

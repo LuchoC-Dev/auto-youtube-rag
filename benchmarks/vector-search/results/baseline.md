@@ -15,5 +15,5 @@ Los conjuntos `top-k` coincidieron al 100 %. Ambos backends superaron inserción
 actualización, eliminación y reapertura. `sqlite-vec` redujo memoria y disco,
 pero la búsqueda exacta en memoria fue aproximadamente cinco veces más rápida.
 
-Recomendación provisional: adaptador exacto en memoria para el MVP. La decisión
-permanece pendiente de aprobación del usuario.
+Decisión confirmada: adaptador exacto en memoria para el MVP. `sqlite-vec`
+permanece disponible como referencia de benchmark y posible adaptador futuro.

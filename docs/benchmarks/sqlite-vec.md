@@ -74,7 +74,7 @@ medición modifica paquetes de video ni el dominio del producto.
 ### Preguntar antes
 
 - Cambiar dimensiones, métrica o escalas de aceptación.
-- Adoptar `sqlite-vec` como decisión final del producto.
+- Sustituir el backend exacto en memoria aprobado para el MVP.
 
 ### Nunca
 
@@ -116,16 +116,15 @@ que tomó 95,75 ms y 519,15 ms respectivamente en memoria.
 - Node.js 24.13.1 todavía marca `node:sqlite` como experimental.
 - `sqlite-vec` continúa siendo pre-v1 y puede introducir cambios incompatibles.
 
-## Recomendación del benchmark
+## Decisión confirmada
 
 `sqlite-vec` es técnicamente viable, exacto y operativo en el equipo objetivo,
-pero no ofrece el mejor equilibrio para el volumen inicial. La recomendación
-provisional es comenzar con el adaptador exacto en memoria, persistiendo los
-vectores como BLOB en SQLite. En 10.000 vectores su costo adicional de memoria es
-pequeño y su latencia es mucho menor. Incluso en 50.000, los 66,9 MB ahorrados
-por `sqlite-vec` representan menos del 1 % de la RAM total del equipo.
+pero no ofrece el mejor equilibrio para el volumen inicial. El usuario confirmó
+el adaptador exacto en memoria, con los vectores persistidos como BLOB en SQLite.
+En 10.000 vectores su costo adicional de memoria es pequeño y su latencia es
+mucho menor. Incluso en 50.000, los 66,9 MB ahorrados por `sqlite-vec`
+representan menos del 1 % de la RAM total del equipo.
 
 `sqlite-vec` queda como adaptador alternativo cuando la memoria o el tiempo de
 carga sean más importantes que la latencia, o cuando sus índices aproximados
-maduren. Esta recomendación no constituye todavía la decisión arquitectónica;
-la adopción final corresponde al usuario.
+maduren. Cualquier sustitución deberá conservar el puerto `VectorSearchIndex`.
