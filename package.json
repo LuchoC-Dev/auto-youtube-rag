@@ -7,6 +7,8 @@
     "models:download": "tsx benchmarks/embeddings/run.ts --download-only",
     "benchmark:embeddings": "tsx benchmarks/embeddings/run.ts --local-only",
     "benchmark:smoke": "tsx benchmarks/embeddings/run.ts --local-only --smoke",
+    "benchmark:vector": "tsx benchmarks/vector-search/run.ts",
+    "benchmark:vector:smoke": "tsx benchmarks/vector-search/run.ts --smoke --output=smoke",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -14,6 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "sqlite-vec": "0.1.9",
     "tsx": "4.23.11",
     "typescript": "7.0.2"
   }

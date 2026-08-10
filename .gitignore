@@ -11,6 +11,9 @@ node_modules/
 benchmarks/embeddings/results/*
 !benchmarks/embeddings/results/baseline.json
 !benchmarks/embeddings/results/baseline.md
+benchmarks/vector-search/results/*
+!benchmarks/vector-search/results/baseline.json
+!benchmarks/vector-search/results/baseline.md
 
 # Local databases and generated indexes
 *.db
