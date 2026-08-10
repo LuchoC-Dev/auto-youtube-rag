@@ -9,13 +9,17 @@
     "benchmark:smoke": "tsx benchmarks/embeddings/run.ts --local-only --smoke",
     "benchmark:vector": "tsx benchmarks/vector-search/run.ts",
     "benchmark:vector:smoke": "tsx benchmarks/vector-search/run.ts --smoke --output=smoke",
+    "benchmark:sqlite-client": "tsx benchmarks/sqlite-client/run.ts",
+    "benchmark:sqlite-client:smoke": "tsx benchmarks/sqlite-client/run.ts --smoke --output=smoke",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@huggingface/transformers": "4.2.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^24.0.0",
+    "better-sqlite3": "^12.6.2",
     "sqlite-vec": "0.1.9",
     "tsx": "4.23.11",
     "typescript": "7.0.2"
