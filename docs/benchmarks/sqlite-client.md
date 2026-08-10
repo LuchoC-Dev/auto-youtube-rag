@@ -74,7 +74,7 @@ ambas corridas. También usó entre 8,3 y 18,4 MB menos de RSS final.
 - `node:sqlite` funcionó sin paquetes ni bindings adicionales, aunque Node
   24.13.1 todavía emite una advertencia experimental.
 - La documentación de Node 24.15.0 y posteriores clasifica la API como release
-  candidate; si se adopta, el proyecto debería requerir Node `>=24.15.0`.
+  candidate. El proyecto fue actualizado y validado con Node 24.19.0 LTS.
 - `better-sqlite3` 12.6.2 declara soporte para Node 24 y su prebuild Windows x64
   funcionó, pero la configuración local `ignore-scripts=true` impidió que se
   instalara automáticamente. Fue necesario ejecutar
@@ -83,11 +83,15 @@ ambas corridas. También usó entre 8,3 y 18,4 MB menos de RSS final.
   vulnerabilidades nuevas a esos paquetes; las cuatro alertas existentes
   provienen de la dependencia de embeddings.
 
-## Recomendación pendiente de aprobación
+## Decisión confirmada
 
-Usar `node:sqlite` como adaptador inicial y elevar el runtime mínimo a Node
-`>=24.15.0`. Entrega todas las capacidades requeridas, evita una dependencia
-nativa y funciona con instalaciones que deshabilitan scripts. El benchmark no
+El usuario aprobó `node:sqlite` como adaptador inicial y Node 24.19.0 LTS como
+runtime de desarrollo. Entrega todas las capacidades requeridas, evita una
+dependencia nativa y funciona con instalaciones que deshabilitan scripts. El benchmark no
 muestra una ventaja consistente de `better-sqlite3` que compense ese costo de
 distribución. La elección no cambia el dominio: el acceso seguirá detrás de
 `KnowledgeRepository` y `TextSearchIndex`.
+
+Una ejecución smoke posterior a la actualización validó ambos clientes con
+Node 24.19.0. `node:sqlite` utilizó SQLite 3.53.3 y no emitió la advertencia
+experimental observada con Node 24.13.1.
