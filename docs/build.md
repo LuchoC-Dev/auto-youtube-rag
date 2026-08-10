@@ -48,6 +48,7 @@
 - [x] Definir límites de dominio y adaptadores
 - [x] Comparar búsqueda exacta y sqlite-vec
 - [x] Elegir implementación vectorial inicial
+- [x] Evaluar clientes SQLite reproduciblemente
 - [ ] Definir comandos de build, test y lint
 
 ### Etapa 2 — Implementación MVP
