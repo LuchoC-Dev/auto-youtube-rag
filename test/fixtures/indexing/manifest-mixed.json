@@ -1,0 +1,37 @@
+{
+  "videos": [
+    {
+      "video_id": "dQw4w9WgXcQ",
+      "slug": "design-principles",
+      "source_language": "en",
+      "dossier_language": "es",
+      "stage": "batch-1",
+      "resources": {
+        "context": true,
+        "rules": true,
+        "metadata": true,
+        "transcript": true,
+        "frames": true
+      }
+    },
+    {
+      "video_id": "abc_123-XYZ",
+      "slug": "visual-hierarchy",
+      "source_language": "es",
+      "dossier_language": "es",
+      "stage": null,
+      "resources": {
+        "context": true,
+        "rules": false,
+        "metadata": true,
+        "source_video": true
+      }
+    }
+  ],
+  "pages": [
+    {
+      "slug": "ignored-web-page",
+      "resources": "this shape is intentionally irrelevant"
+    }
+  ]
+}
