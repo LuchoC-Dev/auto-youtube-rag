@@ -234,7 +234,7 @@ Checkpoint C: suite rápida offline aprobada y smoke local aprobado por separado
 
 ### D1. Apertura y migración SQLite inicial
 
-- [ ] Crear la base con schema versionado, foreign keys, WAL, tablas, índices y
+- [x] Crear la base con schema versionado, foreign keys, WAL, tablas, índices y
       triggers FTS5 aprobados.
   - Depende de: A1–A6.
   - Aceptación: abrir dos veces es idempotente; esquema incompatible falla sin
@@ -247,7 +247,7 @@ Checkpoint C: suite rápida offline aprobada y smoke local aprobado por separado
 
 ### D2. Registro SQLite de fuentes
 
-- [ ] Implementar `SourceRegistry` sobre `node:sqlite` y su suite de contrato.
+- [x] Implementar `SourceRegistry` sobre `node:sqlite` y su suite de contrato.
   - Depende de: D1 y B1.
   - Aceptación: add/list/get/remove son deterministas; nombre y rutas son únicos;
     remove sólo elimina derivados; ningún tipo SQLite cruza el puerto.
@@ -259,7 +259,7 @@ Checkpoint C: suite rápida offline aprobada y smoke local aprobado por separado
 
 ### D3. Estado de paquetes y runs
 
-- [ ] Implementar lectura de estado, inicio/cierre de `SyncRun` y registro de
+- [x] Implementar lectura de estado, inicio/cierre de `SyncRun` y registro de
       `SyncIssue` en `IndexStore`.
   - Depende de: D1 y A6.
   - Aceptación: reapertura conserva estado y contadores; issues se asocian al
@@ -272,7 +272,7 @@ Checkpoint C: suite rápida offline aprobada y smoke local aprobado por separado
 
 ### D4. Aplicación atómica de paquetes
 
-- [ ] Completar `IndexStore.applyPackage`, FTS5, embeddings BLOB y eliminación
+- [x] Completar `IndexStore.applyPackage`, FTS5, embeddings BLOB y eliminación
       segura de ausentes.
   - Depende de: D3, B6, B7 y C1.
   - Aceptación: commit reemplaza todo el agregado; rollback conserva la versión
