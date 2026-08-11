@@ -13,7 +13,7 @@
 | **1 — Definición**         | 1.1 | Repositorio y contexto inicial |   ✅   | 100% | Git y decisiones documentadas            |
 |                            | 1.2 | Contrato de CLI y salidas      |   ✅   | 100% | Comandos, formatos y códigos definidos   |
 |                            | 1.3 | Stack y estrategia vectorial   |   ✅   | 100% | Stack y toolchain reproducible aprobados |
-| **2 — Implementación MVP** | 2.1 | Indexación incremental         |   🔵   | 73%  | Reglas JSON validadas                    |
+| **2 — Implementación MVP** | 2.1 | Indexación incremental         |   🔵   | 76%  | Paquetes completos leídos                |
 |                            | 2.2 | Recuperación híbrida           |   ⚪   |  0%  | FTS5, vectores y ranking                 |
 |                            | 2.3 | Ensamblado de contexto         |   ⚪   |  0%  | Profundidad, citas y presupuesto         |
 |                            | 2.4 | Skill general                  |   ⚪   |  0%  | Integración portable con CLI             |
@@ -66,8 +66,9 @@
 - [x] Leer y validar manifests
 - [x] Parsear contextos Markdown
 - [x] Parsear reglas JSON
+- [x] Seleccionar metadata estable
 - [ ] Registrar múltiples raíces
-- [ ] Leer paquetes sin modificarlos
+- [x] Leer paquetes sin modificarlos
 - [ ] Crear unidades jerárquicas
 - [ ] Detectar cambios mediante hashes
 

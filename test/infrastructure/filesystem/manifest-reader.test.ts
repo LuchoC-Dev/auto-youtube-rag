@@ -147,6 +147,46 @@ void test("validates unknown structures and resource booleans", () => {
   );
 });
 
+void test("accepts canonical Unicode slugs without allowing path separators", () => {
+  const manifest = parseManifest(
+    {
+      videos: [
+        {
+          video_id: "video_es",
+          slug: "7-estilos-de-diseño-gráfico-que-no-conocías",
+          resources: { context: true, rules: true, metadata: true },
+        },
+      ],
+    },
+    { sourceName, manifestPath: "memory://manifest", contentHash: hash },
+  );
+
+  assert.equal(
+    manifest.videos[0]?.slug,
+    "7-estilos-de-diseño-gráfico-que-no-conocías",
+  );
+  assert.throws(
+    () =>
+      parseManifest(
+        {
+          videos: [
+            {
+              video_id: "video_es",
+              slug: "diseño/../fuera",
+              resources: { context: true, rules: true, metadata: true },
+            },
+          ],
+        },
+        { sourceName, manifestPath: "memory://manifest", contentHash: hash },
+      ),
+    assertManifestError(
+      "MANIFEST_SCHEMA_INVALID",
+      "memory://manifest",
+      "videos[0].slug",
+    ),
+  );
+});
+
 void test("reports malformed JSON and unreadable files with path and root field", async () => {
   const directory = await mkdtemp(join(tmpdir(), "auto-youtube-rag-manifest-"));
   const malformedPath = join(directory, "manifest.json");

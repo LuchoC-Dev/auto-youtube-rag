@@ -1,0 +1,36 @@
+{
+  "id": "video_123",
+  "title": "Diseño visual útil",
+  "uploader": "Canal de Diseño",
+  "channel": "Canal de Diseño",
+  "webpage_url": "https://www.youtube.com/watch?v=video_123",
+  "duration": 125,
+  "upload_date": "20260810",
+  "language": "en",
+  "tags": ["diseño", "jerarquía visual"],
+  "categories": ["Education"],
+  "description": "Descripción extensa que no se indexa como metadata estable.",
+  "view_count": 987654,
+  "like_count": 4321,
+  "comment_count": 123,
+  "availability": "public",
+  "epoch": 1786400000,
+  "formats": [
+    {
+      "format_id": "18",
+      "url": "https://volatile.example/video?token=temporary"
+    }
+  ],
+  "automatic_captions": {
+    "en": [
+      {
+        "url": "https://volatile.example/captions?token=temporary"
+      }
+    ]
+  },
+  "requested_downloads": [
+    {
+      "filepath": "C:/temporary/video.mp4"
+    }
+  ]
+}
