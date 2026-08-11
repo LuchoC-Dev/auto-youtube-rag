@@ -29,7 +29,9 @@ export interface IndexedPackageState {
 }
 
 export interface IndexStore {
+  listPackageRefs(source: SourceName): Promise<readonly PackageRef[]>;
   getPackageState(ref: PackageRef): Promise<IndexedPackageState | null>;
+  markPackageSeen(ref: PackageRef, syncId: SyncId): Promise<void>;
   applyPackage(change: IndexedPackageChange): Promise<void>;
   deletePackagesNotSeen(source: SourceName, syncId: SyncId): Promise<number>;
   recordRun(run: SyncRun): Promise<void>;
