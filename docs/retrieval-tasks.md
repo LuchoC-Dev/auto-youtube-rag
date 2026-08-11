@@ -42,7 +42,7 @@ read-only sobre SQLite y sobre las fuentes.
 
 ### F2. Puertos y tipos de resultado
 
-- [ ] Declarar `TextSearchIndex`, `VectorSearchIndex`, `KnowledgeRepository`,
+- [x] Declarar `TextSearchIndex`, `VectorSearchIndex`, `KnowledgeRepository`,
       `RankedHit`, `RetrievalCandidate` y `RetrievalOutcome`.
   - Depende de: F1.
   - Aceptación: ninguna firma expone tipos de SQLite ni de Transformers.js;
