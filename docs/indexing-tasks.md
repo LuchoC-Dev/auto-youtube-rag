@@ -79,7 +79,7 @@ archivos o menos.
 
 ### A5. Snapshots y cambios de aplicación
 
-- [ ] Definir snapshots internos de manifest, paquete y metadata, junto con el
+- [x] Definir snapshots internos de manifest, paquete y metadata, junto con el
       cambio atómico que recibe `IndexStore`.
   - Depende de: A1–A4.
   - Aceptación: todos los límites son readonly, discriminados y libres de tipos
