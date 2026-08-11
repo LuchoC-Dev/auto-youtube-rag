@@ -147,7 +147,7 @@ Transformers.js.
 
 ### B4. Parser de `rules.json`
 
-- [ ] Convertir tesis, secciones, patrones y elementos hijos en un snapshot
+- [x] Convertir tesis, secciones, patrones y elementos hijos en un snapshot
       estructurado.
   - Depende de: A4 y A5.
   - Aceptación: cubre todas las formas observadas, valida IDs por video,
