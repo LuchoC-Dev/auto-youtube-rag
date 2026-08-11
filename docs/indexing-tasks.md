@@ -90,7 +90,7 @@ archivos o menos.
 
 ### A6. Puertos de indexación
 
-- [ ] Declarar los puertos `PackageSourceReader`, `SourceRegistry`, `IndexStore`,
+- [x] Declarar los puertos `PackageSourceReader`, `SourceRegistry`, `IndexStore`,
       `EmbeddingGenerator` y `VectorIndexSink`.
   - Depende de: A5.
   - Aceptación: ninguna firma expone tipos externos; `IndexStore.applyPackage`
