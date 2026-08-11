@@ -41,7 +41,7 @@ MVP sobre todo el corpus.
 ```text
 npm install
 npm run typecheck
-npm run models:download
+npm run models:download:benchmarks
 npm run benchmark:embeddings
 ```
 

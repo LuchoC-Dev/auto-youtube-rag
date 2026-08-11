@@ -21,20 +21,38 @@ La actualización se reconsiderará cuando la cadena oficial sea compatible.
 
 ## Comandos
 
-| Comando                 | Responsabilidad                                            |
-| ----------------------- | ---------------------------------------------------------- |
-| `npm run build`         | Compilar `src/` en `dist/` con declaraciones y source maps |
-| `npm run typecheck`     | Verificar todo el TypeScript sin emitir archivos           |
-| `npm run lint`          | Ejecutar reglas estrictas y conscientes de tipos           |
-| `npm test`              | Ejecutar pruebas con el runner nativo de Node              |
-| `npm run test:watch`    | Repetir las pruebas afectadas durante el desarrollo        |
-| `npm run test:coverage` | Generar cobertura con el soporte nativo de Node            |
-| `npm run format`        | Aplicar Prettier                                           |
-| `npm run format:check`  | Verificar formato sin modificar archivos                   |
-| `npm run check`         | Ejecutar typecheck, lint, tests y formato                  |
+| Comando                        | Responsabilidad                                            |
+| ------------------------------ | ---------------------------------------------------------- |
+| `npm run build`                | Compilar `src/` en `dist/` con declaraciones y source maps |
+| `npm run typecheck`            | Verificar todo el TypeScript sin emitir archivos           |
+| `npm run lint`                 | Ejecutar reglas estrictas y conscientes de tipos           |
+| `npm test`                     | Ejecutar pruebas con el runner nativo de Node              |
+| `npm run test:watch`           | Repetir las pruebas afectadas durante el desarrollo        |
+| `npm run test:coverage`        | Generar cobertura con el soporte nativo de Node            |
+| `npm run test:embedding:smoke` | Validar E5 Small usando sólo el modelo local               |
+| `npm run format`               | Aplicar Prettier                                           |
+| `npm run format:check`         | Verificar formato sin modificar archivos                   |
+| `npm run check`                | Ejecutar typecheck, lint, tests y formato                  |
 
 Los benchmarks conservan comandos separados porque no forman parte de la
 puerta rápida de calidad de cada cambio.
+
+### Smoke local de E5 Small
+
+El smoke del modelo es deliberadamente independiente de `npm run check`. La
+suite rápida descubre su archivo, pero lo omite por el patrón `smoke`; sólo el
+comando explícito ejecuta la inferencia:
+
+```text
+npm run models:download
+npm run test:embedding:smoke
+```
+
+`models:download` descarga únicamente E5 Small. El smoke exige los archivos en
+`.cache/models`, trabaja con `local_files_only` y nunca intenta acceder a la
+red. Si el modelo falta, falla indicando el comando de descarga. Para descargar
+todos los modelos del benchmark histórico se usa
+`npm run models:download:benchmarks`.
 
 ## Estructura y límites
 
