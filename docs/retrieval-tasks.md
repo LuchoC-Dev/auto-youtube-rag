@@ -27,7 +27,7 @@ read-only sobre SQLite y sobre las fuentes.
 
 ### F1. Consulta, filtros y límites
 
-- [ ] Crear los value objects `RetrievalQuery`, `RetrievalFilter` y
+- [x] Crear los value objects `RetrievalQuery`, `RetrievalFilter` y
       `RetrievalLimits` con validación estricta.
   - Depende de: A1 (identificadores existentes).
   - Aceptación: normaliza a NFC y recorta espacios; rechaza consulta vacía, sólo

@@ -1,5 +1,5 @@
 export type DomainValidationErrorCode =
-  "INVALID_IDENTIFIER" | "INVALID_PACKAGE_REF";
+  "INVALID_IDENTIFIER" | "INVALID_PACKAGE_REF" | "INVALID_RETRIEVAL_QUERY";
 
 export class DomainValidationError extends Error {
   public constructor(
