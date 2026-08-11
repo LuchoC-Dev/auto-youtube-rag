@@ -2,9 +2,8 @@
 
 ## Estado
 
-Fase `TASKS`, pendiente de aprobación. Este checklist ejecuta
-[indexing-plan.md](indexing-plan.md) y no autoriza implementación hasta ser
-aprobado. Todas las tareas están ordenadas por dependencia y modifican cinco
+Checklist aprobado el 11 de agosto de 2026. La fase `IMPLEMENT` está activa y
+debe ejecutar estas tareas en orden de dependencia. Todas modifican cinco
 archivos o menos.
 
 ## Convenciones de ejecución
