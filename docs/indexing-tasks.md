@@ -176,7 +176,7 @@ Transformers.js.
 
 ### B6. Constructor jerárquico de unidades
 
-- [ ] Transformar snapshots de contexto y reglas en `KnowledgeUnit`.
+- [x] Transformar snapshots de contexto y reglas en `KnowledgeUnit`.
   - Depende de: A1–A6 y B3–B5.
   - Aceptación: genera documentos raíz, secciones, patrones e hijos con claves
     estables, padres válidos, headings, evidencia y contenido estructurado; una

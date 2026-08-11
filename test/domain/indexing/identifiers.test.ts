@@ -80,6 +80,16 @@ void test("requires explicit namespaces and non-empty internal id segments", () 
   assertInvalid(() => SyncId.create("sync:"), "syncId");
 });
 
+void test("keeps RFC 3986 unreserved characters at internal segment boundaries", () => {
+  const document = DocumentId.create(
+    "document:auto-design:_DHiyzRN4gY:context",
+  );
+  const unit = KnowledgeUnitId.create("unit:auto-design:trailing-:context");
+
+  assert.equal(document.value, "document:auto-design:_DHiyzRN4gY:context");
+  assert.equal(unit.value, "unit:auto-design:trailing-:context");
+});
+
 void test("serializes and parses package references without delimiter ambiguity", () => {
   const reference = PackageRef.create(
     SourceName.create("auto-design"),

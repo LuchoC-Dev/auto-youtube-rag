@@ -2,7 +2,7 @@ import { DomainValidationError } from "./domain-error.js";
 
 const sourceNamePattern = /^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$/;
 const videoIdPattern = /^[A-Za-z0-9_-]+$/;
-const identifierSegment = "[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?";
+const identifierSegment = "[A-Za-z0-9._~-]+";
 
 abstract class StringIdentifier<
   TIdentifier extends StringIdentifier<TIdentifier>,
