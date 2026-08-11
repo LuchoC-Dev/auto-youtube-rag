@@ -206,7 +206,7 @@ deterministas; un hash de todos los archivos fuente permanece idéntico.
 
 ### C1. Adaptador E5 Small
 
-- [ ] Implementar `EmbeddingGenerator` para el modelo local aprobado.
+- [x] Implementar `EmbeddingGenerator` para el modelo local aprobado.
   - Depende de: A3, A6 y B7.
   - Aceptación: declara clave, versión, dimensión 384 y límite real; usa prefijos
     E5 correctos para documentos y consulta; procesa lotes; normaliza y valida
@@ -218,7 +218,7 @@ deterministas; un hash de todos los archivos fuente permanece idéntico.
 
 ### C2. Smoke test local del modelo
 
-- [ ] Añadir un smoke test explícito que nunca se ejecute dentro de
+- [x] Añadir un smoke test explícito que nunca se ejecute dentro de
       `npm run check`.
   - Depende de: C1.
   - Aceptación: usa sólo el modelo descargado, valida 384 valores finitos y
