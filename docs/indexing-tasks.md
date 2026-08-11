@@ -188,7 +188,7 @@ Transformers.js.
 
 ### B7. Fragmentación limitada por tokens
 
-- [ ] Transformar unidades searchable en `SearchFragment` mediante límites
+- [x] Transformar unidades searchable en `SearchFragment` mediante límites
       semánticos y conteo provisto por el puerto.
   - Depende de: A3, A6 y B6.
   - Aceptación: prioriza párrafos y listas, divide recursivamente bloques largos,
