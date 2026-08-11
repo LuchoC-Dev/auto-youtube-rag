@@ -52,7 +52,7 @@ archivos o menos.
 
 ### A3. Unidades, fragmentos y embeddings
 
-- [ ] Implementar `KnowledgeUnit`, `SearchFragment` y `EmbeddingRecord`.
+- [x] Implementar `KnowledgeUnit`, `SearchFragment` y `EmbeddingRecord`.
   - Depende de: A1 y A2.
   - Aceptación: jerarquía, profundidad, ordinal, searchable, tokens, dimensión,
     hash y finitud del vector se validan; ningún vector acepta `NaN` o infinito.
