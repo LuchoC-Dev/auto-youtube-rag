@@ -37,7 +37,7 @@ archivos o menos.
 
 ### A2. Entidades de catálogo
 
-- [ ] Implementar `SourceRoot`, `VideoPackage` y `SourceDocument` con sus
+- [x] Implementar `SourceRoot`, `VideoPackage` y `SourceDocument` con sus
       invariantes.
   - Depende de: A1.
   - Aceptación: las rutas internas son datos canónicos, el slug sólo localiza,
