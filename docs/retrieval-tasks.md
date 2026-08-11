@@ -78,7 +78,7 @@ Transformers.js.
 
 ### G1. Sanitizador de consultas FTS5
 
-- [ ] Convertir texto libre en una expresión `MATCH` segura.
+- [x] Convertir texto libre en una expresión `MATCH` segura.
   - Depende de: F1.
   - Aceptación: tokeniza por espacios y puntuación; escapa comillas dobles
     duplicándolas; envuelve cada token en comillas; une con `OR`; neutraliza
