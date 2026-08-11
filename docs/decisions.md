@@ -2,44 +2,45 @@
 
 ## Confirmadas
 
-| Tema | Decisión | Motivo |
-| --- | --- | --- |
-| Nombre | `auto-youtube-rag` | Identidad del proyecto |
-| Ejecución | Exclusivamente local | Privacidad y ausencia de servicios externos |
-| Cerebro generativo | Agente consultante | Evitar duplicar razonamiento dentro del RAG |
-| Integración | Skill general + CLI | Portabilidad entre proveedores |
-| Ejecutable | `auto-youtube-rag` | Nombre explícito y neutral |
-| Indexación | Un único comando `sync` | Evitar duplicar `index` y `sync` |
-| Recuperación CLI | Comando `retrieve` | Ensambla contexto, no sólo coincidencias |
-| Salida | Bundle Markdown + JSON | Evitar truncamiento y permitir integración |
-| Profundidades | 12k / 32k / 64k | Presets ajustables por evaluación |
-| Citaciones | `[S01]` resuelto en JSON | Lectura compacta con procedencia completa |
-| Idioma | Contenido original; claves inglesas | Neutralidad entre proveedores |
-| Códigos de proceso | `0`, `1`, `2` y `130` | Convención portable; detalle mediante códigos JSON |
-| Skills | Una fuente canónica | Evitar variantes para Codex y Claude |
-| Agentes iniciales | Codex y Claude | Compatibilidad mínima requerida |
-| Lenguaje | TypeScript estricto | Ruta integrada y soportada para ONNX en Windows |
-| Runtime | Node.js 24.19.0 LTS con ESM | Fijar una base reproducible validada localmente |
-| Empaquetado | npm + `package-lock.json` | Instalación reproducible sin otro runtime |
-| Arquitectura | Dominio + puertos y adaptadores | Sustituir infraestructura sin alterar casos de uso |
-| Persistencia | SQLite | Simplicidad local y escala suficiente |
-| Cliente SQLite | `node:sqlite` | Sin binding nativo y suficiente en el benchmark local |
-| Texto | SQLite FTS5 | Búsqueda exacta y por relevancia |
-| Embeddings | E5 Small multilingüe `q8` | Mejor equilibrio del benchmark local |
-| Acoplamiento | Modelo y DB sólo en infraestructura | Mantener dominio y aplicación reemplazables |
-| Vectores | BLOB SQLite + índice exacto en memoria | Menor latencia en el benchmark local |
-| Recuperación | Híbrida y jerárquica | Combinar precisión con cobertura amplia |
-| Resultado | Contexto amplio y citado | Proveer hechos suficientes al agente |
-| Fuentes | Múltiples raíces registradas | Unificar `auto-design` y `catalog-design` |
-| Corpus principal | `context.md` | Documento autónomo y validado |
-| Reglas | `rules.json` | Fuente estructurada de patrones |
-| Metadata | Filtros y procedencia | Evitar tratar metadata como conocimiento |
-| Transcripción | Respaldo opcional | Evitar duplicar VTT y texto equivalente |
-| Imágenes | Referencias, sin embeddings MVP | El nombre del archivo no es semántico |
-| Alcance MVP | Sólo paquetes de video | Reducir superficie inicial |
-| UI humana | Posterior al MVP | Primero validar recuperación para agentes |
-| Pruebas | Durante todo el desarrollo | Detectar regresiones funcionales |
-| Evals | Al cerrar el MVP | Medir calidad sobre el flujo completo |
+| Tema               | Decisión                                              | Motivo                                                             |
+| ------------------ | ----------------------------------------------------- | ------------------------------------------------------------------ |
+| Nombre             | `auto-youtube-rag`                                    | Identidad del proyecto                                             |
+| Ejecución          | Exclusivamente local                                  | Privacidad y ausencia de servicios externos                        |
+| Cerebro generativo | Agente consultante                                    | Evitar duplicar razonamiento dentro del RAG                        |
+| Integración        | Skill general + CLI                                   | Portabilidad entre proveedores                                     |
+| Ejecutable         | `auto-youtube-rag`                                    | Nombre explícito y neutral                                         |
+| Indexación         | Un único comando `sync`                               | Evitar duplicar `index` y `sync`                                   |
+| Recuperación CLI   | Comando `retrieve`                                    | Ensambla contexto, no sólo coincidencias                           |
+| Salida             | Bundle Markdown + JSON                                | Evitar truncamiento y permitir integración                         |
+| Profundidades      | 12k / 32k / 64k                                       | Presets ajustables por evaluación                                  |
+| Citaciones         | `[S01]` resuelto en JSON                              | Lectura compacta con procedencia completa                          |
+| Idioma             | Contenido original; claves inglesas                   | Neutralidad entre proveedores                                      |
+| Códigos de proceso | `0`, `1`, `2` y `130`                                 | Convención portable; detalle mediante códigos JSON                 |
+| Skills             | Una fuente canónica                                   | Evitar variantes para Codex y Claude                               |
+| Agentes iniciales  | Codex y Claude                                        | Compatibilidad mínima requerida                                    |
+| Lenguaje           | TypeScript estricto                                   | Ruta integrada y soportada para ONNX en Windows                    |
+| Toolchain          | TypeScript 6.0.3, ESLint 10, Prettier 3 y `node:test` | Mantener análisis estricto, reproducible y oficialmente compatible |
+| Runtime            | Node.js 24.19.0 LTS con ESM                           | Fijar una base reproducible validada localmente                    |
+| Empaquetado        | npm + `package-lock.json`                             | Instalación reproducible sin otro runtime                          |
+| Arquitectura       | Dominio + puertos y adaptadores                       | Sustituir infraestructura sin alterar casos de uso                 |
+| Persistencia       | SQLite                                                | Simplicidad local y escala suficiente                              |
+| Cliente SQLite     | `node:sqlite`                                         | Sin binding nativo y suficiente en el benchmark local              |
+| Texto              | SQLite FTS5                                           | Búsqueda exacta y por relevancia                                   |
+| Embeddings         | E5 Small multilingüe `q8`                             | Mejor equilibrio del benchmark local                               |
+| Acoplamiento       | Modelo y DB sólo en infraestructura                   | Mantener dominio y aplicación reemplazables                        |
+| Vectores           | BLOB SQLite + índice exacto en memoria                | Menor latencia en el benchmark local                               |
+| Recuperación       | Híbrida y jerárquica                                  | Combinar precisión con cobertura amplia                            |
+| Resultado          | Contexto amplio y citado                              | Proveer hechos suficientes al agente                               |
+| Fuentes            | Múltiples raíces registradas                          | Unificar `auto-design` y `catalog-design`                          |
+| Corpus principal   | `context.md`                                          | Documento autónomo y validado                                      |
+| Reglas             | `rules.json`                                          | Fuente estructurada de patrones                                    |
+| Metadata           | Filtros y procedencia                                 | Evitar tratar metadata como conocimiento                           |
+| Transcripción      | Respaldo opcional                                     | Evitar duplicar VTT y texto equivalente                            |
+| Imágenes           | Referencias, sin embeddings MVP                       | El nombre del archivo no es semántico                              |
+| Alcance MVP        | Sólo paquetes de video                                | Reducir superficie inicial                                         |
+| UI humana          | Posterior al MVP                                      | Primero validar recuperación para agentes                          |
+| Pruebas            | Durante todo el desarrollo                            | Detectar regresiones funcionales                                   |
+| Evals              | Al cerrar el MVP                                      | Medir calidad sobre el flujo completo                              |
 
 ## Volumen esperado
 
@@ -73,6 +74,18 @@ nativo y funcionó con la configuración local que deshabilita scripts de npm.
 `better-sqlite3` queda únicamente como dependencia de desarrollo para reproducir
 el benchmark. El acceso a datos seguirá detrás de `KnowledgeRepository` y
 `TextSearchIndex`, por lo que cambiar de cliente no afectará al dominio.
+
+## Toolchain aprobado
+
+El repositorio compila con `tsc`, ejecuta pruebas TypeScript con `node:test` y
+`tsx`, aplica ESLint con las configuraciones estrictas y conscientes de tipos de
+typescript-eslint, y usa Prettier como única autoridad de formato. `npm run
+check` reúne las verificaciones rápidas obligatorias.
+
+TypeScript queda fijado temporalmente en 6.0.3. TypeScript 7.0.2 ya estaba
+disponible, pero typescript-eslint 8.67.0 declara soporte únicamente hasta
+TypeScript menor que 6.1. La actualización se hará cuando exista compatibilidad
+oficial, sin afectar la arquitectura ni los contratos del producto.
 
 ## Pendientes de decisión
 

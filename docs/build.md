@@ -8,17 +8,17 @@
 
 ---
 
-| Fase | N° | Etapa | Estado | % | Descripción |
-| --- | --- | --- | :---: | :---: | --- |
-| **1 — Definición** | 1.1 | Repositorio y contexto inicial | ✅ | 100% | Git y decisiones documentadas |
-|  | 1.2 | Contrato de CLI y salidas | ✅ | 100% | Comandos, formatos y códigos definidos |
-|  | 1.3 | Stack y estrategia vectorial | 🔵 | 50% | Stack elegido; herramientas pendientes |
-| **2 — Implementación MVP** | 2.1 | Indexación incremental | ⚪ | 0% | Fuentes, hashes y jerarquía |
-|  | 2.2 | Recuperación híbrida | ⚪ | 0% | FTS5, vectores y ranking |
-|  | 2.3 | Ensamblado de contexto | ⚪ | 0% | Profundidad, citas y presupuesto |
-|  | 2.4 | Skill general | ⚪ | 0% | Integración portable con CLI |
-| **3 — Calidad** | 3.1 | Pruebas funcionales | ⚪ | 0% | Unidad, integración y CLI |
-|  | 3.2 | Evaluaciones del MVP | ⚪ | 0% | Recall, precisión y cobertura |
+| Fase                       | N°  | Etapa                          | Estado |  %   | Descripción                              |
+| -------------------------- | --- | ------------------------------ | :----: | :--: | ---------------------------------------- |
+| **1 — Definición**         | 1.1 | Repositorio y contexto inicial |   ✅   | 100% | Git y decisiones documentadas            |
+|                            | 1.2 | Contrato de CLI y salidas      |   ✅   | 100% | Comandos, formatos y códigos definidos   |
+|                            | 1.3 | Stack y estrategia vectorial   |   ✅   | 100% | Stack y toolchain reproducible aprobados |
+| **2 — Implementación MVP** | 2.1 | Indexación incremental         |   ⚪   |  0%  | Fuentes, hashes y jerarquía              |
+|                            | 2.2 | Recuperación híbrida           |   ⚪   |  0%  | FTS5, vectores y ranking                 |
+|                            | 2.3 | Ensamblado de contexto         |   ⚪   |  0%  | Profundidad, citas y presupuesto         |
+|                            | 2.4 | Skill general                  |   ⚪   |  0%  | Integración portable con CLI             |
+| **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ⚪   |  0%  | Unidad, integración y CLI                |
+|                            | 3.2 | Evaluaciones del MVP           |   ⚪   |  0%  | Recall, precisión y cobertura            |
 
 ---
 
@@ -50,7 +50,7 @@
 - [x] Elegir implementación vectorial inicial
 - [x] Evaluar clientes SQLite reproduciblemente
 - [x] Elegir `node:sqlite` y fijar Node 24.19.0
-- [ ] Definir comandos de build, test y lint
+- [x] Definir comandos de build, test y lint
 
 ### Etapa 2 — Implementación MVP
 
