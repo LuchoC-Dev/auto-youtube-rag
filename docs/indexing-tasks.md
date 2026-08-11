@@ -110,7 +110,7 @@ Transformers.js.
 
 ### B1. Resolución de layout de fuentes
 
-- [ ] Resolver una ruta de colección o su carpeta `videos/` al mismo layout
+- [x] Resolver una ruta de colección o su carpeta `videos/` al mismo layout
       canónico.
   - Depende de: A2 y A6.
   - Aceptación: devuelve `collectionPath`, `manifestPath` y `videosPath`
