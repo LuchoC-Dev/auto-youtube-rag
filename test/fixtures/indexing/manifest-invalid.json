@@ -1,0 +1,22 @@
+{
+  "videos": [
+    {
+      "video_id": "duplicate_id",
+      "slug": "first-video",
+      "resources": {
+        "context": true,
+        "rules": true,
+        "metadata": true
+      }
+    },
+    {
+      "video_id": "duplicate_id",
+      "slug": "second-video",
+      "resources": {
+        "context": true,
+        "rules": true,
+        "metadata": true
+      }
+    }
+  ]
+}

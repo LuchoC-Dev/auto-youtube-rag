@@ -122,7 +122,7 @@ Transformers.js.
 
 ### B2. Lectura del manifest
 
-- [ ] Leer y validar `manifest.json` desde datos `unknown`.
+- [x] Leer y validar `manifest.json` desde datos `unknown`.
   - Depende de: A5, A6 y B1.
   - Aceptación: conserva los videos y recursos admitidos, ignora `pages`,
     rechaza IDs o slugs duplicados y produce errores con ruta y campo.
