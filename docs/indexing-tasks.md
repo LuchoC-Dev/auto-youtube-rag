@@ -161,7 +161,7 @@ Transformers.js.
 
 ### B5. Metadata y lector de paquetes
 
-- [ ] Aplicar la allowlist de metadata y componer `PackageSourceReader` con los
+- [x] Aplicar la allowlist de metadata y componer `PackageSourceReader` con los
       tres parsers.
   - Depende de: B1–B4.
   - Aceptación: selecciona identidad, creador, URL, duración, publicación,
