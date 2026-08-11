@@ -58,7 +58,7 @@ read-only sobre SQLite y sobre las fuentes.
 
 ### F3. Fusión RRF ponderada
 
-- [ ] Implementar `FusionStrategy` y su estrategia `RrfFusion` como función pura.
+- [x] Implementar `FusionStrategy` y su estrategia `RrfFusion` como función pura.
   - Depende de: F2.
   - Aceptación: `k = 60`, `wText` y `wVector` configurables; conserva hits
     exclusivos de cada vía; el consenso supera a un primer puesto único cuando
