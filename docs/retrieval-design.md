@@ -90,6 +90,16 @@ interface RetrievalLimits {
 Un filtro vacío significa "sin restricción". Los límites son de candidatos, no
 de tokens; el presupuesto es un asunto de 2.3.
 
+La consulta admite como máximo 1000 caracteres. El límite evita que un documento
+pegado por error llegue al modelo de embeddings o al parser de FTS5; las
+consultas reales de un agente son mucho más cortas. También se colapsan los
+espacios internos, de modo que dos escrituras de la misma consulta produzcan el
+mismo resultado.
+
+Los tags de idioma se comparan en minúsculas porque los paquetes indexados los
+declaran de forma inconsistente. Las listas de filtro conservan la primera
+aparición de cada criterio: repetir un valor nunca cambia el SQL resultante.
+
 ### Hits y candidatos
 
 Cada vía devuelve `RankedHit`, con la posición ya resuelta por el adaptador.
