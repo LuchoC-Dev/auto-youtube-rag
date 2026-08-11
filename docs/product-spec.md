@@ -226,4 +226,11 @@ infraestructura ni tipos específicos de proveedores.
 
 ## Asuntos abiertos
 
-1. Política de combinación y reranking de resultados.
+Ninguno bloquea la implementación en curso.
+
+La política de combinación y reranking se resolvió el 11 de agosto de 2026:
+Reciprocal Rank Fusion ponderada como baseline, detrás de un puerto sustituible.
+Los pesos se calibrarán en la etapa 3.2 mediante evaluaciones reales, sin alterar
+el dominio, los casos de uso ni el contrato público de la CLI. El fundamento está
+en [decisions.md](decisions.md) y el diseño en
+[retrieval-design.md](retrieval-design.md).
