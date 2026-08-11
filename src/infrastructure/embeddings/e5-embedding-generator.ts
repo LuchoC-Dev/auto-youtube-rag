@@ -211,7 +211,10 @@ function readRuntimeMatrix(input: unknown): readonly (readonly number[])[] {
 
 const transformersRuntime: E5EmbeddingRuntime = {
   async load(options) {
-    const { pipeline } = await import("@huggingface/transformers");
+    const { env, pipeline } = await import("@huggingface/transformers");
+    env.allowLocalModels = true;
+    env.allowRemoteModels = false;
+    env.cacheDir = options.cacheDir;
     const extractor = await pipeline("feature-extraction", options.repository, {
       revision: options.revision,
       dtype: options.dtype,
