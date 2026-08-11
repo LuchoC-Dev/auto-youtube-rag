@@ -135,7 +135,7 @@ Transformers.js.
 
 ### B3. Parser de `context.md`
 
-- [ ] Convertir frontmatter y encabezados Markdown en un árbol neutral.
+- [x] Convertir frontmatter y encabezados Markdown en un árbol neutral.
   - Depende de: A4 y A5.
   - Aceptación: soporta claves observadas, encabezados repetidos, saltos de nivel,
     texto anterior al primer heading y UTF-8; preserva contenido y orden.
