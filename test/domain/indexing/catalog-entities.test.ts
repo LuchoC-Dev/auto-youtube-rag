@@ -99,6 +99,19 @@ void test("creates a video package without deriving identity from its slug", () 
   assert.deepEqual(videoPackage.categories, ["Education"]);
 });
 
+void test("accepts the same canonical Unicode slugs as the manifest", () => {
+  const videoPackage = VideoPackage.create({
+    ref: packageRef,
+    slug: "7-estilos-de-diseño-gráfico-que-no-conocías",
+    relativePath: "videos/7-estilos-de-diseño-gráfico-que-no-conocías",
+  });
+
+  assert.equal(
+    videoPackage.slug,
+    "7-estilos-de-diseño-gráfico-que-no-conocías",
+  );
+});
+
 void test("rejects invalid package locations and negative durations", () => {
   const valid = {
     ref: packageRef,
