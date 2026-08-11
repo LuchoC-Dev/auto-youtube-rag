@@ -3,8 +3,8 @@
 Biblioteca RAG local para recuperar contexto amplio, ordenado y citado desde los
 paquetes de conocimiento producidos por la skill de videos.
 
-El proyecto se encuentra en fase de especificación. Todavía no contiene una
-implementación ejecutable.
+La indexación incremental y la CLI administrativa están implementadas y
+verificadas. El próximo bloque es la recuperación híbrida del punto 2.2.
 
 ## Propósito
 
@@ -27,6 +27,8 @@ para que el agente consultante razone y redacte la respuesta.
 
 ## Documentación
 
+- [`docs/agent-handoff.md`](docs/agent-handoff.md): estado completo y relevo
+  detallado para continuar el proyecto en frío.
 - [`docs/product-spec.md`](docs/product-spec.md): objetivo, alcance y criterios.
 - [`docs/architecture.md`](docs/architecture.md): arquitectura acordada.
 - [`docs/cli-contract.md`](docs/cli-contract.md): comandos y formatos aprobados.
