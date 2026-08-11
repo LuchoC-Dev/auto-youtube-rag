@@ -1,7 +1,10 @@
 import { access, mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 
+import { getStatus } from "../../application/diagnostics/get-status.js";
+import { runDoctor } from "../../application/diagnostics/run-doctor.js";
 import { SourceName } from "../../domain/indexing/identifiers.js";
+import { SQLiteDiagnosticsRepository } from "../../infrastructure/sqlite/sqlite-diagnostics.js";
 import type {
   Application,
   ApplicationConfig,
@@ -127,15 +130,24 @@ export async function runCli(options: RunCliOptions): Promise<number> {
         );
         return partial ? 1 : 0;
       }
-      case "status":
-      case "doctor":
-        throw Object.assign(
-          new Error(`${command.kind} is not available yet.`),
-          {
-            code: "COMMAND_NOT_IMPLEMENTED",
-            retryable: false,
-          },
+      case "status": {
+        const status = await getStatus(
+          new SQLiteDiagnosticsRepository(application.database),
+          application.embeddingGenerator,
         );
+        options.stdout.write(renderCliSuccess({ status: "ok", ...status }));
+        return 0;
+      }
+      case "doctor": {
+        const result = await runDoctor(
+          new SQLiteDiagnosticsRepository(application.database),
+          application.sourceRegistry,
+          application.embeddingGenerator,
+          options.config.modelCachePath,
+        );
+        options.stdout.write(renderCliSuccess({ ...result }));
+        return result.status === "ok" ? 0 : 1;
+      }
     }
     return unreachable(command);
   } catch (error: unknown) {
