@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "video_id": "video_123",
+    "title": "Diseño visual útil"
+  },
+  "evidence": {
+    "transcript_file": "transcript/source.txt",
+    "frames_directory": "visual/frames",
+    "contact_sheet": "visual/frames/contact-sheet.jpg",
+    "adaptive_contact_sheets": [
+      "visual/frames/adaptive-contact-sheet-01.jpg",
+      "visual/frames/adaptive-contact-sheet-02.jpg"
+    ],
+    "coverage_report": "visual/coverage.json",
+    "visual_profile": "visual-heavy",
+    "frame_sampling": "20 uniformes y muestreo adaptativo",
+    "limitations": [
+      "El texto pequeño de algunos ejemplos no es legible.",
+      "Las muestras visuales no demuestran licencias de reutilización."
+    ]
+  },
+  "core_thesis": "Nombrar un estilo permite buscar referencias precisas.",
+  "patterns": [
+    {
+      "id": "visual_hierarchy",
+      "name": "Jerarquía visual",
+      "principle": "El contraste dirige la atención.",
+      "problem": "La igualdad de peso oculta la prioridad.",
+      "visual_evidence": ["frame-05pct.png muestra un elemento dominante."],
+      "rules": [
+        "Definir un elemento dominante.",
+        "Reducir el peso de los elementos secundarios."
+      ],
+      "avoid": ["Dar el mismo peso a todos los elementos."],
+      "acceptance_criteria": [
+        "La acción principal se reconoce sin explicación adicional."
+      ],
+      "source_basis": {
+        "direct": "La fuente lo demuestra entre 00:10 y 00:30.",
+        "professional_extension": null
+      }
+    },
+    {
+      "id": "context-first",
+      "name": "Diseñar para el contexto",
+      "principle": "Cada medio presenta restricciones propias.",
+      "problem": "Evita trasladar una solución sin adaptación.",
+      "visual_evidence": [],
+      "rules": ["Identificar el medio antes de componer."],
+      "avoid": ["Copiar una composición sin revisar el contexto."],
+      "acceptance_criteria": [
+        "Las restricciones del medio están documentadas."
+      ],
+      "source_basis": {
+        "direct": "La fuente diferencia explícitamente tres medios.",
+        "professional_extension": "Documentar también restricciones de accesibilidad."
+      }
+    }
+  ],
+  "agent_workflow": [
+    "Identificar el objetivo principal.",
+    "Seleccionar el patrón aplicable.",
+    "Verificar sus criterios de aceptación."
+  ],
+  "evaluation": {
+    "scale": "0-3"
+  },
+  "evidence_boundary": {
+    "transcript": "La transcripción establece la tesis."
+  }
+}
