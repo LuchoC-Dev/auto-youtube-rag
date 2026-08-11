@@ -31,6 +31,7 @@
 | Acoplamiento       | Modelo y DB sólo en infraestructura                   | Mantener dominio y aplicación reemplazables                        |
 | Vectores           | BLOB SQLite + índice exacto en memoria                | Menor latencia en el benchmark local                               |
 | Recuperación       | Híbrida y jerárquica                                  | Combinar precisión con cobertura amplia                            |
+| Fusión             | RRF ponderado tras `FusionStrategy`                   | Combina rangos sin comparar escalas y conserva hits exclusivos     |
 | Resultado          | Contexto amplio y citado                              | Proveer hechos suficientes al agente                               |
 | Fuentes            | Múltiples raíces registradas                          | Unificar `auto-design` y `catalog-design`                          |
 | Corpus principal   | `context.md`                                          | Documento autónomo y validado                                      |
@@ -96,7 +97,26 @@ disponible, pero typescript-eslint 8.67.0 declara soporte únicamente hasta
 TypeScript menor que 6.1. La actualización se hará cuando exista compatibilidad
 oficial, sin afectar la arquitectura ni los contratos del producto.
 
+## Política de fusión aprobada
+
+El 11 de agosto de 2026 se aprobó Reciprocal Rank Fusion ponderada como baseline
+de la búsqueda híbrida, con `k = 60` y pesos iniciales `wText = wVector = 1.0`.
+
+`bm25()` devuelve valores negativos sin cota estable y la similitud coseno vive
+en `0..1`; no son comparables, y normalizarlos por lote haría que el orden
+dependa de qué otros candidatos aparecieron. RRF combina únicamente posiciones,
+es determinista y conserva los hits que sólo una de las dos vías encuentra, lo
+que sostiene el criterio de cobertura amplia del producto.
+
+Se descartó la cascada —una vía filtra y la otra reordena— porque pierde esos
+hits exclusivos. A la escala real, ejecutar ambas vías completas no tiene costo
+relevante, de modo que la cascada no aporta rendimiento.
+
+La estrategia queda detrás del puerto `FusionStrategy`, por lo que los pesos
+pueden calibrarse, o la estrategia sustituirse, sin modificar casos de uso ni
+adaptadores. El detalle está en [retrieval-design.md](retrieval-design.md).
+
 ## Pendientes de decisión
 
-- Pesos de búsqueda híbrida y reranking.
+- Calibración de los pesos RRF mediante evaluaciones reales, en la etapa 3.2.
 - Presupuestos de contexto por profundidad.
