@@ -17,7 +17,10 @@ import type { SourceDocumentKind } from "../../domain/indexing/source-document.j
 import type { SyncIssue, SyncRun } from "../../domain/indexing/sync-run.js";
 
 export type SQLiteIndexStoreErrorCode =
-  "PACKAGE_WRITES_NOT_IMPLEMENTED" | "UNKNOWN_SOURCE" | "UNKNOWN_SYNC_RUN";
+  | "INVALID_DELETE_RUN"
+  | "INVALID_PACKAGE_CHANGE"
+  | "UNKNOWN_SOURCE"
+  | "UNKNOWN_SYNC_RUN";
 
 export class SQLiteIndexStoreError extends Error {
   public readonly code: SQLiteIndexStoreErrorCode;
@@ -53,6 +56,39 @@ function rejected(error: unknown): Promise<never> {
       ? error
       : new Error("SQLite index persistence failed.", { cause: error }),
   );
+}
+
+function vectorBlob(vector: Float32Array): Uint8Array {
+  const bytes = new Uint8Array(vector.length * Float32Array.BYTES_PER_ELEMENT);
+  const view = new DataView(bytes.buffer);
+  for (const [index, value] of vector.entries()) {
+    view.setFloat32(index * Float32Array.BYTES_PER_ELEMENT, value, true);
+  }
+  return bytes;
+}
+
+interface SourceIdRow {
+  readonly id: number;
+}
+
+interface SyncRunRow {
+  readonly source_id: number | null;
+  readonly status: string;
+}
+
+function insertedId(row: unknown): number {
+  if (
+    typeof row !== "object" ||
+    row === null ||
+    !("id" in row) ||
+    typeof row.id !== "number"
+  ) {
+    throw new SQLiteIndexStoreError(
+      "INVALID_PACKAGE_CHANGE",
+      "SQLite did not return the inserted row identifier.",
+    );
+  }
+  return row.id;
 }
 
 export class SQLiteIndexStore implements IndexStore {
@@ -131,27 +167,294 @@ export class SQLiteIndexStore implements IndexStore {
   }
 
   public applyPackage(change: IndexedPackageChange): Promise<void> {
-    void change;
-    return rejected(
-      new SQLiteIndexStoreError(
-        "PACKAGE_WRITES_NOT_IMPLEMENTED",
-        "Atomic package writes are implemented in persistence task D4.",
-      ),
-    );
+    try {
+      const source = this.database
+        .prepare("SELECT id FROM sources WHERE name = ?")
+        .get(change.videoPackage.ref.sourceName.value) as
+        SourceIdRow | undefined;
+      if (source === undefined) {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "UNKNOWN_SOURCE",
+            `Source ${change.videoPackage.ref.sourceName.value} is not registered.`,
+          ),
+        );
+      }
+      const run = this.database
+        .prepare("SELECT source_id, status FROM sync_runs WHERE id = ?")
+        .get(change.syncId.value) as SyncRunRow | undefined;
+      if (run === undefined) {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "UNKNOWN_SYNC_RUN",
+            `Sync run ${change.syncId.value} does not exist.`,
+          ),
+        );
+      }
+      if (run.source_id !== source.id || run.status !== "running") {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "INVALID_PACKAGE_CHANGE",
+            "Package changes require a running sync for the package source.",
+          ),
+        );
+      }
+
+      this.database.exec("BEGIN IMMEDIATE");
+      try {
+        const videoPackage = change.videoPackage;
+        const packageId = insertedId(
+          this.database
+            .prepare(
+              `INSERT INTO video_packages(
+              source_id, video_id, slug, relative_path, manifest_stage, title,
+              creator, canonical_url, duration_seconds, published_at,
+              source_language, context_language, tags_json, categories_json,
+              visual_profile, package_hash, last_seen_sync_id, indexed_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(source_id, video_id) DO UPDATE SET
+              slug = excluded.slug,
+              relative_path = excluded.relative_path,
+              manifest_stage = excluded.manifest_stage,
+              title = excluded.title,
+              creator = excluded.creator,
+              canonical_url = excluded.canonical_url,
+              duration_seconds = excluded.duration_seconds,
+              published_at = excluded.published_at,
+              source_language = excluded.source_language,
+              context_language = excluded.context_language,
+              tags_json = excluded.tags_json,
+              categories_json = excluded.categories_json,
+              visual_profile = excluded.visual_profile,
+              package_hash = excluded.package_hash,
+              last_seen_sync_id = excluded.last_seen_sync_id,
+              indexed_at = excluded.indexed_at
+            RETURNING id`,
+            )
+            .get(
+              source.id,
+              videoPackage.ref.videoId.value,
+              videoPackage.slug,
+              videoPackage.relativePath,
+              videoPackage.manifestStage,
+              videoPackage.title,
+              videoPackage.creator,
+              videoPackage.canonicalUrl,
+              videoPackage.durationSeconds,
+              videoPackage.publishedAt,
+              videoPackage.sourceLanguage,
+              videoPackage.contextLanguage,
+              JSON.stringify(videoPackage.tags),
+              JSON.stringify(videoPackage.categories),
+              videoPackage.visualProfile,
+              change.packageHash,
+              change.syncId.value,
+              change.indexedAt,
+            ),
+        );
+
+        this.database
+          .prepare("DELETE FROM source_documents WHERE package_id = ?")
+          .run(packageId);
+
+        const documentIds = new Map<string, number>();
+        const insertDocument = this.database.prepare(
+          `INSERT INTO source_documents(
+            package_id, kind, relative_path, content_hash, byte_size, parser_version
+          ) VALUES (?, ?, ?, ?, ?, ?) RETURNING id`,
+        );
+        for (const document of change.documents) {
+          if (!document.packageRef.equals(videoPackage.ref)) {
+            throw new SQLiteIndexStoreError(
+              "INVALID_PACKAGE_CHANGE",
+              `Document ${document.id.value} belongs to another package.`,
+            );
+          }
+          const id = insertedId(
+            insertDocument.get(
+              packageId,
+              document.kind,
+              document.relativePath,
+              document.contentHash,
+              document.byteSize,
+              document.parserVersion,
+            ),
+          );
+          documentIds.set(document.id.value, id);
+        }
+
+        const unitIds = new Map<string, number>();
+        const insertUnit = this.database.prepare(
+          `INSERT INTO knowledge_units(
+            document_id, parent_id, stable_key, unit_type, depth, ordinal,
+            title, content, structured_json, heading_path_json, timestamps_json,
+            visual_evidence_json, estimated_tokens, content_hash, searchable
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+        );
+        let pendingUnits = [...change.units];
+        while (pendingUnits.length > 0) {
+          const deferred = [];
+          for (const unit of pendingUnits) {
+            const documentId = documentIds.get(unit.documentId.value);
+            if (documentId === undefined) {
+              deferred.push(unit);
+              continue;
+            }
+            let parentId: number | null = null;
+            if (unit.parentId !== null) {
+              const resolvedParentId = unitIds.get(unit.parentId.value);
+              if (resolvedParentId === undefined) {
+                deferred.push(unit);
+                continue;
+              }
+              parentId = resolvedParentId;
+            }
+            const id = insertedId(
+              insertUnit.get(
+                documentId,
+                parentId,
+                unit.id.value,
+                unit.unitType,
+                unit.depth,
+                unit.ordinal,
+                unit.title,
+                unit.content,
+                unit.structuredJson,
+                JSON.stringify(unit.headingPath),
+                JSON.stringify(unit.timestamps),
+                JSON.stringify(unit.visualEvidence),
+                unit.estimatedTokens,
+                unit.contentHash,
+                unit.searchable ? 1 : 0,
+              ),
+            );
+            unitIds.set(unit.id.value, id);
+          }
+          if (deferred.length === pendingUnits.length) {
+            throw new SQLiteIndexStoreError(
+              "INVALID_PACKAGE_CHANGE",
+              "Knowledge units contain a missing document, parent or cycle.",
+            );
+          }
+          pendingUnits = deferred;
+        }
+
+        const fragmentIds = new Map<string, number>();
+        const insertFragment = this.database.prepare(
+          `INSERT INTO search_fragments(
+            unit_id, ordinal, title, heading_path, content, token_count, content_hash
+          ) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+        );
+        for (const fragment of change.fragments) {
+          const unitId = unitIds.get(fragment.unitId.value);
+          if (unitId === undefined) {
+            throw new SQLiteIndexStoreError(
+              "INVALID_PACKAGE_CHANGE",
+              `Fragment ${fragment.id.value} references a missing unit.`,
+            );
+          }
+          const id = insertedId(
+            insertFragment.get(
+              unitId,
+              fragment.ordinal,
+              fragment.title,
+              fragment.headingPath.join(" > "),
+              fragment.content,
+              fragment.tokenCount,
+              fragment.contentHash,
+            ),
+          );
+          fragmentIds.set(fragment.id.value, id);
+        }
+
+        const insertEmbedding = this.database.prepare(
+          `INSERT INTO embeddings(
+            fragment_id, model_key, model_version, dimensions,
+            content_hash, vector, created_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        );
+        for (const embedding of change.embeddings) {
+          const fragmentId = fragmentIds.get(embedding.fragmentId.value);
+          if (fragmentId === undefined) {
+            throw new SQLiteIndexStoreError(
+              "INVALID_PACKAGE_CHANGE",
+              `Embedding for ${embedding.fragmentId.value} references a missing fragment.`,
+            );
+          }
+          insertEmbedding.run(
+            fragmentId,
+            embedding.modelKey,
+            embedding.modelVersion,
+            embedding.dimensions,
+            embedding.contentHash,
+            vectorBlob(embedding.vector),
+            embedding.createdAt,
+          );
+        }
+
+        this.database.exec("COMMIT");
+        return Promise.resolve();
+      } catch (error: unknown) {
+        this.database.exec("ROLLBACK");
+        return rejected(
+          error instanceof SQLiteIndexStoreError
+            ? error
+            : new SQLiteIndexStoreError(
+                "INVALID_PACKAGE_CHANGE",
+                `Could not atomically replace package ${change.videoPackage.ref.serialize()}: ${error instanceof Error ? error.message : "unknown SQLite error"}`,
+              ),
+        );
+      }
+    } catch (error: unknown) {
+      return rejected(error);
+    }
   }
 
   public deletePackagesNotSeen(
     source: SourceName,
     syncId: SyncId,
   ): Promise<number> {
-    void source;
-    void syncId;
-    return rejected(
-      new SQLiteIndexStoreError(
-        "PACKAGE_WRITES_NOT_IMPLEMENTED",
-        "Safe package deletion is implemented in persistence task D4.",
-      ),
-    );
+    try {
+      const sourceRow = this.database
+        .prepare("SELECT id FROM sources WHERE name = ?")
+        .get(source.value) as SourceIdRow | undefined;
+      if (sourceRow === undefined) {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "UNKNOWN_SOURCE",
+            `Source ${source.value} is not registered.`,
+          ),
+        );
+      }
+      const run = this.database
+        .prepare("SELECT source_id, status FROM sync_runs WHERE id = ?")
+        .get(syncId.value) as SyncRunRow | undefined;
+      if (run === undefined) {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "UNKNOWN_SYNC_RUN",
+            `Sync run ${syncId.value} does not exist.`,
+          ),
+        );
+      }
+      if (run.source_id !== sourceRow.id || run.status !== "running") {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "INVALID_DELETE_RUN",
+            "Deleting unseen packages requires the active run for that source after a valid manifest scan.",
+          ),
+        );
+      }
+      const result = this.database
+        .prepare(
+          `DELETE FROM video_packages
+           WHERE source_id = ? AND last_seen_sync_id <> ?`,
+        )
+        .run(sourceRow.id, syncId.value);
+      return Promise.resolve(Number(result.changes));
+    } catch (error: unknown) {
+      return rejected(error);
+    }
   }
 
   public recordRun(run: SyncRun): Promise<void> {
