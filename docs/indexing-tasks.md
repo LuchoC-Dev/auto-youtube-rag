@@ -23,7 +23,7 @@ archivos o menos.
 
 ### A1. Identidades del dominio
 
-- [ ] Crear value objects validados para `SourceName`, `VideoId`, `PackageRef`,
+- [x] Crear value objects validados para `SourceName`, `VideoId`, `PackageRef`,
       `DocumentId`, `KnowledgeUnitId`, `SearchFragmentId` y `SyncId`.
   - Depende de: ninguna tarea.
   - Aceptación: rechazan vacío, whitespace y separadores ambiguos; igualdad y
