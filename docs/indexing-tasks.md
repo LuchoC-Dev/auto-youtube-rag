@@ -292,7 +292,7 @@ rollback y `PRAGMA integrity_check`.
 
 ### E1. Casos de uso de fuentes
 
-- [ ] Implementar add/list/remove de fuentes contra `SourceRegistry` y el
+- [x] Implementar add/list/remove de fuentes contra `SourceRegistry` y el
       resolver de layout.
   - Depende de: A6, B1 y D2.
   - Aceptación: normaliza ambas formas de ruta, detecta duplicados, no toca el
@@ -306,7 +306,7 @@ rollback y `PRAGMA integrity_check`.
 
 ### E2. Caso de uso `sync`
 
-- [ ] Orquestar manifest, hashes, parsing, unidades, fragmentos, embeddings,
+- [x] Orquestar manifest, hashes, parsing, unidades, fragmentos, embeddings,
       persistencia, issues, eliminaciones y publicación vectorial.
   - Depende de: B2–B7, C1, D3 y D4.
   - Aceptación: cubre inicial, `no_changes`, cambio, parcial, manifest inválido y
@@ -321,7 +321,7 @@ rollback y `PRAGMA integrity_check`.
 
 ### E3. Composition root de indexación
 
-- [ ] Conectar filesystem, E5 y SQLite en una fábrica de aplicación sin lógica
+- [x] Conectar filesystem, E5 y SQLite en una fábrica de aplicación sin lógica
       de negocio nueva.
   - Depende de: E1 y E2.
   - Aceptación: configuración y rutas entran como valores; el wiring puede
@@ -333,7 +333,7 @@ rollback y `PRAGMA integrity_check`.
 
 ### E4. Parser y presentación de CLI
 
-- [ ] Parsear los comandos administrativos con `node:util.parseArgs` y renderizar
+- [x] Parsear los comandos administrativos con `node:util.parseArgs` y renderizar
       recibos/errores JSON.
   - Depende de: contrato CLI aprobado y E1–E3.
   - Aceptación: argumentos inválidos producen código 2; claves técnicas están en
@@ -347,7 +347,7 @@ rollback y `PRAGMA integrity_check`.
 
 ### E5. Ejecutable `init`, `source` y `sync`
 
-- [ ] Conectar el runner CLI, entry point ESM y metadatos del paquete.
+- [x] Conectar el runner CLI, entry point ESM y metadatos del paquete.
   - Depende de: E3 y E4.
   - Aceptación: `init`, `source add/list/remove` y `sync` ejecutan casos de uso;
     códigos 0/1/2/130 coinciden con el contrato; importar módulos no ejecuta la
@@ -360,7 +360,7 @@ rollback y `PRAGMA integrity_check`.
 
 ### E6. `status` y `doctor`
 
-- [ ] Implementar diagnósticos de biblioteca y exponerlos mediante la CLI.
+- [x] Implementar diagnósticos de biblioteca y exponerlos mediante la CLI.
   - Depende de: D1–D4 y E5.
   - Aceptación: `status` informa contadores/modelo/schema; `doctor` comprueba
     paths, permisos de lectura, SQLite, FTS5, integridad y modelo sin mutar datos;
@@ -374,7 +374,7 @@ rollback y `PRAGMA integrity_check`.
 
 ### E7. Integración extremo a extremo e inmutabilidad
 
-- [ ] Verificar el punto 2.1 completo sobre una colección temporal reproducible.
+- [x] Verificar el punto 2.1 completo sobre una colección temporal reproducible.
   - Depende de: E1–E6.
   - Aceptación: alta, primera sync, repetición, modificación, paquete inválido y
     eliminación producen estados correctos; SQLite reabre consistente; hash y

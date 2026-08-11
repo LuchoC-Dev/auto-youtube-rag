@@ -9,6 +9,7 @@
 | Cerebro generativo | Agente consultante                                    | Evitar duplicar razonamiento dentro del RAG                        |
 | Integración        | Skill general + CLI                                   | Portabilidad entre proveedores                                     |
 | Ejecutable         | `auto-youtube-rag`                                    | Nombre explícito y neutral                                         |
+| Parser CLI         | `node:util.parseArgs` estricto                        | API estándar de Node, sin dependencia adicional                    |
 | Indexación         | Un único comando `sync`                               | Evitar duplicar `index` y `sync`                                   |
 | Recuperación CLI   | Comando `retrieve`                                    | Ensambla contexto, no sólo coincidencias                           |
 | Salida             | Bundle Markdown + JSON                                | Evitar truncamiento y permitir integración                         |
