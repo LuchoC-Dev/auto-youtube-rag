@@ -193,12 +193,21 @@ La gramática de `MATCH` no es `LIKE`. Una consulta cruda como `diseño 3d: guí
 interpretan como operadores. El adaptador convierte el texto en una consulta
 segura:
 
-1. dividir en tokens por espacios y puntuación no alfanumérica;
-2. descartar tokens vacíos;
-3. escapar comillas dobles internas duplicándolas;
-4. envolver cada token en comillas dobles;
-5. unir con `OR` explícito para maximizar cobertura;
-6. si no queda ningún token, devolver lista vacía sin ejecutar SQL.
+1. extraer como tokens las secuencias de letras y números, exactamente lo que
+   el tokenizador `unicode61` considera token;
+2. descartar todo lo demás —comillas, dos puntos, asteriscos, acentos
+   circunflejos, paréntesis y guiones son separadores, de modo que la
+   puntuación hostil nunca llega al parser;
+3. deduplicar tokens sin distinguir mayúsculas, porque FTS5 pliega el caso al
+   indexar;
+4. envolver cada token en comillas dobles, lo que convierte `OR`, `NOT` y
+   `NEAR` en términos literales;
+5. limitar a 64 tokens para no agotar la profundidad de expresión de FTS5;
+6. unir con `OR` explícito para maximizar cobertura;
+7. si no queda ningún token, devolver `null` y no ejecutar SQL.
+
+La suite verifica cada expresión generada contra un `MATCH` real de FTS5: la
+gramática del motor es la única autoridad sobre si una consulta parsea.
 
 El usuario nunca escribe sintaxis FTS5; ningún operador suyo se honra. Esto es
 una decisión de seguridad y de previsibilidad, no una limitación temporal.
