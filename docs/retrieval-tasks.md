@@ -132,7 +132,7 @@ Transformers.js.
 
 ### G4. Repositorio de conocimiento
 
-- [ ] Implementar `KnowledgeRepository` con procedencia por lote, unidades y
+- [x] Implementar `KnowledgeRepository` con procedencia por lote, unidades y
       ancestros.
   - Depende de: F2 y D4.
   - Aceptación: `getFragmentProvenance` resuelve un lote en una sola consulta y
