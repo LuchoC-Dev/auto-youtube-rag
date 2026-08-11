@@ -6,6 +6,8 @@
 # Local model weights and runtime caches
 .cache/
 node_modules/
+dist/
+coverage/
 
 # Generated benchmark runs; keep only reviewed baselines
 benchmarks/embeddings/results/*

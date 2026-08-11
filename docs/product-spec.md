@@ -58,16 +58,16 @@ El sistema admite varias raíces registradas, inicialmente:
 Cada paquete conserva su estructura original. El indexador no agrega ni modifica
 archivos dentro de esos paquetes.
 
-| Fuente | Uso en el MVP |
-| --- | --- |
-| `manifest.json` | Inventario y estado; no corpus semántico |
-| `deliverables/context.md` | Fuente principal de conocimiento |
-| `deliverables/rules.json` | Patrones y reglas estructuradas |
-| `source/metadata.json` | Identidad, filtros y procedencia |
-| `transcript/source.txt` | Respaldo opcional; no indexado por defecto |
-| Archivos VTT | No indexados |
-| `visual/coverage.json` | Metadatos de evidencia |
-| Imágenes | Ruta preservada; sin embeddings en el MVP |
+| Fuente                    | Uso en el MVP                              |
+| ------------------------- | ------------------------------------------ |
+| `manifest.json`           | Inventario y estado; no corpus semántico   |
+| `deliverables/context.md` | Fuente principal de conocimiento           |
+| `deliverables/rules.json` | Patrones y reglas estructuradas            |
+| `source/metadata.json`    | Identidad, filtros y procedencia           |
+| `transcript/source.txt`   | Respaldo opcional; no indexado por defecto |
+| Archivos VTT              | No indexados                               |
+| `visual/coverage.json`    | Metadatos de evidencia                     |
+| Imágenes                  | Ruta preservada; sin embeddings en el MVP  |
 
 ## Alcance del MVP
 
@@ -96,7 +96,7 @@ archivos dentro de esos paquetes.
 
 ## Stack confirmado
 
-- Lenguaje: TypeScript estricto.
+- Lenguaje: TypeScript 6.0.3 estricto.
 - Runtime: Node.js 24 o superior, módulos ESM.
 - Empaquetado: npm con `package-lock.json`.
 - Arquitectura: dominio central con puertos y adaptadores.
@@ -106,8 +106,9 @@ archivos dentro de esos paquetes.
 - Vectores: BLOB versionado en SQLite e índice exacto `Float32Array` en memoria.
 - Integración: CLI y una única skill portable.
 
-El framework de CLI y los comandos definitivos de desarrollo permanecen
-pendientes.
+El toolchain utiliza `tsc`, ESLint con información de tipos, Prettier y
+`node:test`; sus comandos están definidos en [development.md](development.md).
+El framework de la CLI permanece pendiente hasta implementar su interfaz.
 
 ## Contrato de CLI aprobado
 
@@ -129,8 +130,8 @@ auto-youtube-rag rebuild --confirm
 Los presets iniciales son `focused` = 12k, `balanced` = 32k y `deep` = 64k
 tokens estimados, reemplazables mediante `--max-tokens`.
 
-Los comandos de desarrollo, pruebas, lint y build se definirán al aprobar las
-herramientas correspondientes. La CLI usa `0` para éxito,
+Los comandos de desarrollo, pruebas, lint y build están definidos en
+[development.md](development.md). La CLI usa `0` para éxito,
 `1` para fallo operativo o resultado parcial, `2` para uso inválido y `130`
 para una interrupción mediante `Ctrl+C`; las causas concretas se expresan con
 códigos simbólicos en JSON.
@@ -224,5 +225,5 @@ infraestructura ni tipos específicos de proveedores.
 
 ## Asuntos abiertos
 
-1. Framework de CLI y comandos definitivos de build, test y lint.
+1. Framework de CLI.
 2. Política de combinación y reranking de resultados.
