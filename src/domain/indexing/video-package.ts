@@ -1,7 +1,8 @@
 import { DomainValidationError } from "./domain-error.js";
 import { PackageRef } from "./identifiers.js";
 
-const slugPattern = /^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$/;
+const slugPattern =
+  /^[\p{L}\p{N}](?:[\p{L}\p{N}\p{M}._-]*[\p{L}\p{N}\p{M}])?$/u;
 
 export interface VideoPackageInput {
   readonly ref: PackageRef;
