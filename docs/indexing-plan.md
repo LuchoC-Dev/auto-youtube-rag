@@ -2,9 +2,10 @@
 
 ## Estado
 
-Fase `PLAN`, pendiente de aprobación. La especificación aprobada está en
-[indexing-design.md](indexing-design.md). Este documento define el orden y los
-checkpoints; todavía no desglosa tareas ni autoriza implementación.
+Plan aprobado el 11 de agosto de 2026. La especificación está en
+[indexing-design.md](indexing-design.md) y el desglose ejecutable está en
+[indexing-tasks.md](indexing-tasks.md). La implementación comienza únicamente
+después de aprobar también ese checklist.
 
 ## Objetivo del plan
 
@@ -241,7 +242,9 @@ modelo local se ejecutan adicionalmente cuando el bloque correspondiente cambia.
 - Dominio y aplicación se prueban sin infraestructura concreta.
 - CLI respeta recibos y códigos de salida ya aprobados.
 
-## Decisiones solicitadas para aprobar el plan
+## Decisiones aprobadas del plan
+
+El 11 de agosto de 2026 se aprobaron:
 
 1. Seguir el orden por bloques A → E.
 2. Incluir embeddings dentro de `sync` y tratar su fallo como fallo del paquete.
