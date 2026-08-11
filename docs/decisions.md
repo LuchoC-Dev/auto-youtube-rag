@@ -42,6 +42,14 @@
 | Pruebas            | Durante todo el desarrollo                            | Detectar regresiones funcionales                                   |
 | Evals              | Al cerrar el MVP                                      | Medir calidad sobre el flujo completo                              |
 
+## Diseño de indexación aprobado
+
+- Identidad de paquete: `(source_name, video_id)`; el slug sólo localiza.
+- Unidad amplia `KnowledgeUnit` separada de `SearchFragment` buscable.
+- Metadata persistida mediante allowlist; no se guarda yt-dlp completo.
+- `rules.json` conserva jerarquía de documento, patrón y elementos hijos.
+- `sync` aplica cada paquete atómicamente y conserva la última versión válida.
+
 ## Volumen esperado
 
 - Inicio: aproximadamente 40 videos.
