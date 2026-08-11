@@ -65,7 +65,7 @@ archivos o menos.
 
 ### A4. Sincronización e identidad de contenido
 
-- [ ] Implementar `SyncRun`, `SyncIssue`, SHA-256 y claves estructurales
+- [x] Implementar `SyncRun`, `SyncIssue`, SHA-256 y claves estructurales
       deterministas.
   - Depende de: A1–A3.
   - Aceptación: sólo existen transiciones válidas de run; contadores no son
