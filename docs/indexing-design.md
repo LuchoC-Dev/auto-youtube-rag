@@ -2,8 +2,9 @@
 
 ## Estado
 
-Propuesta para revisión. Este documento define entidades, puertos y esquema
-SQLite del punto 2.1. No autoriza todavía su implementación.
+Especificación aprobada el 10 de agosto de 2026. Este documento es la fuente de
+verdad para entidades, puertos y esquema SQLite del punto 2.1. La implementación
+debe seguir un plan y tareas revisados antes de comenzar.
 
 ## Evidencia inspeccionada
 
@@ -367,9 +368,9 @@ eliminados. El run falla y el índice previo permanece intacto.
 - Atomicidad SQLite, cascadas, triggers FTS5 y reapertura.
 - Reconstrucción por cambio de parser o modelo.
 
-## Criterio de aprobación
+## Decisiones aprobadas
 
-Antes de implementar deben aprobarse especialmente:
+El 10 de agosto de 2026 se aprobaron explícitamente:
 
 1. la separación entre `KnowledgeUnit` amplia y `SearchFragment` pequeño;
 2. la identidad `(source_name, video_id)` del paquete;
