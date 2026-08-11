@@ -94,6 +94,27 @@ function insertedId(row: unknown): number {
 export class SQLiteIndexStore implements IndexStore {
   public constructor(private readonly database: DatabaseSync) {}
 
+  public listPackageRefs(source: SourceName): Promise<readonly PackageRef[]> {
+    try {
+      const rows = this.database
+        .prepare(
+          `SELECT p.video_id
+           FROM video_packages p
+           JOIN sources s ON s.id = p.source_id
+           WHERE s.name = ?
+           ORDER BY p.video_id COLLATE BINARY`,
+        )
+        .all(source.value);
+      return Promise.resolve(
+        rows.map((row) =>
+          PackageRef.create(source, VideoId.create(String(row.video_id))),
+        ),
+      );
+    } catch (error: unknown) {
+      return rejected(error);
+    }
+  }
+
   public getPackageState(ref: PackageRef): Promise<IndexedPackageState | null> {
     try {
       const packageRow = this.database
@@ -161,6 +182,59 @@ export class SQLiteIndexStore implements IndexStore {
         lastSeenSyncId: SyncId.create(packageRow.last_seen_sync_id),
         indexedAt: packageRow.indexed_at,
       });
+    } catch (error: unknown) {
+      return rejected(error);
+    }
+  }
+
+  public markPackageSeen(ref: PackageRef, syncId: SyncId): Promise<void> {
+    try {
+      const source = this.database
+        .prepare("SELECT id FROM sources WHERE name = ?")
+        .get(ref.sourceName.value) as SourceIdRow | undefined;
+      if (source === undefined) {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "UNKNOWN_SOURCE",
+            `Source ${ref.sourceName.value} is not registered.`,
+          ),
+        );
+      }
+      const run = this.database
+        .prepare("SELECT source_id, status FROM sync_runs WHERE id = ?")
+        .get(syncId.value) as SyncRunRow | undefined;
+      if (run === undefined) {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "UNKNOWN_SYNC_RUN",
+            `Sync run ${syncId.value} does not exist.`,
+          ),
+        );
+      }
+      if (run.source_id !== source.id || run.status !== "running") {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "INVALID_PACKAGE_CHANGE",
+            "Marking a package seen requires the active run for its source.",
+          ),
+        );
+      }
+      const result = this.database
+        .prepare(
+          `UPDATE video_packages
+           SET last_seen_sync_id = ?
+           WHERE source_id = ? AND video_id = ?`,
+        )
+        .run(syncId.value, source.id, ref.videoId.value);
+      if (result.changes !== 1) {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "INVALID_PACKAGE_CHANGE",
+            `Package ${ref.serialize()} is not indexed.`,
+          ),
+        );
+      }
+      return Promise.resolve();
     } catch (error: unknown) {
       return rejected(error);
     }

@@ -377,6 +377,11 @@ void test("deletes only unseen packages for the source and active run", async ()
       }),
     );
 
+    assert.deepEqual(
+      (await store.listPackageRefs(alpha.name)).map((ref) => ref.videoId.value),
+      ["kept_video", "old_video"],
+    );
+
     assert.equal(
       await store.deletePackagesNotSeen(alpha.name, alphaCurrent.id),
       1,
@@ -435,6 +440,47 @@ void test("deletes only unseen packages for the source and active run", async ()
       },
     );
     assert.deepEqual(database.prepare("PRAGMA foreign_key_check").all(), []);
+  } finally {
+    database.close();
+  }
+});
+
+void test("marks an unchanged package seen without replacing derivatives", async () => {
+  const database = openDatabase(await databasePath());
+  const sourceRoot = source("auto-design");
+  try {
+    await new SQLiteSourceRegistry(database).add(sourceRoot);
+    const store = new SQLiteIndexStore(database);
+    const oldRun = await startRun(store, sourceRoot.name, "sync:old");
+    const currentRun = await startRun(store, sourceRoot.name, "sync:current");
+    const change = packageChange({
+      sourceName: sourceRoot.name,
+      videoId: "unchanged_video",
+      syncId: oldRun.id,
+      hashCharacter: "d",
+      searchTerm: "unchanged",
+      vectorValue: 0.4,
+    });
+    await store.applyPackage(change);
+    const before = database
+      .prepare(
+        "SELECT package_hash, (SELECT count(*) FROM embeddings) AS embeddings FROM video_packages",
+      )
+      .get();
+
+    await store.markPackageSeen(change.videoPackage.ref, currentRun.id);
+    assert.equal(
+      await store.deletePackagesNotSeen(sourceRoot.name, currentRun.id),
+      0,
+    );
+    const after = database
+      .prepare(
+        "SELECT package_hash, last_seen_sync_id, (SELECT count(*) FROM embeddings) AS embeddings FROM video_packages",
+      )
+      .get();
+    assert.equal(after?.package_hash, before?.package_hash);
+    assert.equal(after?.embeddings, before?.embeddings);
+    assert.equal(after?.last_seen_sync_id, currentRun.id.value);
   } finally {
     database.close();
   }
