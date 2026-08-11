@@ -231,12 +231,16 @@ invalidar el uso del índice FTS.
 
 ### Carga
 
-Se construye perezosamente desde SQLite en la primera consulta, no al crear la
-aplicación: abrir la CLI para `source list` no debe leer 1,1 MB de BLOBs ni
-tocar el modelo. `sync` aplica cambios incrementales sobre la instancia ya
-cargada; si nunca se cargó, marca el índice como sucio y la próxima consulta lo
-reconstruye. Reiniciar el proceso siempre reconstruye desde SQLite, que es la
-única fuente de verdad.
+Se construye perezosamente desde SQLite, no al crear la aplicación: abrir la CLI
+para `source list` no debe leer 1,1 MB de BLOBs ni tocar el modelo.
+
+`sync` publica cambios que transportan vectores e identidades, pero no el tipo
+de unidad ni el idioma sobre los que filtra la recuperación. Por eso `apply` no
+parchea el índice —dejaría entradas nuevas imposibles de filtrar— sino que
+descarta el snapshot y deja que la siguiente consulta lo reconstruya. SQLite ya
+es la fuente de verdad y el cambio se publica después del commit, así que la
+reconstrucción es siempre correcta y cuesta milisegundos a esta escala.
+Reiniciar el proceso reconstruye por el mismo camino.
 
 ### Validación del modelo
 

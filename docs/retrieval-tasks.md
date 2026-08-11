@@ -1,4 +1,4 @@
-# Tareas de recuperación híbrida
+﻿# Tareas de recuperación híbrida
 
 ## Estado
 
@@ -92,7 +92,7 @@ Transformers.js.
 
 ### G2. Búsqueda textual SQLite
 
-- [ ] Implementar `TextSearchIndex` sobre `fragment_fts` con `bm25()` y filtros.
+- [x] Implementar `TextSearchIndex` sobre `fragment_fts` con `bm25()` y filtros.
   - Depende de: F2, G1 y D1.
   - Aceptación: pondera `title = 3.0`, `heading_path = 2.0`, `content = 1.0`;
     ordena ascendente por `bm25` y desempata por `fragment_id`; aplica filtros de
@@ -107,15 +107,21 @@ Transformers.js.
 
 ### G3. Índice vectorial exacto en memoria
 
-- [ ] Implementar `VectorSearchIndex` con carga perezosa desde SQLite y
+- [x] Implementar `VectorSearchIndex` con carga perezosa desde SQLite y
       aplicación incremental de cambios.
   - Depende de: F2, D4 y C1.
   - Aceptación: construye un `Float32Array` contiguo con identidades paralelas;
-    carga en la primera consulta y no al construirse; `apply` actualiza sin
-    recargar y marca sucio si aún no había cargado; valida clave, versión y
+    carga perezosamente y no al construirse; `apply` invalida el snapshot y la
+    siguiente consulta lo reconstruye desde SQLite; valida clave, versión y
     dimensión del modelo con error simbólico explícito; calcula producto punto
     sobre vectores normalizados; filtra antes de puntuar; desempata por
     `fragmentId`; reemplaza al `MemoryVectorIndexSink` sin romper `sync`.
+  - Nota de implementación: `VectorIndexChange` transporta vectores e
+    identidades, pero no el tipo de unidad ni el idioma sobre los que filtra la
+    recuperación. Parchear el índice en memoria dejaría entradas nuevas
+    imposibles de filtrar, así que se invalida el snapshot. SQLite ya es la
+    fuente de verdad y el cambio se publica después del commit, de modo que la
+    reconstrucción es siempre correcta y cuesta milisegundos a esta escala.
   - Verificar: `node --import tsx --test test/infrastructure/vector/in-memory-vector-search-index.test.ts`,
     `node --import tsx --test test/application/indexing/sync-source.test.ts` y
     `npm run check`.
