@@ -108,7 +108,8 @@ archivos dentro de esos paquetes.
 
 El toolchain utiliza `tsc`, ESLint con información de tipos, Prettier y
 `node:test`; sus comandos están definidos en [development.md](development.md).
-El framework de la CLI permanece pendiente hasta implementar su interfaz.
+La CLI administrativa usa `node:util.parseArgs` en modo estricto, sin incorporar
+un framework adicional. La decisión conserva una superficie pequeña y portable.
 
 ## Contrato de CLI aprobado
 
@@ -225,5 +226,4 @@ infraestructura ni tipos específicos de proveedores.
 
 ## Asuntos abiertos
 
-1. Framework de CLI.
-2. Política de combinación y reranking de resultados.
+1. Política de combinación y reranking de resultados.
