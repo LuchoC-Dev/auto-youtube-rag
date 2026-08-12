@@ -120,6 +120,12 @@ para el procedimiento de verificación en Codex si hace falta más adelante.
 
 #### 3.2 Evaluaciones del MVP
 
+Diseño y checklist fino propuestos y aprobados el 12 de agosto de 2026 en
+`docs/eval-design.md` y `docs/eval-tasks.md` (bloques M–O). Sin ground truth
+etiquetado: mide en dos capas independientes, mecánica (cobertura, integridad
+de citas) y juzgada (rúbrica respondida por Codex y por Claude sobre el mismo
+bundle). Implementación todavía no iniciada.
+
 - [ ] Preparar consultas reales
 - [ ] Medir recall y precisión
 - [ ] Medir cobertura temática

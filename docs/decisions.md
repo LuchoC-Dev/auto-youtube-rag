@@ -2,47 +2,48 @@
 
 ## Confirmadas
 
-| Tema               | Decisión                                              | Motivo                                                             |
-| ------------------ | ----------------------------------------------------- | ------------------------------------------------------------------ |
-| Nombre             | `auto-youtube-rag`                                    | Identidad del proyecto                                             |
-| Ejecución          | Exclusivamente local                                  | Privacidad y ausencia de servicios externos                        |
-| Cerebro generativo | Agente consultante                                    | Evitar duplicar razonamiento dentro del RAG                        |
-| Integración        | Skill general + CLI                                   | Portabilidad entre proveedores                                     |
-| Ejecutable         | `auto-youtube-rag`                                    | Nombre explícito y neutral                                         |
-| Parser CLI         | `node:util.parseArgs` estricto                        | API estándar de Node, sin dependencia adicional                    |
-| Indexación         | Un único comando `sync`                               | Evitar duplicar `index` y `sync`                                   |
-| Recuperación CLI   | Comando `retrieve`                                    | Ensambla contexto, no sólo coincidencias                           |
-| Salida             | Bundle Markdown + JSON                                | Evitar truncamiento y permitir integración                         |
-| Profundidades      | 12k / 32k / 64k                                       | Presets ajustables por evaluación                                  |
-| Citaciones         | `[S01]` resuelto en JSON                              | Lectura compacta con procedencia completa                          |
-| Idioma             | Contenido original; claves inglesas                   | Neutralidad entre proveedores                                      |
-| Códigos de proceso | `0`, `1`, `2` y `130`                                 | Convención portable; detalle mediante códigos JSON                 |
-| Skills             | Una fuente canónica                                   | Evitar variantes para Codex y Claude                               |
-| Agentes iniciales  | Codex y Claude                                        | Compatibilidad mínima requerida                                    |
-| Lenguaje           | TypeScript estricto                                   | Ruta integrada y soportada para ONNX en Windows                    |
-| Toolchain          | TypeScript 6.0.3, ESLint 10, Prettier 3 y `node:test` | Mantener análisis estricto, reproducible y oficialmente compatible |
-| Runtime            | Node.js 24.19.0 LTS con ESM                           | Fijar una base reproducible validada localmente                    |
-| Empaquetado        | npm + `package-lock.json`                             | Instalación reproducible sin otro runtime                          |
-| Arquitectura       | Dominio + puertos y adaptadores                       | Sustituir infraestructura sin alterar casos de uso                 |
-| Persistencia       | SQLite                                                | Simplicidad local y escala suficiente                              |
-| Cliente SQLite     | `node:sqlite`                                         | Sin binding nativo y suficiente en el benchmark local              |
-| Texto              | SQLite FTS5                                           | Búsqueda exacta y por relevancia                                   |
-| Embeddings         | E5 Small multilingüe `q8`                             | Mejor equilibrio del benchmark local                               |
-| Acoplamiento       | Modelo y DB sólo en infraestructura                   | Mantener dominio y aplicación reemplazables                        |
-| Vectores           | BLOB SQLite + índice exacto en memoria                | Menor latencia en el benchmark local                               |
-| Recuperación       | Híbrida y jerárquica                                  | Combinar precisión con cobertura amplia                            |
-| Fusión             | RRF ponderado tras `FusionStrategy`                   | Combina rangos sin comparar escalas y conserva hits exclusivos     |
-| Resultado          | Contexto amplio y citado                              | Proveer hechos suficientes al agente                               |
-| Fuentes            | Múltiples raíces registradas                          | Unificar `auto-design` y `catalog-design`                          |
-| Corpus principal   | `context.md`                                          | Documento autónomo y validado                                      |
-| Reglas             | `rules.json`                                          | Fuente estructurada de patrones                                    |
-| Metadata           | Filtros y procedencia                                 | Evitar tratar metadata como conocimiento                           |
-| Transcripción      | Respaldo opcional                                     | Evitar duplicar VTT y texto equivalente                            |
-| Imágenes           | Referencias, sin embeddings MVP                       | El nombre del archivo no es semántico                              |
-| Alcance MVP        | Sólo paquetes de video                                | Reducir superficie inicial                                         |
-| UI humana          | Posterior al MVP                                      | Primero validar recuperación para agentes                          |
-| Pruebas            | Durante todo el desarrollo                            | Detectar regresiones funcionales                                   |
-| Evals              | Al cerrar el MVP                                      | Medir calidad sobre el flujo completo                              |
+| Tema               | Decisión                                                            | Motivo                                                               |
+| ------------------ | ------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Nombre             | `auto-youtube-rag`                                                  | Identidad del proyecto                                               |
+| Ejecución          | Exclusivamente local                                                | Privacidad y ausencia de servicios externos                          |
+| Cerebro generativo | Agente consultante                                                  | Evitar duplicar razonamiento dentro del RAG                          |
+| Integración        | Skill general + CLI                                                 | Portabilidad entre proveedores                                       |
+| Ejecutable         | `auto-youtube-rag`                                                  | Nombre explícito y neutral                                           |
+| Parser CLI         | `node:util.parseArgs` estricto                                      | API estándar de Node, sin dependencia adicional                      |
+| Indexación         | Un único comando `sync`                                             | Evitar duplicar `index` y `sync`                                     |
+| Recuperación CLI   | Comando `retrieve`                                                  | Ensambla contexto, no sólo coincidencias                             |
+| Salida             | Bundle Markdown + JSON                                              | Evitar truncamiento y permitir integración                           |
+| Profundidades      | 12k / 32k / 64k                                                     | Presets ajustables por evaluación                                    |
+| Citaciones         | `[S01]` resuelto en JSON                                            | Lectura compacta con procedencia completa                            |
+| Idioma             | Contenido original; claves inglesas                                 | Neutralidad entre proveedores                                        |
+| Códigos de proceso | `0`, `1`, `2` y `130`                                               | Convención portable; detalle mediante códigos JSON                   |
+| Skills             | Una fuente canónica                                                 | Evitar variantes para Codex y Claude                                 |
+| Agentes iniciales  | Codex y Claude                                                      | Compatibilidad mínima requerida                                      |
+| Lenguaje           | TypeScript estricto                                                 | Ruta integrada y soportada para ONNX en Windows                      |
+| Toolchain          | TypeScript 6.0.3, ESLint 10, Prettier 3 y `node:test`               | Mantener análisis estricto, reproducible y oficialmente compatible   |
+| Runtime            | Node.js 24.19.0 LTS con ESM                                         | Fijar una base reproducible validada localmente                      |
+| Empaquetado        | npm + `package-lock.json`                                           | Instalación reproducible sin otro runtime                            |
+| Arquitectura       | Dominio + puertos y adaptadores                                     | Sustituir infraestructura sin alterar casos de uso                   |
+| Persistencia       | SQLite                                                              | Simplicidad local y escala suficiente                                |
+| Cliente SQLite     | `node:sqlite`                                                       | Sin binding nativo y suficiente en el benchmark local                |
+| Texto              | SQLite FTS5                                                         | Búsqueda exacta y por relevancia                                     |
+| Embeddings         | E5 Small multilingüe `q8`                                           | Mejor equilibrio del benchmark local                                 |
+| Acoplamiento       | Modelo y DB sólo en infraestructura                                 | Mantener dominio y aplicación reemplazables                          |
+| Vectores           | BLOB SQLite + índice exacto en memoria                              | Menor latencia en el benchmark local                                 |
+| Recuperación       | Híbrida y jerárquica                                                | Combinar precisión con cobertura amplia                              |
+| Fusión             | RRF ponderado tras `FusionStrategy`                                 | Combina rangos sin comparar escalas y conserva hits exclusivos       |
+| Resultado          | Contexto amplio y citado                                            | Proveer hechos suficientes al agente                                 |
+| Fuentes            | Múltiples raíces registradas                                        | Unificar `auto-design` y `catalog-design`                            |
+| Corpus principal   | `context.md`                                                        | Documento autónomo y validado                                        |
+| Reglas             | `rules.json`                                                        | Fuente estructurada de patrones                                      |
+| Metadata           | Filtros y procedencia                                               | Evitar tratar metadata como conocimiento                             |
+| Transcripción      | Respaldo opcional                                                   | Evitar duplicar VTT y texto equivalente                              |
+| Imágenes           | Referencias, sin embeddings MVP                                     | El nombre del archivo no es semántico                                |
+| Alcance MVP        | Sólo paquetes de video                                              | Reducir superficie inicial                                           |
+| UI humana          | Posterior al MVP                                                    | Primero validar recuperación para agentes                            |
+| Pruebas            | Durante todo el desarrollo                                          | Detectar regresiones funcionales                                     |
+| Evals              | Al cerrar el MVP                                                    | Medir calidad sobre el flujo completo                                |
+| Método de evals    | Métricas mecánicas + juicio de Codex y Claude sobre el mismo bundle | Sin ground truth etiquetado; el agente consumidor es el juez natural |
 
 ## Diseño de indexación aprobado
 
@@ -139,6 +140,30 @@ detalladas en [context-assembly-design.md](context-assembly-design.md):
 - Presupuestos por profundidad confirmados sin recalibrar: `focused` = 12k,
   `balanced` = 32k, `deep` = 64k tokens estimados.
 
+## Diseño de evaluaciones aprobado
+
+El 12 de agosto de 2026 se aprobó el diseño del punto 3.2, detallado en
+[eval-design.md](eval-design.md):
+
+- Sin ground truth de relevancia etiquetado a mano: es caro, subjetivo, y el
+  criterio de éxito del producto no es una coincidencia puntual sino cobertura
+  amplia y citada.
+- Dos capas de medición independientes: mecánica (integridad de citas,
+  cobertura, estado vs. `kind` esperado, calculable sin ningún agente) y
+  juzgada (rúbrica corta que responde el agente consumidor real sobre el
+  bundle ya ensamblado).
+- Codex y Claude evalúan exactamente el mismo bundle por consulta y
+  profundidad — nunca corridas de `retrieve` independientes por agente — para
+  medir consistencia del producto entre proveedores, no comparar
+  configuraciones de recuperación distintas.
+- No se barre la grilla de pesos RRF ni de presupuestos por profundidad a
+  ciegas: sólo se ajustan si la evidencia de 3.2 muestra un problema
+  concreto, y el cambio se documenta aquí con esa evidencia.
+
 ## Pendientes de decisión
 
-- Calibración de los pesos RRF mediante evaluaciones reales, en la etapa 3.2.
+- Calibración de los pesos RRF y de los presupuestos por profundidad, sujeta
+  a la evidencia que produzca la etapa 3.2 (ver
+  [eval-design.md](eval-design.md)). Si 3.2 no encuentra evidencia
+  suficiente, la decisión final es mantener los defaults actuales, y ese
+  resultado también se registra aquí.
