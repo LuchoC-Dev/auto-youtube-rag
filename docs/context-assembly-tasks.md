@@ -170,7 +170,7 @@ Checkpoint J: las cuatro políticas puras pasan sin instanciar SQLite, sin
 
 ### K3. Caso de uso `assembleContext`
 
-- [ ] Orquestar `retrieveCandidates`, `getAncestors`, expansión,
+- [x] Orquestar `retrieveCandidates`, `getAncestors`, expansión,
       deduplicación, presupuesto, citas y redacción.
   - Depende de: J1–J4, K1, K2, H2 (2.2).
   - Aceptación: llama `getAncestors` una sola vez por lote con los `unitId`
