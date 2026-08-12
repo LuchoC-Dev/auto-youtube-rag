@@ -11,6 +11,9 @@ import type { PackageSourceReader } from "../application/ports/package-source-re
 import type { SourceRegistry } from "../application/ports/source-registry.js";
 import type { TextSearchIndex } from "../application/ports/text-search-index.js";
 import type { VectorSearchIndex } from "../application/ports/vector-search-index.js";
+import { assembleContext } from "../application/context/assemble-context.js";
+import type { ContextBundle } from "../application/context/context-bundle.js";
+import type { ContextRequest } from "../application/context/context-request.js";
 import type { FusionStrategy } from "../application/retrieval/fusion-strategy.js";
 import {
   retrieveCandidates,
@@ -71,6 +74,7 @@ export interface Application {
   removeSource(name: unknown): Promise<void>;
   sync(sourceName?: unknown): Promise<readonly SyncSourceResult[]>;
   retrieveCandidates(query: RetrievalQuery): Promise<RetrievalOutcome>;
+  assembleContext(request: ContextRequest): Promise<ContextBundle>;
   close(): Promise<void>;
 }
 
@@ -145,6 +149,15 @@ export function createApplication(
     },
     retrieveCandidates: (query) =>
       retrieveCandidates(retrievalDependencies, query),
+    assembleContext: (request) =>
+      assembleContext(
+        {
+          retrieveCandidates: (query) =>
+            retrieveCandidates(retrievalDependencies, query),
+          knowledgeRepository,
+        },
+        request,
+      ),
     async close(): Promise<void> {
       if (embeddingGenerator instanceof E5EmbeddingGenerator) {
         await embeddingGenerator.dispose();

@@ -1,5 +1,7 @@
 import { parseArgs } from "node:util";
 
+import { contextDepths } from "../../domain/context/context-budget.js";
+
 export type ParsedCliCommand =
   | { readonly kind: "init" }
   | {
@@ -11,7 +13,15 @@ export type ParsedCliCommand =
   | { readonly kind: "source_remove"; readonly name: string }
   | { readonly kind: "sync"; readonly source: string | null }
   | { readonly kind: "status" }
-  | { readonly kind: "doctor" };
+  | { readonly kind: "doctor" }
+  | {
+      readonly kind: "retrieve";
+      readonly query: string;
+      readonly depth: string | null;
+      readonly maxTokens: number | null;
+      readonly sources: readonly string[];
+      readonly out: string | null;
+    };
 
 export class CliUsageError extends Error {
   public readonly code = "INVALID_ARGUMENTS";
@@ -124,6 +134,47 @@ export function parseCommand(argv: readonly string[]): ParsedCliCommand {
       const { positionals } = parse(rest);
       exactPositionals(positionals, 0, `auto-youtube-rag ${command}`);
       return { kind: command };
+    }
+    case "retrieve": {
+      const usageText =
+        "auto-youtube-rag retrieve <query> [--depth focused|balanced|deep] " +
+        "[--max-tokens <positive-integer>] [--source <name>] [--out <directory>]";
+      const { positionals, values } = parse(rest, {
+        depth: { type: "string" },
+        "max-tokens": { type: "string" },
+        source: { type: "string", multiple: true },
+        out: { type: "string" },
+      });
+      exactPositionals(positionals, 1, usageText);
+
+      if (
+        typeof values.depth === "string" &&
+        !contextDepths.some((depth) => depth === values.depth)
+      ) {
+        return usage(`--depth must be one of ${contextDepths.join(", ")}.`);
+      }
+
+      let maxTokens: number | null = null;
+      if (typeof values["max-tokens"] === "string") {
+        const parsed = Number(values["max-tokens"]);
+        if (!Number.isSafeInteger(parsed) || parsed < 1) {
+          return usage("--max-tokens must be a positive integer.");
+        }
+        maxTokens = parsed;
+      }
+
+      return {
+        kind: "retrieve",
+        query: positionals[0] ?? "",
+        depth: typeof values.depth === "string" ? values.depth : null,
+        maxTokens,
+        sources:
+          Array.isArray(values.source) &&
+          values.source.every((entry) => typeof entry === "string")
+            ? values.source
+            : [],
+        out: typeof values.out === "string" ? values.out : null,
+      };
     }
     default:
       return usage(`Unknown command: ${command}`);
