@@ -152,12 +152,15 @@ con `PRAGMA integrity_check` intacto y sin mutaciones.
 
 ### H1. Selección: deduplicación y diversidad
 
-- [ ] Implementar la política pura que reduce hits fusionados a candidatos
+- [x] Implementar la política pura que reduce hits fusionados a candidatos
       finales.
   - Depende de: F3.
   - Aceptación: conserva el mejor fragmento por unidad; aplica `maxPerVideo`
     recorriendo en orden de puntaje; trunca a `fusedResults`; no reordena por
     diversidad; un video dominante no monopoliza el resultado; es determinista.
+  - Nota de implementación: opera sobre `RetrievalCandidate` ya hidratado
+    (`unitId` y `packageRef` resueltos), no sobre `FusedHit`; ver la nota de
+    orquestación en `retrieval-design.md`.
   - Verificar: `node --import tsx --test test/application/retrieval/select-candidates.test.ts`
     y `npm run check`.
   - Archivos: `src/application/retrieval/select-candidates.ts`,
@@ -165,7 +168,7 @@ con `PRAGMA integrity_check` intacto y sin mutaciones.
 
 ### H2. Caso de uso `retrieveCandidates`
 
-- [ ] Orquestar consulta, ambas vías, fusión, selección e hidratación de
+- [x] Orquestar consulta, ambas vías, fusión, selección e hidratación de
       procedencia.
   - Depende de: F1–F3, G1–G4 y H1.
   - Aceptación: ejecuta las vías en paralelo; una vía fallida produce advertencia
