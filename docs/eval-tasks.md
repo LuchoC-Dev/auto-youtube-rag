@@ -137,7 +137,7 @@ tabla de Capa A está lista para alimentar el reporte final.
 
 ### N1. Plantilla de rúbrica
 
-- [ ] Redactar la plantilla que un juez (Claude o Codex) completa por bundle:
+- [x] Redactar la plantilla que un juez (Claude o Codex) completa por bundle:
       precisión aparente, cobertura suficiente, brecha percibida,
       coincidencia con `expected.notes`.
   - Depende de: M4 (necesita bundles reales para validar que la plantilla es
