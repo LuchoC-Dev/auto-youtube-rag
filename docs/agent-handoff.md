@@ -9,8 +9,9 @@ implementada, las invariantes que no deben romperse, las validaciones realizadas
 y el siguiente bloque recomendado.
 
 Estado de referencia: **12 de agosto de 2026**, después de completar el punto
-2.3 — ensamblado de contexto. El comando `retrieve` de la CLI ya está
-implementado, probado y anunciado como disponible.
+2.4 — skill general. El comando `retrieve` de la CLI y la skill portable
+(`skill/SKILL.md`) ya están implementados, probados y anunciados como
+disponibles. Sólo queda abierto el punto 3.2 (evaluaciones del MVP).
 
 ## Datos rápidos
 
@@ -28,7 +29,7 @@ implementado, probado y anunciado como disponible.
 | Dimensión                 | 384                                                                      |
 | Caché aproximada          | 129 MB en `.cache/models`                                                |
 | Operación                 | Exclusivamente local; sin APIs externas                                  |
-| Próximo punto             | 2.4 — skill general (o 3.2 — evaluaciones, a discreción del usuario)     |
+| Próximo punto             | 3.2 — evaluaciones del MVP                                               |
 
 La rama conserva el nombre de un benchmark anterior. No asumas que el proyecto
 está trabajando actualmente en `sqlite-vec`: esa opción fue evaluada y
@@ -54,8 +55,8 @@ Antes de modificar código, leer en este orden:
     completado.
 11. `docs/context-assembly-tasks.md`: checklist fino completado I1–L3 para
     2.3.
-12. Este documento: estado operativo, gotchas y arranque del siguiente punto
-    (2.4 o 3.2).
+12. `skill/SKILL.md`: skill portable ya verificada, punto 2.4 completado.
+13. Este documento: estado operativo, gotchas y arranque del punto 3.2.
 
 `docs/development.md` sigue siendo la referencia del toolchain. Su frase que
 describe `src/main.ts` como un scaffold quedó históricamente desactualizada: la
@@ -199,8 +200,21 @@ Los bloques I–L están completados:
 de implementación en `docs/context-assembly-design.md` y
 `docs/context-assembly-tasks.md`.
 
-`docs/build.md` marca 2.1, 2.2 y 2.3, y las pruebas funcionales actuales, al
-100%.
+### Punto 2.4 — skill general
+
+Completado: `skill/SKILL.md` en la raíz del repositorio, autocontenida (sin
+depender de rutas relativas a `docs/` para poder instalarse fuera de este
+repo), enseña a un agente a operar `init`, `status`, `doctor`,
+`source add/list/remove`, `sync` y `retrieve` sin lógica específica de
+proveedor. No requirió cambios en `src/`.
+
+Verificada con dos corridas de un subagente sin contexto previo del proyecto
+("en frío"), cada una con sólo el texto de la skill y una copia temporal de
+dos videos reales de `auto-design`. Detalle completo en la sección
+["Punto 2.4 completado"](#punto-24-completado--skill-general) más abajo.
+
+`docs/build.md` marca 2.1, 2.2, 2.3 y 2.4, y las pruebas funcionales
+actuales, al 100%. Sólo 3.2 queda en `0%`.
 
 ## Arquitectura implementada
 
@@ -809,46 +823,98 @@ también en `decisions.md`):
 Presupuestos de contexto por profundidad ya no aparece como pendiente de
 decisión en `decisions.md`: quedó confirmado el 12 de agosto de 2026.
 
-## Próximo trabajo: punto 2.4 — skill general (o 3.2 — evaluaciones)
+## Punto 2.4 completado — skill general
 
-No hay un bloque siguiente obligatorio fijado: `build.md` deja 2.4 (skill
-general) y 3.2 (evaluaciones del MVP) ambos en `0%`. Según `product-spec.md`
-y `cli-contract.md`:
+`skill/SKILL.md` invoca la CLI ya completa (`init`, `source add/list/remove`,
+`sync`, `retrieve`, `status`, `doctor`) sin lógica específica de proveedor.
+`rebuild` se documenta explícitamente como no disponible todavía.
 
-- **2.4 — skill general**: una única skill portable, instalable o enlazable
-  desde Codex, Claude y futuros agentes, que invoque la CLI ya completa
-  (`init`, `source`, `sync`, `retrieve`, `status`, `doctor`) sin lógica
-  específica de proveedor. No requiere cambios en `src/`.
-- **3.2 — evaluaciones del MVP**: recall, precisión y cobertura temática sobre
-  consultas reales (`evals/queries/seed-queries.json` ya sembrado en 2.2),
-  comparación con Codex y Claude, y la calibración pendiente de pesos RRF y
-  presupuestos de profundidad que 2.2 y 2.3 dejaron explícitamente diferida.
+Decisiones cerradas durante 2.4 que no deben reabrirse sin motivo:
 
-No asumas cuál de los dos sigue: preguntá al usuario antes de proponer diseño
-y checklist fino, siguiendo el mismo patrón que `retrieval-design.md`/
-`context-assembly-design.md`.
+- Ubicación: `skill/SKILL.md` en la raíz del repo, tal como ya aprobaba el
+  árbol conceptual de `product-spec.md` (`skill/` a secas, sin anidar un
+  directorio con el nombre del proyecto adentro).
+- Autocontención: el contenido esencial del contrato de CLI (comandos, flags,
+  exit codes, forma del recibo JSON, códigos simbólicos) está embebido
+  directamente en `SKILL.md`, no referenciado por ruta relativa a `docs/`,
+  porque la skill debe poder instalarse o enlazarse fuera de este
+  repositorio.
+- Invocación: la skill asume `auto-youtube-rag <comando>` como forma
+  canónica (igual que `cli-contract.md`) y documenta `node
+"<ruta-al-repo>/dist/main.js" <comando>` como respaldo, porque el binario
+  no está enlazado globalmente (`npm link`) en este entorno de desarrollo.
+- Verificación: **"en frío"**, con un subagente sin contexto previo del
+  proyecto (no leyó `docs/` ni `src/`, sólo el texto de la skill) contra una
+  copia temporal de dos videos reales de `auto-design` — nunca contra la
+  colección original. Dos corridas:
+  1. La primera corrida reveló un hueco crítico: la skill no mencionaba
+     `init` como paso previo obligatorio. Sin él, `status`/`doctor`/
+     `source add` fallan con `ERR_SQLITE_ERROR: unable to open database
+file`, un código que la skill tampoco explicaba. Corregido agregando
+     `init` como paso 1 del flujo recomendado.
+  2. La segunda corrida, con la skill corregida, completó el flujo completo
+     (`init` → `status` → `source add` → `sync` → `retrieve` → lectura de
+     `context.md`/`result.json` → cita con procedencia) sin inspeccionar
+     `src/` ni inventar sintaxis, y confirmó que las citas `[S0N]` resuelven
+     correctamente contra `result.json`. Encontró dos ambigüedades menores,
+     ya corregidas en el texto: (a) el mismo `ERR_SQLITE_ERROR` también
+     puede deberse a un `cwd` inconsistente entre invocaciones, no sólo a
+     `init` faltante — la base de datos por defecto es relativa a
+     `<cwd>/.auto-youtube-rag/`; (b) `source add` espera la ruta a la
+     carpeta `videos/` en sí, no a su carpeta padre, y el `collection_path`
+     del recibo puede quedar un nivel arriba de esa ruta sin que eso sea un
+     error.
+  3. **Verificación específica en Codex (agente externo real, no simulado)
+     no se ejecutó** — el usuario eligió explícitamente cerrar 2.4 con sólo
+     verificación en Claude Code por ahora. Si aparece un problema de
+     interpretación de la skill específico de Codex, o antes de considerar
+     el punto "verificado en dos proveedores" en un sentido estricto, correr
+     la misma skill desde Codex contra una colección de prueba y reportar
+     resultado.
+- No se modificó ningún archivo de `src/`, `docs/cli-contract.md` ni
+  `docs/product-spec.md`: 2.4 fue estrictamente documentación de uso sobre
+  una CLI ya cerrada.
+
+## Próximo trabajo: punto 3.2 — evaluaciones del MVP
+
+Único bloque abierto según `build.md`. Según `product-spec.md`:
+
+- Recall, precisión y cobertura temática sobre consultas reales
+  (`evals/queries/seed-queries.json`, ya sembrado en 2.2).
+- Comparación de resultados entre Codex y Claude usando la skill de 2.4.
+- Calibración de los pesos RRF (`k = 60`, `wText = wVector = 1.0`, ver
+  `docs/retrieval-design.md`) y de los presupuestos por profundidad
+  (`focused` 12k / `balanced` 32k / `deep` 64k), ambos dejados
+  explícitamente diferidos por 2.2 y 2.3.
+- Probablemente la primera vez que se justifica una validación completa
+  sobre la colección real `auto-design` con el modelo E5 real (ver el
+  procedimiento ya documentado en "Última validación conocida" → notas de
+  2.2/2.3), en vez de sobre fixtures o copias parciales.
+
+No hay diseño ni checklist fino todavía para 3.2. Antes de implementar,
+proponer diseño (métricas concretas, formato de reporte, cómo se compara
+Codex vs. Claude) siguiendo el mismo patrón que `retrieval-design.md`/
+`context-assembly-design.md`, y esperar aprobación explícita del usuario.
 
 ## Primer turno recomendado para el próximo agente
 
 1. Confirmar `git status --short` vacío y revisar los últimos commits.
 2. Ejecutar `npm.cmd run check` y `npm.cmd run build`.
-3. Leer los doce documentos indicados al inicio.
-4. Inspeccionar `assemble-context.ts`, `allocate-budget.ts`,
-   `render-context-markdown.ts`, `render-context-result.ts` y
-   `run-cli.ts` (caso `"retrieve"`).
-5. Preguntar al usuario si el siguiente bloque es 2.4 (skill general) o 3.2
-   (evaluaciones), y no empezar código directamente: proponer el diseño y
-   checklist fino correspondiente primero.
-6. Implementar en cortes de máximo cinco archivos por tarea, conservando
+3. Leer los trece documentos indicados al inicio, incluido `skill/SKILL.md`.
+4. Preguntar al usuario si corresponde arrancar 3.2 ahora o si hay trabajo
+   previo (por ejemplo, verificar la skill desde Codex real). No empezar
+   código directamente: proponer diseño y checklist fino de evaluaciones
+   primero.
+5. Implementar en cortes de máximo cinco archivos por tarea, conservando
    arquitectura y commits convencionales.
 
 Prompt sugerido para retomar:
 
 > Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero el
-> estado del repositorio y las pruebas. Los puntos 2.2 y 2.3 están terminados,
-> incluido el comando `retrieve` de la CLI. Preguntame si seguimos con 2.4
-> —skill general— o con 3.2 —evaluaciones del MVP— antes de planificar. No
-> implementes hasta presentar y aprobar el checklist detallado.
+> estado del repositorio y las pruebas. Los puntos 2.2, 2.3 y 2.4 están
+> terminados, incluidos el comando `retrieve` y la skill portable
+> `skill/SKILL.md`. Sólo queda 3.2 —evaluaciones del MVP— abierto. No
+> implementes hasta presentar y aprobar el diseño y checklist detallado.
 
 ## Historial reciente relevante
 
@@ -914,7 +980,7 @@ código:
 5. cómo se mantienen alineados SQLite, FTS5 y embeddings;
 6. por qué la búsqueda vectorial inicial será exacta y reemplazable;
 7. qué entregó cada punto — 2.1 indexación, 2.2 recuperación, 2.3 ensamblado y
-   `retrieve` — y qué queda para 2.4 (skill) y 3.2 (evaluaciones);
+   `retrieve`, 2.4 la skill portable — y qué queda para 3.2 (evaluaciones);
 8. por qué RRF ponderado es el baseline de fusión y qué queda pendiente de
    calibrar en 3.2;
 9. por qué la búsqueda vectorial no tiene piso de similitud y qué implica eso

@@ -16,7 +16,7 @@
 | **2 — Implementación MVP** | 2.1 | Indexación incremental         |   ✅   | 100% | Sync incremental y CLI verificadas         |
 |                            | 2.2 | Recuperación híbrida           |   ✅   | 100% | FTS5, vectores y ranking verificados       |
 |                            | 2.3 | Ensamblado de contexto         |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve` |
-|                            | 2.4 | Skill general                  |   ⚪   |  0%  | Integración portable con CLI               |
+|                            | 2.4 | Skill general                  |   ✅   | 100% | `skill/SKILL.md` verificada en frío        |
 | **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos       |
 |                            | 3.2 | Evaluaciones del MVP           |   ⚪   |  0%  | Recall, precisión y cobertura              |
 
@@ -92,9 +92,22 @@
 
 #### 2.4 Skill general
 
-- [ ] Crear una skill canónica
-- [ ] Invocar la CLI sin lógica de proveedor
-- [ ] Verificar uso desde Codex y Claude
+- [x] Crear una skill canónica
+- [x] Invocar la CLI sin lógica de proveedor
+- [x] Verificar uso desde Claude (agente en frío, sin contexto previo)
+- [ ] Verificar uso desde Codex (agente externo real, pendiente de que el
+      usuario la corra)
+
+`skill/SKILL.md` es autocontenida (no depende de rutas relativas a `docs/`)
+para poder instalarse fuera de este repositorio. Verificada con dos corridas
+de un subagente en frío (sin contexto previo del proyecto, sólo el texto de
+la skill) contra una copia temporal de dos videos reales de `auto-design`: la
+primera corrida detectó que faltaba documentar `init` como paso previo
+obligatorio; corregido, la segunda corrida completó el flujo completo
+(`init` → `status` → `source add` → `sync` → `retrieve`) y produjo un bundle
+citado correctamente sin inspeccionar `src/`. Cerrado con verificación sólo
+en Claude por decisión explícita del usuario; ver `docs/agent-handoff.md`
+para el procedimiento de verificación en Codex si hace falta más adelante.
 
 ### Etapa 3 — Calidad
 
