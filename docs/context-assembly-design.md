@@ -88,14 +88,14 @@ ofrecer.
 ```ts
 export interface ContextRequest {
   readonly query: RetrievalQuery; // reutiliza el value object de 2.2
-  readonly depth: ContextDepth;
-  readonly maxTokensOverride: number | null;
+  readonly budget: ContextBudget; // ya resuelve depth + maxTokens (I1)
 }
 ```
 
 No se crea un nuevo value object de consulta: `RetrievalQuery` y
 `RetrievalFilter` de 2.2 ya cubren texto, filtros y límites de candidatos. El
-único concepto nuevo de 2.3 es la profundidad/presupuesto.
+único concepto nuevo de 2.3 es el presupuesto, y se reutiliza `ContextBudget`
+en vez de repetir `depth`/`maxTokensOverride` sueltos.
 
 ## Expansión a unidades padre
 
@@ -121,9 +121,10 @@ export interface ContextUnitBlock {
   readonly headingPath: readonly string[];
   readonly title: string | null;
   readonly content: string;
+  readonly contentHash: string; // para la deduplicación de J2
   readonly tokenCount: number;
   readonly origin: "candidate" | "ancestor";
-  readonly fusedScore: number | null; // null para bloques de ancestro
+  readonly fusedScore: number; // propio, o el del candidato que expandió el ancestro
   readonly depth: number; // profundidad jerárquica, 0 = documento
   readonly documentKind: SourceDocumentKind;
   readonly documentRelativePath: string;
@@ -135,6 +136,22 @@ export interface ContextUnitBlock {
   readonly visualEvidence: readonly string[];
 }
 ```
+
+Implementado en `src/application/context/context-blocks.ts`, junto con
+`BudgetAllocation` y `CitationRecord`. `fusedScore` nunca es `null`: un bloque
+de ancestro hereda el puntaje del candidato que lo trajo, porque J3 necesita
+un valor comparable para ordenar dentro de "Additional relevant context" sin
+introducir un segundo criterio de orden.
+
+El objeto `result.json` se tipó en `src/application/context/context-bundle.ts`
+(`ContextResultDocument`). `cli-contract.md` deja los ítems de `units[]` y
+`sources[]` sin schema explícito más allá del ejemplo de cita; 2.3 lo completa
+así: cada `ContextResultUnit` extiende `CitationRecord` con `section`
+(`highest_relevance | related_rules | additional_context`), `content` y
+`tokenCount`; cada `ContextResultSource` resume un `packageRef` distinto
+(`sourceName`, `videoId`, `videoTitle`, `creator`, `canonicalUrl`).
+`coverage` reporta conteos reales (`unitsByType`, `unitsBySource`,
+`omittedForBudget`, `budgetExhausted`), nunca texto inventado.
 
 `tokenCount` de un candidato viene de `provenance.tokenCount`; el de un
 ancestro viene de `KnowledgeUnit.estimatedTokens`. Ninguno de los dos se
