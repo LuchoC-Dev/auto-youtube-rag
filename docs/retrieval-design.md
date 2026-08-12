@@ -263,19 +263,29 @@ milisegundos y evita el error de aproximación de un índice ANN.
 `retrieveCandidates` es el caso de uso y sólo conoce puertos:
 
 1. normalizar y validar la consulta;
-2. lanzar ambas búsquedas en paralelo con `Promise.all`;
+2. lanzar ambas búsquedas en paralelo;
 3. si una vía falla, registrar una advertencia y continuar con la otra —una
    recuperación degradada es preferible a ninguna—;
 4. fusionar con `FusionStrategy`;
-5. deduplicar: conservar el mejor fragmento por `unitId`;
-6. diversificar: aplicar `maxPerVideo` recorriendo en orden de puntaje;
-7. truncar a `fusedResults`;
-8. hidratar procedencia en una sola consulta por lote;
+5. hidratar procedencia del conjunto fusionado completo en una sola consulta
+   por lote;
+6. deduplicar: conservar el mejor fragmento por `unitId`;
+7. diversificar: aplicar `maxPerVideo` recorriendo en orden de puntaje;
+8. truncar a `fusedResults`;
 9. devolver `RetrievalOutcome` con métricas.
 
 La deduplicación precede a la diversidad de forma deliberada: dos fragmentos de
 la misma sección son redundancia, mientras que dos secciones distintas del mismo
 video son contexto legítimo hasta el límite por video.
+
+Nota de implementación: la hidratación se adelantó respecto del orden original
+de este documento. `RankedHit` sólo lleva `fragmentId`; ni la deduplicación por
+`unitId` ni la diversidad por video son posibles sin conocer la procedencia, así
+que ambas etapas necesitan el lote hidratado. El conjunto a hidratar está
+acotado por `textCandidates + vectorCandidates`, de modo que sigue siendo una
+sola consulta por lote, no una por candidato. Un hit fusionado sin procedencia
+—una eliminación que compite con la consulta— se descarta en vez de mostrarse
+sin evidencia.
 
 ## Determinismo
 
