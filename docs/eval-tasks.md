@@ -192,7 +192,7 @@ de responder. 24 rúbricas generadas en
 
 ### N3. Juicio de Codex
 
-- [ ] Completar la rúbrica de N1 para los mismos 24 bundles con Codex como
+- [x] Completar la rúbrica de N1 para los mismos 24 bundles con Codex como
       juez, sin que Codex vea las respuestas de Claude de antemano.
   - Depende de: N1, mismos bundles que N2.
   - Aceptación: 24 rúbricas completas guardadas en
