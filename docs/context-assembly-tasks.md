@@ -65,7 +65,7 @@ Transformers.js.
 
 ### J1. Expansión a unidades padre
 
-- [ ] Implementar la función pura que combina candidatos y ancestros ya
+- [x] Implementar la función pura que combina candidatos y ancestros ya
       resueltos en bloques citables sin duplicados.
   - Depende de: I2.
   - Aceptación: cada `unitId` produce un único bloque aunque llegue como
@@ -73,10 +73,16 @@ Transformers.js.
     `unitId` que es candidato conserva `origin: "candidate"` y su
     `fusedScore`; un ancestro nunca pisa un candidato ya construido;
     determinista ante el mismo par de listas de entrada.
-  - Nota de implementación: la llamada a `knowledgeRepository.getAncestors`
-    ocurre en el caso de uso (bloque J2), no aquí; esta función recibe ya
-    resueltos `candidates: readonly RetrievalCandidate[]` y
-    `ancestorUnits: readonly KnowledgeUnit[]`.
+  - Nota de implementación: las llamadas a `knowledgeRepository.getUnits` y
+    `knowledgeRepository.getAncestors` ocurren en el caso de uso (bloque K3),
+    no aquí; esta función recibe ya resueltos `candidates: readonly
+RetrievalCandidate[]`, `candidateUnits: ReadonlyMap<string,
+KnowledgeUnit>` (clave = `unitId.value`, para conocer el `parentId` de
+    cada candidato) y `ancestorUnits: readonly KnowledgeUnit[]`. Un bloque de
+    ancestro hereda `packageRef`/`documentKind`/`documentRelativePath`/
+    `videoTitle`/`creator`/`canonicalUrl`/`language` del candidato cuya cadena
+    lo trajo, porque `KnowledgeUnit` no transporta esa metadata y un ancestro
+    nunca cruza de documento.
   - Verificar: `node --import tsx --test test/application/context/expand-to-ancestors.test.ts`
     y `npm run check`.
   - Archivos: `src/application/context/expand-to-ancestors.ts`,
