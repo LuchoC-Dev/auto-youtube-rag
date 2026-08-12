@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 
+import { ContextBudget } from "../../src/domain/context/context-budget.js";
 import { RetrievalQuery } from "../../src/domain/retrieval/retrieval-query.js";
 import { createApplication } from "../../src/main/create-application.js";
 import { FakeEmbeddingGenerator } from "../fakes/fake-embedding-generator.js";
@@ -92,6 +93,37 @@ void test("shares one vector index between sync and retrieval", async () => {
     // served this query, so a committed change and a query can never see
     // different vectors.
     assert.equal(vectors.searchCalls.length, 1);
+  } finally {
+    await application.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+void test("exposes assembleContext, reusing the same retrieval wiring", async () => {
+  const directory = await mkdtemp(
+    join(tmpdir(), "auto-youtube-rag-assemble-context-"),
+  );
+  const application = createApplication(
+    {
+      databasePath: join(directory, "index.sqlite"),
+      modelCachePath: join(directory, "models"),
+    },
+    {
+      embeddingGenerator: new FakeEmbeddingGenerator(),
+      vectorIndex: new FakeVectorSearchIndex(),
+    },
+  );
+
+  try {
+    const bundle = await application.assembleContext({
+      query: RetrievalQuery.create({ text: "brutalismo" }),
+      budget: ContextBudget.default(),
+    });
+
+    // An empty library has no candidates, so a valid bundle explaining the
+    // absence of evidence is the expected outcome, not an error.
+    assert.equal(bundle.result.status, "no_results");
+    assert.deepEqual(bundle.result.units, []);
   } finally {
     await application.close();
     await rm(directory, { recursive: true, force: true });
