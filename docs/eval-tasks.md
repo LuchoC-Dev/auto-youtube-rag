@@ -47,7 +47,7 @@ profundidad, y sólo detrás de las interfaces ya sustituibles
 
 ### M2. Script de orquestación de consultas semilla
 
-- [ ] Implementar un script que, dado un directorio de colección ya
+- [x] Implementar un script que, dado un directorio de colección ya
       sincronizado, ejecute las ocho consultas de `seed-queries.json` en las
       tres profundidades usando la `Application` real (`assembleContext`), y
       vuelque cada bundle bajo
