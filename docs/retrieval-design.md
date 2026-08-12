@@ -287,6 +287,24 @@ sola consulta por lote, no una por candidato. Un hit fusionado sin procedencia
 —una eliminación que compite con la consulta— se descarta en vez de mostrarse
 sin evidencia.
 
+## Ausencia de umbral en la búsqueda vectorial
+
+La búsqueda vectorial es un ranking exhaustivo, no un filtro: cada consulta
+devuelve todos los fragmentos que pasan el filtro de metadata, ordenados por
+similitud, hasta `vectorCandidates`. No existe un piso de similitud mínima.
+
+Esto significa que `status: "no_results"` sólo ocurre cuando el filtro deja la
+biblioteca vacía o cuando ambas vías fallan; una consulta sobre una biblioteca
+no vacía y sin filtros restrictivos siempre devuelve candidatos, aunque su
+similitud semántica real sea baja. El E2E de recuperación lo confirma: verificar
+que una eliminación "desaparece de ambos rankings" requiere filtrar por el video
+eliminado, no sólo repetir la consulta original, porque el resto de la
+biblioteca sigue apareciendo vía la vía vectorial.
+
+Un umbral mínimo de similitud —o un límite de calidad configurable— queda como
+candidato de calibración para la etapa 3.2, junto con los pesos de RRF; no se
+introduce ahora sin evaluaciones reales que lo justifiquen.
+
 ## Determinismo
 
 La misma consulta sobre la misma base produce exactamente el mismo orden. Se
