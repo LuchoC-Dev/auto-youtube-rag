@@ -103,15 +103,27 @@ en vez de repetir `depth`/`maxTokensOverride` sueltos.
    diversificados por video en 2.2; como máximo `fusedResults`, 50 por
    defecto).
 2. Recolectar el conjunto único de `unitId` de los candidatos.
-3. Llamar `knowledgeRepository.getAncestors(unitIds)` **una sola vez** — ya
-   soporta lotes y devuelve la cadena completa hasta la raíz sin duplicados
-   (implementado en 2.2, `G4`).
+3. Llamar **dos** lotes, no uno: `knowledgeRepository.getUnits(unitIds)` y
+   `knowledgeRepository.getAncestors(unitIds)`. `getAncestors` sólo devuelve
+   el conjunto plano y deduplicado de unidades ancestro —no dice qué ancestro
+   corresponde a qué candidato—, y `KnowledgeUnit` no transporta metadata de
+   video/documento (eso vive únicamente en `CandidateProvenance`). `getUnits`
+   recupera el `parentId` de cada candidato, indispensable para reconstruir su
+   cadena exacta y para que cada bloque de ancestro herede la metadata del
+   candidato que lo originó, ya que un ancestro nunca cruza de documento.
+   Sigue siendo O(1) en cantidad de consultas: dos lotes, no una consulta por
+   candidato.
 4. Construir un bloque citable (`ContextUnitBlock`) por cada candidato (usando
    `provenance.content`, que ya es el texto completo de la unidad en el caso
    común — sólo se fragmenta cuando una unidad excede el límite de tokens del
-   modelo, ver `fragment-knowledge-units.ts`) y un bloque por cada unidad
-   ancestro devuelta (usando `KnowledgeUnit.content`, que siempre es el texto
-   íntegro de la unidad, nunca un fragmento).
+   modelo, ver `fragment-knowledge-units.ts`) y, caminando `parentId` desde la
+   unidad de cada candidato hacia la raíz a través del mapa de ancestros, un
+   bloque por cada unidad ancestro no vista todavía (usando
+   `KnowledgeUnit.content`, siempre el texto íntegro de la unidad, nunca un
+   fragmento, y heredando `packageRef`, `documentKind`, `documentRelativePath`,
+   `videoTitle`, `creator`, `canonicalUrl` y `language` del candidato que lo
+   trajo). Si dos candidatos comparten un ancestro, el segundo camino se
+   detiene apenas encuentra un `unitId` ya construido.
 
 ```ts
 export interface ContextUnitBlock {
