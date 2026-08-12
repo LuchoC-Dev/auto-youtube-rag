@@ -156,75 +156,137 @@ Los bloques A–E están completados:
 - E: casos de uso de fuentes, orquestador `sync`, composition root, CLI,
   `status`, `doctor` y E2E.
 
-`docs/build.md` marca 2.1 y las pruebas funcionales actuales al 100%.
+### Punto 2.2 — recuperación híbrida
+
+Los bloques F–H están completados:
+
+- F: value objects de consulta/filtro/límites, puertos de recuperación
+  (`TextSearchIndex`, `VectorSearchIndex`, `KnowledgeRepository`) y fusión RRF
+  ponderada.
+- G: sanitizador de consultas FTS5, adaptador textual sobre `fragment_fts`,
+  índice vectorial exacto en memoria y repositorio de conocimiento SQLite.
+- H: selección (dedupe + diversidad), caso de uso `retrieveCandidates`,
+  cableado en el composition root y E2E completo.
+
+Detalle completo, decisiones y notas de implementación en la sección
+["Punto 2.2 completado"](#punto-22-completado--recuperación-híbrida) más abajo,
+y en `docs/retrieval-design.md` / `docs/retrieval-tasks.md`.
+
+`docs/build.md` marca 2.1 y 2.2, y las pruebas funcionales actuales, al 100%.
 
 ## Arquitectura implementada
 
-### Dominio — `src/domain/indexing`
+Inventario completo de `src/` a la fecha de este documento (52 archivos). Un
+agente frío puede confiar en esta lista en vez de explorar el árbol de nuevo;
+si diverge de la realidad, el árbol manda y esta lista está desactualizada.
 
-No importa infraestructura. Contiene:
+### Dominio — `src/domain`
 
-- identificadores: `SourceName`, `VideoId`, `PackageRef`, `DocumentId`,
-  `KnowledgeUnitId`, `SearchFragmentId`, `SyncId`;
-- entidades: `SourceRoot`, `VideoPackage`, `SourceDocument`, `KnowledgeUnit`,
-  `SearchFragment`, `EmbeddingRecord`, `SyncRun`, `SyncIssue`;
-- hashes y claves estructurales deterministas;
-- validación estricta y errores de dominio.
+No importa infraestructura.
+
+`src/domain/indexing/`:
+
+- identificadores (`identifiers.ts`): `SourceName`, `VideoId`, `PackageRef`,
+  `DocumentId`, `KnowledgeUnitId`, `SearchFragmentId`, `SyncId`;
+- entidades: `source-root.ts`, `video-package.ts`, `source-document.ts`,
+  `knowledge-unit.ts`, `search-fragment.ts`, `embedding-record.ts`,
+  `sync-run.ts` (incluye `SyncIssue`);
+- `content-identity.ts`: SHA-256 y claves estructurales deterministas
+  (`createMarkdownSectionKey`, `createRulePatternKey`, `createRuleChildKey`,
+  `createFragmentKey`);
+- `domain-error.ts`: `DomainValidationError` con códigos simbólicos
+  compartidos por todo el dominio (`INVALID_IDENTIFIER`,
+  `INVALID_PACKAGE_REF`, `INVALID_RETRIEVAL_QUERY`).
 
 Identidad importante: un paquete es `(source_name, video_id)`. El slug sólo
 localiza el directorio y puede cambiar.
 
+`src/domain/retrieval/` (nuevo en 2.2):
+
+- `retrieval-query.ts`: `RetrievalQuery`, `RetrievalLimits`, normalización NFC
+  y tope de 1000 caracteres;
+- `retrieval-filter.ts`: `RetrievalFilter`, deduplicación de criterios y
+  comparación de idioma en minúsculas.
+
 ### Aplicación — `src/application`
 
-Puertos actuales:
+Puertos actuales (`src/application/ports/`):
 
-- `PackageSourceReader`;
-- `SourceRegistry`;
-- `IndexStore`;
-- `EmbeddingGenerator`;
-- `VectorIndexSink`.
+- `package-source-reader.ts` → `PackageSourceReader`;
+- `source-registry.ts` → `SourceRegistry`;
+- `index-store.ts` → `IndexStore`;
+- `embedding-generator.ts` → `EmbeddingGenerator`;
+- `vector-index-sink.ts` → `VectorIndexSink` (sólo escritura; sigue existiendo
+  como base de `VectorSearchIndex`, no lo reemplaza `sync` directamente);
+- `text-search-index.ts` → `TextSearchIndex` (nuevo en 2.2);
+- `vector-search-index.ts` → `VectorSearchIndex` (nuevo en 2.2; extiende
+  `VectorIndexSink` con `load` y `search`);
+- `knowledge-repository.ts` → `KnowledgeRepository` (nuevo en 2.2).
 
-Casos de uso principales:
+Casos de uso y políticas puras:
 
-- `addSource`, `listSources`, `removeSource`;
-- `buildKnowledgeUnits`;
-- `fragmentKnowledgeUnits`;
-- `syncSource`;
-- `getStatus`;
-- `runDoctor`.
+- `src/application/sources/`: `add-source.ts`, `list-sources.ts`,
+  `remove-source.ts`;
+- `src/application/indexing/`: `build-knowledge-units.ts`,
+  `fragment-knowledge-units.ts`, `sync-source.ts` (orquestador `syncSource`),
+  `package-snapshots.ts`, `indexed-package-change.ts`;
+- `src/application/diagnostics/`: `get-status.ts`, `run-doctor.ts`;
+- `src/application/retrieval/` (nuevo en 2.2): `retrieval-results.ts` (tipos
+  compartidos `RankedHit`, `FusedHit`, `CandidateProvenance`,
+  `RetrievalCandidate`, `RetrievalOutcome`), `fusion-strategy.ts` (puerto
+  `FusionStrategy`), `rrf-fusion.ts` (`createRrfFusion`),
+  `select-candidates.ts` (`selectCandidates`, dedupe + diversidad),
+  `retrieve-candidates.ts` (`retrieveCandidates`, el orquestador de 2.2).
 
-El orquestador sólo conoce puertos. Tests de aplicación usan fakes y no cargan
-SQLite ni el modelo real.
+El orquestador sólo conoce puertos. Tests de aplicación usan fakes
+(`test/fakes/`) y no cargan SQLite ni el modelo real.
 
 ### Infraestructura — `src/infrastructure`
 
-Filesystem:
+Filesystem (`src/infrastructure/filesystem/`):
 
-- resolución canónica de colección o carpeta `videos/`;
-- parsing del manifest;
-- parsing de `context.md` y `rules.json`;
-- selección de metadata estable;
-- lectura completa de paquetes sin escrituras.
+- `source-layout-resolver.ts`: resolución canónica de colección o carpeta
+  `videos/`;
+- `manifest-reader.ts`: parsing del manifest;
+- `context-markdown-parser.ts`, `rules-json-parser.ts`: parsing de
+  `context.md` y `rules.json`;
+- `metadata-selector.ts`: selección de metadata estable;
+- `filesystem-package-source-reader.ts`: lectura completa de paquetes sin
+  escrituras.
 
-Embeddings:
+Embeddings (`src/infrastructure/embeddings/e5-embedding-generator.ts`):
 
 - `E5EmbeddingGenerator` carga perezosamente;
-- prefijos E5: `passage:` y `query:`;
+- prefijos E5: `passage:` y `query:` (el prefijo `query:` lo aplica el
+  adaptador dentro de `embedQuery`; el caso de uso de recuperación pasa el
+  texto crudo);
 - límite declarado: 512 tokens;
 - lotes configurables;
 - vectores normalizados y validados;
 - runtime forzado a local mediante `env.allowRemoteModels = false` y
   `env.cacheDir` antes de crear el pipeline.
 
-SQLite:
+SQLite (`src/infrastructure/sqlite/`):
 
-- apertura con WAL y foreign keys;
-- migración inicial versionada;
-- registro de fuentes;
-- estado de paquetes y runs;
-- aplicación transaccional completa;
-- triggers de sincronización FTS5;
-- diagnósticos read-only.
+- `open-database.ts`: apertura con WAL y foreign keys;
+- `migrations/001-initial.ts`: migración inicial versionada;
+- `sqlite-source-registry.ts`: registro de fuentes;
+- `sqlite-index-store.ts`: estado de paquetes y runs, aplicación
+  transaccional completa;
+- `sqlite-diagnostics.ts`: diagnósticos read-only para `status`/`doctor`;
+- `fts-query-sanitizer.ts` (nuevo en 2.2): traduce texto libre a una expresión
+  `MATCH` segura, tokenizando por letras/números y citando cada token;
+- `sqlite-text-search-index.ts` (nuevo en 2.2): `SQLiteTextSearchIndex`,
+  consulta `fragment_fts` con `bm25()` ponderado por columna;
+- `sqlite-knowledge-repository.ts` (nuevo en 2.2): `SQLiteKnowledgeRepository`,
+  procedencia por lote, unidades y ancestros.
+
+Vector (`src/infrastructure/vector/`, nuevo en 2.2):
+
+- `sqlite-vector-loader.ts`: `SQLiteVectorSource`, decodifica BLOBs float32
+  little-endian desde `embeddings`;
+- `in-memory-vector-search-index.ts`: `InMemoryVectorSearchIndex`, matriz
+  contigua, carga perezosa, producto punto sobre vectores normalizados.
 
 ### Interfaz — `src/interfaces/cli`
 
@@ -233,15 +295,54 @@ SQLite:
 - `run-cli.ts`: ejecución de casos de uso y códigos de salida.
 - `src/main.ts`: entry point ESM y configuración por entorno.
 
+Sin cambios en 2.2: la CLI no expone `retrieve` todavía (ver
+["CLI implementada y CLI futura"](#cli-implementada-y-cli-futura)).
+
 ### Composition root — `src/main/create-application.ts`
 
-Conecta adaptadores concretos y permite reemplazarlos mediante overrides. Crear
-la aplicación no descarga modelos ni sincroniza. El modelo se carga sólo al
-contar tokens o generar embeddings.
+Conecta adaptadores concretos y permite reemplazarlos mediante overrides
+(`ApplicationOverrides`). Crear la aplicación no descarga modelos, no
+sincroniza y no carga vectores. El modelo se carga sólo al contar tokens o
+generar embeddings; el índice vectorial se carga sólo en la primera consulta o
+`sync`.
 
-El `MemoryVectorIndexSink` actual recibe cambios confirmados, pero no es todavía
-el motor de consulta de 2.2. No confundir publicación de cambios con búsqueda
-vectorial implementada.
+Cambio importante de 2.2: **`MemoryVectorIndexSink` fue eliminado.** El campo
+`vectorIndex` de `Application` ahora es un `VectorSearchIndex`
+(`InMemoryVectorSearchIndex` sobre `SQLiteVectorSource` por defecto). La misma
+instancia recibe los cambios que publica `sync` y sirve las consultas de
+`retrieveCandidates`, así que un cambio confirmado y una consulta nunca pueden
+ver vectores distintos. Si encontrás referencias a `MemoryVectorIndexSink` en
+código o memoria de sesiones viejas, están obsoletas.
+
+`Application` expone ahora `retrieveCandidates(query: RetrievalQuery):
+Promise<RetrievalOutcome>`, además de `vectorIndex`, `textSearchIndex` y
+`knowledgeRepository` como propiedades reemplazables.
+
+## Flujo exacto de `retrieveCandidates` (2.2)
+
+1. Normalizar y validar la consulta ya llegó resuelta como `RetrievalQuery`
+   (el dominio ya garantiza texto no vacío, NFC, ≤1000 caracteres).
+2. Lanzar `textIndex.search` y (`embeddingGenerator.describe` +
+   `embeddingGenerator.embedQuery` + `vectorIndex.load` +
+   `vectorIndex.search`) en paralelo.
+3. Si una vía falla, capturar el error, agregar un `RetrievalWarning` con
+   código `TEXT_SEARCH_UNAVAILABLE` o `VECTOR_SEARCH_UNAVAILABLE` y continuar
+   con hits vacíos de esa vía. Nunca aborta la consulta completa.
+4. Fusionar ambas listas de `RankedHit` con `FusionStrategy` (RRF ponderado
+   por defecto) → `FusedHit[]`.
+5. Hidratar procedencia del conjunto fusionado completo con
+   `knowledgeRepository.getFragmentProvenance` en un solo lote (acotado por
+   `textCandidates + vectorCandidates`). Un `FusedHit` sin procedencia
+   (fragmento borrado justo antes de esta consulta) se descarta.
+6. `selectCandidates`: deduplicar por `unitId` (conserva el de mejor score),
+   diversificar con `maxPerVideo`, truncar a `fusedResults`.
+7. Devolver `RetrievalOutcome` con `status` (`"ok"` o `"no_results"`),
+   `candidates`, `metrics` y `warnings`.
+
+**Gotcha crítico para 2.3:** la búsqueda vectorial no tiene piso de similitud
+(ver la sección de decisiones de 2.2 más abajo). `status: "ok"` con candidatos
+de relevancia real baja es un resultado válido y esperado, no un bug. 2.3 no
+debe asumir que todo candidato devuelto es necesariamente relevante.
 
 ## Flujo exacto de `sync`
 
@@ -284,6 +385,17 @@ Triggers: insert, update y delete mantienen FTS5 alineado. Las eliminaciones de
 paquetes usan cascadas y `last_seen_sync_id`. Los embeddings incluyen modelo,
 versión, dimensión, hash y BLOB.
 
+**2.2 no agregó ninguna migración ni tabla.** Los adaptadores de recuperación
+leen el esquema tal cual quedó en 2.1. Los identificadores de dominio de
+fragmento y documento (`SearchFragmentId`, `DocumentId`) no tienen columna
+propia: se reconstruyen en cada adaptador a partir de columnas existentes
+(`knowledge_units.stable_key`, `search_fragments.ordinal`, `sources.name`,
+`video_packages.video_id`, `source_documents.kind`). Antes de proponer
+persistirlos explícitamente, leer la nota completa en
+`docs/retrieval-design.md` — a la escala actual (~3.000 fragmentos) no hace
+falta, y agregar una columna es un cambio de esquema que requiere aprobación
+explícita según los invariantes del proyecto.
+
 ## CLI implementada y CLI futura
 
 Implementado actualmente:
@@ -305,7 +417,9 @@ auto-youtube-rag retrieve <query> [options]
 auto-youtube-rag rebuild --confirm
 ```
 
-No anuncies `retrieve` como disponible hasta completar 2.2 y 2.3.
+No anuncies `retrieve` como disponible hasta completar 2.3. 2.2 entregó todo el
+motor de recuperación (`retrieveCandidates`) pero deliberadamente sin
+superficie de CLI: ver la decisión en la sección de 2.2 más abajo.
 
 ## Configuración de ejecución
 
@@ -357,7 +471,7 @@ E5 se ejecuta explícitamente y nunca debe depender de red.
 
 ## Última validación conocida
 
-Puerta final de 2.1:
+### Puerta final de 2.1 (11 de agosto de 2026)
 
 - 91 tests aprobados;
 - cobertura: 93,90% líneas, 81,73% ramas, 98,17% funciones;
@@ -379,6 +493,30 @@ real `auto-design`:
 - digest SHA-256 del árbol fuente idéntico antes y después.
 
 La copia y su base temporal fueron eliminadas tras validar.
+
+### Puerta final de 2.2 (12 de agosto de 2026)
+
+- 151 tests aprobados (91 heredados de 2.1 + 60 nuevos de recuperación);
+- cobertura: 94,66% líneas, 84,25% ramas, 98,23% funciones;
+- `npm run build`: aprobado;
+- `npm run check`: aprobado;
+- `npm run test:coverage`: aprobado;
+- `test/e2e/retrieval.e2e.test.ts` aprobado sobre SQLite real (no fakes),
+  fixture de dos fuentes, sin modelo E5 real (embedding determinista por
+  palabra clave, ver el propio archivo);
+- worktree limpio.
+
+**No se ejecutó una validación sobre la colección real `auto-design` con el
+modelo E5 real.** Fue una decisión explícita del usuario el 12 de agosto de
+2026: avanzar a 2.3 sin correr esa confirmación. No es un olvido ni un
+pendiente urgente — no la ejecutes de oficio al retomar el proyecto. Si en
+algún momento se necesita (por ejemplo, antes de evaluaciones reales en 3.2, o
+si aparece un bug que sólo se manifiesta con datos reales), el patrón a seguir
+es el mismo que documentó la puerta de 2.1: copiar la colección a un directorio
+temporal, sincronizar con el modelo real (ya cacheado en `.cache/models`),
+correr consultas de `evals/queries/seed-queries.json` contra
+`retrieveCandidates`, revisar cualitativamente, verificar el digest SHA-256 del
+árbol fuente antes/después, y borrar la copia y la base temporal al terminar.
 
 ## Bugs importantes ya corregidos
 
@@ -416,6 +554,18 @@ un patrón ASCII.
   `npm run build` según el riesgo.
 - Preservar stdout JSON y stderr para progreso.
 
+Invariantes propias de recuperación (2.2):
+
+- Nunca comparar `rawScore` entre la vía textual y la vectorial: BM25 no tiene
+  cota y coseno vive en `0..1`. Sólo se comparan posiciones (rangos).
+- Nunca asumir que la búsqueda vectorial tiene un piso de similitud: siempre
+  devuelve algo si la biblioteca (tras filtros) no está vacía.
+- Nunca exponer `retrieve` en la CLI ni anunciarlo como disponible hasta cerrar
+  2.3.
+- Nunca dejar que `sync` y `retrieveCandidates` usen instancias distintas del
+  índice vectorial: deben compartir la misma para que un cambio publicado y una
+  consulta nunca vean vectores diferentes.
+
 ## Punto 2.2 completado — recuperación híbrida
 
 Bloques F–H están completados (contratos, adaptadores, orquestación). Detalle
@@ -449,19 +599,10 @@ Decisiones cerradas durante 2.2 que no deben reabrirse sin motivo:
 - 2.2 no expone superficie de CLI. `retrieve` sigue sin anunciarse hasta cerrar
   2.3.
 
-Validación realizada: 151 tests (eran 91 al cerrar 2.1), cobertura 94,66%
-líneas / 84,25% ramas / 98,23% funciones, `npm run build` y `npm run check`
-aprobados. El E2E de recuperación (`test/e2e/retrieval.e2e.test.ts`) cubre
-consulta sin restart, término raro por vía textual, paráfrasis sin léxico
-compartido por vía vectorial, filtro por fuente, eliminación en ambas vías y
-reconstrucción tras reiniciar el proceso, sin mutar las fuentes.
-
-Pendiente opcional antes de avanzar, no bloqueante: una pasada cualitativa de
-`retrieveCandidates` sobre una copia temporal de la colección real
-`auto-design` con el modelo E5 real (ya cacheado en `.cache/models`), siguiendo
-el mismo patrón que la validación real de 2.1. No se ejecutó en el cierre de
-2.2 porque las cuatro capacidades ya están verificadas por pruebas automatizadas
-y el E2E; queda como confirmación adicional, no como condición de cierre.
+Validación completa, incluida la decisión explícita de no correr la pasada
+cualitativa sobre la colección real, en
+["Última validación conocida"](#última-validación-conocida) → "Puerta final de
+2.2".
 
 ## Próximo trabajo: punto 2.3 — ensamblado de contexto
 
