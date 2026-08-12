@@ -120,7 +120,7 @@ KnowledgeUnit>` (clave = `unitId.value`, para conocer el `parentId` de
 
 ### J4. Asignación de citas
 
-- [ ] Implementar `assignCitations` sobre los bloques finalmente incluidos.
+- [x] Implementar `assignCitations` sobre los bloques finalmente incluidos.
   - Depende de: J3.
   - Aceptación: IDs `S01`, `S02`... secuenciales y sin huecos en el orden
     final de inclusión; un bloque omitido por presupuesto nunca reserva
