@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Initial retrieval queries for qualitative review against a real collection once point 2.2 is exercised manually. No thresholds are fixed yet; the 'expected' field states what a reviewer should look for, not a pass/fail assertion. Numeric evaluation belongs to stage 3.2.",
+  "queries": [
+    {
+      "id": "es-concept-brutalism",
+      "text": "características del diseño brutalista",
+      "language": "es",
+      "kind": "concept",
+      "expected": {
+        "notes": "Debe recuperar contexto conceptual amplio sobre brutalismo (definición, rasgos visuales, uso de tipografía y contraste), no una única coincidencia puntual. Se espera aporte de ambas vías."
+      }
+    },
+    {
+      "id": "en-concept-visual-hierarchy",
+      "text": "how to build visual hierarchy with typography",
+      "language": "en",
+      "kind": "concept",
+      "expected": {
+        "notes": "Should surface rules or context sections about type scale, weight, and contrast even if the exact phrase 'visual hierarchy' is rare in the corpus."
+      }
+    },
+    {
+      "id": "es-rare-term-kerning",
+      "text": "kerning",
+      "language": "es",
+      "kind": "rare_term",
+      "expected": {
+        "notes": "Término técnico específico y poco frecuente. Debe llegar principalmente por la vía textual, con alta precisión. Si aparece en pocos videos, la cobertura será baja y es esperable."
+      }
+    },
+    {
+      "id": "es-paraphrase-saturated-colors",
+      "text": "colores muy llamativos y saturados en el diseño",
+      "language": "es",
+      "kind": "paraphrase",
+      "expected": {
+        "notes": "No debe depender de coincidencia literal de palabras. Se espera que la vía vectorial recupere fragmentos que hablan de paletas de alto contraste o saturación aunque usen otro vocabulario ('paleta vibrante', 'colores intensos', etc.)."
+      }
+    },
+    {
+      "id": "multilingual-grid-systems",
+      "text": "sistemas de grilla editorial",
+      "language": "es",
+      "kind": "multilingual",
+      "expected": {
+        "notes": "E5 es multilingüe: si existe contenido en inglés sobre 'grid systems' o 'editorial grids', debería poder aparecer entre los candidatos vectoriales aunque la consulta esté en español."
+      }
+    },
+    {
+      "id": "en-multilingual-typography-pairing",
+      "text": "font pairing best practices",
+      "language": "en",
+      "kind": "multilingual",
+      "expected": {
+        "notes": "Debe poder cruzar hacia contenido en español sobre combinación de tipografías ('pareo tipográfico', 'combinar fuentes') vía similitud semántica, no sólo vía coincidencia textual."
+      }
+    },
+    {
+      "id": "es-no-answer-unrelated-topic",
+      "text": "recetas de cocina vegana para principiantes",
+      "language": "es",
+      "kind": "no_answer",
+      "expected": {
+        "notes": "El corpus es de diseño gráfico y no cubre cocina. Se espera status 'no_results' o candidatos de baja relevancia sin ninguno realmente pertinente. Sirve para observar el comportamiento de la biblioteca sin umbral de similitud (ver docs/retrieval-design.md): la vía vectorial puede seguir devolviendo candidatos débiles, así que la revisión debe ser cualitativa, no sólo de status."
+      }
+    },
+    {
+      "id": "es-rules-comparison-brutalism-minimalism",
+      "text": "diferencias entre brutalismo y minimalismo",
+      "language": "es",
+      "kind": "comparison",
+      "expected": {
+        "notes": "Consulta comparativa entre dos estilos. Debe recuperar contexto y reglas de ambos, permitiendo que el agente construya la comparación; el producto no compara por sí mismo."
+      }
+    }
+  ]
+}
