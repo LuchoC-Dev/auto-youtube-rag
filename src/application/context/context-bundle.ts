@@ -1,50 +1,64 @@
 import type { ContextDepth } from "../../domain/context/context-budget.js";
 import type { KnowledgeUnitType } from "../../domain/indexing/knowledge-unit.js";
 import type { RetrievalWarning } from "../retrieval/retrieval-results.js";
-import type { CitationRecord, ContextSection } from "./context-blocks.js";
+import type { ContextSection } from "./context-blocks.js";
 
 /**
- * One entry of `result.json`'s `units` array: a resolved citation plus the
- * full text it backs and the section of `context.md` it was rendered into.
- * `cli-contract.md` shows the citation shape alone; this extends it with the
- * fields a consumer needs without reopening `context.md`.
+ * `result.json`'s field names are the wire contract already approved in
+ * `cli-contract.md` (snake_case), not an internal TypeScript convention, so
+ * this type spells them exactly as the file will. `CitationRecord`
+ * (`context-blocks.ts`) stays camelCase for internal use; `renderContextResult`
+ * is the one place that maps one to the other, the same way `run-cli.ts`
+ * builds its snake_case receipts from camelCase application types.
  */
-export interface ContextResultUnit extends CitationRecord {
+export interface ContextResultUnit {
+  readonly citation_id: string;
   readonly section: ContextSection;
+  readonly source_name: string;
+  readonly video_id: string;
+  readonly video_title: string | null;
+  readonly creator: string | null;
+  readonly file: string;
+  readonly heading_path: readonly string[];
+  readonly unit_type: KnowledgeUnitType;
+  readonly timestamp: string | null;
+  readonly visual_evidence: readonly string[];
   readonly content: string;
-  readonly tokenCount: number;
+  readonly token_count: number;
 }
 
 export interface ContextResultSource {
-  readonly sourceName: string;
-  readonly videoId: string;
-  readonly videoTitle: string | null;
+  readonly source_name: string;
+  readonly video_id: string;
+  readonly video_title: string | null;
   readonly creator: string | null;
-  readonly canonicalUrl: string | null;
+  readonly canonical_url: string | null;
 }
 
 export interface ContextResultDocument {
-  readonly schemaVersion: "1.0";
+  readonly schema_version: "1.0";
   readonly status: "ok" | "no_results";
   readonly request: {
     readonly query: string;
     readonly depth: ContextDepth;
-    readonly maxTokens: number;
+    readonly max_tokens: number;
     readonly sources: readonly string[];
   };
   readonly metrics: {
-    readonly candidatesConsidered: number;
-    readonly unitsSelected: number;
-    readonly sourcesUsed: number;
-    readonly estimatedTokens: number;
+    readonly candidates_considered: number;
+    readonly units_selected: number;
+    readonly sources_used: number;
+    readonly estimated_tokens: number;
   };
   readonly units: readonly ContextResultUnit[];
   readonly sources: readonly ContextResultSource[];
   readonly coverage: {
-    readonly unitsByType: Readonly<Partial<Record<KnowledgeUnitType, number>>>;
-    readonly unitsBySource: Readonly<Record<string, number>>;
-    readonly omittedForBudget: number;
-    readonly budgetExhausted: boolean;
+    readonly units_by_type: Readonly<
+      Partial<Record<KnowledgeUnitType, number>>
+    >;
+    readonly units_by_source: Readonly<Record<string, number>>;
+    readonly omitted_for_budget: number;
+    readonly budget_exhausted: boolean;
   };
   readonly warnings: readonly RetrievalWarning[];
   readonly limitations: readonly string[];

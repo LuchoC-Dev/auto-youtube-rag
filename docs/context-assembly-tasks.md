@@ -155,7 +155,7 @@ Checkpoint J: las cuatro políticas puras pasan sin instanciar SQLite, sin
 
 ### K2. Redacción de `result.json`
 
-- [ ] Implementar `renderContextResult` como función pura.
+- [x] Implementar `renderContextResult` como función pura.
   - Depende de: J1–J4, I1.
   - Aceptación: valida contra el esquema de `cli-contract.md`
     (`schema_version`, `status`, `request`, `metrics`, `units`, `sources`,

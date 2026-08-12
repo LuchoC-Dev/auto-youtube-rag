@@ -158,10 +158,18 @@ introducir un segundo criterio de orden.
 El objeto `result.json` se tipó en `src/application/context/context-bundle.ts`
 (`ContextResultDocument`). `cli-contract.md` deja los ítems de `units[]` y
 `sources[]` sin schema explícito más allá del ejemplo de cita; 2.3 lo completa
-así: cada `ContextResultUnit` extiende `CitationRecord` con `section`
+así: cada `ContextResultUnit` lleva los mismos campos de cita (`citation_id`,
+`source_name`, `video_id`, ...) más `section`
 (`highest_relevance | related_rules | additional_context`), `content` y
-`tokenCount`; cada `ContextResultSource` resume un `packageRef` distinto
-(`sourceName`, `videoId`, `videoTitle`, `creator`, `canonicalUrl`).
+`token_count`; cada `ContextResultSource` resume un `packageRef` distinto
+(`source_name`, `video_id`, `video_title`, `creator`, `canonical_url`).
+
+`ContextResultDocument` usa `snake_case` en sus campos porque ésa es la
+forma exacta ya aprobada del archivo, no una convención de TypeScript interna
+— a diferencia de `CitationRecord`/`ContextUnitBlock`, que son tipos internos
+en `camelCase`. `renderContextResult` (K2) es el único lugar que traduce de
+uno a otro, igual que `run-cli.ts` construye sus recibos `snake_case` a partir
+de tipos de aplicación en `camelCase`.
 `coverage` reporta conteos reales (`unitsByType`, `unitsBySource`,
 `omittedForBudget`, `budgetExhausted`), nunca texto inventado.
 
