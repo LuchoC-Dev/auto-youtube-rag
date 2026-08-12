@@ -202,7 +202,7 @@ de responder. 24 rúbricas generadas en
 
 ### N4. Comparación Codex vs. Claude
 
-- [ ] Comparar las 24 parejas de rúbricas y señalar discrepancias
+- [x] Comparar las 24 parejas de rúbricas y señalar discrepancias
       (precisión aparente fuera de ±0.2, cobertura suficiente fuera de ±1, o
       coincidencia con `expected.notes` divergente).
   - Depende de: N2, N3.
@@ -215,6 +215,29 @@ de responder. 24 rúbricas generadas en
 
 Checkpoint N: las 48 rúbricas (24 por juez) existen y la comparación está
 lista.
+
+**Ejecutado el 12 de agosto de 2026.** 9 de 24 pares divergen según la regla
+(±0.2 en `precision_aparente`, ±1 en `cobertura_suficiente`, o
+`coincidencia_expected_notes` distinta). Tabla completa y las nueve
+hipótesis en `evals/results/2026-08-12/report.md`, sección "Comparación
+Codex vs. Claude". Ninguna discrepancia indica que un juez haya leído mal
+un bundle o inventado contenido; se agrupan en dos causas:
+
+- **Severidad de `precision_aparente`** (2 casos, ambos en
+  `en-concept-visual-hierarchy`): ambos jueces describen el mismo contenido
+  y sólo pesan distinto cuánto castigar el ruido temático.
+- **Ambigüedad de la rúbrica sobre "cobertura suficiente" y "cruce
+  multilingüe demostrado"** (7 casos: las tres profundidades de
+  `en-multilingual-typography-pairing` y de `multilingual-grid-systems`, más
+  `es-concept-brutalism/deep`). El caso más claro es `multilingual-grid-systems`:
+  Claude infiere el cruce multilingüe por la sola presencia de fuentes en
+  inglés respondiendo una consulta en español; Codex exige evidencia
+  explícita en el propio `context.md`, que el producto nunca declara por
+  diseño (no anota por qué vía llegó cada fragmento). Con la redacción
+  actual de `evals/rubric-template.md`, ningún bundle podría satisfacer
+  nunca la lectura más estricta de Codex — es una ambigüedad del
+  instrumento de evaluación, no un defecto del producto. Queda anotado como
+  mejora para una futura pasada de N1, no como acción de 3.2.
 
 ## Bloque O — Decisión de calibración y cierre
 
