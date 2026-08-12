@@ -198,7 +198,7 @@ con `PRAGMA integrity_check` intacto y sin mutaciones.
 
 ### H4. Integración extremo a extremo
 
-- [ ] Verificar el ciclo completo sobre la colección temporal reproducible.
+- [x] Verificar el ciclo completo sobre la colección temporal reproducible.
   - Depende de: H1–H3.
   - Aceptación: un paquete recién sincronizado es consultable sin reiniciar;
     eliminarlo lo retira de ambas vías; reabrir el proceso reconstruye el índice
