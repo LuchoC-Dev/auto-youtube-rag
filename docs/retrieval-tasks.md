@@ -240,6 +240,16 @@ Cuando F1–H5 estén completas:
 5. revisar que el worktree no contenga bases, modelos ni artefactos locales;
 6. no avanzar a 2.3 sin aprobar antes su propio diseño y checklist.
 
+**Estado real de cierre (12 de agosto de 2026):** los pasos 1, 3, 4 y 5 se
+cumplieron. El paso 2 —recuperación manual sobre la colección real con el
+modelo E5 real— **no se ejecutó**: el usuario decidió explícitamente avanzar a
+2.3 sin correr esa confirmación, dado que las cuatro capacidades ya estaban
+verificadas por 151 tests automatizados y el E2E de
+`test/e2e/retrieval.e2e.test.ts`. Queda como pendiente opcional, no bloqueante;
+el procedimiento a seguir si se retoma está documentado en
+`docs/agent-handoff.md`, sección "Última validación conocida" → "Puerta final
+de 2.2".
+
 ## Decisiones solicitadas para aprobar las tareas
 
 1. Ejecutar las doce tareas en orden F1–H5, respetando dependencias.
