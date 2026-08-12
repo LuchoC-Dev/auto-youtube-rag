@@ -18,7 +18,7 @@
 |                            | 2.3 | Ensamblado de contexto         |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve` |
 |                            | 2.4 | Skill general                  |   ✅   | 100% | `skill/SKILL.md` verificada en frío        |
 | **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos       |
-|                            | 3.2 | Evaluaciones del MVP           |   🔵   | 67%  | M y N1–N2 completos; N3 pendiente (Codex)  |
+|                            | 3.2 | Evaluaciones del MVP           |   🔵   | 78%  | M y N1–N3 completos; N4/O en curso         |
 
 ---
 
@@ -132,7 +132,7 @@ bundle). Checklist fino en `docs/eval-tasks.md`, bloques M–O.
 - [x] M4. Ejecución real sobre `auto-design` (24 bundles en `evals/results/2026-08-12/`; hallazgo de deriva de esquema en 17/51 videos del manifest real, ver `docs/eval-tasks.md`)
 - [x] N1. Plantilla de rúbrica (`evals/rubric-template.md`)
 - [x] N2. Juicio de Claude (`evals/results/2026-08-12/judgments/claude/`, subagente en frío)
-- [ ] N3. Juicio de Codex
+- [x] N3. Juicio de Codex (`evals/results/2026-08-12/judgments/codex/`, corrido por el usuario)
 - [ ] N4. Comparación Codex vs. Claude
 - [ ] O1. Decisión sobre pesos RRF y presupuestos
 - [ ] O2. Reporte final y cierre de 3.2
