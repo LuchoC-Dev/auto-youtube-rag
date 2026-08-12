@@ -6,12 +6,18 @@ import {
 } from "../application/indexing/sync-source.js";
 import type { EmbeddingGenerator } from "../application/ports/embedding-generator.js";
 import type { IndexStore } from "../application/ports/index-store.js";
+import type { KnowledgeRepository } from "../application/ports/knowledge-repository.js";
 import type { PackageSourceReader } from "../application/ports/package-source-reader.js";
 import type { SourceRegistry } from "../application/ports/source-registry.js";
-import type {
-  VectorIndexChange,
-  VectorIndexSink,
-} from "../application/ports/vector-index-sink.js";
+import type { TextSearchIndex } from "../application/ports/text-search-index.js";
+import type { VectorSearchIndex } from "../application/ports/vector-search-index.js";
+import type { FusionStrategy } from "../application/retrieval/fusion-strategy.js";
+import {
+  retrieveCandidates,
+  type RetrieveCandidatesDependencies,
+} from "../application/retrieval/retrieve-candidates.js";
+import { createRrfFusion } from "../application/retrieval/rrf-fusion.js";
+import type { RetrievalOutcome } from "../application/retrieval/retrieval-results.js";
 import {
   addSource,
   type AddSourceInput,
@@ -20,13 +26,18 @@ import {
 import { listSources } from "../application/sources/list-sources.js";
 import { removeSource } from "../application/sources/remove-source.js";
 import { SourceName } from "../domain/indexing/identifiers.js";
+import type { RetrievalQuery } from "../domain/retrieval/retrieval-query.js";
 import type { SourceRoot } from "../domain/indexing/source-root.js";
 import { E5EmbeddingGenerator } from "../infrastructure/embeddings/e5-embedding-generator.js";
 import { FilesystemPackageSourceReader } from "../infrastructure/filesystem/filesystem-package-source-reader.js";
 import { resolveSourceLayout } from "../infrastructure/filesystem/source-layout-resolver.js";
 import { openDatabase } from "../infrastructure/sqlite/open-database.js";
 import { SQLiteIndexStore } from "../infrastructure/sqlite/sqlite-index-store.js";
+import { SQLiteKnowledgeRepository } from "../infrastructure/sqlite/sqlite-knowledge-repository.js";
 import { SQLiteSourceRegistry } from "../infrastructure/sqlite/sqlite-source-registry.js";
+import { SQLiteTextSearchIndex } from "../infrastructure/sqlite/sqlite-text-search-index.js";
+import { InMemoryVectorSearchIndex } from "../infrastructure/vector/in-memory-vector-search-index.js";
+import { SQLiteVectorSource } from "../infrastructure/vector/sqlite-vector-loader.js";
 
 export interface ApplicationConfig {
   readonly databasePath: string;
@@ -39,7 +50,10 @@ export interface ApplicationOverrides {
   readonly indexStore?: IndexStore;
   readonly packageReader?: PackageSourceReader;
   readonly embeddingGenerator?: EmbeddingGenerator;
-  readonly vectorIndex?: VectorIndexSink;
+  readonly vectorIndex?: VectorSearchIndex;
+  readonly textSearchIndex?: TextSearchIndex;
+  readonly knowledgeRepository?: KnowledgeRepository;
+  readonly fusionStrategy?: FusionStrategy;
   readonly resolveLayout?: SourceLayoutResolver;
 }
 
@@ -49,21 +63,15 @@ export interface Application {
   readonly indexStore: IndexStore;
   readonly packageReader: PackageSourceReader;
   readonly embeddingGenerator: EmbeddingGenerator;
-  readonly vectorIndex: VectorIndexSink;
+  readonly vectorIndex: VectorSearchIndex;
+  readonly textSearchIndex: TextSearchIndex;
+  readonly knowledgeRepository: KnowledgeRepository;
   addSource(input: AddSourceInput): Promise<SourceRoot>;
   listSources(): Promise<readonly SourceRoot[]>;
   removeSource(name: unknown): Promise<void>;
   sync(sourceName?: unknown): Promise<readonly SyncSourceResult[]>;
+  retrieveCandidates(query: RetrievalQuery): Promise<RetrievalOutcome>;
   close(): Promise<void>;
-}
-
-export class MemoryVectorIndexSink implements VectorIndexSink {
-  public readonly changes: VectorIndexChange[] = [];
-
-  public apply(change: VectorIndexChange): Promise<void> {
-    this.changes.push(change);
-    return Promise.resolve();
-  }
 }
 
 export function createApplication(
@@ -81,8 +89,25 @@ export function createApplication(
   const embeddingGenerator =
     overrides.embeddingGenerator ??
     new E5EmbeddingGenerator({ cacheDir: config.modelCachePath });
-  const vectorIndex = overrides.vectorIndex ?? new MemoryVectorIndexSink();
+  // sync publishes through this same instance, and retrieval queries it: one
+  // object owns the vectors, so a committed change and a served query cannot
+  // disagree about which fragments exist.
+  const vectorIndex =
+    overrides.vectorIndex ??
+    new InMemoryVectorSearchIndex(new SQLiteVectorSource(database));
+  const textSearchIndex =
+    overrides.textSearchIndex ?? new SQLiteTextSearchIndex(database);
+  const knowledgeRepository =
+    overrides.knowledgeRepository ?? new SQLiteKnowledgeRepository(database);
+  const fusionStrategy = overrides.fusionStrategy ?? createRrfFusion();
   const resolveLayout = overrides.resolveLayout ?? resolveSourceLayout;
+  const retrievalDependencies: RetrieveCandidatesDependencies = {
+    textIndex: textSearchIndex,
+    vectorIndex,
+    knowledgeRepository,
+    embeddingGenerator,
+    fusionStrategy,
+  };
 
   return {
     database,
@@ -91,6 +116,8 @@ export function createApplication(
     packageReader,
     embeddingGenerator,
     vectorIndex,
+    textSearchIndex,
+    knowledgeRepository,
     addSource: (input) =>
       addSource({ registry: sourceRegistry, resolveLayout }, input),
     listSources: () => listSources(sourceRegistry),
@@ -116,6 +143,8 @@ export function createApplication(
         ),
       );
     },
+    retrieveCandidates: (query) =>
+      retrieveCandidates(retrievalDependencies, query),
     async close(): Promise<void> {
       if (embeddingGenerator instanceof E5EmbeddingGenerator) {
         await embeddingGenerator.dispose();
