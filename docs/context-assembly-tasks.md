@@ -90,7 +90,7 @@ KnowledgeUnit>` (clave = `unitId.value`, para conocer el `parentId` de
 
 ### J2. Deduplicación por contenido
 
-- [ ] Añadir la deduplicación secundaria por `contentHash` sobre la salida de
+- [x] Añadir la deduplicación secundaria por `contentHash` sobre la salida de
       J1.
   - Depende de: J1.
   - Aceptación: dos bloques con `contentHash` idéntico bajo `unitId`
