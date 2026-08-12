@@ -45,7 +45,7 @@ y únicamente en la tarea de escritura del bloque K.
 
 ### I2. Tipos de solicitud y bundle
 
-- [ ] Declarar `ContextRequest`, `ContextUnitBlock`, `BudgetAllocation`,
+- [x] Declarar `ContextRequest`, `ContextUnitBlock`, `BudgetAllocation`,
       `CitationRecord` y los tipos de salida (`ContextBundle`,
       `ContextResultDocument`).
   - Depende de: I1.
