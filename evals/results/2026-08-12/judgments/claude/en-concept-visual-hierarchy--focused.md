@@ -1,0 +1,6 @@
+# en-concept-visual-hierarchy — focused — juez: claude
+
+**precision_aparente**: 0.7
+**cobertura_suficiente**: 4
+**brecha_percibida**: Ninguna mayor. La cobertura de jerarquía visual con tipografía es directa y bien anclada: contraste/uniformidad/composición como las tres fuerzas de jerarquía, las variables técnicas de tipografía (peso, baseline, cap-line, x-height, line-height, tracking, kerning, contraste de color con ratio mínimo), la jerarquía de cuatro categorías (headings/paragraphs/buttons/labels), reglas de reducción de jerarquías tipográficas (máximo 3-5 niveles, saltos perceptibles) y varios "agent workflows" accionables. Hay ruido moderado de fuentes sobre brutalismo, minimalismo y catálogos de estilos/tendencias que tocan tipografía solo tangencialmente, pero es menor que en otras consultas de este corpus.
+**coincidencia_expected_notes**: si — el bundle trae exactamente lo que la nota esperaba: reglas y secciones de contexto sobre escala tipográfica, peso y contraste (incluyendo ratios de contraste concretos, reglas de line-height inversamente proporcional al tamaño, tracking/kerning), sin depender de que la frase literal "visual hierarchy" aparezca; de hecho aparece explícitamente como tesis central en varias fuentes (S09, S22, etc.).

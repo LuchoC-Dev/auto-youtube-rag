@@ -1,0 +1,6 @@
+# es-rare-term-kerning — deep — juez: claude
+
+**precision_aparente**: 0.12
+**cobertura_suficiente**: 2
+**brecha_percibida**: El núcleo de contenido específico sobre kerning sigue siendo el mismo puñado de fragmentos ya presentes en focused/balanced (distinción kerning/tracking, ejemplo del par "w"/"a", asociación emocional de kerning apretado vs. generoso, mención de dominar el kerning de una tipografía al reutilizarla). Al llegar a deep (96 de 110 bloques incluidos) el bundle no amplía ese núcleo: agrega, en cambio, catálogos completos de estilos de diseño (30 estilos, 20 estilos adicionales, 15 más), tendencias web 2026, teoría del color y consejos de negocio para diseñadores, ninguno centrado en kerning. Para un término técnico raro, más profundidad debería aumentar la señal específica, pero aquí solo diluye aún más la proporción de contenido relevante.
+**coincidencia_expected_notes**: parcial — la vía textual sí entrega los fragmentos correctos y técnicamente precisos sobre kerning, cumpliendo la parte de "llega principalmente por la vía textual", pero la nota también esperaba "alta precisión", y la precisión aparente de este bundle es baja porque el volumen de contenido no relacionado crece proporcionalmente más que el contenido relevante a medida que aumenta la profundidad.

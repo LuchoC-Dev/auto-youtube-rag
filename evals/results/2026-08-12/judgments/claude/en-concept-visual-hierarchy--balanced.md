@@ -1,0 +1,6 @@
+# en-concept-visual-hierarchy — balanced — juez: claude
+
+**precision_aparente**: 0.65
+**cobertura_suficiente**: 5
+**brecha_percibida**: Ninguna significativa. La cobertura es excelente y muy directa a la consulta: jerarquía visual como contraste + uniformidad + composición con diez técnicas de contraste rankeadas, jerarquía tipográfica de cuatro categorías (headings/paragraphs/buttons/labels), variables técnicas completas de tipografía (baseline, cap-line, x-height, line-height inverso al tamaño, tracking/kerning, contraste de color con ratios concretos 4.5:1 y 7:1), y varios "agent workflows" accionables derivados directamente de fuentes. El ruido proviene de varias fuentes sobre catálogos de tendencias de diseño web 2025/2026 y brutalismo que tocan tipografía y jerarquía solo de forma tangencial dentro de listas más amplias de tendencias no relacionadas.
+**coincidencia_expected_notes**: si — el bundle cubre ampliamente reglas y contexto sobre escala tipográfica, peso y contraste sin depender de la coincidencia literal de "visual hierarchy": aparece como tesis central explícita en múltiples fuentes independientes (S09/S53, S22, etc.) con reglas operativas concretas y verificables.

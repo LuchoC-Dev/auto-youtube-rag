@@ -1,0 +1,6 @@
+# es-rare-term-kerning — focused — juez: claude
+
+**precision_aparente**: 0.2
+**cobertura_suficiente**: 2
+**brecha_percibida**: El contenido que sí habla de kerning es correcto y específico (kerning como espaciado por pares de letras distinto de tracking, ejemplo "w"/"a", la asociación kerning-apretado/cursiva con urgencia vs. kerning generoso con relajación, la mención de que dominar una tipografía implica conocer su comportamiento de kerning en distintos tamaños). Pero es una fracción muy pequeña del bundle: la mayoría de las ~67 unidades tratan temas de diseño sin relación con kerning (antipatrones de UI fintech, tendencias de diseño web 2026, sistemas de grilla, brutalismo, teoría del color, jerarquía visual general), aportados por la vía vectorial sin mención real del término. Para un término técnico raro, se esperaría mayor precisión, no un bundle dominado por ruido temático.
+**coincidencia_expected_notes**: parcial — sí llegó contenido por la vía textual con información puntual y correcta sobre kerning (incluyendo la distinción kerning/tracking), pero la nota esperaba "alta precisión" y este bundle no la tiene: la mayor parte del espacio se llena de contenido vectorial de baja relevancia temática que un agente tendría que descartar para aislar los pocos fragmentos realmente sobre kerning.
