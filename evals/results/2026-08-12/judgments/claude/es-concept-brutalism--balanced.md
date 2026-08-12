@@ -1,0 +1,6 @@
+# es-concept-brutalism — balanced — juez: claude
+
+**precision_aparente**: 0.4
+**cobertura_suficiente**: 4
+**brecha_percibida**: Sobre brutalismo específicamente el bundle es sólido (origen arquitectónico, checklist de características, tipografía, retícula, color, textura, filosofía, doce ejemplos visuales documentados con procedencia, más un segundo dossier completo del video de Spoon Graphics con reglas operativas, antipatrones y rúbrica). La brecha no es de brutalismo en sí sino de ruido: más de la mitad de las 20 fuentes citadas tratan temas adyacentes pero distintos (jerarquía visual, minimalismo, diseño editorial, sistemas de diseño con IA, un carrusel de producto, otros 6 estilos gráficos como Y2K/Retrowave/Aurora) que un agente tendría que descartar activamente antes de responder, no evidencia que faltó.
+**coincidencia_expected_notes**: parcial — el bundle sí trae definición, rasgos visuales y tipografía/contraste de brutalismo con profundidad real, y sí aporta de ambas vías (secciones "Método completo de la fuente" de lectura textual directa y "Contexto autónomo para un agente" con síntesis más semántica), pero la nota pedía contexto amplio _sobre brutalismo_ y una fracción grande del presupuesto de balanced (~29.7k tokens) se fue en contenido de otros estilos y principios de diseño no relacionados.

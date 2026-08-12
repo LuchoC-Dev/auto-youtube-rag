@@ -1,0 +1,6 @@
+# multilingual-grid-systems — focused — juez: claude
+
+**precision_aparente**: 0.55
+**cobertura_suficiente**: 4
+**brecha_percibida**: Ninguna grave. El bundle trae contenido sólido y específico sobre sistemas de grilla editorial: las cinco razones para usar grillas, el catálogo de tipos de grilla (columnas, modular, manuscrito, jerarquía, proporción áurea, asimétrica, cuadrada), la restricción a cinco elementos del layout editorial (tipografía, color, grilla, imágenes, espacio en blanco), la grilla de 12 columnas con márgenes fijos, y comparaciones de columnas por medio (12 web, 6 periódico, 3 revista, proporción áurea en pósters) — todo proveniente de fuentes en inglés pese a que la consulta está en español, confirmando el cruce multilingüe esperado. El ruido viene de fragmentos sobre catálogos de estilos y tendencias de diseño 2026 donde la grilla es mencionada de pasada dentro de un tema más amplio.
+**coincidencia_expected_notes**: si — el bundle demuestra exactamente lo que pedía la nota: contenido en inglés sobre "grid systems"/"editorial grids" (por ejemplo "The FULL 2026 Guide To Layout & Composition" y "How I design websites with EDITORIAL style layouts") aparece entre los candidatos pese a que la consulta está en español, vía similitud semántica.

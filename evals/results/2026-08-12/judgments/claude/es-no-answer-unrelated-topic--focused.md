@@ -1,0 +1,6 @@
+# es-no-answer-unrelated-topic — focused — juez: claude
+
+**precision_aparente**: 0.0
+**cobertura_suficiente**: 1
+**brecha_percibida**: Ninguna unidad del bundle trata sobre cocina vegana ni recetas: todo el contenido pertenece al corpus de diseño gráfico/web (jerarquía visual, minimalismo personal, tipografía, tendencias de diseño 2026, catálogos de estilos). Las únicas coincidencias superficiales son metafóricas ("recolectar ingredientes en Figma es como preparar una receta", "limpiar las superficies de la cocina" como microacción de minimalismo, la mención de una receta de galletas como ejemplo de UX) — ninguna es información culinaria real. Esto es exactamente lo esperado dado que el corpus es de diseño gráfico y no cubre cocina.
+**coincidencia_expected_notes**: si — el bundle confirma el comportamiento esperado: no hay ningún candidato realmente pertinente sobre cocina vegana, y la vía vectorial efectivamente devolvió candidatos débiles (conectados solo por coincidencias léxicas superficiales como "receta" o "cocina" usadas en sentido metafórico) en lugar de un estado limpio de "sin resultados", tal como anticipaba la nota sobre la ausencia de umbral de similitud en la biblioteca.

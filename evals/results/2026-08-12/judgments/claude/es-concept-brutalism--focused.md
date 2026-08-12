@@ -1,0 +1,6 @@
+# es-concept-brutalism — focused — juez: claude
+
+**precision_aparente**: 0.35
+**cobertura_suficiente**: 4
+**brecha_percibida**: El núcleo sobre brutalismo (origen arquitectónico, checklist de rasgos, tipografía audaz, retícula rota, color en conflicto, textura, filosofía por encima de checklist, doce ejemplos visuales con procedencia, y el patrón "Narrative Neo-Brutalism") está completo y bien citado. La brecha no es de contenido faltante sino de ruido: aproximadamente dos tercios de las 20 fuentes citadas en este bundle "focused" tratan temas de diseño sin relación directa (jerarquía visual, minimalismo, diseño editorial, teoría del color, sistemas de diseño con IA, Art Déco, Memphis, estilo suizo) que un agente tendría que filtrar antes de construir la respuesta.
+**coincidencia_expected_notes**: parcial — el bundle sí trae definición, rasgos visuales y tipografía/contraste de brutalismo con profundidad y aporta tanto de la vía textual directa ("Método completo de la fuente") como de síntesis autónoma ("Contexto autónomo para un agente"), pero una fracción grande del presupuesto de "focused" (~11.7k tokens) está ocupada por contenido de otros estilos y principios de diseño no relacionados con brutalismo.

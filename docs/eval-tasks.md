@@ -150,12 +150,45 @@ tabla de Capa A está lista para alimentar el reporte final.
 
 ### N2. Juicio de Claude
 
-- [ ] Completar la rúbrica de N1 para los 24 bundles con Claude como juez.
+- [x] Completar la rúbrica de N1 para los 24 bundles con Claude como juez.
   - Depende de: N1.
   - Aceptación: 24 rúbricas completas, una por bundle, guardadas en
     `evals/results/<fecha>/judgments/claude/`.
   - Verificar: revisión manual de que ninguna rúbrica quedó incompleta.
   - Archivos: `evals/results/<fecha>/judgments/claude/*.md` (generado).
+
+**Ejecutado el 12 de agosto de 2026** con un subagente en frío (sin contexto
+previo del proyecto, sólo `evals/rubric-template.md` y
+`evals/queries/seed-queries.json`), leyendo cada `context.md` completo antes
+de responder. 24 rúbricas generadas en
+`evals/results/2026-08-12/judgments/claude/`. Patrones que reportó:
+
+- **Precisión aparente limitada por un problema de corpus compartido, no de
+  recuperación.** Casi todas las consultas recuperan de los mismos ~20 videos
+  de `auto-design`, así que casi todo bundle carga ruido de catálogos de
+  estilos no relacionados (30/20/15 estilos, tendencias 2025/2026) una vez que
+  el presupuesto lo permite. Precisión aparente típica 0.4–0.65, y aumentar la
+  profundidad (`focused` → `balanced` → `deep`) en general **bajó** la
+  precisión en vez de subirla, porque el presupuesto extra se fue a más
+  catálogo, no a más contenido on-topic.
+- **Cobertura sigue la frecuencia del tema en el corpus, no la profundidad.**
+  Temas con material real de base (brutalismo, jerarquía visual, sistemas de
+  grilla) tuvieron cobertura fuerte (4–5) en las tres profundidades.
+  `es-rare-term-kerning` se quedó en cobertura baja (2) en las tres — ir más
+  profundo no trajo más contenido específico de kerning, sólo más ruido: es
+  una limitación real de la colección, no un fallo de recuperación.
+- `es-no-answer-unrelated-topic` se comportó exactamente como predecía
+  `expected.notes`: precisión 0.0 en las tres profundidades.
+- **El desajuste más claro con `expected.notes`**: `en-multilingual-typography-pairing`
+  esperaba cruce a contenido en español sobre "pareo tipográfico", pero no
+  existe ningún video en español sobre ese tema específico en el corpus, ni
+  siquiera en `deep` (99 de 101 bloques candidatos incluidos). El subagente lo
+  marcó `no` en las tres profundidades — parece un vacío real de la colección,
+  no un defecto de recuperación.
+- Los bundles `deep` de brutalismo (3260–3516 líneas, con el mismo texto
+  fuente reformateado varias veces entre secciones) fueron los más costosos de
+  juzgar; requirieron muestreo cuidadoso (inicio/medio/fin) para no confundir
+  contenido repetido con contenido nuevo.
 
 ### N3. Juicio de Codex
 

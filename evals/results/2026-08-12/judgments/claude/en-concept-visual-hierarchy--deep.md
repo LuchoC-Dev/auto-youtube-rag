@@ -1,0 +1,6 @@
+# en-concept-visual-hierarchy — deep — juez: claude
+
+**precision_aparente**: 0.6
+**cobertura_suficiente**: 5
+**brecha_percibida**: Ninguna. Este bundle deep incluye el 100% de los 92 bloques candidatos (sin truncamiento por presupuesto de tokens), por lo que cubre de forma exhaustiva jerarquía visual (contraste/uniformidad/composición, diez técnicas de contraste rankeadas), la guía completa de tipografía (unidades, peso, baseline/cap-line/x-height, line-height, tracking/kerning, contraste de color, jerarquía de cuatro categorías), el sistema "lift" de composición (leverage points, ritmo interno, fricción, transferibilidad) y reglas de reducción de jerarquías tipográficas. El costo de la exhaustividad es que también arrastra íntegros varios catálogos de tendencias de diseño web 2025/2026 y estilos gráficos (brutalismo, Y2K, Retrowave, Aurora, Cybercore) donde la tipografía es solo un atributo secundario dentro de un tema más amplio no centrado en jerarquía.
+**coincidencia_expected_notes**: si — con cobertura completa del corpus relevante a la consulta, el bundle satisface ampliamente la nota esperada (reglas y contexto sobre escala tipográfica, peso y contraste, presentes explícitamente sin depender de la frase literal "visual hierarchy").
