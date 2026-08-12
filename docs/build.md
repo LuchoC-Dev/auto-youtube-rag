@@ -8,17 +8,17 @@
 
 ---
 
-| Fase                       | N°  | Etapa                          | Estado |  %   | Descripción                              |
-| -------------------------- | --- | ------------------------------ | :----: | :--: | ---------------------------------------- |
-| **1 — Definición**         | 1.1 | Repositorio y contexto inicial |   ✅   | 100% | Git y decisiones documentadas            |
-|                            | 1.2 | Contrato de CLI y salidas      |   ✅   | 100% | Comandos, formatos y códigos definidos   |
-|                            | 1.3 | Stack y estrategia vectorial   |   ✅   | 100% | Stack y toolchain reproducible aprobados |
-| **2 — Implementación MVP** | 2.1 | Indexación incremental         |   ✅   | 100% | Sync incremental y CLI verificadas       |
-|                            | 2.2 | Recuperación híbrida           |   ✅   | 100% | FTS5, vectores y ranking verificados     |
-|                            | 2.3 | Ensamblado de contexto         |   ⚪   |  0%  | Profundidad, citas y presupuesto         |
-|                            | 2.4 | Skill general                  |   ⚪   |  0%  | Integración portable con CLI             |
-| **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos     |
-|                            | 3.2 | Evaluaciones del MVP           |   ⚪   |  0%  | Recall, precisión y cobertura            |
+| Fase                       | N°  | Etapa                          | Estado |  %   | Descripción                                |
+| -------------------------- | --- | ------------------------------ | :----: | :--: | ------------------------------------------ |
+| **1 — Definición**         | 1.1 | Repositorio y contexto inicial |   ✅   | 100% | Git y decisiones documentadas              |
+|                            | 1.2 | Contrato de CLI y salidas      |   ✅   | 100% | Comandos, formatos y códigos definidos     |
+|                            | 1.3 | Stack y estrategia vectorial   |   ✅   | 100% | Stack y toolchain reproducible aprobados   |
+| **2 — Implementación MVP** | 2.1 | Indexación incremental         |   ✅   | 100% | Sync incremental y CLI verificadas         |
+|                            | 2.2 | Recuperación híbrida           |   ✅   | 100% | FTS5, vectores y ranking verificados       |
+|                            | 2.3 | Ensamblado de contexto         |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve` |
+|                            | 2.4 | Skill general                  |   ⚪   |  0%  | Integración portable con CLI               |
+| **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos       |
+|                            | 3.2 | Evaluaciones del MVP           |   ⚪   |  0%  | Recall, precisión y cobertura              |
 
 ---
 
@@ -84,10 +84,11 @@
 
 #### 2.3 Ensamblado de contexto
 
-- [ ] Expandir unidades padre
-- [ ] Deduplicar contenido
-- [ ] Aplicar presupuestos por profundidad
-- [ ] Preservar citas y limitaciones
+- [x] Expandir unidades padre
+- [x] Deduplicar contenido
+- [x] Aplicar presupuestos por profundidad
+- [x] Preservar citas y limitaciones
+- [x] Implementar el comando `retrieve` de la CLI
 
 #### 2.4 Skill general
 

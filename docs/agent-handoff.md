@@ -9,7 +9,8 @@ implementada, las invariantes que no deben romperse, las validaciones realizadas
 y el siguiente bloque recomendado.
 
 Estado de referencia: **12 de agosto de 2026**, después de completar el punto
-2.2 — recuperación híbrida.
+2.3 — ensamblado de contexto. El comando `retrieve` de la CLI ya está
+implementado, probado y anunciado como disponible.
 
 ## Datos rápidos
 
@@ -18,7 +19,7 @@ Estado de referencia: **12 de agosto de 2026**, después de completar el punto
 | Proyecto                  | `auto-youtube-rag`                                                       |
 | Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag` |
 | Rama actual               | `feat/sqlite-vec-benchmark`                                              |
-| Último commit documentado | `8fa0fa7 test(e2e): verify hybrid retrieval end to end`                  |
+| Último commit documentado | `fdb9255 test(e2e): verify context assembly end to end`                  |
 | Estado Git al cerrar      | Worktree limpio                                                          |
 | Runtime                   | Node.js 24.19.0 LTS, ESM                                                 |
 | Lenguaje                  | TypeScript 6.0.3 estricto                                                |
@@ -27,7 +28,7 @@ Estado de referencia: **12 de agosto de 2026**, después de completar el punto
 | Dimensión                 | 384                                                                      |
 | Caché aproximada          | 129 MB en `.cache/models`                                                |
 | Operación                 | Exclusivamente local; sin APIs externas                                  |
-| Próximo punto             | 2.3 — ensamblado de contexto                                             |
+| Próximo punto             | 2.4 — skill general (o 3.2 — evaluaciones, a discreción del usuario)     |
 
 La rama conserva el nombre de un benchmark anterior. No asumas que el proyecto
 está trabajando actualmente en `sqlite-vec`: esa opción fue evaluada y
@@ -48,7 +49,13 @@ Antes de modificar código, leer en este orden:
 8. `docs/retrieval-design.md`: contratos, adaptadores y política de fusión del
    punto 2.2, ya completado.
 9. `docs/retrieval-tasks.md`: checklist fino completado F1–H5 para 2.2.
-10. Este documento: estado operativo, gotchas y arranque de 2.3.
+10. `docs/context-assembly-design.md`: contratos, capas, expansión,
+    deduplicación, presupuesto, citas y contrato de bundle del punto 2.3, ya
+    completado.
+11. `docs/context-assembly-tasks.md`: checklist fino completado I1–L3 para
+    2.3.
+12. Este documento: estado operativo, gotchas y arranque del siguiente punto
+    (2.4 o 3.2).
 
 `docs/development.md` sigue siendo la referencia del toolchain. Su frase que
 describe `src/main.ts` como un scaffold quedó históricamente desactualizada: la
@@ -128,8 +135,9 @@ las unidades para futuras citas o inspección.
 - Los paquetes fuente son inmutables.
 - Las evaluaciones de recuperación se preparan antes de cerrar el MVP.
 
-El único asunto de producto todavía abierto en `product-spec.md` es la política
-de combinación y reranking de resultados.
+`product-spec.md` no tiene asuntos abiertos que bloqueen la implementación: la
+política de combinación y reranking de resultados, que era el único pendiente,
+se resolvió el 11 de agosto de 2026 (RRF ponderado, ver `decisions.md`).
 
 ## Estado completado
 
@@ -172,11 +180,31 @@ Detalle completo, decisiones y notas de implementación en la sección
 ["Punto 2.2 completado"](#punto-22-completado--recuperación-híbrida) más abajo,
 y en `docs/retrieval-design.md` / `docs/retrieval-tasks.md`.
 
-`docs/build.md` marca 2.1 y 2.2, y las pruebas funcionales actuales, al 100%.
+### Punto 2.3 — ensamblado de contexto
+
+Los bloques I–L están completados:
+
+- I: presupuesto por profundidad (`ContextBudget`) y tipos de aplicación
+  (`ContextRequest`, `ContextUnitBlock`, `BudgetAllocation`, `CitationRecord`,
+  `ContextBundle`/`ContextResultDocument`).
+- J: expansión a unidades padre (`expandToAncestors`), deduplicación por
+  `unitId` y por `contentHash` (`deduplicateBlocks`), presupuesto y
+  truncamiento (`allocateBudget`) y asignación de citas (`assignCitations`).
+- K: redacción de `context.md` (`renderContextMarkdown`) y `result.json`
+  (`renderContextResult`), orquestación (`assembleContext`) y escritura del
+  bundle a disco (`writeContextBundle`).
+- L: comando `retrieve` de la CLI, E2E completo y cierre de documentación.
+
+`retrieve` está anunciado y disponible. Detalle completo, decisiones y notas
+de implementación en `docs/context-assembly-design.md` y
+`docs/context-assembly-tasks.md`.
+
+`docs/build.md` marca 2.1, 2.2 y 2.3, y las pruebas funcionales actuales, al
+100%.
 
 ## Arquitectura implementada
 
-Inventario completo de `src/` a la fecha de este documento (52 archivos). Un
+Inventario completo de `src/` a la fecha de este documento (69 archivos). Un
 agente frío puede confiar en esta lista en vez de explorar el árbol de nuevo;
 si diverge de la realidad, el árbol manda y esta lista está desactualizada.
 
@@ -208,6 +236,12 @@ localiza el directorio y puede cambiar.
 - `retrieval-filter.ts`: `RetrievalFilter`, deduplicación de criterios y
   comparación de idioma en minúsculas.
 
+`src/domain/context/` (nuevo en 2.3):
+
+- `context-budget.ts`: `ContextBudget`, resuelve los presets
+  `focused`/`balanced`/`deep` (12k/32k/64k tokens) y valida el override
+  `--max-tokens` como entero positivo sin renombrar el preset público.
+
 ### Aplicación — `src/application`
 
 Puertos actuales (`src/application/ports/`):
@@ -238,6 +272,31 @@ Casos de uso y políticas puras:
   `select-candidates.ts` (`selectCandidates`, dedupe + diversidad),
   `retrieve-candidates.ts` (`retrieveCandidates`, el orquestador de 2.2).
 
+`src/application/context/` (nuevo en 2.3):
+
+- `context-request.ts`: `ContextRequest` (consulta + `ContextBudget`);
+- `context-blocks.ts`: `ContextUnitBlock`, `BudgetAllocation`,
+  `CitationRecord`, `ContextSection` y `classifyContextSection` (bucketing
+  compartido por `allocateBudget` y los renderizadores);
+- `context-bundle.ts`: `ContextBundle`, `ContextResultDocument`,
+  `ContextResultUnit`, `ContextResultSource` — con nombres `snake_case`
+  porque son el contrato de cable ya aprobado en `cli-contract.md`, no una
+  convención interna de TypeScript;
+- `expand-to-ancestors.ts` (`expandToAncestors`): combina candidatos y
+  cadenas de ancestros ya resueltas en bloques citables sin duplicados;
+- `deduplicate-blocks.ts` (`deduplicateBlocks`): colapsa bloques con
+  `contentHash` idéntico bajo `unitId` distintos;
+- `allocate-budget.ts` (`allocateBudget`): orden fijo por bucket
+  (documento/sección → reglas/patrones → ancestros) y truncamiento entero,
+  nunca a la mitad;
+- `assign-citations.ts` (`assignCitations`): IDs `S01`, `S02`... en el orden
+  final de inclusión;
+- `render-context-markdown.ts` (`renderContextMarkdown`) y
+  `render-context-result.ts` (`renderContextResult`): redactores puros de
+  `context.md` y `result.json`;
+- `assemble-context.ts` (`assembleContext`): orquestador de 2.3, compone todo
+  lo anterior sobre `RetrievalOutcome`.
+
 El orquestador sólo conoce puertos. Tests de aplicación usan fakes
 (`test/fakes/`) y no cargan SQLite ni el modelo real.
 
@@ -252,7 +311,12 @@ Filesystem (`src/infrastructure/filesystem/`):
   `context.md` y `rules.json`;
 - `metadata-selector.ts`: selección de metadata estable;
 - `filesystem-package-source-reader.ts`: lectura completa de paquetes sin
-  escrituras.
+  escrituras;
+- `write-context-bundle.ts` (nuevo en 2.3): `writeContextBundle`, escribe
+  `context.md` y `result.json` bajo `<outputDir>/<request_id>/`; `request_id`
+  usa el mismo generador ad-hoc que `SyncId` (sin dependencia ULID); falla
+  explícito si el directorio del `request_id` ya existe en vez de mezclar
+  archivos.
 
 Embeddings (`src/infrastructure/embeddings/e5-embedding-generator.ts`):
 
@@ -290,13 +354,19 @@ Vector (`src/infrastructure/vector/`, nuevo en 2.2):
 
 ### Interfaz — `src/interfaces/cli`
 
-- `parse-command.ts`: argumentos estrictos con `parseArgs`.
+- `parse-command.ts`: argumentos estrictos con `parseArgs`; valida `--depth`
+  y `--max-tokens` como error de uso (código `2`) antes de que lleguen a
+  `ContextBudget`, para que un argumento mal escrito nunca produzca el
+  código `1` de fallo operativo;
 - `render-cli-output.ts`: JSON compacto versionado.
-- `run-cli.ts`: ejecución de casos de uso y códigos de salida.
+- `run-cli.ts`: ejecución de casos de uso y códigos de salida; el comando
+  `retrieve` (nuevo en 2.3) construye `RetrievalQuery`/`RetrievalFilter`,
+  llama `application.assembleContext`, escribe el bundle con
+  `writeContextBundle` y emite el recibo compacto de `cli-contract.md`.
 - `src/main.ts`: entry point ESM y configuración por entorno.
 
-Sin cambios en 2.2: la CLI no expone `retrieve` todavía (ver
-["CLI implementada y CLI futura"](#cli-implementada-y-cli-futura)).
+`retrieve` está disponible desde el cierre de 2.3 (ver
+["CLI implementada"](#cli-implementada)).
 
 ### Composition root — `src/main/create-application.ts`
 
@@ -314,9 +384,16 @@ instancia recibe los cambios que publica `sync` y sirve las consultas de
 ver vectores distintos. Si encontrás referencias a `MemoryVectorIndexSink` en
 código o memoria de sesiones viejas, están obsoletas.
 
-`Application` expone ahora `retrieveCandidates(query: RetrievalQuery):
+`Application` expone `retrieveCandidates(query: RetrievalQuery):
 Promise<RetrievalOutcome>`, además de `vectorIndex`, `textSearchIndex` y
 `knowledgeRepository` como propiedades reemplazables.
+
+Nuevo en 2.3: `Application` también expone `assembleContext(request:
+ContextRequest): Promise<ContextBundle>`, reemplazable igual que
+`retrieveCandidates` (ver el test `exposes assembleContext, reusing the same
+retrieval wiring` en `test/main/create-application.test.ts`). Reutiliza
+exactamente la misma `retrieveCandidates` interna, así que nunca puede quedar
+desincronizado del motor de recuperación.
 
 ## Flujo exacto de `retrieveCandidates` (2.2)
 
@@ -339,10 +416,47 @@ Promise<RetrievalOutcome>`, además de `vectorIndex`, `textSearchIndex` y
 7. Devolver `RetrievalOutcome` con `status` (`"ok"` o `"no_results"`),
    `candidates`, `metrics` y `warnings`.
 
-**Gotcha crítico para 2.3:** la búsqueda vectorial no tiene piso de similitud
+**Gotcha que sigue vigente:** la búsqueda vectorial no tiene piso de similitud
 (ver la sección de decisiones de 2.2 más abajo). `status: "ok"` con candidatos
-de relevancia real baja es un resultado válido y esperado, no un bug. 2.3 no
-debe asumir que todo candidato devuelto es necesariamente relevante.
+de relevancia real baja es un resultado válido y esperado, no un bug. 2.3 lo
+heredó explícitamente: `assembleContext` nunca filtra por umbral de similitud,
+sólo por lo que el presupuesto de tokens permite incluir. El E2E de 2.3 lo
+confirma: el único camino confiable a `status: "no_results"` es un filtro que
+deja vacío el universo de candidatos (por ejemplo, `--source` de una fuente
+inexistente), no una consulta "sin sentido" sobre una biblioteca no vacía.
+
+## Flujo exacto de `assembleContext` (2.3)
+
+1. Llamar `retrieveCandidates(request.query)` → `RetrievalOutcome`.
+2. Recolectar el conjunto único de `unitId` de `outcome.candidates`.
+3. Llamar `knowledgeRepository.getUnits(unitIds)` y
+   `knowledgeRepository.getAncestors(unitIds)` en paralelo — dos lotes, no una
+   consulta por candidato. `getUnits` recupera el `parentId` de cada
+   candidato (`RetrievalCandidate` no lo transporta); `getAncestors` resuelve
+   el conjunto plano deduplicado de ancestros alcanzables.
+4. `expandToAncestors`: camina `parentId` desde cada candidato hacia la raíz,
+   construye un `ContextUnitBlock` por `unitId` único (un ancestro nunca pisa
+   un candidato ya construido) y hereda `packageRef`/metadata de video del
+   candidato que lo trajo, porque `KnowledgeUnit` no la transporta.
+5. `deduplicateBlocks`: colapsa bloques con `contentHash` idéntico bajo
+   `unitId` distintos, conservando el primero en orden de entrada.
+6. `allocateBudget`: bucketing fijo (documento/sección → reglas/patrones →
+   ancestros, cada uno por `fusedScore` descendente; ancestros además por
+   `depth` descendente, padre inmediato antes que abuelo) y truncamiento
+   entero — nunca a la mitad. El primer bloque se incluye igual si por sí
+   solo excede el presupuesto, y el presupuesto se marca agotado de
+   inmediato.
+7. `assignCitations`: IDs `S01`, `S02`... en el orden final de inclusión.
+8. `renderContextMarkdown` y `renderContextResult`: redactan `context.md`
+   (Markdown con las seis secciones fijas) y el objeto `ContextResultDocument`
+   (`snake_case`, contrato ya aprobado en `cli-contract.md`).
+9. Devolver `ContextBundle { markdown, result }`. La escritura a disco
+   (`writeContextBundle`) ocurre después, en la capa de infraestructura/CLI,
+   nunca dentro de `assembleContext`.
+
+Una consulta `no_results` de 2.2, o un presupuesto tan chico que no cabe ni el
+primer bloque, produce igual un `ContextBundle` válido explicando la ausencia
+de evidencia — nunca nada sin escribir.
 
 ## Flujo exacto de `sync`
 
@@ -396,9 +510,9 @@ persistirlos explícitamente, leer la nota completa en
 falta, y agregar una columna es un cambio de esquema que requiere aprobación
 explícita según los invariantes del proyecto.
 
-## CLI implementada y CLI futura
+## CLI implementada
 
-Implementado actualmente:
+Implementado y anunciado como disponible:
 
 ```text
 auto-youtube-rag init
@@ -408,18 +522,20 @@ auto-youtube-rag source remove <name>
 auto-youtube-rag sync [--source <name>]
 auto-youtube-rag status
 auto-youtube-rag doctor
+auto-youtube-rag retrieve <query> [--depth focused|balanced|deep] \
+  [--max-tokens <positive-integer>] [--source <name>] [--out <directory>]
 ```
+
+`--source` es repetible. `--depth` y `--max-tokens` inválidos se rechazan en
+`parse-command.ts` con código de uso `2`, antes de instanciar la aplicación.
 
 Todavía no implementado, aunque el contrato público ya está aprobado:
 
 ```text
-auto-youtube-rag retrieve <query> [options]
 auto-youtube-rag rebuild --confirm
 ```
 
-No anuncies `retrieve` como disponible hasta completar 2.3. 2.2 entregó todo el
-motor de recuperación (`retrieveCandidates`) pero deliberadamente sin
-superficie de CLI: ver la decisión en la sección de 2.2 más abajo.
+`rebuild` no depende de 2.3 y queda para cuando el producto lo requiera.
 
 ## Configuración de ejecución
 
@@ -506,17 +622,45 @@ La copia y su base temporal fueron eliminadas tras validar.
   palabra clave, ver el propio archivo);
 - worktree limpio.
 
-**No se ejecutó una validación sobre la colección real `auto-design` con el
-modelo E5 real.** Fue una decisión explícita del usuario el 12 de agosto de
-2026: avanzar a 2.3 sin correr esa confirmación. No es un olvido ni un
-pendiente urgente — no la ejecutes de oficio al retomar el proyecto. Si en
-algún momento se necesita (por ejemplo, antes de evaluaciones reales en 3.2, o
-si aparece un bug que sólo se manifiesta con datos reales), el patrón a seguir
-es el mismo que documentó la puerta de 2.1: copiar la colección a un directorio
-temporal, sincronizar con el modelo real (ya cacheado en `.cache/models`),
-correr consultas de `evals/queries/seed-queries.json` contra
-`retrieveCandidates`, revisar cualitativamente, verificar el digest SHA-256 del
-árbol fuente antes/después, y borrar la copia y la base temporal al terminar.
+No se ejecutó una validación sobre la colección real `auto-design` con el
+modelo E5 real al cerrar 2.2, por decisión explícita del usuario. **Sigue sin
+ejecutarse al cerrar 2.3** — el mismo patrón documentado abajo aplica, y
+tampoco es un pendiente urgente por sí solo. Si se necesita (por ejemplo,
+antes de evaluaciones reales en 3.2, o si aparece un bug que sólo se
+manifiesta con datos reales), el patrón es: copiar la colección a un
+directorio temporal, sincronizar con el modelo real (ya cacheado en
+`.cache/models`), correr consultas de `evals/queries/seed-queries.json` contra
+`retrieveCandidates`/`assembleContext`, revisar cualitativamente, verificar el
+digest SHA-256 del árbol fuente antes/después, y borrar la copia y la base
+temporal al terminar.
+
+### Puerta final de 2.3 (12 de agosto de 2026)
+
+- 221 tests aprobados (151 heredados de 2.1–2.2 + 70 nuevos de ensamblado de
+  contexto y CLI);
+- cobertura: 95,25% líneas, 86,02% ramas, 98,43% funciones;
+- `npm run build`: aprobado;
+- `npm run check`: aprobado;
+- `npm run test:coverage`: aprobado;
+- `test/e2e/context-assembly.e2e.test.ts` aprobado sobre SQLite real (no
+  fakes) y el comando `retrieve` real de la CLI, fixture de dos fuentes con
+  encabezados anidados (documento → sección → subsección) para ejercer la
+  expansión a ancestros, sin modelo E5 real (`FakeEmbeddingGenerator`);
+- worktree limpio.
+
+**Nota de implementación descubierta durante la prueba E2E:** la búsqueda
+vectorial no tiene piso de similitud (heredado de 2.2), así que una consulta
+"sin sentido" sobre una biblioteca no vacía igual devuelve `status: "ok"`. El
+E2E prueba `no_results` filtrando por una fuente inexistente (`--source
+ghost-source`), que sí vacía el universo de candidatos, en vez de depender de
+una consulta sin coincidencias léxicas ni semánticas aparentes.
+
+**Tampoco se ejecutó una validación de `retrieve` sobre la colección real
+`auto-design`.** Mismo patrón y mismo criterio que el párrafo anterior: no es
+un pendiente urgente, y el procedimiento a seguir es el mismo, agregando la
+inspección cualitativa de `context.md`/`result.json` generados (¿el bundle es
+legible?, ¿las citas resuelven?, ¿la expansión a padres aporta contexto real
+o sólo ruido?) antes de calibrar presupuestos en una etapa posterior.
 
 ## Bugs importantes ya corregidos
 
@@ -539,6 +683,17 @@ Manifest y dominio deben aceptar la misma forma canónica Unicode. El paquete
 real `7-estilos-de-diseño-gráfico-que-no-conocías` es la regresión. No volver a
 un patrón ASCII.
 
+### Orden de ancestros invertido en `allocateBudget` (2.3)
+
+El primer borrador de `context-assembly-design.md` especificaba "depth
+ascendente (el padre inmediato antes que el abuelo)" para desempatar bloques
+de ancestro con el mismo `fusedScore`. Es una contradicción: `depth` 0 es la
+raíz del documento, así que el padre inmediato de una unidad profunda tiene
+`depth` **mayor** que su abuelo, no menor. El test de `allocate-budget.test.ts`
+lo capturó de inmediato al implementar J3. La regla correcta —ya aplicada en
+código y documentación— es `depth` **descendente**. Si alguna referencia
+vieja (memoria de sesión, comentario) dice "ascendente", está desactualizada.
+
 ## Invariantes y límites obligatorios
 
 - Nunca escribir, mover ni eliminar archivos de las fuentes registradas.
@@ -560,11 +715,31 @@ Invariantes propias de recuperación (2.2):
   cota y coseno vive en `0..1`. Sólo se comparan posiciones (rangos).
 - Nunca asumir que la búsqueda vectorial tiene un piso de similitud: siempre
   devuelve algo si la biblioteca (tras filtros) no está vacía.
-- Nunca exponer `retrieve` en la CLI ni anunciarlo como disponible hasta cerrar
-  2.3.
 - Nunca dejar que `sync` y `retrieveCandidates` usen instancias distintas del
   índice vectorial: deben compartir la misma para que un cambio publicado y una
   consulta nunca vean vectores diferentes.
+
+Invariantes propias de ensamblado de contexto (2.3):
+
+- Nunca cortar un `ContextUnitBlock` a la mitad: se incluye completo o se
+  omite entero, para que ninguna cita `[S0N]` quede apuntando a texto
+  truncado.
+- Nunca reservar ni saltar un número de cita para un bloque omitido por
+  presupuesto: `assignCitations` sólo recorre `allocation.included`.
+- Nunca volver a tokenizar en el ensamblado: `tokenCount`/`estimatedTokens`
+  ya están persistidos desde la indexación (2.1); ni `assembleContext` ni sus
+  políticas puras abren el modelo de embeddings.
+- Nunca fabricar una causa en `limitations`/"Coverage and limitations": sólo
+  se describen señales reales (`warnings` de `RetrievalOutcome`,
+  `budgetExhausted`, `omittedCount`, filtros aplicados).
+- Nunca dejar que un ancestro pise un bloque que ya llegó como candidato:
+  `origin: "candidate"` siempre gana sobre `"ancestor"` para el mismo
+  `unitId`.
+- Nunca escribir el bundle fuera de `<outputDir>/<request_id>/`; un
+  `request_id` repetido falla explícito (`WriteContextBundleError`) en vez de
+  mezclar archivos.
+- Nunca validar `--depth`/`--max-tokens` como fallo operativo (código `1`):
+  son errores de uso (código `2`), validados en `parse-command.ts`.
 
 ## Punto 2.2 completado — recuperación híbrida
 
@@ -596,60 +771,104 @@ Decisiones cerradas durante 2.2 que no deben reabrirse sin motivo:
   devuelve candidatos, aunque la similitud real sea baja. `status: "no_results"`
   sólo ocurre si el filtro deja la biblioteca vacía o si ambas vías fallan. Un
   umbral mínimo queda pendiente de calibración en 3.2.
-- 2.2 no expone superficie de CLI. `retrieve` sigue sin anunciarse hasta cerrar
-  2.3.
+- 2.2 no exponía superficie de CLI; `retrieve` se implementó recién al cerrar
+  2.3 (ver la sección siguiente).
 
 Validación completa, incluida la decisión explícita de no correr la pasada
 cualitativa sobre la colección real, en
 ["Última validación conocida"](#última-validación-conocida) → "Puerta final de
 2.2".
 
-## Próximo trabajo: punto 2.3 — ensamblado de contexto
+## Punto 2.3 completado — ensamblado de contexto
 
-No existe todavía un checklist fino aprobado para 2.3. Antes de implementar,
-crear y revisar diseño y tareas siguiendo el mismo patrón que
-`retrieval-design.md`/`retrieval-tasks.md`. Por `product-spec.md` y
-`cli-contract.md`, 2.3 debe:
+Bloques I–L están completados (contratos, expansión/deduplicación/presupuesto/
+citas, redacción, orquestación, CLI). Detalle completo en
+`docs/context-assembly-design.md` y `docs/context-assembly-tasks.md`.
 
-- expandir candidatos a sus unidades padre usando
-  `KnowledgeRepository.getAncestors`, ya implementado en 2.2;
-- deduplicar contenido repetido tras la expansión;
-- aplicar presupuestos por profundidad (`focused` 12k / `balanced` 32k /
-  `deep` 64k tokens estimados, ajustables por evaluación);
-- preservar citas `[S01]` resueltas contra `CandidateProvenance` y
-  limitaciones cuando la evidencia sea insuficiente;
-- ensamblar `context.md` y `result.json` según el contrato ya aprobado en
-  `cli-contract.md`;
-- recién ahí implementar el comando `retrieve` de la CLI.
+Decisiones cerradas durante 2.3 que no deben reabrirse sin motivo (registradas
+también en `decisions.md`):
 
-`RetrievalOutcome.candidates` de 2.2 es la materia prima: cada candidato ya
-trae procedencia completa (encabezados, tipo de unidad, documento, paquete,
-creador, timestamps, evidencia visual) y texto citable.
+- Bucketing fijo por `unitType`: documento/sección siempre a "Highest-relevance
+  context", reglas/patrones siempre a "Related rules and patterns", nunca por
+  puntaje puro.
+- Los ancestros de expansión caen siempre en "Additional relevant context",
+  aunque el ancestro sea en sí una regla relevante.
+- Un bloque único que por sí solo excede el presupuesto se incluye igual —el
+  bundle nunca queda vacío habiendo evidencia real— y el presupuesto se marca
+  agotado de inmediato después.
+- Deduplicación en dos niveles desde el inicio: por `unitId` (estructural) y
+  por `contentHash` (contenido idéntico bajo unidades distintas).
+- `request_id` usa el mismo generador ad-hoc que `SyncId`, sin depender de
+  ULID.
+- `result.json` usa `snake_case` porque es el contrato de cable ya aprobado;
+  `CitationRecord`/`ContextUnitBlock` internos siguen en `camelCase`.
+  `renderContextResult` es el único punto de traducción entre ambos.
+- Presupuestos por profundidad (`focused` 12k / `balanced` 32k / `deep` 64k)
+  confirmados sin recalibrar en este punto; la calibración queda para 3.2.
+
+Presupuestos de contexto por profundidad ya no aparece como pendiente de
+decisión en `decisions.md`: quedó confirmado el 12 de agosto de 2026.
+
+## Próximo trabajo: punto 2.4 — skill general (o 3.2 — evaluaciones)
+
+No hay un bloque siguiente obligatorio fijado: `build.md` deja 2.4 (skill
+general) y 3.2 (evaluaciones del MVP) ambos en `0%`. Según `product-spec.md`
+y `cli-contract.md`:
+
+- **2.4 — skill general**: una única skill portable, instalable o enlazable
+  desde Codex, Claude y futuros agentes, que invoque la CLI ya completa
+  (`init`, `source`, `sync`, `retrieve`, `status`, `doctor`) sin lógica
+  específica de proveedor. No requiere cambios en `src/`.
+- **3.2 — evaluaciones del MVP**: recall, precisión y cobertura temática sobre
+  consultas reales (`evals/queries/seed-queries.json` ya sembrado en 2.2),
+  comparación con Codex y Claude, y la calibración pendiente de pesos RRF y
+  presupuestos de profundidad que 2.2 y 2.3 dejaron explícitamente diferida.
+
+No asumas cuál de los dos sigue: preguntá al usuario antes de proponer diseño
+y checklist fino, siguiendo el mismo patrón que `retrieval-design.md`/
+`context-assembly-design.md`.
 
 ## Primer turno recomendado para el próximo agente
 
 1. Confirmar `git status --short` vacío y revisar los últimos commits.
 2. Ejecutar `npm.cmd run check` y `npm.cmd run build`.
-3. Leer los diez documentos indicados al inicio.
-4. Inspeccionar `retrieve-candidates.ts`, `select-candidates.ts`,
-   `sqlite-knowledge-repository.ts` y `create-application.ts`.
-5. No empezar código directamente: proponer el diseño y checklist fino de 2.3.
-6. Resolver con el usuario los presupuestos de profundidad si las evaluaciones
-   de 3.2 sugieren ajustarlos antes de fijar el ensamblado.
-7. Implementar en cortes de máximo cinco archivos por tarea, conservando
+3. Leer los doce documentos indicados al inicio.
+4. Inspeccionar `assemble-context.ts`, `allocate-budget.ts`,
+   `render-context-markdown.ts`, `render-context-result.ts` y
+   `run-cli.ts` (caso `"retrieve"`).
+5. Preguntar al usuario si el siguiente bloque es 2.4 (skill general) o 3.2
+   (evaluaciones), y no empezar código directamente: proponer el diseño y
+   checklist fino correspondiente primero.
+6. Implementar en cortes de máximo cinco archivos por tarea, conservando
    arquitectura y commits convencionales.
 
 Prompt sugerido para retomar:
 
 > Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero el
-> estado del repositorio y las pruebas. El punto 2.2 está terminado; planifica
-> 2.3 — ensamblado de contexto — con expansión a unidades padre, deduplicación,
-> presupuestos por profundidad, citas y el comando `retrieve` de la CLI. No
+> estado del repositorio y las pruebas. Los puntos 2.2 y 2.3 están terminados,
+> incluido el comando `retrieve` de la CLI. Preguntame si seguimos con 2.4
+> —skill general— o con 3.2 —evaluaciones del MVP— antes de planificar. No
 > implementes hasta presentar y aprobar el checklist detallado.
 
 ## Historial reciente relevante
 
 ```text
+fdb9255 test(e2e): verify context assembly end to end
+af19db2 test(main): verify assembleContext is exposed on the application
+99a7399 feat(cli): add the retrieve command
+b5846fd feat(context): write the context bundle to disk
+92a5b98 feat(context): orchestrate context assembly end to end
+ccf4475 feat(context): render the result.json bundle
+934c960 feat(context): render the context.md bundle
+c8b9c4f feat(context): assign sequential citations to included blocks
+f7f3037 feat(context): allocate the token budget across ordered blocks
+b0da4fb feat(context): deduplicate blocks by content hash
+98a1300 feat(context): expand candidates to their parent units
+0fdf539 feat(context): declare context assembly types
+faa84c2 feat(context): resolve token budgets per depth preset
+cbc6e65 docs(context): propose and approve 2.3 context assembly plan
+a7e4098 docs(handoff): detail cold-start state and defer real-collection validation
+9a1e68f docs(retrieval): close point 2.2 and seed evaluation queries
 8fa0fa7 test(e2e): verify hybrid retrieval end to end
 9f77192 feat(main): compose retrieval adapters into the application
 639fa56 feat(retrieval): orchestrate candidate selection and retrieval
@@ -694,10 +913,18 @@ código:
 4. por qué los paquetes fuente son estrictamente read-only;
 5. cómo se mantienen alineados SQLite, FTS5 y embeddings;
 6. por qué la búsqueda vectorial inicial será exacta y reemplazable;
-7. qué parte corresponde a 2.3 y qué ya entregó 2.2;
+7. qué entregó cada punto — 2.1 indexación, 2.2 recuperación, 2.3 ensamblado y
+   `retrieve` — y qué queda para 2.4 (skill) y 3.2 (evaluaciones);
 8. por qué RRF ponderado es el baseline de fusión y qué queda pendiente de
    calibrar en 3.2;
 9. por qué la búsqueda vectorial no tiene piso de similitud y qué implica eso
-   para `status: "no_results"`;
+   tanto para `status: "no_results"` en 2.2 como para el mismo estado en el
+   bundle de 2.3;
 10. por qué los identificadores de fragmento y documento son derivados en vez
-    de persistidos, y qué adaptadores dependen de esa reconstrucción.
+    de persistidos, y qué adaptadores dependen de esa reconstrucción;
+11. por qué `assembleContext` necesita `getUnits` además de `getAncestors`
+    (`KnowledgeUnit` no transporta metadata de video/documento, y hay que
+    conocer el `parentId` de cada candidato antes de poder caminarlo);
+12. por qué un bloque de ancestro siempre cae en "Additional relevant
+    context" aunque sea en sí una regla relevante, y por qué un presupuesto
+    nunca corta un bloque a la mitad.

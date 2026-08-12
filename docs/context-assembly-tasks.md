@@ -250,7 +250,7 @@ válido sobre una base temporal real, sin tocar las fuentes registradas.
 
 ### L3. Documentación y cierre
 
-- [ ] Actualizar la documentación del proyecto para reflejar 2.3 completo.
+- [x] Actualizar la documentación del proyecto para reflejar 2.3 completo.
   - Depende de: L2.
   - Aceptación: `build.md` marca 2.3 al 100%; `decisions.md` registra las
     decisiones aprobadas en la sección final de
@@ -261,9 +261,8 @@ válido sobre una base temporal real, sin tocar las fuentes registradas.
   - Verificar: `npm run check` y revisión manual del worktree.
   - Archivos: `docs/build.md`, `docs/decisions.md`, `docs/agent-handoff.md`.
 
-Checkpoint L: `retrieve` queda disponible y anunciado; los diez puntos del
-criterio de éxito del relevo en `agent-handoff.md` siguen siendo explicables,
-más el ensamblado de contexto.
+Checkpoint L: `retrieve` queda disponible y anunciado; los doce puntos del
+criterio de éxito del relevo en `agent-handoff.md` siguen siendo explicables.
 
 ## Cierre del punto 2.3
 
