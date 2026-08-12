@@ -116,7 +116,29 @@ La estrategia queda detrás del puerto `FusionStrategy`, por lo que los pesos
 pueden calibrarse, o la estrategia sustituirse, sin modificar casos de uso ni
 adaptadores. El detalle está en [retrieval-design.md](retrieval-design.md).
 
+## Diseño de ensamblado de contexto aprobado
+
+El 12 de agosto de 2026 se aprobaron las decisiones de diseño del punto 2.3,
+detalladas en [context-assembly-design.md](context-assembly-design.md):
+
+- Bucketing fijo por `unitType`: unidades de documento/sección van siempre a
+  "Highest-relevance context" y reglas/patrones siempre a "Related rules and
+  patterns", sin mezclar por puntaje puro.
+- Los ancestros producidos por la expansión jerárquica caen siempre en
+  "Additional relevant context", nunca en las dos secciones anteriores.
+- Un bloque único que por sí solo excede el presupuesto se incluye igual —el
+  bundle nunca queda vacío habiendo evidencia real— y el presupuesto se marca
+  agotado de inmediato después.
+- Deduplicación en dos niveles: por `unitId` (estructural) y por
+  `contentHash` (contenido idéntico bajo unidades distintas), ambas
+  implementadas desde el inicio de 2.3.
+- `request_id` usa el mismo generador ad-hoc que `SyncId`
+  (`Date.now().toString(36)` + aleatorio), sin añadir una dependencia de
+  ULID. Es independiente de la deduplicación por `contentHash`: una nombra el
+  directorio del bundle, la otra colapsa contenido repetido.
+- Presupuestos por profundidad confirmados sin recalibrar: `focused` = 12k,
+  `balanced` = 32k, `deep` = 64k tokens estimados.
+
 ## Pendientes de decisión
 
 - Calibración de los pesos RRF mediante evaluaciones reales, en la etapa 3.2.
-- Presupuestos de contexto por profundidad.
