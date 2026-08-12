@@ -14,7 +14,7 @@
 |                            | 1.2 | Contrato de CLI y salidas      |   ✅   | 100% | Comandos, formatos y códigos definidos   |
 |                            | 1.3 | Stack y estrategia vectorial   |   ✅   | 100% | Stack y toolchain reproducible aprobados |
 | **2 — Implementación MVP** | 2.1 | Indexación incremental         |   ✅   | 100% | Sync incremental y CLI verificadas       |
-|                            | 2.2 | Recuperación híbrida           |   ⚪   |  0%  | FTS5, vectores y ranking                 |
+|                            | 2.2 | Recuperación híbrida           |   ✅   | 100% | FTS5, vectores y ranking verificados     |
 |                            | 2.3 | Ensamblado de contexto         |   ⚪   |  0%  | Profundidad, citas y presupuesto         |
 |                            | 2.4 | Skill general                  |   ⚪   |  0%  | Integración portable con CLI             |
 | **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos     |
@@ -77,10 +77,10 @@
 
 #### 2.2 Recuperación híbrida
 
-- [ ] Implementar búsqueda FTS5
-- [ ] Implementar búsqueda semántica
-- [ ] Combinar y diversificar resultados
-- [ ] Filtrar por metadatos
+- [x] Implementar búsqueda FTS5
+- [x] Implementar búsqueda semántica
+- [x] Combinar y diversificar resultados
+- [x] Filtrar por metadatos
 
 #### 2.3 Ensamblado de contexto
 

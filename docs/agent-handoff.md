@@ -8,8 +8,8 @@ exacto del repositorio, las decisiones confirmadas, la arquitectura ya
 implementada, las invariantes que no deben romperse, las validaciones realizadas
 y el siguiente bloque recomendado.
 
-Estado de referencia: **11 de agosto de 2026**, después de completar el punto
-2.1 — indexación incremental.
+Estado de referencia: **12 de agosto de 2026**, después de completar el punto
+2.2 — recuperación híbrida.
 
 ## Datos rápidos
 
@@ -18,7 +18,7 @@ Estado de referencia: **11 de agosto de 2026**, después de completar el punto
 | Proyecto                  | `auto-youtube-rag`                                                       |
 | Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag` |
 | Rama actual               | `feat/sqlite-vec-benchmark`                                              |
-| Último commit documentado | `ed89878 docs(progress): complete synchronization phase`                 |
+| Último commit documentado | `8fa0fa7 test(e2e): verify hybrid retrieval end to end`                  |
 | Estado Git al cerrar      | Worktree limpio                                                          |
 | Runtime                   | Node.js 24.19.0 LTS, ESM                                                 |
 | Lenguaje                  | TypeScript 6.0.3 estricto                                                |
@@ -27,7 +27,7 @@ Estado de referencia: **11 de agosto de 2026**, después de completar el punto
 | Dimensión                 | 384                                                                      |
 | Caché aproximada          | 129 MB en `.cache/models`                                                |
 | Operación                 | Exclusivamente local; sin APIs externas                                  |
-| Próximo punto             | 2.2 — recuperación híbrida                                               |
+| Próximo punto             | 2.3 — ensamblado de contexto                                             |
 
 La rama conserva el nombre de un benchmark anterior. No asumas que el proyecto
 está trabajando actualmente en `sqlite-vec`: esa opción fue evaluada y
@@ -45,7 +45,10 @@ Antes de modificar código, leer en este orden:
 5. `docs/indexing-design.md`: modelo lógico y arquitectura del punto 2.1.
 6. `docs/indexing-plan.md`: estrategia por bloques A–E.
 7. `docs/indexing-tasks.md`: checklist fino ya completado para 2.1.
-8. Este documento: estado operativo, gotchas y arranque de 2.2.
+8. `docs/retrieval-design.md`: contratos, adaptadores y política de fusión del
+   punto 2.2, ya completado.
+9. `docs/retrieval-tasks.md`: checklist fino completado F1–H5 para 2.2.
+10. Este documento: estado operativo, gotchas y arranque de 2.3.
 
 `docs/development.md` sigue siendo la referencia del toolchain. Su frase que
 describe `src/main.ts` como un scaffold quedó históricamente desactualizada: la
@@ -413,115 +416,110 @@ un patrón ASCII.
   `npm run build` según el riesgo.
 - Preservar stdout JSON y stderr para progreso.
 
-## Próximo trabajo: punto 2.2 — recuperación híbrida
+## Punto 2.2 completado — recuperación híbrida
 
-No existe todavía un checklist fino aprobado equivalente a
-`indexing-tasks.md` para 2.2. Antes de implementar, crear y revisar una spec,
-diseño y tareas. El orden recomendado es:
+Bloques F–H están completados (contratos, adaptadores, orquestación). Detalle
+completo en `docs/retrieval-design.md` y `docs/retrieval-tasks.md`.
 
-### 1. Congelar contratos de recuperación
+Decisiones cerradas durante 2.2 que no deben reabrirse sin motivo:
 
-Definir tipos y puertos propios para:
+- Fusión: RRF ponderado (`k = 60`, `wText = wVector = 1.0`) detrás de
+  `FusionStrategy`, sustituible para la calibración de 3.2. Se descartó la
+  cascada porque descarta hits exclusivos de una vía sin ganar rendimiento a
+  esta escala.
+- `VectorIndexSink` fue reemplazado por `VectorSearchIndex` en `sync` y en la
+  aplicación: una sola instancia (`InMemoryVectorSearchIndex`) recibe los
+  cambios publicados y sirve las consultas, así que nunca pueden divergir.
+- Los identificadores de fragmento y documento **no se persisten**; son
+  funciones puras de columnas que sí existen (`fragment:sha256(unitId):ordinal`
+  y `document:<source>:<video>:<kind>`). Los adaptadores los reconstruyen. Ver
+  la nota en `retrieval-design.md` antes de considerar un cambio de esquema.
+- El índice vectorial invalida su snapshot completo en `apply` en vez de
+  parchear: `VectorIndexChange` no transporta tipo de unidad ni idioma, y un
+  parche dejaría entradas nuevas imposibles de filtrar.
+- La hidratación de procedencia ocurre **antes** de deduplicar y diversificar,
+  no después como sugería el primer borrador del diseño: `RankedHit` sólo lleva
+  `fragmentId`, y ni la deduplicación por `unitId` ni la diversidad por video
+  son posibles sin conocer la procedencia.
+- **La búsqueda vectorial no tiene piso de similitud.** Es un ranking
+  exhaustivo: toda consulta sobre una biblioteca no vacía (tras filtros)
+  devuelve candidatos, aunque la similitud real sea baja. `status: "no_results"`
+  sólo ocurre si el filtro deja la biblioteca vacía o si ambas vías fallan. Un
+  umbral mínimo queda pendiente de calibración en 3.2.
+- 2.2 no expone superficie de CLI. `retrieve` sigue sin anunciarse hasta cerrar
+  2.3.
 
-- consulta normalizada;
-- filtros por fuente, video, idioma y metadata estable;
-- hit textual y hit vectorial;
-- score original y score fusionado;
-- procedencia hasta fragmento/unidad/documento/paquete;
-- límites de candidatos;
-- resultado vacío y warnings.
+Validación realizada: 151 tests (eran 91 al cerrar 2.1), cobertura 94,66%
+líneas / 84,25% ramas / 98,23% funciones, `npm run build` y `npm run check`
+aprobados. El E2E de recuperación (`test/e2e/retrieval.e2e.test.ts`) cubre
+consulta sin restart, término raro por vía textual, paráfrasis sin léxico
+compartido por vía vectorial, filtro por fuente, eliminación en ambas vías y
+reconstrucción tras reiniciar el proceso, sin mutar las fuentes.
 
-No exponer filas SQLite ni objetos de Transformers.js.
+Pendiente opcional antes de avanzar, no bloqueante: una pasada cualitativa de
+`retrieveCandidates` sobre una copia temporal de la colección real
+`auto-design` con el modelo E5 real (ya cacheado en `.cache/models`), siguiendo
+el mismo patrón que la validación real de 2.1. No se ejecutó en el cierre de
+2.2 porque las cuatro capacidades ya están verificadas por pruebas automatizadas
+y el E2E; queda como confirmación adicional, no como condición de cierre.
 
-### 2. Implementar búsqueda textual FTS5
+## Próximo trabajo: punto 2.3 — ensamblado de contexto
 
-- Adaptador detrás de `TextSearchIndex`.
-- Sanitizar la consulta para la gramática `MATCH`; no tratarla como `LIKE`.
-- Recuperar `fragment_id`, score y procedencia suficiente.
-- Aplicar filtros sin romper índices.
-- Probar Unicode, diacríticos, términos vacíos, caracteres especiales y
-  consultas sin resultados.
+No existe todavía un checklist fino aprobado para 2.3. Antes de implementar,
+crear y revisar diseño y tareas siguiendo el mismo patrón que
+`retrieval-design.md`/`retrieval-tasks.md`. Por `product-spec.md` y
+`cli-contract.md`, 2.3 debe:
 
-### 3. Implementar búsqueda vectorial exacta
+- expandir candidatos a sus unidades padre usando
+  `KnowledgeRepository.getAncestors`, ya implementado en 2.2;
+- deduplicar contenido repetido tras la expansión;
+- aplicar presupuestos por profundidad (`focused` 12k / `balanced` 32k /
+  `deep` 64k tokens estimados, ajustables por evaluación);
+- preservar citas `[S01]` resueltas contra `CandidateProvenance` y
+  limitaciones cuando la evidencia sea insuficiente;
+- ensamblar `context.md` y `result.json` según el contrato ya aprobado en
+  `cli-contract.md`;
+- recién ahí implementar el comando `retrieve` de la CLI.
 
-- Generar `embedQuery` con prefijo E5 correcto.
-- Cargar embeddings BLOB del modelo activo.
-- Validar modelo, versión y 384 dimensiones.
-- Calcular similitud coseno o dot product sobre vectores normalizados.
-- Mantener una abstracción reemplazable para que sqlite-vec pueda incorporarse
-  en el futuro sin cambiar aplicación.
-- Definir estrategia de recarga al abrir la aplicación y tras `sync`.
-
-### 4. Diseñar fusión y diversidad
-
-La política sigue abierta. Evaluar como baseline RRF porque combina rankings sin
-comparar escalas incompatibles. Después incorporar:
-
-- deduplicación por fragmento y unidad;
-- límite por video/fuente;
-- diversidad temática;
-- preservación de hits fuertes de reglas y contexto;
-- candidatos suficientes para no depender sólo del top mínimo.
-
-No fijar pesos finales sin evaluaciones reales.
-
-### 5. Filtros y repositorio de conocimiento
-
-Implementar lectura de unidades y ancestros para que 2.3 pueda expandir un hit
-pequeño a contexto amplio. Evitar ensamblar todavía `context.md` dentro de 2.2:
-separar recuperación de candidatos y ensamblado presupuestado.
-
-### 6. Pruebas y evaluación inicial
-
-Crear fixtures pequeños con resultados esperados y un conjunto inicial de
-consultas reales de diseño en español e inglés. Medir al menos:
-
-- recall de candidatos relevantes;
-- posición del primer resultado relevante;
-- cobertura de unidades/videos;
-- duplicación;
-- latencia y memoria;
-- comportamiento sin resultados.
-
-La evaluación no necesita un LLM interno.
-
-## Criterio provisional de cierre para 2.2
-
-Antes de marcar recuperación híbrida al 100%, demostrar:
-
-- FTS5 recupera términos exactos y relacionados por tokenización;
-- búsqueda exacta recupera similitud semántica con el E5 local;
-- la fusión es determinista;
-- filtros no contaminan resultados;
-- un paquete sincronizado se vuelve consultable sin reconstrucción manual;
-- una eliminación desaparece de ambos rankings;
-- reiniciar el proceso reconstruye correctamente el índice vectorial derivado;
-- no hay llamadas de red ni mutación de fuentes;
-- las métricas y procedencia permiten que 2.3 construya citas.
+`RetrievalOutcome.candidates` de 2.2 es la materia prima: cada candidato ya
+trae procedencia completa (encabezados, tipo de unidad, documento, paquete,
+creador, timestamps, evidencia visual) y texto citable.
 
 ## Primer turno recomendado para el próximo agente
 
 1. Confirmar `git status --short` vacío y revisar los últimos commits.
 2. Ejecutar `npm.cmd run check` y `npm.cmd run build`.
-3. Leer los ocho documentos indicados al inicio.
-4. Inspeccionar puertos, `sync-source.ts`, `sqlite-index-store.ts`, migración y
-   `create-application.ts`.
-5. No empezar código directamente: proponer el diseño y checklist fino de 2.2.
-6. Resolver con el usuario la política baseline de fusión/reranking.
+3. Leer los diez documentos indicados al inicio.
+4. Inspeccionar `retrieve-candidates.ts`, `select-candidates.ts`,
+   `sqlite-knowledge-repository.ts` y `create-application.ts`.
+5. No empezar código directamente: proponer el diseño y checklist fino de 2.3.
+6. Resolver con el usuario los presupuestos de profundidad si las evaluaciones
+   de 3.2 sugieren ajustarlos antes de fijar el ensamblado.
 7. Implementar en cortes de máximo cinco archivos por tarea, conservando
    arquitectura y commits convencionales.
 
 Prompt sugerido para retomar:
 
 > Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero el
-> estado del repositorio y las pruebas. El punto 2.1 está terminado; planifica
-> 2.2 — recuperación híbrida — con contratos independientes de SQLite/E5,
-> búsqueda FTS5, búsqueda vectorial exacta, fusión, diversidad, filtros y tests.
-> No implementes hasta presentar y aprobar el checklist detallado.
+> estado del repositorio y las pruebas. El punto 2.2 está terminado; planifica
+> 2.3 — ensamblado de contexto — con expansión a unidades padre, deduplicación,
+> presupuestos por profundidad, citas y el comando `retrieve` de la CLI. No
+> implementes hasta presentar y aprobar el checklist detallado.
 
 ## Historial reciente relevante
 
 ```text
+8fa0fa7 test(e2e): verify hybrid retrieval end to end
+9f77192 feat(main): compose retrieval adapters into the application
+639fa56 feat(retrieval): orchestrate candidate selection and retrieval
+bb88f27 feat(retrieval): read provenance and unit hierarchy
+709a3c5 feat(retrieval): search vectors with an exact in-memory index
+aa517bc feat(retrieval): search fragments through FTS5
+59f5090 feat(retrieval): sanitize queries for the FTS5 grammar
+faed06f feat(retrieval): fuse ranked hits with weighted RRF
+2495cc9 feat(retrieval): declare hybrid retrieval ports
+3d85c3a feat(retrieval): validate retrieval queries and filters
+ba132e9 docs(retrieval): propose hybrid retrieval design
 ed89878 docs(progress): complete synchronization phase
 35ef5d1 fix(domain): accept canonical unicode slugs
 b902d0c fix(embeddings): enforce offline model loading
@@ -555,5 +553,10 @@ código:
 4. por qué los paquetes fuente son estrictamente read-only;
 5. cómo se mantienen alineados SQLite, FTS5 y embeddings;
 6. por qué la búsqueda vectorial inicial será exacta y reemplazable;
-7. qué parte corresponde a 2.2 y qué debe esperar a 2.3;
-8. qué decisión de fusión/reranking aún requiere validación.
+7. qué parte corresponde a 2.3 y qué ya entregó 2.2;
+8. por qué RRF ponderado es el baseline de fusión y qué queda pendiente de
+   calibrar en 3.2;
+9. por qué la búsqueda vectorial no tiene piso de similitud y qué implica eso
+   para `status: "no_results"`;
+10. por qué los identificadores de fragmento y documento son derivados en vez
+    de persistidos, y qué adaptadores dependen de esa reconstrucción.
