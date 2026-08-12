@@ -226,7 +226,7 @@ válido sobre una base temporal real, sin tocar las fuentes registradas.
 
 ### L2. Integración extremo a extremo
 
-- [ ] Verificar el ciclo completo sobre la colección temporal reproducible.
+- [x] Verificar el ciclo completo sobre la colección temporal reproducible.
   - Depende de: L1.
   - Aceptación: `retrieve` sobre una biblioteca sincronizada escribe un
     bundle válido y consistente con `RetrievalOutcome`; `--depth focused` con
@@ -234,6 +234,16 @@ válido sobre una base temporal real, sin tocar las fuentes registradas.
     consulta; `--source` repetido filtra correctamente; una consulta sin
     coincidencias produce `status: "no_results"` con bundle igual escrito;
     el árbol fuente conserva su digest SHA-256; no hay accesos de red.
+  - Nota de implementación: la prueba de presupuesto usa `--max-tokens`
+    explícito (5 contra 5000) en vez de los presets nombrados
+    `focused`/`deep`, porque el fixture es demasiado pequeño para que 12k y
+    64k produzcan una diferencia observable; los nombres de preset ya están
+    cubiertos por `context-budget.test.ts` y `retrieve-command.test.ts`. El
+    caso `no_results` usa un filtro `--source` inexistente en vez de una
+    consulta "sin sentido", porque la búsqueda vectorial no tiene piso de
+    similitud (ver `retrieval-design.md`): toda consulta sobre una biblioteca
+    no vacía devuelve algo salvo que el filtro deje el universo de
+    candidatos vacío.
   - Verificar: `node --import tsx --test test/e2e/context-assembly.e2e.test.ts`,
     `npm run test:coverage`, `npm run build` y `npm run check`.
   - Archivos: `test/e2e/context-assembly.e2e.test.ts`.
