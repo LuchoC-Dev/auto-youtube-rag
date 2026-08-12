@@ -30,7 +30,7 @@ profundidad, y sólo detrás de las interfaces ya sustituibles
 
 ### M1. Verificador de integridad de citas
 
-- [ ] Implementar una función pura que, dado un bundle (`markdown` +
+- [x] Implementar una función pura que, dado un bundle (`markdown` +
       `ContextResultDocument`), detecte citas huérfanas (`[S0N]` en el
       Markdown sin `citation_id` correspondiente en `result.json.units`) y
       unidades sin cita (`citation_id` en `result.json.units` que no aparece
