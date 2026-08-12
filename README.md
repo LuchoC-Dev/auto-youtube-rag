@@ -3,8 +3,10 @@
 Biblioteca RAG local para recuperar contexto amplio, ordenado y citado desde los
 paquetes de conocimiento producidos por la skill de videos.
 
-La indexación incremental y la CLI administrativa están implementadas y
-verificadas. El próximo bloque es la recuperación híbrida del punto 2.2.
+La indexación incremental, la recuperación híbrida, el ensamblado de contexto
+(comando `retrieve`) y la skill portable (`skill/SKILL.md`) están
+implementados y verificados. El próximo bloque son las evaluaciones del MVP
+del punto 3.2.
 
 ## Propósito
 
@@ -34,3 +36,5 @@ para que el agente consultante razone y redacte la respuesta.
 - [`docs/cli-contract.md`](docs/cli-contract.md): comandos y formatos aprobados.
 - [`docs/decisions.md`](docs/decisions.md): decisiones y asuntos pendientes.
 - [`docs/build.md`](docs/build.md): progreso de construcción.
+- [`skill/SKILL.md`](skill/SKILL.md): skill portable que enseña a un agente
+  (Codex, Claude u otro) a operar la CLI.
