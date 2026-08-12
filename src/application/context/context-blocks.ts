@@ -42,6 +42,46 @@ export interface ContextUnitBlock {
 export type ContextSection =
   "highest_relevance" | "related_rules" | "additional_context";
 
+const highestRelevanceTypes = new Set([
+  "context_section",
+  "context_document",
+  "rules_section",
+  "rules_document",
+]);
+
+const relatedRulesTypes = new Set([
+  "rule_pattern",
+  "rule_item",
+  "avoid_item",
+  "acceptance_criterion",
+]);
+
+/**
+ * The fixed bucketing rule approved for 2.3: ancestor blocks always land in
+ * "Additional relevant context" regardless of their own unit type, because
+ * they exist only to give surrounding context, not because they matched the
+ * query directly. A candidate block lands by its `unitType`; any candidate
+ * type outside the two named buckets falls back to "additional_context"
+ * rather than being silently dropped from every section.
+ */
+export function classifyContextSection(
+  block: ContextUnitBlock,
+): ContextSection {
+  if (block.origin === "ancestor") {
+    return "additional_context";
+  }
+
+  if (highestRelevanceTypes.has(block.unitType)) {
+    return "highest_relevance";
+  }
+
+  if (relatedRulesTypes.has(block.unitType)) {
+    return "related_rules";
+  }
+
+  return "additional_context";
+}
+
 /**
  * The outcome of walking the ordered block sequence and accumulating token
  * counts. A block is either fully included or fully omitted; nothing is cut

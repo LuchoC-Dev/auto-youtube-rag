@@ -139,7 +139,7 @@ Checkpoint J: las cuatro políticas puras pasan sin instanciar SQLite, sin
 
 ### K1. Redacción de `context.md`
 
-- [ ] Implementar `renderContextMarkdown` como función pura.
+- [x] Implementar `renderContextMarkdown` como función pura.
   - Depende de: J1–J4, I1.
   - Aceptación: produce front-matter y las seis secciones fijas de
     `cli-contract.md` en el orden aprobado; cada bloque incluido muestra su

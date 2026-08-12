@@ -1,18 +1,8 @@
-import type { BudgetAllocation, ContextUnitBlock } from "./context-blocks.js";
-
-const highestRelevanceTypes = new Set([
-  "context_section",
-  "context_document",
-  "rules_section",
-  "rules_document",
-]);
-
-const relatedRulesTypes = new Set([
-  "rule_pattern",
-  "rule_item",
-  "avoid_item",
-  "acceptance_criterion",
-]);
+import {
+  classifyContextSection,
+  type BudgetAllocation,
+  type ContextUnitBlock,
+} from "./context-blocks.js";
 
 /**
  * Fixed, deterministic ingestion order approved for 2.3: document/section
@@ -26,20 +16,17 @@ function orderedForBudget(
 ): readonly ContextUnitBlock[] {
   const highestRelevance: ContextUnitBlock[] = [];
   const relatedRules: ContextUnitBlock[] = [];
-  const ancestors: ContextUnitBlock[] = [];
+  const additionalContext: ContextUnitBlock[] = [];
 
   for (const block of blocks) {
-    if (block.origin === "ancestor") {
-      ancestors.push(block);
-    } else if (highestRelevanceTypes.has(block.unitType)) {
+    const section = classifyContextSection(block);
+
+    if (section === "highest_relevance") {
       highestRelevance.push(block);
-    } else if (relatedRulesTypes.has(block.unitType)) {
+    } else if (section === "related_rules") {
       relatedRules.push(block);
     } else {
-      // A candidate block whose unitType belongs to neither bucket has no
-      // dedicated section; treat it as additional context rather than
-      // dropping it silently.
-      ancestors.push(block);
+      additionalContext.push(block);
     }
   }
 
@@ -48,9 +35,14 @@ function orderedForBudget(
 
   highestRelevance.sort(byScoreDesc);
   relatedRules.sort(byScoreDesc);
-  ancestors.sort((a, b) => b.fusedScore - a.fusedScore || b.depth - a.depth);
+  // Within "additional context", ancestor blocks additionally break ties by
+  // descending depth; a stray candidate without a dedicated bucket has no
+  // such notion and simply keeps the score-only order.
+  additionalContext.sort(
+    (a, b) => b.fusedScore - a.fusedScore || b.depth - a.depth,
+  );
 
-  return [...highestRelevance, ...relatedRules, ...ancestors];
+  return [...highestRelevance, ...relatedRules, ...additionalContext];
 }
 
 /**
