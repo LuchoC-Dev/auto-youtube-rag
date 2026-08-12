@@ -65,7 +65,7 @@ profundidad, y sólo detrás de las interfaces ya sustituibles
 
 ### M3. Agregador de métricas de Capa A
 
-- [ ] Implementar una función que, dados los 24 `result.json` generados,
+- [x] Implementar una función que, dados los 24 `result.json` generados,
       produzca la tabla de Capa A del reporte (estado vs. `kind` esperado,
       cobertura, `budget_exhausted`, advertencias).
   - Depende de: M2.

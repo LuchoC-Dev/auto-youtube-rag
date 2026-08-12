@@ -18,7 +18,7 @@
 |                            | 2.3 | Ensamblado de contexto         |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve` |
 |                            | 2.4 | Skill general                  |   ✅   | 100% | `skill/SKILL.md` verificada en frío        |
 | **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos       |
-|                            | 3.2 | Evaluaciones del MVP           |   🔵   | 22%  | M1–M2 completados; M3–O2 en curso          |
+|                            | 3.2 | Evaluaciones del MVP           |   🔵   | 33%  | M1–M3 completados; M4–O2 en curso          |
 
 ---
 
@@ -128,7 +128,7 @@ bundle). Checklist fino en `docs/eval-tasks.md`, bloques M–O.
 
 - [x] M1. Verificador de integridad de citas (`evals/citation-integrity.ts`)
 - [x] M2. Script de orquestación de consultas semilla (`evals/run-seed-queries.ts`)
-- [ ] M3. Agregador de métricas de Capa A
+- [x] M3. Agregador de métricas de Capa A (`evals/aggregate-mechanical-metrics.ts`)
 - [ ] M4. Ejecución real sobre `auto-design`
 - [ ] N1. Plantilla de rúbrica
 - [ ] N2. Juicio de Claude
