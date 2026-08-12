@@ -185,7 +185,7 @@ con `PRAGMA integrity_check` intacto y sin mutaciones.
 
 ### H3. Composition root
 
-- [ ] Conectar los adaptadores de recuperación sin lógica de negocio nueva.
+- [x] Conectar los adaptadores de recuperación sin lógica de negocio nueva.
   - Depende de: G1–G4 y H2.
   - Aceptación: crear la aplicación no carga vectores, no abre el modelo y no
     consulta; cada adaptador de recuperación es reemplazable por override;
