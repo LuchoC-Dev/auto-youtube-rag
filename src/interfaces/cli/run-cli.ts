@@ -1,9 +1,14 @@
 import { access, mkdir } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { dirname } from "node:path";
 
 import { getStatus } from "../../application/diagnostics/get-status.js";
 import { runDoctor } from "../../application/diagnostics/run-doctor.js";
+import { ContextBudget } from "../../domain/context/context-budget.js";
 import { SourceName } from "../../domain/indexing/identifiers.js";
+import { RetrievalFilter } from "../../domain/retrieval/retrieval-filter.js";
+import { RetrievalQuery } from "../../domain/retrieval/retrieval-query.js";
+import { writeContextBundle } from "../../infrastructure/filesystem/write-context-bundle.js";
 import { SQLiteDiagnosticsRepository } from "../../infrastructure/sqlite/sqlite-diagnostics.js";
 import type {
   Application,
@@ -147,6 +152,41 @@ export async function runCli(options: RunCliOptions): Promise<number> {
         );
         options.stdout.write(renderCliSuccess({ ...result }));
         return result.status === "ok" ? 0 : 1;
+      }
+      case "retrieve": {
+        const request = {
+          query: RetrievalQuery.create({
+            text: command.query,
+            filter: RetrievalFilter.create({
+              sources: command.sources.map((name) => SourceName.create(name)),
+            }),
+          }),
+          budget: ContextBudget.create({
+            depth: command.depth ?? undefined,
+            maxTokensOverride: command.maxTokens,
+          }),
+        };
+
+        options.stderr.write("Retrieving context...\n");
+        const bundle = await application.assembleContext(request);
+        const written = await writeContextBundle(
+          bundle,
+          command.out ?? tmpdir(),
+        );
+
+        const degraded = bundle.result.warnings.length > 0;
+        options.stdout.write(
+          renderCliSuccess({
+            status: degraded ? "partial" : bundle.result.status,
+            request_id: written.requestId,
+            context_path: written.contextPath,
+            result_path: written.resultPath,
+            estimated_tokens: bundle.result.metrics.estimated_tokens,
+            sources_used: bundle.result.metrics.sources_used,
+            warnings: bundle.result.warnings,
+          }),
+        );
+        return degraded ? 1 : 0;
       }
     }
     return unreachable(command);

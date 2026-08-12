@@ -32,6 +32,38 @@ void test("parses every non-interactive administrative command", () => {
   });
   assert.deepEqual(parseCommand(["status"]), { kind: "status" });
   assert.deepEqual(parseCommand(["doctor"]), { kind: "doctor" });
+  assert.deepEqual(parseCommand(["retrieve", "brutalismo"]), {
+    kind: "retrieve",
+    query: "brutalismo",
+    depth: null,
+    maxTokens: null,
+    sources: [],
+    out: null,
+  });
+  assert.deepEqual(
+    parseCommand([
+      "retrieve",
+      "brutalismo",
+      "--depth",
+      "deep",
+      "--max-tokens",
+      "5000",
+      "--source",
+      "auto-design",
+      "--source",
+      "catalog-design",
+      "--out",
+      "C:\\out",
+    ]),
+    {
+      kind: "retrieve",
+      query: "brutalismo",
+      depth: "deep",
+      maxTokens: 5000,
+      sources: ["auto-design", "catalog-design"],
+      out: "C:\\out",
+    },
+  );
 });
 
 void test("maps missing, unknown and mistyped arguments to usage exit code 2", () => {
@@ -43,6 +75,10 @@ void test("maps missing, unknown and mistyped arguments to usage exit code 2", (
     ["source", "remove"],
     ["sync", "--unknown"],
     ["status", "extra"],
+    ["retrieve"],
+    ["retrieve", "brutalismo", "--depth", "shallow"],
+    ["retrieve", "brutalismo", "--max-tokens", "0"],
+    ["retrieve", "brutalismo", "--max-tokens", "abc"],
   ]) {
     assert.throws(
       () => parseCommand(args),

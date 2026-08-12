@@ -205,7 +205,7 @@ válido sobre una base temporal real, sin tocar las fuentes registradas.
 
 ### L1. Comando `retrieve`
 
-- [ ] Extender `parse-command.ts`, `run-cli.ts` y el composition root.
+- [x] Extender `parse-command.ts`, `run-cli.ts` y el composition root.
   - Depende de: K3, K4.
   - Aceptación: acepta `<query>`, `--depth`, `--max-tokens`, `--source`
     (repetible), `--out`; construye `RetrievalQuery`/`RetrievalFilter`/
@@ -214,8 +214,12 @@ válido sobre una base temporal real, sin tocar las fuentes registradas.
     código `0` para `ok`/`no_results`, `1` para `partial`, `2` para uso
     inválido; `Application` expone `assembleContext` reemplazable igual que
     `retrieveCandidates`.
-  - Verificar: `node --import tsx --test test/interfaces/cli/parse-command.test.ts`,
-    `node --import tsx --test test/interfaces/cli/run-cli.test.ts` y
+  - Nota de implementación: `--depth` inválido y `--max-tokens` no entero
+    positivo se validan en `parse-command.ts` (código `2`), no dentro de
+    `ContextBudget` en tiempo de ejecución, para que un argumento mal escrito
+    nunca produzca el código `1` de fallo operativo.
+  - Verificar: `node --import tsx --test test/interfaces/cli/cli-contract.test.ts`,
+    `node --import tsx --test test/interfaces/cli/retrieve-command.test.ts` y
     `npm run check`.
   - Archivos: `src/interfaces/cli/parse-command.ts`,
     `src/interfaces/cli/run-cli.ts`, `src/main/create-application.ts`.
