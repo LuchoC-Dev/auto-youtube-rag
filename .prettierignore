@@ -6,4 +6,5 @@ benchmarks/
 docs/architecture.md
 docs/benchmarks/
 docs/cli-contract.md
+evals/results/
 package-lock.json

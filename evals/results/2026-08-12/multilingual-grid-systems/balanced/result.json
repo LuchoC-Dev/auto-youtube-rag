@@ -1,0 +1,1308 @@
+{
+  "schema_version": "1.0",
+  "status": "ok",
+  "request": {
+    "query": "sistemas de grilla editorial",
+    "depth": "balanced",
+    "max_tokens": 32000,
+    "sources": []
+  },
+  "metrics": {
+    "candidates_considered": 50,
+    "units_selected": 63,
+    "sources_used": 21,
+    "estimated_tokens": 31973
+  },
+  "units": [
+    {
+      "citation_id": "S01",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 2: Por qué usar sistemas de grilla (cinco razones)"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:08:47",
+      "visual_evidence": [],
+      "content": "Tras situar el origen histórico de las grillas (\"Grids go way back 1500 years in ancient manuscripts\", 00:08:47) y advertir que el interés no es histórico sino práctico, el video enumera cinco razones concretas para adoptar grillas:\n\n1. **Determinan la jerarquía visual.** Una grilla de, por ejemplo, seis columnas permite que un elemento importante \"domine\" al abarcar más de una columna. El creador usa una página web de ejemplo (\"mixd\") donde un bloque de texto ocupa una columna y otro ocupa dos, generando jerarquía de forma simple.\n2. **Romper la grilla con intención genera impacto.** Mantener partes del diseño alineadas a la grilla mientras un elemento la rompe deliberadamente crea contraste y capta la atención, siempre que la ruptura sea intencional y no accidental.\n3. **Versatilidad.** Las grillas no son exclusivas de revistas o periódicos: se aplican a logotipos, sitios web, tipografía y pósters, entre otros formatos.\n4. **Generación de espacio en blanco (white space).** Pensar en qué filas y columnas quedarán vacías es una manera efectiva de construir espacio en blanco micro y macro. El creador recomienda subdividir columnas y filas (por ejemplo, 3 columnas × 4 filas subdivididas en 6 × 6) para tener más control sobre el \"espacio en blanco micro\", definido explícitamente como \"el espacio pequeño entre líneas de texto y elementos de diseño muy juntos\" (00:12:08).\n5. **Guían el ojo del espectador.** Las líneas de texto demasiado largas o cortas dificultan la lectura; los sistemas de grilla ayudan a evitar esto y a poner orden en diseños recargados. Las grillas base (\"baseline grids\") alinean cuerpo de texto, titulares y pies de foto entre columnas; se recomienda usar tamaños tipográficos múltiplos del interlineado base (ejemplo dado: 28 puntos para titulares si el cuerpo de texto es de 14 puntos).",
+      "token_count": 455
+    },
+    {
+      "citation_id": "S02",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–00:32",
+      "visual_evidence": [],
+      "content": "| Tiempo | Contenido | Evidencia |\n|---|---|---|\n| 00:00–00:32 | Introducción: qué es el minimalismo gráfico y por qué divide opiniones | Transcript directo |\n| 00:32–01:02 | Origen histórico: Bauhaus y diseño suizo, mediados del siglo XX | Transcript directo |\n| 01:02–02:04 | Layout: grillas, jerarquía visual, asimetría equilibrada | Transcript directo + frame-15pct.png (póster con grilla visible, incluye una pieza tipo \"Heinz\") |\n| 02:04–02:36 | Mención de un libro sobre sistemas de grilla (recurso recomendado) | Transcript directo; supplemental-124s.png muestra en ese instante otros ejemplos de branding, no el libro |\n| 02:36–03:07 | Espacio en blanco: función y dificultad de dominarlo | Transcript directo |\n| 03:07–04:11 | Tipografía: fuentes sans-serif y serif recomendadas | Transcript directo + frame-35pct.png y frame-40pct.png (pósters y portadas tipográficas) |\n| 04:11–04:42 | Ética de pago a diseñadores de tipografías | Transcript directo |\n| 04:42–05:13 | Estilo editorial y uso intensivo de texto | Transcript directo + frame-40pct.png / frame-45pct.png (portadas de revista) |\n| 05:13–06:13 | Paletas de color: neutros + un acento, \"off-white\"/\"off-black\" | Transcript directo + frame-50pct.png / frame-55pct.png (pósters con paleta reducida y acentos) |\n| 06:13–06:44 | Consejo práctico: guardar y recrear pines de Pinterest | Transcript directo |\n| 06:44–07:16 | Referencia cruzada a otro video del canal sobre diseño suizo (promoción interna) | Transcript directo |",
+      "token_count": 476
+    },
+    {
+      "citation_id": "S03",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 3: Catálogo de tipos de sistemas de grilla"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- **Grilla de columnas (column grid).** Divide la página en secciones verticales iguales (el ejemplo muestra cuatro columnas); habitual en revistas, periódicos y sitios de contenido múltiple. Consejo: superponer elementos (una imagen destacada abarcando tres columnas mientras el texto ocupa una sola) para generar interés visual.\n- **Grilla modular.** Cada producto, imagen o pieza gráfica recibe su propio módulo (imagen, título, descripción, precio), típico en e-commerce. Consejo: variar el tamaño del módulo según la importancia del contenido (por ejemplo, destacar más espacio a productos \"best seller\").\n- **Grilla de manuscrito (manuscript grid).** Una sola columna que organiza el flujo de texto en un libro, con márgenes reservados para notas o imágenes.\n- **Grilla de jerarquía.** Módulos de distinto tamaño y forma para colocar imágenes o textos importantes (titulares, CTA) con mayor prominencia que la información secundaria (navegación, pie de página). Consejo: usar color y tamaño para reforzar el contraste entre elementos primarios y secundarios.\n- **Proporción áurea (golden ratio, ~1:1.618).** Aplicada a logotipos como el pájaro de Twitter o el logo de Apple para lograr proporciones \"equilibradas\"; el creador aclara que no es una regla rígida sino un punto de partida a ajustar según el proyecto.\n- **Grilla asimétrica.** Rompe la simetría dejando que la imagen o titular principal ocupe más espacio, dirigiendo la atención hacia lo más importante, mientras columnas menores aportan información secundaria. Consejo adicional: superponer texto sobre imágenes o usar líneas diagonales sutiles para dar sensación de profundidad y movimiento.\n- **Grilla cuadrada.** Ideal para galerías uniformes (ejemplo: un perfil de Instagram) donde cada imagen ocupa un cuadrado idéntico. Consejo: añadir color o un patrón sutil de fondo en ciertos cuadrados sin romper la estructura general.",
+      "token_count": 453
+    },
+    {
+      "citation_id": "S04",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 11 — Grilla de columnas con márgenes fijos"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "15:16–15:46",
+      "visual_evidence": [],
+      "content": "El creador confirma explícitamente la estructura de grilla usada en todo el\nejercicio.\n\n> \"I'm using a 12 column grid like you've seen [...] this is a regular 12\n> column grid with 40 pixel margins on both sides.\" (15:16–15:46)\n\nTraducción: \"Estoy usando una grilla de 12 columnas, como ya vieron [...]\nes una grilla regular de 12 columnas con márgenes de 40 píxeles a ambos\nlados.\" (15:16–15:46)\n\n**Regla operativa:** para layouts editoriales de este tipo, partir de una\ngrilla de 12 columnas con márgenes laterales fijos de 40 píxeles (en\nresoluciones de escritorio), y alinear cada bloque de contenido a los límites\nde columna de esa grilla en lugar de posicionarlo libremente.",
+      "token_count": 188
+    },
+    {
+      "citation_id": "S05",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Criterios de aceptación"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- El diseño define con claridad al menos un punto de apalancamiento identificable en los primeros segundos de visualización.\n- Existe una jerarquía visual perceptible entre elementos primarios y secundarios, lograda mediante tamaño, contraste o posición en la grilla, y no únicamente mediante texto explicativo.\n- El sistema de grilla elegido es coherente con el tipo de contenido (editorial, e-commerce, branding, infografía, etc.) y se aplica de manera consistente salvo en el punto de ruptura intencional, si existe.\n- El espacio en blanco micro y macro es suficiente para que el contenido no se perciba abarrotado.\n- El recorrido visual (ritmo interno) puede describirse verbalmente como una secuencia lógica de pasos, no como saltos arbitrarios.\n- Cualquier fricción presente en el diseño puede justificarse como intencional y ligada a un objetivo de énfasis.\n- El diseño se probó reducido de tamaño y en al menos un formato adicional al original, conservando su identidad y legibilidad.",
+      "token_count": 228
+    },
+    {
+      "citation_id": "S06",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Demostraciones y ejemplos visibles"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:12:08",
+      "visual_evidence": [],
+      "content": "- `frame-45pct.png`: un botón rojo rotulado \"COLUMN GRIDS\" sobre fondo rosa, transición hacia la explicación de la grilla de columnas.\n- `frame-50pct.png`: una composición tipográfica elegante titulada \"Cherry Blossom Time\" con texto en cursiva, ejemplo de aplicación editorial de grillas.\n- `frame-55pct.png`: el presentador hablando directamente a cámara en un entorno con iluminación morada, confirmando los tramos en los que el creador se dirige al espectador entre ejemplos.\n- `frame-60pct.png`: un fondo negro con un único círculo rosa, posiblemente parte de la explicación de la regla de tercios o de la grilla circular.\n- `frame-65pct.png`: una ilustración con el rótulo \"FISHEYE\" y dos peces estilizados junto a una línea ondulada dibujada a mano, un ejemplo visual de distorsión que no tiene una cita textual exacta en el transcript más cercano pero que se asocia contextualmente al bloque de grillas y proporciones.\n- `frame-70pct.png`: una composición con una fotografía de retrato en tonos morados sobre una cuadrícula visible de puntos, ejemplo de grilla aplicada a fotografía editorial.\n- `frame-75pct.png`: una pieza de branding con el texto \"SAPFORCE.\" y una esfera 3D con textura orgánica verde y gris, ejemplo de identidad visual con grilla subyacente.\n- `frame-80pct.png`: un collage de portadas de películas o pósters (incluyendo \"Interstellar\" y \"THE RIFT\") junto al texto \"Use spacing and positioning to control the speed of engagement: fast rhythm for simple, skimmable content; slower more deliberate flow for dense or complex information\", que resume explícitamente el principio de ritmo.\n- `frame-85pct.png`: un collage de portadas de revista de moda, ilustrando ejemplos editoriales de composición.",
+      "token_count": 458
+    },
+    {
+      "citation_id": "S07",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Resumen compacto"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "21:19",
+      "visual_evidence": [],
+      "content": "El video \"How I design websites with EDITORIAL style layouts (part 1)\" (BONT,\nAdrian Somoza, DU6vjWnH2p0, 21:19) enseña un método de diseño web inspirado\nen el diseño editorial impreso: restringir el trabajo a cinco elementos\n(tipografía, color, grilla, imágenes, espacio en blanco), reunir y \"digerir\"\nel contenido antes de maquetar, declarar el objetivo del sitio, investigar\nreferencias variadas, iterar duplicando versiones, aplicar un sistema de\nespaciado en múltiplos fijos sobre una grilla de 12 columnas, alinear cada\nelemento vertical y horizontalmente contra los demás (\"branching\"), y usar\nmodos de fusión para mantener contraste entre texto e imágenes. El caso\npráctico es el rediseño del sitio inmobiliario \"The Rider\" en un ejercicio\nde portafolio en Figma, sin evidencia de que haya llegado a producción. El\nvideo incluye contenido promocional (curso \"Golden Canon Grid\" y mentoría\n\"Bunk Lab\") que debe tratarse como provenance/sesgo declarado y no como parte\ndel método técnico transferible.",
+      "token_count": 249
+    },
+    {
+      "citation_id": "S08",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Demostraciones y ejemplos visibles"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "pieza corporativa con el texto \"L Studio\" sobre fondo mostaza—. Este\nfotograma se generó porque el instante mencionado en el audio para el\nlibro de sistemas de grilla no estaba cubierto por el muestreo uniforme;\nlo que realmente aparece en pantalla en ese segundo es este otro grupo de\nejemplos de branding, no el libro.",
+      "token_count": 75
+    },
+    {
+      "citation_id": "S09",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso 3 — El libro sobre sistemas de grilla (recurso recomendado)"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "02:04–02:36",
+      "visual_evidence": [],
+      "content": "El presentador menciona un libro sobre sistemas de grilla que considera útil\ny estéticamente atractivo, y remite a una lista de libros (\"book list\") en\nla descripción del video (02:04–02:36). Esto se documenta como **recurso\nrecomendado / promoción de contenido asociado al canal**, no como parte del\nmétodo en sí: el video no explica el contenido del libro, solo lo señala\ncomo lectura complementaria. El fotograma capturado en ese instante exacto\n(`supplemental-124s.png`) no muestra el libro sino otro conjunto de piezas de\nbranding minimalista (packaging de una vela, tarjetas de presentación,\nidentidad de marca), lo que indica que el corte de edición del video no\ncoincide de forma exacta con el minuto citado o que la referencia visual al\nlibro ocurre en otro instante no capturado por el muestreo. Se reporta esto\nexplícitamente para no fabricar una correspondencia que la evidencia visual\nno respalda.",
+      "token_count": 210
+    },
+    {
+      "citation_id": "S10",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "tbf6XDqCWFE",
+      "video_title": "BRUTALISM: Best Website Examples for Your Web Design Inspiration |  TemplateMonster",
+      "creator": "TemplateMonster",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio 3 — Composición tipo collage y ruptura deliberada de la grilla"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Varios ejemplos muestran composiciones que ignoran la alineación de grilla\nconvencional, superponiendo imágenes, iconos y bloques de texto en ángulos o\ntamaños dispares.\n\n- `frame-00pct.png`/`frame-05pct.png` combinan fotografía de producto,\n  formas 3D flotantes y tipografía superpuesta sin un contenedor visual\n  claro.\n- `frame-40pct.png` (De Vlieg, según cronología) muestra una composición de\n  nube de humo/pintura fusionada con elementos gráficos flotantes, sin\n  bordes ni tarjetas que delimiten el contenido.\n- `frame-50pct.png` y `frame-55pct.png` (Lazy Eyes / Laurel Halo) presentan\n  cuadrículas de imágenes de tamaño desigual, con controles de reproductor\n  (\"Prev / Play / Next\", \"0:00\") integrados de forma cruda dentro de la\n  composición visual en vez de aislados en una barra de control estándar.\n- `frame-70pct.png`/`frame-75pct.png` (Chrissie Abbott) alternan una portada\n  ultra-minimalista con una grilla densa de miniaturas de ilustración de\n  tamaños heterogéneos.\n\n**Regla derivada**: la ausencia de una grilla uniforme no es un error de\nmaquetación en este estilo, sino una decisión expresiva; al documentar estos\nsitios como referencia, se debe distinguir explícitamente entre \"ruptura de\ngrilla intencional\" y un problema real de usabilidad, que requiere pruebas de\nuso reales, no solo inspección visual.",
+      "token_count": 362
+    },
+    {
+      "citation_id": "S11",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–00:31",
+      "visual_evidence": [],
+      "content": "- **00:00–00:31** — Introducción: promesa del video (pasar de un diseño a\notro aplicando composición editorial) y presentación del creador, Adrian\nSomoza, exlíder de diseño en Media Monks, ahora mentor de diseñadores\nfreelance.\n- **00:31–01:05** — Primera mención promocional: curso gratuito \"Golden\nCanon Grid\" con más de 10.000 descargas declaradas. Origen histórico del\nestilo editorial: revistas y libros impresos.\n- **01:05–02:06** — Por qué el diseño impreso perfeccionó la composición\n(no se podía \"enviar y arreglar después\"); aparición de la \"contaminación\nvisual\" en la era digital y en la era de la IA generativa.\n- **02:06–03:42** — Enumeración de los cinco elementos del diseño editorial\n(tipografía, color, grilla, imágenes, espacio en blanco) y la metáfora del\nesqueleto/estructura como fuente de libertad creativa.\n- **03:42–04:44** — Segunda mención promocional del curso \"Golden Canon\nGrid\" versión 3.0. Presentación del ejercicio práctico: transformar el\nsitio \"The Rider\" en un diseño editorial.\n- **04:44–06:19** — Paso 1 del proceso: recolectar todos los activos\n(imágenes, logo, textos) e importarlos a Figma.\n- **06:19–07:23** — Paso 2: \"digerir\" el contenido (entender y priorizar el\ntexto antes de maquetarlo) y definir el objetivo del sitio (en este caso,\ndirigir a los usuarios a la lista de precios).\n- **07:23–08:58** — Paso 3: investigación de referencias visuales (estilo\nsuizo/minimalista, mezcla de referencias de distintos medios incluyendo un\npóster no relacionado con la web) y recomendación de revisar referencias 30\nminutos al día.\n- **08:58–10:32** — Paso 4: composición inicial del hero, elección de\nimágenes que combinan producto/lugar con personas usándolo (\"lifestyle\nimages\"), creación del CTA.\n- **10:32–12:07** — Iteración de layouts: descarte de una primera versión\npor exceso de imágenes, reducción a dos imágenes (una arquitectónica, una\nde estilo de vida), técnica de duplicar el archivo para conservar\nversiones al iterar.",
+      "token_count": 512
+    },
+    {
+      "citation_id": "S12",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 1 — Restringir los recursos a cinco elementos"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "02:06",
+      "visual_evidence": [],
+      "content": "El punto de partida conceptual del video es que un diseño de estilo editorial\nse construye deliberadamente con solo cinco elementos, sin excepciones:\n\n1. Tipografía (una o máximo dos familias).\n2. Colores (uno o máximo dos, además de los neutros de base).\n3. Una grilla simple.\n4. Imágenes, dentro de contenedores/cajas claras (no composiciones \"sin\n   límites\" ni inmersivas).\n5. Espacio en blanco, usado de forma consciente para guiar la mirada del\n   usuario.\n\n> \"Editorial layouts are built on three things. Typography, one or two max\n> grid, so we'll use a simple one. Colors one or two max. Images. and inside\n> clear boxes, not those boundaryless immersive messes, right? And wide space\n> and learning how to balance it and use it to guide the user's eye.\" (02:06)\n\nTraducción: \"Los layouts editoriales se construyen con estas cosas:\ntipografía, una grilla simple (uno o máximo dos estilos), colores (uno o\nmáximo dos), imágenes dentro de cajas claras —no esos amasijos inmersivos\nsin límites— y espacio amplio, aprendiendo a balancearlo y a usarlo para\nguiar la mirada del usuario.\" (02:06)\n\nEl fuente explica que esta restricción no es una limitación creativa sino\nuna fuente de libertad, mediante la analogía del esqueleto:\n\n> \"Think about the bones in your body. If you remove the bones, technically\n> you have less limits, right? [...] But without bones, you can't jump, you\n> can't run, you can't even stand.\" (02:38)\n\nTraducción: \"Piensa en los huesos de tu cuerpo. Si le quitas los huesos,\ntécnicamente tienes menos límites [...] Pero sin huesos no puedes saltar, no\npuedes correr, ni siquiera puedes pararte.\" (02:38)\n\n**Regla operativa:** antes de agregar cualquier efecto visual (sombra,\ndegradado, textura, borde 3D, patrón), verificar si el problema de\ncomposición se puede resolver ajustando tipografía, color, grilla, imágenes o\nespacio en blanco. Los efectos decorativos se presentan en el video como un\nsíntoma de habilidades de layout todavía inmaduras, no como una herramienta\nválida del estilo editorial.",
+      "token_count": 509
+    },
+    {
+      "citation_id": "S13",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "8ahnUt_A5eA",
+      "video_title": "Popular Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "4. Header, Bento y tipografía expresiva"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Un header a pantalla completa concentra la primera promesa y la llamada a la acción. La fuente enseña titulares grandes y composición editorial; el usuario debe comprender producto, beneficio y siguiente paso antes de desplazarse. El Bento Grid agrupa contenido heterogéneo en módulos. `frame-45pct.png` y `adaptive-contact-sheet-10.jpg` muestran mosaicos de tarjetas, imágenes y métricas visuales. La grilla no equivale a meter todo en cajas: define prioridad, tamaño y relación entre bloques.\n\nLa tipografía expresiva convierte letras en imagen. Los ejemplos incluyen pesos enormes, fuentes singulares y palabras superpuestas. Reservarla para jerarquía y marca; para lectura prolongada usar tamaños, altura de línea y contraste medibles. No asumir que una fuente ornamental comunica por sí sola: confirmar idioma, carga de fuente y fallback.",
+      "token_count": 198
+    },
+    {
+      "citation_id": "S14",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso 2 — Layout y sistema de grilla"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Un layout minimalista fuerte se apoya en:\n\n- **Balance y colocación intencional.** Nada debe sentirse tirado al azar; la\n  composición debe transmitir que cada elemento está donde está por una\n  razón.\n- **Sistema de grilla.** Ayuda a mantener los elementos alineados y a que la\n  composición se sienta estable incluso cuando hay mucho espacio vacío o\n  elementos colocados de forma asimétrica.\n- **Jerarquía visual clara.** Se logra ubicando el contenido más importante\n  arriba, o usando tipografía más grande para los mensajes clave, de modo\n  que el ojo del espectador sea guiado de forma natural.\n- **Asimetría controlada.** Puede funcionar muy bien siempre que se mantenga\n  equilibrada dentro de la grilla; no es sinónimo de desorden.\n\n`frame-15pct.png` confirma visualmente este principio: muestra un póster\ncompuesto sobre una grilla explícita (líneas rosadas de referencia visibles\nsobre el diseño) junto a otra pieza con un layout circular tipo \"Heinz\",\nambas ejemplificando composición deliberada y alineación modular. Esta es\nevidencia visual directa de la técnica descrita en el audio, no una\ninferencia.",
+      "token_count": 266
+    },
+    {
+      "citation_id": "S15",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 15 — Pictogramas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "09:20–09:52",
+      "visual_evidence": [],
+      "content": "**Fuente directa** (09:20–09:52): en una línea similar al monoline, los\npictogramas son íconos simplificados que se asemejan a objetos del mundo\nreal, con el objetivo de comunicar una idea instantáneamente. Están en todas\npartes: sistemas de señalización (wayfinding), packaging con etiquetas,\ninfografías y branding. Es la opción recomendada cuando la claridad y la\ncomprensión inmediata importan más que la decoración.\n\n**Evidencia visual**: `supplemental-565s.png` muestra un rótulo \"PICTOGRAM\"\nsobre una lámina titulada \"Symbol Signs\" con una grilla de íconos simples en\nblanco y negro (teléfono, correo, cruz médica, transporte, estacionamiento,\npersona caminando, etc.), un ejemplo clásico de sistema de pictogramas.\n\n**Clasificación**: fuente directa + confirmación visual.",
+      "token_count": 205
+    },
+    {
+      "citation_id": "S16",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "8ahnUt_A5eA",
+      "video_title": "Popular Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "6. Espacio negativo, grillas y 3D"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "El espacio negativo organiza atención. La fuente aclara que no es vacío indiscriminado: permite que el elemento central respire y que otras piezas no compitan. Aplicarlo mediante márgenes, agrupación, longitudes de línea y ritmo; revisarlo en móvil, donde un gran hueco puede retrasar contenido importante. Las grillas CSS facilitan organizar catálogos, admin panels y secciones, y también permiten anidar módulos. El agente debe definir una grilla responsive antes de decorar tarjetas.\n\nEl 3D aparece en headers, producto y experiencias inmersivas. `adaptive-contact-sheet-19.jpg` muestra objetos, perspectiva y escenas espaciales. Usar 3D para orientar un producto, mostrar variación o reforzar una historia. Extensión profesional: establecer presupuesto de peso, fallback 2D, controles accesibles y no exigir WebGL para leer precio, contenido o acción.",
+      "token_count": 199
+    },
+    {
+      "citation_id": "S17",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Antipatrones"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Defender un layout editorial solo por atractivo visual, sin poder señalar\n  qué acción del usuario guía la composición.\n- Diseñar primero mobile y tratar de \"escalar\" ese diseño a escritorio.\n- Intentar cubrir diez tamaños de pantalla distintos en un sitio \"brochure\"\n  pequeño, gastando tiempo de diseño desproporcionado al alcance del\n  proyecto.\n- Reutilizar sin revisión el tamaño de texto de escritorio en mobile (el\n  propio presentador reconoce haber usado 12px \"sin saber por qué\" en vez de\n  16px, y lo corrige en pantalla).\n- Usar una grilla de mobile con muy pocas columnas (2 o 4) cuando se necesita\n  crear proporciones asimétricas, resultando en un layout donde todo queda\n  alineado al mismo borde y se vuelve monótono.\n- Entregar al desarrollador un archivo de Figma desordenado o sin sistema\n  tipográfico/de color documentado.\n- Delegar desarrollo a alguien de nivel claramente inferior al del\n  diseñador, esperando el mismo resultado de calidad.\n- Presentar cifras de conversión o ingresos de un sitio como prueba objetiva\n  del método de diseño, sin datos de analítica verificables.\n- Ignorar problemas de responsividad conocidos (como el que el propio\n  presentador reconoce en su sitio personal) en vez de documentarlos y\n  mitigarlos (por ejemplo, redirigiendo a la versión de escritorio en\n  pantallas muy pequeñas).",
+      "token_count": 306
+    },
+    {
+      "citation_id": "S18",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Diseñar la versión de escritorio antes que la mobile, salvo que el\n  contexto del proyecto exija lo contrario.\n- No superar tres tamaños de referencia por proyecto salvo alta escala o\n  presupuesto alto.\n- El cuerpo de texto en mobile debe ser de 16px como mínimo por legibilidad.\n- Los CTAs en mobile deben tener un tamaño táctil suficiente (referencia\n  usada en el video: 60px de alto/tamaño de texto, contra 40px en\n  escritorio).\n- La navegación de mobile se colapsa en un ícono; no se listan todos los\n  ítems de navegación de forma expandida por defecto.\n- Usar una grilla de al menos 6 columnas en mobile si se necesita crear\n  proporciones asimétricas (2/3–1/3); una grilla de 2 o 4 columnas no permite\n  esa proporción.\n- El archivo de handoff debe incluir, como mínimo: tipografía, color, grilla\n  con márgenes/gutters, kit de UI básico y notas de comportamiento; no es\n  necesario documentar absolutamente cada breakpoint intermedio.\n- Los ajustes de breakpoints intermedios se resuelven en conjunto con el\n  desarrollador después de la codificación, no exclusivamente en el diseño.\n- Cualquier cifra de ingresos, conversión o tiempo de escalamiento\n  mencionada por el presentador debe presentarse como afirmación no\n  verificada, nunca como resultado garantizado del método.",
+      "token_count": 297
+    },
+    {
+      "citation_id": "S19",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–00:30",
+      "visual_evidence": [],
+      "content": "| 08:14–08:45 | Altura de x (x-height); introducción al interlineado (leading/line height). |\n| 08:45–09:16 | Reglas prácticas para el interlineado según el tamaño del texto. |\n| 09:16–09:46 | Tracking / letter-spacing y su relación inversa con el tamaño del texto. |\n| 09:46–10:17 | Kerning: espaciado entre pares específicos de letras; ejemplo del logo de Southern Living. |\n| 10:17–10:49 | Contraste accesible entre texto y fondo; estándar del W3C de 1999 y ratio recomendado de 7 a 1. |\n| 10:49–11:19 | Transición hacia la construcción de un sistema tipográfico completo. |\n| 11:19–11:49 | Jerarquía tipográfica: encabezados, párrafos, botones y etiquetas; los seis niveles de encabezado H1–H6 en diseño web. |\n| 11:49–12:21 | Proceso de diseño de la jerarquía: definir el encabezado más grande primero y derivar los demás; excepción de los botones (más gruesos y con más letter-spacing). |\n| 12:21–12:52 | Etiquetas (labels) y su uso en anotaciones; introducción al sistema de rejilla (grid) y columnas. |\n| 12:52–13:23 | Sistemas de rejilla comparados: 12 columnas en web, 2 columnas en impresos, 6 columnas en periódicos, 3 en revistas, razón áurea en pósters. |\n| 13:23–13:30 | Cierre: promoción de otro video del canal (\"4 pixel Rule\") y llamado a comentar o contactar por redes. |",
+      "token_count": 407
+    },
+    {
+      "citation_id": "S20",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Criterios de aceptación"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Un rediseño mobile derivado de este método puede considerarse alineado con\nla fuente si cumple, de forma verificable:\n\n- [ ] Existe una versión de escritorio previa y documentada de la que parte\n  el rediseño mobile.\n- [ ] La navegación mobile está colapsada en un ícono, no expandida por\n  defecto.\n- [ ] El cuerpo de texto en mobile mide 16px como mínimo.\n- [ ] Los CTAs son táctilmente accesibles (tamaño y posición adecuados;\n  referencia: 60px, ubicados hacia la parte inferior de la sección o del\n  layout donde el usuario ya está interactuando).\n- [ ] La grilla mobile permite proporciones asimétricas (mínimo 6 columnas\n  si se busca ese efecto), evitando que todos los bloques queden alineados\n  al mismo borde.\n- [ ] El archivo de handoff incluye sistema tipográfico, sistema de color\n  documentado, grilla con márgenes/gutters explícitos y kit de UI básico.\n- [ ] Cualquier afirmación de conversión o ingresos atribuida al método está\n  etiquetada como no verificada o como afirmación del cliente/presentador,\n  no como hecho comprobado por el propio diseño.\n- [ ] Los problemas de responsividad conocidos están documentados y\n  mitigados de alguna forma (aunque sea una redirección o un mensaje\n  explicativo), no ocultados.",
+      "token_count": 301
+    },
+    {
+      "citation_id": "S21",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Resumen compacto"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "El video defiende que los layouts editoriales son una técnica de jerarquía\nvisual, no decoración superficial, y expone un flujo de trabajo concreto:\ndiseñar primero escritorio, simplificar deliberadamente a mobile siguiendo\nseis reglas (ocultar navegación, permitir resumir contenido, invertir\norientación, empujar botones hacia abajo, reducir solo títulos manteniendo\n16px en el cuerpo, y usar 6 columnas para proporciones asimétricas), y\nentregar al desarrollador un archivo limpio con tipografía, color, grilla y\nkit de UI documentados, sin sobre-especificar cada breakpoint. Recomienda\nademás elegir desarrolladores de nivel comparable y especializarse en una\ndisciplina antes de sumar otra. Muestra tres sitios reales como prueba de\nque el estilo se puede construir y funciona en producción, aunque las cifras\nde conversión e ingresos que acompaña son afirmaciones del presentador sin\nevidencia primaria dentro del video, y el propio presentador reconoce\nproblemas de responsividad en su sitio personal. El método es replicable sin\nver el video: los pasos, reglas y criterios de aceptación están documentados\níntegramente arriba.\n\n---",
+      "token_count": 248
+    },
+    {
+      "citation_id": "S22",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "8ahnUt_A5eA",
+      "video_title": "Popular Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Una tendencia debe mejorar orientación, reconocimiento o emoción vinculada a la tarea.\n- Mantener CTA, navegación y contenido esencial sin hover ni animación.\n- Usar grilla y espacio para priorizar; no como decoración automática.\n- Hacer que el cambio de modo respete preferencia del sistema y conserve contraste.\n- Declarar que un chatbot es asistente y exigir confirmación para acciones de impacto.",
+      "token_count": 92
+    },
+    {
+      "citation_id": "S23",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "uZWnxa4mkKA",
+      "video_title": "15 More Design Styles You've Never Heard Of",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 13 — Narrative Neo-Brutalism"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "17:06",
+      "visual_evidence": [],
+      "content": "Presentado con una advertencia práctica de búsqueda: \"if you just search narrative design, you're probably not going to get anything that you're looking for\", por lo que recomienda combinar el término con \"neo brutalism\" (17:06). Lo describe como un estilo \"louder, raw, and text-heavy... that isn't trying to be pretty. It's trying to tell you something often in the case of story\" (17:06), que mezcla los rasgos utilitarios y de bordes duros del brutalismo con energía narrativa usada en revistas independientes o portadas de libros de arte (17:36). El presentador señala que ha visto layouts adaptados tanto a portafolios web como a diseño de empaque literal, apoyándose en un sistema de grilla donde \"you're filling in boxes to create the overall composition\" (17:36).\n\nRasgos centrales citados: \"bold pastel colors, heavy use of sans serif type, grid lines, borders, and sharp boxy elements, and a focus on text and message instead of images or illustrations\" (18:08). El fotograma suplementario `supplemental-1088s.png` (00:18:08) confirma visualmente esta descripción: muestra una lámina \"CORE FEATURES\" con el texto \"BOLD PASTEL COLORS\" y \"HEAVY USE OF SANS-SERIF TYPE\" junto a un collage de portadas con recuadros de colores pastel, tipografía sans-serif en mayúsculas y una revista de moda titulada \"MOTH\".\n\nCasos de uso: pósters de eventos, diseño editorial atrevido, portafolios personales, o proyectos de branding \"más ruidosos\" donde la honestidad y el impacto del mensaje importan más que la estética pulida (18:08-18:38).",
+      "token_count": 397
+    },
+    {
+      "citation_id": "S24",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 4 — Risograph"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "02:33–03:05",
+      "visual_evidence": [],
+      "content": "**Fuente directa** (02:33–03:05): imita la impresión risográfica: colores de\ntinta en capas, grano, desalineación intencional y formas planas y audaces.\nEl presentador menciona que el propio canal hizo un tutorial sobre este\nestilo y visitó un taller real de risografía en Berlín para imprimir pósters\npersonalizados. Usos: pósters, fanzines, portadas de álbum, ilustración\neditorial, flyers de eventos; el presentador aclara que en la práctica se\npuede incorporar a casi cualquier proyecto.\n\n**Nota de transcripción**: la pista automática transcribe el nombre como\n\"Rzzograph\" o \"Rizzo print style\"; el rótulo visual confirma \"RISOGRAPH\".\n\n**Evidencia visual**: `frame-25pct.png` muestra un collage de tres piezas con\nrótulo \"RISOGRAPH\": una portada con la palabra \"RUBY\", un póster con\ntipografía distorsionada estilo grafiti (\"IMG\"?) y un retrato con textura\ngranulada de trama de puntos en rosa y naranja. `supplemental-190s.png` y\n`supplemental-195s.png` muestran collages adicionales de piezas risográficas\nen rosa, amarillo y naranja con textura de grano visible. `supplemental-200s.png`\nconfirma el rótulo \"*PAUSE TO READ* — SEARCH TERMS USED TO FIND REFERENCES\"\ncon la lista \"risograph / risoprint / risograph design / risograph\neditorial\". Adicionalmente, los fotogramas adaptativos\n`adaptive-000180000ms.png` a `adaptive-000185519ms.png` muestran una\ndemostración real de proceso: el equipo del canal en un taller de impresión\nrisográfica en Berlín, con tomas de manos operando la máquina, tinta rosa\nsiendo aplicada al rodillo y una hoja recién impresa saliendo con manchas de\ncolor rosa y amarillo.\n\n**Clasificación**: fuente directa + confirmación visual (incluyendo una\ndemostración de proceso genuina, la única del video) + extensión menor (el\nvideo no explica en detalle técnico cómo operar una impresora risográfica,\nsolo remite a un tutorial externo del mismo canal para eso).",
+      "token_count": 492
+    },
+    {
+      "citation_id": "S25",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Resumen compacto"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "\"The ULTIMATE Guide To Typography For Beginners\" (DesignSpo, 810 segundos) enseña que la tipografía es un lenguaje de tono además de un sistema de reglas técnicas. Recorre las cinco grandes familias de tipos de letra —serif (tradición), sans-serif (versatilidad y legibilidad moderna), display (impacto puntual), script/handwritten (elegancia o calidez) y monospace (alineación técnica)— y explica que cada una comunica algo distinto antes incluso de leerse el contenido. Luego detalla diez variables técnicas que controlan la apariencia de cualquier bloque de texto: unidades de medida (punto, píxel, em, rem), peso, línea base, línea de mayúsculas, altura de x, interlineado, tracking, kerning y contraste de color, estableciendo para varias de ellas una relación inversamente proporcional con el tamaño del texto. Finalmente, muestra cómo combinar todas estas variables en un sistema tipográfico completo: una jerarquía de cuatro niveles (encabezados, párrafos, botones, etiquetas) montada sobre un sistema de rejilla apropiado al medio de salida (12 columnas en web, menos columnas en impresos). El video cierra con una promoción de otro contenido propio del canal, que este dossier excluye explícitamente del método operativo. Las principales limitaciones de evidencia son: dos cifras estadísticas de adopción (90 % en dos contextos distintos) sin fuente primaria citada, y la atribución del rediseño del logo de Southern Living a Jessica Hische, presentada como hecho por el narrador pero sin confirmación visual propia dentro del video.",
+      "token_count": 365
+    },
+    {
+      "citation_id": "S26",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "rFyOIWMwRdg",
+      "video_title": "2026 Web Design Trends You Need to Know",
+      "creator": "Sam Crawford | Web Design Expert",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "3. Layouts orgánicos y anti-grid"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "03:18",
+      "visual_evidence": [],
+      "content": "El autor describe una salida parcial de cuadrículas rígidas hacia composiciones fluidas, naturales y a veces asimétricas, comparables a una página de revista. > “When you break the grid, you can guide the user’s eye in a more natural flowing way.” (03:18). La anti-grid no significa eliminar estructura: significa elegir jerarquía, ritmo y recorrido antes de alinear todo en cajas repetidas.\n\n`frame-35pct.png` y `adaptive-000190000ms.png` muestran composiciones editoriales con módulos descentrados. El agente debe usar asimetría para priorizar, no para ocultar. Probará reflujo en pantallas estrechas, orden de lectura, contraste y navegación por teclado. Extensión profesional: una composición expresiva que se rompe en móvil o altera el orden semántico es un fallo, aunque se vea distintiva en una captura.",
+      "token_count": 212
+    },
+    {
+      "citation_id": "S27",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "uZWnxa4mkKA",
+      "video_title": "15 More Design Styles You've Never Heard Of",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 15 — Swiss Punk Typography"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "19:42",
+      "visual_evidence": [],
+      "content": "Cierra el catálogo con este estilo, descrito como \"what happens when clean, orderly, heavily gridded Swiss style goes rogue\" (19:42): conserva las tipografías sans-serif y las grillas del diseño suizo clásico, pero los elementos \"have been rotated. They've been layered. They've been duplicated. And it is noisy on purpose\" (19:42-20:14).\n\nRasgos centrales: \"sans serif fonts that clash in terms of size and weight... sharp contrast, a lot of black and white, occasionally a bold pop of color like red, blue, or green... misaligned layouts on purpose, seemingly broken grids, and overlapping elements... this cut and paste collage energy, almost like the DIY scrapbooking of cutout typography\" (20:14-20:44). El fotograma suplementario `supplemental-1240s.png` (00:20:40) confirma visualmente esta descripción completa: la lámina \"CORE FEATURES\" enumera \"SANS-SERIF FONTS IN CLASHING SIZES AND WEIGHTS\", \"SHARP CONTRAST, LIKE BLACK AND WHITE, OCCASIONALLY WITH BOLD COLORS\", \"MISALIGNED LAYOUTS, SEEMINGLY BROKEN GRIDS, OVERLAPPING ELEMENTS\" y \"CUT-AND-PASTE COLLAGE ENERGY, ALMOST LIKE DIY SCRAPBOOKING WITH CUT-OUT TYPOGRAPHY\", junto a ejemplos tipográficos en blanco y negro con letras superpuestas y rotadas.\n\nCasos de uso: diseñadores de pósters, lookbooks y revistas de moda experimental, branding de sitios web atrevido, o cualquier pieza que busque \"hacer que la gente mire dos veces\" (20:44).",
+      "token_count": 409
+    },
+    {
+      "citation_id": "S28",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "vwVg1sBShH8",
+      "video_title": "7 ESTILOS de Diseño Gráfico que No conocías",
+      "creator": "Crealondra",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 3 — Utilitario"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "01:03",
+      "visual_evidence": [],
+      "content": "**Descripción.** Basado en el estilo suizo de los años 50. Prioriza la claridad, la legibilidad y la función por encima del decorado. Se caracteriza por interfaces limpias, uso riguroso de la retícula (grid) y tipografías de palo seco.\n\n> \"Utilitario, basado en el estilo suizo de los años 50. Prioriza la claridad, la legibilidad y la función por encima del decorado. Se caracteriza por interfaces limpias, uso riguroso del grid y tipografías de palo seco.\" (01:03)\n\n**Ejemplo desarrollado: IKEA.** El narrador propone a IKEA como \"un gran ejemplo del diseño utilitario porque su estética y comunicación visual siguen los principios básicos de este estilo\". Detalla cuatro rasgos que observa en la marca:\n\n1. **Claridad y sencillez**: en catálogos, instrucciones y publicidad se usa tipografía sans serif, muy legible y limpia, sin adornos que distraigan; la información se presenta de forma clara y directa.\n2. **Organización y orden**: uso de rejillas bien definidas para estructurar textos, imágenes y elementos, lo que facilita seguir y entender el contenido.\n3. **Funcionalidad por encima de la forma**: el diseño no busca ser llamativo o extravagante, sino práctico y eficiente.\n4. **Paleta de color simple y coherente**: predominan colores neutros —blancos y grises— combinados con el azul y el amarillo de la marca, para reforzar la identidad.\n\n> \"IKEA es un gran ejemplo del diseño utilitario porque su estética y comunicación visual siguen los principios básicos de este estilo.\" (01:35)\n\n> \"En cuanto a la paleta de color, suele ser simple y coherente. Predominan colores neutros como blancos y gris con el azul y el amarillo. Básicamente los colores de la marca para reforzar la identidad.\" (02:07)",
+      "token_count": 420
+    },
+    {
+      "citation_id": "S29",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Resumen compacto"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "*Steal These Web Design Trends 2026*, de Self-Made Web Designer (13 minutos,\ninglés), enumera nueve tendencias observadas por el autor en un rastreo no\npublicado de sitios web:\n\n1. **Barely there UI** — hiperminimalismo por imitación del sector IA (OpenAI,\n   Perplexity): sans serifs finas, layouts despojados, paletas contenidas, mucho\n   espacio en blanco, gráficos de datos por todas partes.\n2. **Maximalism\\*** — su reacción opuesta, pero frenada: tipografías enormes,\n   colores brillantes, exceso de movimiento en los casos extremos. El autor\n   admite haberse equivocado al predecir su explosión.\n3. **The human touch** — wabi-sabi aplicado a la web: flechas dibujadas a mano,\n   fotos sin pulir, texturas de papel, ilustraciones bocetadas. Su extremo es el\n   \"anti UX\" deliberadamente poco intuitivo.\n4. **Grade school color palettes** — el neón lima cae, vuelven los básicos con\n   matices trabajados; el naranja aparece en todos lados.\n5. **Spaceship instruction manual** — estética de plano técnico: líneas,\n   etiquetas diminutas sin significado, dibujos lo-fi, monoespaciadas.\n6. **Democratized fancy animations** — WebGL al alcance de cualquiera vía Spline\n   y Unicorn Studio; con la advertencia explícita de que poder hacerlo no\n   significa deber hacerlo.\n7. **Internet nostalgia** — todavía incipiente: cursores personalizados, UI tipo\n   Windows viejo, arte ASCII, sensación de computadora antigua.\n8. **The tab that's playing music** — micro-sonidos en las interacciones, porque\n   los teléfonos nos entrenaron a esperar feedback sónico; debe ser opcional.\n9. **Tech bro gradient** — púrpuras, azules y teales con glow, el uniforme no\n   oficial del SaaS y las herramientas de dev.",
+      "token_count": 438
+    },
+    {
+      "citation_id": "S30",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. **Establecer primero la marca y el objetivo.** Antes de evaluar cualquier\n   tendencia, escribir en una línea qué hace el negocio y qué debe lograr el\n   sitio. Este paso es la regla explícita de la fuente y condiciona todo lo demás.\n2. **Elegir un eje, no nueve.** Las tendencias 1 y 2 son opuestas; las 3 y 6\n   tiran en direcciones distintas. Seleccionar como máximo dos tendencias\n   compatibles y descartar el resto conscientemente.\n3. **Definir el nivel de intensidad.** Para cada tendencia elegida, la fuente\n   recomienda sistemáticamente la dosis baja: una pizca de nostalgia, un acento\n   de color, unas pocas líneas técnicas, un sonido suave.\n4. **Construir la base sobria.** Tipografía (una familia si el eje es la\n   tendencia 1), escala de espaciado, paleta reducida con un solo acento.\n5. **Aplicar el acento de la tendencia** sobre esa base, no al revés. El\n   degradado, el cursor, la textura o la animación entran como capa, no como\n   fundamento.\n6. **Verificar contra el objetivo.** Preguntar por cada elemento agregado: ¿esto\n   comunica algo del sitio o solo demuestra que conozco la tendencia? Si es lo\n   segundo, quitarlo.\n7. **Extensión profesional — verificar accesibilidad.** Comprobar contraste de\n   texto sobre degradados y sobre bloques de color saturado, tamaño de área\n   clicable con cursores personalizados, y que ninguna información dependa solo\n   del color o solo del sonido.\n8. **Extensión profesional — verificar rendimiento.** Medir el peso y el tiempo de\n   carga que agregan las escenas WebGL en dispositivos de gama media y en\n   conexiones lentas antes de aprobarlas.\n9. **Extensión profesional — respetar preferencias del sistema.** Honrar\n   `prefers-reduced-motion` en animaciones y nunca reproducir audio sin acción\n   deliberada del usuario.\n10. **Extensión profesional — resolver licencias.** Verificar derechos de fuentes,\n    texturas, ilustraciones y assets 3D antes de publicar.\n11. **Documentar la decisión.** Registrar qué tendencias se adoptaron y por qué,\n    para que la revisión posterior evalúe encaje y no gusto.",
+      "token_count": 500
+    },
+    {
+      "citation_id": "S31",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "bT1tG_E8g-4",
+      "video_title": "🚨 Top 6 Design Trends 2026: Flat Design is DEAD",
+      "creator": "Grayson's Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Tesis central"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "La fuente sostiene que el diseño de 2026 estará menos definido por una forma o fuente concreta y más por la manera en que la tecnología reconfigura la experiencia. Su hilo conductor es el paso de superficies planas a sistemas con profundidad perceptible, respuestas ambientales, materialidad y opciones de adaptación individual. Esta es una hipótesis de dirección de arte: no implica abandonar toda interfaz plana ni aplicar 3D a cualquier producto. La decisión correcta depende de la tarea, la marca, el rendimiento, la accesibilidad y de si la capa visual aporta una señal funcional.",
+      "token_count": 124
+    },
+    {
+      "citation_id": "S32",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "8Z_MEP-_kxA",
+      "video_title": "Web Design Trends 2026",
+      "creator": "DesignSense",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "7. Imperfección intencional"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "05:15",
+      "visual_evidence": [],
+      "content": "Trazos manuales, garabatos, flechas, subrayados y formas irregulares pueden devolver sensación de autoría frente a plantillas. La advertencia central es usarlo con ligereza: “lo suficiente para añadir calidez sin romper la usabilidad” (05:15). `adaptive-000292500ms.png`, `adaptive-000316500ms.png` y `adaptive-000324000ms.png` muestran páginas de Al Murphy con bocadillos, ilustración, damero y un lenguaje deliberadamente imperfecto.\n\nReserva la irregularidad para señalizar, enmarcar o aportar identidad; no la conviertas en ruido alrededor de cada CTA. Un garabato debe mantener la zona táctil, no invadir texto y no depender sólo del color. Comprueba que la estética conserve comprensión a 200% de zoom y cuando las imágenes decorativas no cargan.",
+      "token_count": 197
+    },
+    {
+      "citation_id": "S33",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Tendencia 7 — \"Internet nostalgia\" (nostalgia de internet)"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "**Estado.** Es la única tendencia que el autor marca explícitamente como todavía\nincipiente: la ve aparecer apenas y no la considera mainstream aún. La presenta\ncomo una predicción.\n\n**Causa declarada.** Viene de la gente que creció cuando internet recién nacía y\nque ahora está empezando a ocupar puestos de decisión en sus industrias.\n\n**Señales visuales.** Elementos que parecen salidos directamente de los primeros\naños 2000:\n\n- **Cursores personalizados**, la manifestación más frecuente según el autor.\n  Incluye una observación sobre el ciclo de las tendencias: hace unos años la\n  gente odiaba los cursores alternativos porque se habían ido de las manos —el\n  mouse se convertía en una cabeza de unicornio o un arcoíris—, y ahora vuelven\n  mucho más moderados y de mejor gusto.\n- **Interfaces tipo Microsoft Windows antiguo**, menos frecuentes: todo simple y\n  muy en bloques. El autor aclara con ironía que aquellos no eran días divertidos\n  para los diseñadores web.\n- **Imágenes hechas enteramente de caracteres de texto** (arte ASCII).\n- Experiencias que dan la sensación de estar mirando un sitio en una computadora\n  vieja.\n\n**Confirmación visual.** `frame-70pct.png` muestra un sitio de moda con foto a\npantalla completa, el logotipo \"AKKE\" y la etiqueta `1. Cursor Alternative`.\n`frame-75pct.png` muestra una interfaz gris, plana y en bloques, con la etiqueta\n`4. Old Computer Experiences`. `frame-85pct.png` y `supplemental-660s.png`\nmuestran una página blanca donde el contenido tipográfico está compuesto\nenteramente por puntos y caracteres formando letras gigantes, es decir arte ASCII\nfuncionando como layout. Las tres variantes descritas quedan confirmadas.\n\n**Cómo aplicarla, según la fuente:**\n\n- No hace falta rehacer el sitio entero.\n- Empezar chico: un momento nostálgico, un cursor divertido, un ícono pixelado,\n  un tooltip retro.\n- La metáfora que usa el autor: pensarlo como condimentar. Una pizca rinde mucho.",
+      "token_count": 497
+    },
+    {
+      "citation_id": "S34",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. **Antes de cualquier recomendación de tendencia, exigir la definición del\npropósito del sitio.** Preguntar explícitamente qué acción concreta debe\nrealizar el usuario (comprar, suscribirse, descargar, contactar) antes de\nsugerir cualquiera de las nueve tendencias.\n2. **Filtrar las nueve tendencias por relevancia de marca y objetivo**, no\npor popularidad. Usar la pregunta rectora del presentador (\"¿esta\ntendencia ayuda a que mi sitio cumpla su objetivo?\") como criterio de\ndescarte.\n3. **Evaluar la tendencia 1 (imperfección intencional)** si el objetivo es\ndiferenciación humana frente a competidores que usan estética generada\npor IA; no recomendarla si el negocio necesita transmitir precisión\ntécnica o confianza corporativa estricta.\n4. **Evaluar la tendencia 2 (microinteracciones)** casi universalmente, ya\nque es de bajo riesgo y alto valor de retención de atención; verificar\naccesibilidad de las animaciones (ver salvaguardas más abajo).\n5. **Evaluar la tendencia 3 (colores brillantes y atrevidos)** solo si la\nidentidad de marca lo permite; advertir sobre contraste y legibilidad\nantes de aplicar tipografía extremadamente grande.\n6. **Evaluar la tendencia 4 (sitios con mucho texto)** si el negocio tiene\nuna historia de marca sustancial que contar y su audiencia tolera lectura\nextensa; advertir sobre la carga cognitiva para audiencias con necesidades\nde accesibilidad.\n7. **Evaluar la tendencia 5 (alternativas al cursor)** solo para sitios de\nescritorio orientados a portafolio o marca creativa; advertir que no debe\nsustituir al cursor del sistema operativo sin una alternativa accesible.\n8. **Evaluar la tendencia 6 (sonido)** con máxima cautela: requiere consentimiento\nexplícito del usuario antes de reproducir cualquier audio automáticamente\n(ver salvaguardas).\n9. **Evaluar la tendencia 7 (scrollytelling)** para contenido editorial o\nnarrativo con secuencia temporal clara; advertir sobre el costo de\ndesarrollo y el riesgo de mareo por movimiento (ver salvaguardas de\nmovimiento reducido).\n10. **Evaluar la tendencia 8 (navegación no vertical)** solo si el equipo\ncuenta con capacidad de desarrollo a medida, ya que la fuente reconoce que\nla mayoría de los constructores no lo soportan de forma nativa.",
+      "token_count": 508
+    },
+    {
+      "citation_id": "S35",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. Ninguna tendencia se adopta sin una justificación explícita de encaje con la\n   marca y el objetivo del sitio.\n2. Preferir la dosis mínima: la fuente recomienda contención en las nueve\n   tendencias sin excepción.\n3. Una familia tipográfica es suficiente cuando el eje es la interfaz apenas\n   presente.\n4. Un solo color de acento sobre una base neutra basta para leer como paleta\n   contemporánea.\n5. Las animaciones deben aportar a lo que el sitio comunica; si solo decoran, no\n   se implementan.\n6. Los elementos \"hechos a mano\" deben sentirse humanos, no desprolijos: la\n   diferencia es intencionalidad, no cantidad.\n7. Las etiquetas y líneas de estilo plano técnico son decorativas por definición;\n   nunca deben ocupar el lugar de información real que el usuario necesita.\n8. El sonido en la interfaz es opcional para el usuario, nunca impuesto.\n   *(Regla de la fuente, reforzada como extensión profesional.)*\n9. **Extensión profesional:** todo degradado debe validarse contra contraste\n   mínimo AA en el texto que lo atraviesa.\n10. **Extensión profesional:** todo cursor personalizado debe conservar un estado\n    visible de foco y no reducir el área efectiva de clic.\n11. **Extensión profesional:** toda experiencia WebGL debe tener una degradación\n    definida para dispositivos que no la soporten o que la ejecuten mal.\n12. **Extensión profesional:** las predicciones sobre 2026 se tratan como\n    hipótesis con fecha de vencimiento y se revalidan antes de basarse en ellas.\n13. Las promociones del creador —like, suscripción, recurso de la biografía,\n    remisión al video sobre el \"top 1 % de diseñadores web\"— quedan fuera del\n    método y no se replican como parte del consejo técnico.",
+      "token_count": 388
+    },
+    {
+      "citation_id": "S36",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 9 — Afrofuturism"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "05:42–06:13",
+      "visual_evidence": [],
+      "content": "**Fuente directa** (05:42–06:13): estilo pedido explícitamente por varios\nespectadores en videos anteriores de la serie. Combina arte y cultura\nafricana con ciencia ficción futurista y temas cósmicos: patrones audaces,\nimaginería simbólica, elementos celestiales y retratos poderosos. Se usa en\npósters, portadas de libro, portadas de álbum, branding de moda, diseño\neditorial y proyectos de narrativa cultural, por ser visualmente rico y\nprofundamente narrativo.\n\n**Evidencia visual**: `supplemental-375s.png` muestra un rótulo\n\"AFROFUTURISM\" sobre tres piezas: una portada de libro con una figura\nfemenina en tonos turquesa y dorado, un póster con tipografía de neón sobre\nun rostro en escala de grises, y un diseño circular en rosa con un rostro\ncentral. `supplemental-385s.png` confirma la diapositiva de términos de\nbúsqueda: \"afrofuturism / afrofuturism art / afrofuturism editorial /\nafrofuturism poster\".\n\n**Clasificación**: fuente directa + confirmación visual.",
+      "token_count": 254
+    },
+    {
+      "citation_id": "S37",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "OjaciP_fBwU",
+      "video_title": "30 Graphic Design Styles in 15 Minutes",
+      "creator": "Maria Tokar",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Bloque 2 — Estilos contemporáneos (llevan años en circulación)",
+        "18. Collage Surrealista"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- **Origen**: movimiento artístico surrealista de los años 1920, con artistas\n  como Salvador Dalí y Max Ernst combinando objetos cotidianos de forma\n  extraña y onírica.\n- **Rasgos**: mezcla fotografía vintage con escenas imposibles o caprichosas;\n  objetos flotantes, escalas inusuales, yuxtaposición de lo viejo y lo nuevo.\n- **Aplicación**: diseño editorial, portadas de álbumes, arte para redes\n  sociales.",
+      "token_count": 104
+    },
+    {
+      "citation_id": "S38",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "tbf6XDqCWFE",
+      "video_title": "BRUTALISM: Best Website Examples for Your Web Design Inspiration |  TemplateMonster",
+      "creator": "TemplateMonster",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Demostraciones y ejemplos visibles"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:04–00:20",
+      "visual_evidence": [],
+      "content": "6. **Lazy Eyes** (01:22–01:38, `frame-45pct.png`, `frame-50pct.png`): estudio\no colectivo creativo. Wordmark \"LAZY EYES\" en tipografía gris claro sobre\nfondo blanco, seguido de una página con espaciado extremo y un ícono\ndiminuto centrado.\n7. **Laurel Halo** (01:38–01:53, `frame-55pct.png`): sitio de la\nartista/música. Menú de texto plano rojo y blanco sobre fondo negro\n(\"Mix\", \"Show\", \"Record\", \"Other\", \"Info\") y un reproductor con controles\nbásicos (\"Prev / Play / Next\", barra de progreso \"0:00\").\n8. **Jack Wild** (01:53–02:09, `frame-60pct.png`, `frame-65pct.png`):\nportafolio con listado de créditos en formato \"– Wish\", \"– Still Be Here\",\n\"– Mix: BCR #18\", en tipografía condensada gris sobre blanco, y una pantalla\nposterior casi vacía con un único ícono pequeño centrado.\n9. **Chrissie Abbott** (02:09–02:25, `frame-70pct.png`, `frame-75pct.png`):\nilustradora. Wordmark \"CHRISSIE ABBOTT\" en gris claro sobre fondo verde\noscuro, seguido de una grilla densa de miniaturas de ilustración coloridas\nde tamaños heterogéneos (incluye una miniatura con el texto \"DRINK OUT\nLOUD\").\n10. **One & All Conference** (02:25–02:38, `frame-80pct.png`,\n`frame-85pct.png`): página de conferencia de diseño. Patrón de rayas\ndiagonales verde flúor/negro con el símbolo \"&\" gigante, texto \"ONE&ALL IS\nA 1-DAY FESTIVAL BRINGING TOGETHER 10+ WORLD-CLASS SPEAKERS TO SPARK A\nPROGRESSIVE DISCOURSE ON CREATIVITY TODAY\", formulario de suscripción por\nemail, y una lista de patrocinadores/speakers (incluye nombres como\nNike Studio 23, IDEO, Element AI, Glossier, SSENSE, entre otros).",
+      "token_count": 499
+    },
+    {
+      "citation_id": "S39",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "Vs2oSkw4VHM",
+      "video_title": "8 advanced rules of minimal Web Design",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. Antes de añadir un elemento nuevo a una vista, evaluar si puede ocultarse,\n   moverse a una subpágina o eliminarse (Regla 1).\n2. Mantener un repertorio tipográfico personal reducido y reutilizarlo entre\n   proyectos en lugar de elegir tipografía nueva cada vez (Regla 2).\n3. Limitar cada proyecto a un máximo de dos tipografías, normalmente una de\n   display y una de texto (Regla 3).\n4. Limitar el sistema tipográfico a un máximo de tres a cinco jerarquías, y\n   verificar que cada salto de tamaño sea perceptible (idealmente el doble)\n   o esté reforzado por un cambio de caso (Regla 4).\n5. Limitar la paleta a uno o dos colores de texto y uno o dos colores de\n   fondo, más un único color de acento, y alternar el color de la CTA según\n   el contraste con el fondo inmediato (Regla 5).\n6. Elegir uno o dos tipos de elemento gráfico (imagen, ilustración, icono,\n   vector, video, 3D) por proyecto y mantenerlos consistentes (Regla 6).\n7. Si se usan ilustraciones, fijar de antemano técnica, nivel de detalle,\n   presencia de sombra y perspectiva, y aplicarlos uniformemente (Regla 7).\n8. Si se usan fotografías, fijar un tratamiento único de color, saturación y\n   temperatura; usar un tratamiento unificador (por ejemplo, blanco y negro)\n   cuando las imágenes provienen de fuentes heterogéneas (Regla 8).\n9. Explorar todas las variables de diseño en una sola pieza representativa\n   (el hero del homepage) antes de expandir el sistema al resto del sitio.\n10. Auditar periódicamente el sitio completo, no módulo por módulo, para\n    detectar inconsistencias introducidas al agregar páginas nuevas.\n11. Ante una inconsistencia detectada, resolverla creando una regla\n    explícita aplicable a todo el sitio, no una excepción puntual.",
+      "token_count": 413
+    },
+    {
+      "citation_id": "S40",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "bT1tG_E8g-4",
+      "video_title": "🚨 Top 6 Design Trends 2026: Flat Design is DEAD",
+      "creator": "Grayson's Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Resumen compacto"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "La fuente imagina seis vectores: liquid glass, skeuomorfismo material, 3D, gradientes dinámicos, futurismo y hiperpersonalización. El hilo común es diseñar para una frontera más porosa entre objetos físicos, pantallas y sistemas adaptativos. La evidencia visual apoya la lectura estética mediante transparencias, controles volumétricos, objetos 3D, color cambiante y pares utópico/distópico. No prueba adopción universal ni comportamiento comercial. Para convertir la inspiración en trabajo profesional, tratar cada tendencia como hipótesis, prototipar su señal funcional, proteger accesibilidad/rendimiento/privacidad y conservar una base de sistema que sobreviva a la moda.\n\nLa pregunta final para cada entrega no es si parece una tendencia de 2026, sino si una persona entiende qué puede hacer, conserva el control y recibe el mismo contenido esencial cuando el efecto visual se reduce o desaparece.",
+      "token_count": 198
+    },
+    {
+      "citation_id": "S41",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Elegir la familia tipográfica en función del tono comunicativo requerido, no de preferencia estética aislada del contexto (Principio 1).\n- No usar tipos de letra display en párrafos, botones o etiquetas; reservarlos para fragmentos cortos de alto impacto como logotipos o títulos (Principio 4).\n- No confundir tipos script con tipos handwritten: los primeros imitan caligrafía elegante, los segundos imitan escritura a mano real y suelen ser más informales (Principio 5).\n- Reservar tipos monoespaciados para código o datos tabulares, nunca para texto de lectura general (Principio 6).\n- Usar unidades relativas (em/rem) en lugar de píxeles fijos para tipografía en proyectos digitales, configurando la variable raíz en CSS (Principio 7).\n- Ajustar peso, interlineado y tracking de forma inversamente proporcional al tamaño del texto: textos grandes más ajustados, textos pequeños más espaciados (Principios 8, 10, 11).\n- Verificar siempre el contraste de color entre texto y fondo contra un umbral mínimo (7:1 según el video) antes de finalizar un diseño (Principio 12).\n- Construir la jerarquía tipográfica de mayor a menor, definiendo primero el encabezado más grande y derivando los demás niveles de forma proporcional (Principio 13).\n- Dar a los botones mayor peso que el párrafo circundante, compensando con letter-spacing adicional, para señalar interactividad sin sacrificar legibilidad (Principio 13).\n- Elegir el número de columnas de la rejilla según el medio de salida (12 para web, 2 para impresos, 6 para periódicos, 3 para revistas, razón áurea para pósters) y mantenerlo consistente en todo el proyecto (Principio 14).\n- Tratar cualquier cifra estadística citada verbalmente en el video (por ejemplo, \"90 % de los sitios web\" o \"90 % de los productos de consumo\") como una afirmación no verificada del narrador, no como un dato validado por este dossier.\n- Tratar la atribución del rediseño del logo de Southern Living a Jessica Hische como una afirmación directa no verificada visualmente por este dossier.",
+      "token_count": 499
+    },
+    {
+      "citation_id": "S42",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "jqTC8sk__CQ",
+      "video_title": "The Future of Web Design: Trends in 2026",
+      "creator": "Design from Nick",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "7. Recuperar señales humanas e imperfectas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "05:20",
+      "visual_evidence": [],
+      "content": "Para evitar una apariencia “demasiado generada por IA”, el creador propone una estética orgánica con trazos, texturas crudas y formas imperfectas. `adaptive-000316000ms.png` muestra una portada dibujada a línea y `adaptive-000328500ms.png` a `adaptive-000342500ms.png` muestran una animación colorida de formas manuales, personajes y objetos. La evidencia confirma contraste con geometría pulida, no una regla universal contra el uso de IA.\n\n> “Texturas crudas, formas imperfectas, todo ese tipo de cosas.” (05:20)\n\nConstruye imperfección mediante un sistema coherente: paleta, grosor de trazo, grano, irregularidad de bordes y ritmo de composición. Evita convertir el desorden en descuido: los encabezados, campos y botones deben permanecer inequívocos. Usa activos originales o con licencia; no apropies la firma visual de ilustradores. Si interviene IA, documenta procedencia y licencia, conserva revisión humana y no afirmes autoría o exclusividad sin base.",
+      "token_count": 250
+    },
+    {
+      "citation_id": "S43",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "0BTp6w5yhhw",
+      "video_title": "Brutalism Graphic Design: Why It’s Ugly, Bold, and Trending in 2025!",
+      "creator": "Spoon Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Resumen compacto",
+        "Extensiones profesionales (no atribuidas al video)"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Las siguientes salvaguardas no provienen del video; se añaden como buenas prácticas profesionales al aplicar este método en un contexto real:\n\n- **Accesibilidad**: mantener contraste de color suficiente en el texto funcional (aunque la pieza use paletas extremas), ofrecer navegación por teclado y compatibilidad con lectores de pantalla en cualquier sitio web brutalista, y proveer una alternativa de bajo estímulo (reducción de movimiento, menos ruido visual) para usuarios con sensibilidad vestibular o fotosensible.\n- **Rendimiento**: las texturas granuladas y los efectos de ruido pueden aumentar significativamente el peso de imagen; optimizar formatos y compresión antes de publicar, especialmente en sitios web.\n- **Autoría y licencias**: si se reutilizan tipografías experimentales o \"clunky\" de terceros, verificar la licencia de uso comercial antes de aplicarlas en un proyecto de cliente.\n- **Consentimiento y marca**: al presentar el argumento de \"rebelión generacional\" a un cliente, aclarar que es una hipótesis de posicionamiento, no un dato de investigación de mercado verificado, para evitar decisiones de negocio basadas en una afirmación no comprobada.\n- **Gobernanza de contenido**: en dominios regulados (finanzas, salud, servicios legales), documentar explícitamente por escrito la decisión de usar o no un estilo de alta fricción visual, y obtener aprobación de las áreas de cumplimiento o legal antes de publicar.\n- **Revisión humana**: cualquier decisión de introducir fricción de UX \"deliberadamente incómoda\" en un producto digital real debe pasar por revisión humana de un especialista en experiencia de usuario antes de salir a producción, dado el riesgo de afectar negativamente conversión o accesibilidad.",
+      "token_count": 384
+    },
+    {
+      "citation_id": "S44",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "Vs2oSkw4VHM",
+      "video_title": "8 advanced rules of minimal Web Design",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Resumen compacto",
+        "Extensiones profesionales (no atribuidas al video)"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- **Accesibilidad**: al reducir colores y jerarquías, verificar que el\ncontraste entre texto y fondo cumpla como mínimo WCAG 2.1 AA (4.5:1 para\ntexto normal, 3:1 para texto grande), especialmente en paletas reducidas de\nun único color de acento.\n- **Legibilidad y jerarquía por caso**: cuando se usa mayúsculas/minúsculas\ncomo único diferenciador jerárquico (según describe la Regla 4), verificar\nque los lectores de pantalla no pierdan la distinción semántica; usar\nmarcado HTML semántico (`h1`–`h6`) independientemente del estilo visual\naplicado.\n- **Rendimiento**: cuando el \"elemento gráfico\" elegido incluye video (según\nla Regla 6), aplicar compresión, carga diferida (`lazy loading`) y\nproporcionar una alternativa estática para conexiones lentas o modo de\nahorro de datos.\n- **Movimiento reducido**: si se usan carruseles/sliders (mencionados en el\nPaso 1 del proceso), respetar la preferencia del sistema operativo\n`prefers-reduced-motion` y ofrecer controles de pausa.\n- **Consistencia responsiva**: las reglas de espaciado, jerarquía y color\ndescritas deben validarse también en viewports móviles, donde el\nespaciado de \"150–160 píxeles\" puede no ser apropiado sin adaptarlo\nproporcionalmente.\n- **Licencia y atribución tipográfica**: al reutilizar un repertorio\ntipográfico fijo entre proyectos (Regla 2), confirmar que la licencia de\ncada tipografía permite su uso en todos los proyectos y clientes donde se\naplique.\n- **Autorización sobre activos de cliente**: al mostrar ejemplos con nombres\ny fotografías reales de clientes (como el caso \"John Elway\" identificado en\neste documento), un agente que reutilice estos ejemplos como plantilla debe\nconfirmar que existe autorización para usar esos nombres e imágenes,\nindependientemente de si aparecían así en el material original.\n- **Separación de contenido promocional**: cualquier flujo de trabajo\nautomatizado que use este documento como base debe excluir explícitamente\nlas secciones promocionales (curso gratuito, programa de mentoría,\nnewsletter) del conjunto de reglas de diseño operativas, para no mezclar",
+      "token_count": 509
+    },
+    {
+      "citation_id": "S45",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "meACC0ud-7o",
+      "video_title": "Web Design Trends 2026 (And How To Design In an Oversaturated Market)",
+      "creator": "Tilda",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "5. Romper la cuadrícula con control, no con azar"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "04:08",
+      "visual_evidence": [],
+      "content": "Desde 04:08 la fuente reacciona contra el contenido AI “perfecto” y propone imperfección intencional. Enumera elementos dispersos en vez de cuadrículas alineadas, tipografía caótica y scroll no convencional. Su advertencia es central: no se trata de un desorden; es imprevisibilidad plenamente controlada. La regla citada, traducida fielmente, es: “rompe la cuadrícula sólo cuando la conozcas lo suficiente para doblarla artísticamente” (04:08).\n\n`adaptive-000248500ms.png` muestra tipografía negra de gran escala con bloques e imágenes superpuestas. La secuencia `sequence-anti-grid-000252000ms-00.png` a `-08.png` alterna una composición de palabras, retratos y colores con una página blanca donde objetos e imágenes se dispersan y reconfiguran. El material confirma superposición, escala desigual y distribución no regular. No permite afirmar que la web tenga buen orden de lectura, navegación o respuesta móvil.\n\nLa manera segura de aplicar anti-grid es construir primero una cuadrícula convencional de columnas, espaciado, orden de lectura y prioridades. Luego elegir exactamente qué romper: el borde de una imagen, el alineamiento de un titular, una intersección controlada o la trayectoria de scroll. Mantener anclas: una llamada a la acción visible, una ruta de lectura, contraste suficiente y separación entre elementos interactivos. Probar el reflow por breakpoint; una composición deliberada en escritorio puede convertirse en confusión si simplemente se encoge.\n\nExtensión profesional: el DOM y el orden de foco deben seguir siendo lógicos; no ocultar controles bajo capas; no usar motion como única manera de descubrir contenido; y comprobar lectores de pantalla, zoom, teclado y touch. La fuente autoriza experimentar, pero la experimentación debe tener criterio de salida: si la jerarquía no se puede explicar o probar, volver al sistema base.",
+      "token_count": 433
+    },
+    {
+      "citation_id": "S46",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "8ahnUt_A5eA",
+      "video_title": "Popular Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "5. Color, brutalismo y microinteracciones"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "La sección de color presenta paletas fuertes y referencias a “Color of the Year”; ese rótulo es temporal y no constituye una especificación universal. Seleccionar color por contraste, semántica y sistema de estados, no por novedad. Brutalismo emplea HTML visible, bloques duros, tipografía cruda y choque de colores. `adaptive-contact-sheet-12.jpg` muestra sitios de alto contraste, gráficos densos y letras que dominan la pantalla. Puede crear carácter, pero requiere que botones, enlaces y errores se distingan sin depender sólo del color.\n\nLas microinteracciones comunican respuesta: hover, botón que brilla, toast que nace de un componente o transición de login. La secuencia `sequence-microinteractions-000660000ms-00.png` a `-08.png` confirma un botón que cambia de apariencia; no prueba que genere un sitio. Diseñar una microinteracción como feedback breve, reversible y con final persistente. Evitar animación infinita, espera ambigua o efectos que oculten el estado de envío.",
+      "token_count": 250
+    },
+    {
+      "citation_id": "S47",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "Vs2oSkw4VHM",
+      "video_title": "8 advanced rules of minimal Web Design",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "17:50",
+      "visual_evidence": [],
+      "content": "Un agente que reciba el encargo de aplicar (o auditar) el método de este\nvideo sobre un sitio existente o un sitio nuevo debería seguir esta\nsecuencia, que corresponde al proceso de tres pasos explicado por el\npresentador entre 17:50 y 19:21:\n\n1. **Explorar las variables en el homepage** (17:50–18:44). Tomar la pieza\n   más visible del sitio —normalmente el hero del homepage— y decidir ahí,\n   de una sola vez, todas las variables de las ocho reglas: tipografías,\n   jerarquías, colores, elementos gráficos, estilo de ilustración y\n   tratamiento de imagen. Si el diseño incluye un carrusel o slider, probar\n   variantes en ese único módulo antes de expandir el sistema al resto del\n   sitio.\n2. **Alejarse y auditar** (18:44–18:59). Una vez que el sitio crece a varias\n   páginas, revisar el conjunto completo con perspectiva de sistema, no\n   módulo por módulo, para detectar inconsistencias que se hayan colado al\n   añadir páginas nuevas.\n3. **Simplificar variables y fijar reglas claras** (18:59–19:21). Donde se\n   detecten inconsistencias, no agregar una excepción puntual: volver a las\n   ocho reglas y definir una regla explícita aplicable a todo elemento del\n   sitio (de página a página, de CTA a CTA), de modo que ningún tamaño,\n   color, fondo o tratamiento de imagen quede librado al azar.\n\nUn agente automatizado que ejecute una auditoría de diseño puede traducir\nesto en una lista de comprobación operativa:",
+      "token_count": 337
+    },
+    {
+      "citation_id": "S48",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "qthkkHPNAYQ",
+      "video_title": "You Should Try These 5 Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Interactive 3D",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "01:03",
+      "visual_evidence": [
+        "sequence-three-d-000080000ms-00.png shows the Spline site.",
+        "sequence-three-d-000080000ms-04.png shows a touch interaction with a 3D product."
+      ],
+      "content": "Do not use 3D for editorial content that needs fast reading.",
+      "token_count": 17
+    },
+    {
+      "citation_id": "S49",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Afrofuturism",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "supplemental-375s.png shows the AFROFUTURISM label over a turquoise-and-gold book cover portrait, a neon-typography poster, and a circular pink portrait design.",
+        "supplemental-385s.png confirms the on-screen search-terms slide (afrofuturism / afrofuturism art / afrofuturism editorial / afrofuturism poster)."
+      ],
+      "content": "Use for posters, book covers, album covers, fashion branding, editorial design, and cultural storytelling projects.",
+      "token_count": 30
+    },
+    {
+      "citation_id": "S50",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Trend 7: Scrollytelling",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": "11:11",
+      "visual_evidence": [
+        "frame-65pct.png shows an editorial panel with a trend-prediction headline, a photo, and a sidebar of content thumbnails, consistent with a scroll-driven editorial format."
+      ],
+      "content": "Reserve scrollytelling for content with a genuine narrative or chronological structure (e.g., editorial trend pieces, history-driven content).",
+      "token_count": 37
+    },
+    {
+      "citation_id": "S51",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Método completo de la fuente",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S52",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [],
+      "unit_type": "context_document",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "# Contexto autónomo para un agente\n\n## Propósito\n\nEste documento convierte el video de YouTube \"The FULL 2026 Guide To Layout & Composition For Designers!\" del canal Satori Graphics en una base de conocimiento autosuficiente. El objetivo es que otro agente pueda razonar, enseñar o aplicar los principios de movimiento, jerarquía, grillas y ritmo visual que se explican en el video sin necesidad de verlo ni escucharlo. El video dura 30 minutos y 56 segundos (1856 segundos) y funciona como una guía extensa de composición y layout para diseñadores gráficos, estructurada en tres grandes bloques temáticos: los niveles de movimiento y flujo visual, los fundamentos y tipos de sistemas de grilla, y el llamado \"lift system\" (puntos de apalancamiento, ritmo interno, fricción/flujo y transferibilidad). Todo el contenido proviene del guion hablado (transcript/source.txt) y de la inspección directa de veinte fotogramas uniformes extraídos del archivo de video.\n\n## Evidencia y límites\n\nLa fuente primaria es la pista de subtítulos manual en inglés británico (`en-GB`), descargada directamente de YouTube junto con el video en baja resolución y sus metadatos. Esta pista fue preferida sobre la pista automática (`en`) porque los subtítulos manuales no presentan la duplicación incremental típica de los subtítulos automáticos y representan con mayor fidelidad lo que efectivamente se dice. El transcript limpio resultante tiene 4968 palabras repartidas en 56 segmentos, con cobertura continua desde 00:00:00 hasta 00:30:23, sin saltos abruptos ni duplicaciones masivas detectadas al revisar el inicio, el tramo intermedio y el cierre.\n\nLa evidencia visual proviene de veinte fotogramas extraídos de forma uniforme (0 % a 95 % de la duración) y organizados en una hoja de contacto (`contact-sheet.jpg`), que fue efectivamente abierta e inspeccionada con la herramienta de lectura de imágenes. No se generaron fotogramas suplementarios porque el muestreo uniforme ya cubre representativamente cada bloque temático del video: ejemplos de movimiento (Nike, pósters editoriales), pantallas de título de nivel (\"LEVEL 4\"), la palabra \"GRIDS\" como separador, ejemplos de columnas y grillas modulares, una composición tipográfica (\"Cherry Blossom Time\"), al presentador hablando a cámara, un ejemplo ilustrativo de distorsión tipo \"fisheye\", ejemplos de branding (Sapforce, un evento cultural asiático), portadas editoriales (Interstellar, revistas de moda), un cubo 3D ilustrando la transferibilidad entre formatos, y una pantalla final de comunidad/plataforma educativa del canal.\n\nLímites explícitos de esta evidencia:\n\n- El video es una pieza educativa de un canal de diseño gráfico orientado a creadores de contenido y freelancers; no es un estudio académico ni una fuente revisada por pares. Las afirmaciones sobre \"por qué funciona\" cada principio (por ejemplo, \"el ojo humano sigue instintivamente las señales direccionales\") son afirmaciones del creador, no resultados de investigación citados con fuente.\n- Cifras como \"99 % de los diseñadores no considera el flujo temporal\" son afirmaciones no verificadas del creador, sin evidencia primaria adjunta en el propio video.\n- Los ejemplos visuales (posters, logos, páginas web) son mockups o casos ilustrativos mostrados en pantalla; no hay prueba de que sean trabajos reales de clientes del canal ni de que produzcan resultados de negocio medibles. Ver una interfaz o un poster no demuestra que un sistema esté \"en producción\" ni que genere resultados comerciales.\n- Un fragmento visual (aprox. 65 % del video, ejemplo de distorsión tipo \"fisheye\" con peces) aparece en la hoja de contacto sin que el guion hablado lo describa con ese nombre exacto en el fragmento transcrito más cercano; se cita como apoyo visual general a la sección de grillas/leverage, no como cita textual.\n- No se identificaron patrocinios ni enlaces de afiliados explícitos en el transcript; la única promoción detectada es la invitación final a suscribirse y ver otro video del canal, que se trata como paratexto y no como parte del método.\n- El idioma original es inglés (código `en`); no se detectaron idiomas secundarios materiales en el audio.\n\n## Tesis central\n\nLa composición y el layout no son solo la disposición estética de elementos: son un sistema deliberado de control de la atención del espectador a través del tiempo. El video argumenta que un diseñador experto no solo organiza elementos en el espacio, sino que coreografía el recorrido del ojo humano en varias capas superpuestas: dirección literal, jerarquía visual, múltiples caminos simultáneos, movimiento implícito, disrupción intencional del flujo y, en el nivel más avanzado, \"flujo temporal\" (controlar cuándo el ojo se acelera, se detiene y descansa). Sobre esta base perceptual, las grillas (sistemas de columnas, filas y proporciones) son la herramienta estructural que hace posible construir jerarquía, espacio en blanco, alineación y variedad de forma repetible y escalable. Finalmente, el \"lift system\" combina puntos de apalancamiento (leverage points), ritmo interno, fricción calculada y transferibilidad entre formatos para que un mismo sistema de diseño funcione de manera coherente en cualquier soporte, desde un póster de gran formato hasta un ícono de aplicación móvil.\n\n## Mapa temporal de procedencia\n\n| Tramo | Contenido principal | Evidencia |\n|---|---|---|\n| 00:00–00:09 | Introducción y primer nivel de movimiento: dirección literal (flechas, señales explícitas) | Transcript 00:00:00–00:01:07; `frame-05pct.png` (poster Nike con figura y flecha) |\n| 00:01–00:03 | Nivel 2: jerarquía sin flechas; Nivel 3: flujos múltiples/microrrutas | Transcript 00:01:39–00:04:21 |\n| 00:04–00:08 | Nivel 4: movimiento implícito; Nivel 5: disrupción del flujo; Nivel 6: flujo temporal | Transcript 00:04:21–00:08:47; `frame-15pct.png` (\"LEVEL 4 Implied Motion\") |\n| 00:08–00:09 | Transición a grillas: origen histórico y primera razón de uso (jerarquía) | Transcript 00:08:47–00:09:51; `frame-30pct.png` (palabra \"GRIDS\") |\n| 00:09–00:12 | Razones 2 a 5 para usar grillas (romper la grilla con intención, versatilidad, espacio en blanco, guía del ojo) | Transcript 00:10:28–00:12:40 |\n| 00:12–00:20 | Catálogo de tipos de grilla: baseline, columnas, modular, manuscrito, jerarquía, proporción áurea, asimétrica, cuadrada, regla de tercios, compuesta, isométrica, circular, triangular | Transcript 00:12:40–00:20:29; `frame-45pct.png`, `frame-65pct.png` |\n| 00:20–00:22 | Puntos de apalancamiento (leverage points): ejemplos Nike y póster editorial | Transcript 00:20:29–00:22:06 |\n| 00:22–00:24 | Ritmo interno / coreografía del ojo | Transcript 00:22:36–00:24:17 |\n| 00:24–00:26 | Fricción y flujo | Transcript 00:24:50–00:26:31 |\n| 00:26–00:28 | Transferibilidad entre formatos | Transcript 00:26:31–00:28:07 |\n| 00:28–00:30 | Síntesis final del \"lift system\" sobre un ejemplo compuesto y cierre del video | Transcript 00:28:07–00:30:23; `frame-95pct.png` (pantalla \"COMMUNITY\"/plataforma) |\n\n# Método completo de la fuente\n\n## Principio / paso / elemento 1: Los seis niveles de movimiento y flujo visual\n\nEl video presenta el movimiento visual como una escalera de sofisticación creciente, no como una técnica única.\n\n1. **Dirección literal.** Es el nivel más básico: usar una flecha, la mirada de una persona o cualquier elemento que apunte explícitamente hacia el siguiente punto de interés. El creador ilustra esto con un poster de ejemplo donde un titular en la parte superior izquierda va seguido de una flecha geométrica diagonal que apunta hacia un bloque de llamada a la acción (CTA) en la esquina inferior derecha. Cita literal: \"This is the most obvious and literal form of movement in graphic design\" (00:01:07). El fundamento perceptual invocado es que \"el ojo humano sigue instintivamente las señales direccionales\" (00:01:07), algo que el creador ejemplifica con señalética de aeropuertos y anuncios deportivos donde la mirada de un atleta apunta hacia el logo.\n2. **Jerarquía sin flechas.** Al añadir un subtítulo de tamaño medio y un detalle menor, el ojo se detiene en un punto intermedio antes de llegar al CTA, sin necesidad de una flecha. El principio es que \"elementos más grandes y con más contraste se ven primero, luego los medianos, luego los pequeños\" (00:02:10), como si el peso visual funcionara igual que la gravedad. El beneficio señalado es que este flujo \"se siente sin esfuerzo\" porque la composición misma crea una flecha invisible.\n3. **Flujos múltiples (microrrutas).** El movimiento no tiene que ser un único recorrido de un punto A a un punto B. Se pueden añadir bloques tipográficos y elementos secundarios que generan un bucle corto antes de reconectar con la ruta principal, comparado explícitamente con patrones fractales en la naturaleza (00:03:51). La ventaja es aumentar el tiempo de visualización, pero el riesgo señalado es que un exceso de rutas secundarias compitiendo entre sí puede volver el diseño caótico.\n4. **Movimiento implícito.** Consiste en hacer que un diseño estático se sienta en movimiento mediante repetición, escalado progresivo, difuminado (blur) o patrones direccionales. El creador da ejemplos fotográficos (un salto congelado de un bailarín, tela en movimiento, salpicaduras de agua) y de diseño brutalista con formas geométricas repetidas que se comprimen o expanden a lo largo de la composición.\n5. **Disrupción del flujo.** Se introduce deliberadamente un elemento que bloquea el camino visual principal —en el ejemplo, un cuadrado negro rotado 45° con un motivo rojo— para forzar una pausa y un reenganche de la atención. La justificación es que \"el cerebro no tolera caminos sin resolver\" (00:06:34): si algo interrumpe el recorrido, el espectador intenta resolverlo instintivamente. El creador aclara que esto debe hacerse con intención, no al azar.\n6. **Flujo temporal.** El nivel más avanzado: controlar no solo hacia dónde va el ojo, sino cuándo llega, cuánto se detiene y cuándo acelera. Se compara con dirigir música: impacto, permanencia, liberación (\"Punch, slow, pull, release\", 00:08:15). Los ejemplos citados son editoriales de moda de lujo (una imagen a sangre completa de un modelo como \"golpe rápido\", seguida de detalles en capas como joyería o texturas donde el ojo se ralentiza, y un espacio en blanco final donde descansa el logo) y las páginas de producto de Apple (imagen hero de impacto, detalles técnicos que ralentizan, y espacio en blanco final).\n\nEvidencia visual: `frame-15pct.png` muestra literalmente una diapositiva de título con el texto \"Movement principles in Graphic Design 2025\" seguido de \"LEVEL 4 'Implied Motion'\" con objetos geométricos flotando, confirmando visualmente la estructura por niveles descrita en el audio.\n\n## Principio / paso / elemento 2: Por qué usar sistemas de grilla (cinco razones)\n\nTras situar el origen histórico de las grillas (\"Grids go way back 1500 years in ancient manuscripts\", 00:08:47) y advertir que el interés no es histórico sino práctico, el video enumera cinco razones concretas para adoptar grillas:\n\n1. **Determinan la jerarquía visual.** Una grilla de, por ejemplo, seis columnas permite que un elemento importante \"domine\" al abarcar más de una columna. El creador usa una página web de ejemplo (\"mixd\") donde un bloque de texto ocupa una columna y otro ocupa dos, generando jerarquía de forma simple.\n2. **Romper la grilla con intención genera impacto.** Mantener partes del diseño alineadas a la grilla mientras un elemento la rompe deliberadamente crea contraste y capta la atención, siempre que la ruptura sea intencional y no accidental.\n3. **Versatilidad.** Las grillas no son exclusivas de revistas o periódicos: se aplican a logotipos, sitios web, tipografía y pósters, entre otros formatos.\n4. **Generación de espacio en blanco (white space).** Pensar en qué filas y columnas quedarán vacías es una manera efectiva de construir espacio en blanco micro y macro. El creador recomienda subdividir columnas y filas (por ejemplo, 3 columnas × 4 filas subdivididas en 6 × 6) para tener más control sobre el \"espacio en blanco micro\", definido explícitamente como \"el espacio pequeño entre líneas de texto y elementos de diseño muy juntos\" (00:12:08).\n5. **Guían el ojo del espectador.** Las líneas de texto demasiado largas o cortas dificultan la lectura; los sistemas de grilla ayudan a evitar esto y a poner orden en diseños recargados. Las grillas base (\"baseline grids\") alinean cuerpo de texto, titulares y pies de foto entre columnas; se recomienda usar tamaños tipográficos múltiplos del interlineado base (ejemplo dado: 28 puntos para titulares si el cuerpo de texto es de 14 puntos).\n\n## Principio / paso / elemento 3: Catálogo de tipos de sistemas de grilla\n\nEl video enumera y explica doce sistemas de grilla, cada uno con un caso de uso y un consejo de aplicación. Se preserva la lista completa por tratarse de un inventario numerado en la fuente:\n\n- **Grilla de columnas (column grid).** Divide la página en secciones verticales iguales (el ejemplo muestra cuatro columnas); habitual en revistas, periódicos y sitios de contenido múltiple. Consejo: superponer elementos (una imagen destacada abarcando tres columnas mientras el texto ocupa una sola) para generar interés visual.\n- **Grilla modular.** Cada producto, imagen o pieza gráfica recibe su propio módulo (imagen, título, descripción, precio), típico en e-commerce. Consejo: variar el tamaño del módulo según la importancia del contenido (por ejemplo, destacar más espacio a productos \"best seller\").\n- **Grilla de manuscrito (manuscript grid).** Una sola columna que organiza el flujo de texto en un libro, con márgenes reservados para notas o imágenes.\n- **Grilla de jerarquía.** Módulos de distinto tamaño y forma para colocar imágenes o textos importantes (titulares, CTA) con mayor prominencia que la información secundaria (navegación, pie de página). Consejo: usar color y tamaño para reforzar el contraste entre elementos primarios y secundarios.\n- **Proporción áurea (golden ratio, ~1:1.618).** Aplicada a logotipos como el pájaro de Twitter o el logo de Apple para lograr proporciones \"equilibradas\"; el creador aclara que no es una regla rígida sino un punto de partida a ajustar según el proyecto.\n- **Grilla asimétrica.** Rompe la simetría dejando que la imagen o titular principal ocupe más espacio, dirigiendo la atención hacia lo más importante, mientras columnas menores aportan información secundaria. Consejo adicional: superponer texto sobre imágenes o usar líneas diagonales sutiles para dar sensación de profundidad y movimiento.\n- **Grilla cuadrada.** Ideal para galerías uniformes (ejemplo: un perfil de Instagram) donde cada imagen ocupa un cuadrado idéntico. Consejo: añadir color o un patrón sutil de fondo en ciertos cuadrados sin romper la estructura general.\n- **Regla de tercios.** Divide el diseño en nueve partes iguales mediante dos líneas horizontales y dos verticales, útil para ubicar elementos clave de forma natural; se puede romper deliberadamente colocando el sujeto principal ligeramente fuera de la grilla para generar tensión o sorpresa.\n- **Grilla compuesta (compound grid).** Combina, por ejemplo, una grilla de columnas para listados de producto con una grilla modular para los detalles del producto, manteniendo espacio de respiro entre elementos.\n- **Grilla isométrica.** Aporta un efecto 3D a ilustraciones o infografías (edificios, estructuras de datos); se recomienda usar sombras y colores más claros arriba y más oscuros debajo para reforzar la sensación de volumen.\n- **Grilla circular.** Útil para logotipos con formas orgánicas y redondeadas, ayuda tanto al posicionamiento como a generar formas interesantes en los espacios entre elementos.\n- **Grilla triangular.** Sirve para crear patrones geométricos o posicionar elementos (logo, detalles de producto) en puntos de interés específicos, por ejemplo en el empaque de un producto; puede combinarse con gradientes o acabados metálicos a lo largo de los ángulos.\n\nEvidencia visual: `frame-45pct.png` muestra un botón rotulado \"COLUMN GRIDS\" sobre fondo rosa, confirmando que el video presenta cada tipo de grilla con una diapositiva de transición nombrada explícitamente.\n\n## Principio / paso / elemento 4: Puntos de apalancamiento (leverage points)\n\nUn punto de apalancamiento es el elemento que capta la atención primero en una composición. El video analiza dos ejemplos:\n\n- Una campaña de Nike donde el modelo es el punto de apalancamiento gracias al contraste (contornos de neón brillante), un fondo brumoso y la escala (la figura domina la composición) y el aislamiento (nada más compite, salvo el logo verde neón que actúa como punto de apalancamiento secundario dentro de un grupo de proximidad en la esquina inferior izquierda). Cita: \"This design knows exactly what it wants you to see first, and it makes sure nothing else gets in the way. That's leverage. That is control.\" (00:21:35).\n- Un póster más complejo donde el rostro del artista es el foco no solo por estar centrado sino por ser el elemento más grande del encuadre, rodeado de formas florales suaves que atraen el ojo hacia él, mientras el resto de los elementos (texto, superposiciones, detalles gráficos) se mantienen en un segundo plano de apoyo. El creador aclara que un diseño puede tener múltiples puntos de apalancamiento, siempre que exista una jerarquía clara entre ellos.\n\n## Principio / paso / elemento 5: Ritmo interno y coreografía del ojo (\"lift system\", segunda parte)\n\nUna vez establecido un punto de apalancamiento, el siguiente paso es el ritmo interno: cómo el ojo se desplaza por el resto del layout usando espaciado consistente, alineación predecible y contraste deliberado, a lo que el creador llama \"coreografía del ojo\" (\"eye choreography\", 00:23:13). En el ejemplo analizado, un título en negrita actúa como ancla visual fuerte, desde donde el ojo baja hacia un objeto 3D y luego se desplaza hacia la derecha, donde vive la información secundaria y la llamada a la acción. El video insiste en que este recorrido \"no es accidental, está coreografiado\" y se logra agrupando visualmente los elementos: enlaces de navegación espaciados y delineados de forma uniforme, estadísticas y listas de funciones compactas y estructuradas, mientras el objeto 3D central rompe la simetría de forma controlada para aportar energía. El principio subyacente es que el espaciado predecible genera confianza (\"Predictable spacing builds trust\", 00:23:45), mientras que una disrupción bien colocada reengancha la atención.\n\nPara aplicar este principio, el video propone un conjunto de preguntas de autoevaluación: ¿cómo se mueve el ojo por mi layout?, ¿hay saltos o transiciones suaves?, ¿los elementos relacionados están agrupados visualmente?, ¿el espaciado es consistente en todo el diseño? También recomienda ajustar la velocidad de la lectura según el contenido: ritmo rápido para contenido simple y \"hojeable\", ritmo más lento para layouts densos y complejos.\n\n## Principio / paso / elemento 6: Fricción y flujo\n\nLa tercera parte del \"lift system\" es la fricción, definida como \"espacios ajustados, objetos disonantes, tipografías incómodamente apretadas\" (00:24:50), a menudo vista como algo negativo pero que, usada con criterio, resulta efectiva. El ejemplo analizado combina interlineado muy ajustado, rostros difuminados, una tachadura sobre un rostro e incluso una palabra parcialmente cortada al pie del diseño; toda esta fricción es intencional y convive con zonas de flujo suave (por ejemplo, una declaración de misión legible) frente a zonas de fricción intensa que exigen atención. La distinción clave que propone el video es entre \"buena fricción\" (que capta el ojo) y \"mala fricción\" (que hace perder el mensaje y genera incomodidad no deseada).\n\nPara aplicar el principio, se recomienda preguntarse si cada elemento aporta claridad o solo ruido visual, revisar si hay demasiadas tipografías o colores compitiendo entre sí, ajustar el espaciado donde importa sin sobrecargar, y eliminar cualquier decoración que no cumpla una función. La metáfora usada es la de un condimento: \"solo lo suficiente añade sabor y profundidad; demasiado arruina todo\" (00:25:58).\n\n## Principio / paso / elemento 7: Transferibilidad entre formatos\n\nEl video cierra el \"lift system\" con la transferibilidad: un buen sistema de diseño debe funcionar en cualquier formato y tamaño, no solo en un contexto ideal único. Cita: \"If your design only works in one perfect setting, an ideal setting, then it's not a solution. It is a problem.\" (00:26:31). El ejemplo dado es la identidad visual de una exposición que mantiene consistencia y energía en distintos formatos —desde un póster hero a gran escala hasta una publicación social pequeña— conservando el contraste marcado, la tipografía deformada (\"warp\"), los retratos surrealistas y el esquema de color, de modo que la jerarquía y el \"estado de ánimo\" del concepto se mantienen incluso al reducir el tamaño.\n\nPara aplicar este principio, el video propone pruebas activas: reducir el diseño y verificar si la tipografía sigue siendo legible, comprobar si la identidad visual se reconoce, probarlo sobre fondos claros y oscuros, y evaluar su desempeño en distintos formatos (móvil, impreso, motion graphic). La conclusión es que la transferibilidad no consiste en que un layout \"se vea bien\" en abstracto, sino en construir un diseño que \"vive en todos los lugares donde la marca tiene que estar\" (00:28:07).\n\n# Demostraciones y ejemplos visibles\n\nEl video no incluye una demostración de software paso a paso; en su lugar, ilustra cada principio sobre composiciones de ejemplo que se muestran y se modifican progresivamente en pantalla (por ejemplo, el póster que evoluciona de \"solo flecha\" a \"jerarquía sin flecha\" a \"flujos múltiples\"). Los fotogramas inspeccionados confirman los siguientes momentos visibles:\n\n- `frame-00pct.png`: fondo de introducción con un patrón geométrico azul, correspondiente a la apertura del video antes de que aparezca contenido explicativo.\n- `frame-05pct.png`: el poster de ejemplo con la figura de baloncesto estilo Nike, el titular \"JUST DO IT.\" y el texto explicativo \"Movement is about raw and obvious clarity. You're telling the eye exactly where to go\", ilustrando el nivel 1 (dirección literal).\n- `frame-10pct.png`: una composición tipográfica en blanco y negro con el rótulo \"HIERARCHY FLOW\" y el texto \"the viewer doesn't feel directed on a conscious level, but they're still being guided\", correspondiente al nivel 2.\n- `frame-15pct.png`: diapositiva de título \"Movement principles in Graphic Design 2025\" seguida de \"LEVEL 4 'Implied Motion'\" con formas geométricas flotando, correspondiente al nivel 4.\n- `frame-20pct.png`: una composición con una carpeta o publicación rotulada \"Art-SYNc 2025\" junto a formas geométricas (un rombo negro y un círculo lavanda), probablemente relacionada con la disrupción del flujo o el movimiento implícito.\n- `frame-25pct.png`: una portada de revista con una figura vestida de rojo/negro y el logo \"A$AP Rocky\", usada como ejemplo editorial.\n- `frame-30pct.png`: pantalla de transición con la palabra \"GRIDS\" sobre fondo azul, marcando el inicio del bloque temático de grillas.\n- `frame-35pct.png`: una composición tipográfica con letras grandes fragmentadas (\"LESSONS\"), ilustrando probablemente el uso creativo de grillas tipográficas.\n- `frame-40pct.png`: una composición con el texto \"SMALLER SPACE BETWEEN LINES OF TEXT AND CLOSELY PACKED DESIGN ELEMENTS\" junto a bloques de color (verde, rosa, azul), que corresponde directamente a la explicación del espacio en blanco micro (00:12:08).\n- `frame-45pct.png`: un botón rojo rotulado \"COLUMN GRIDS\" sobre fondo rosa, transición hacia la explicación de la grilla de columnas.\n- `frame-50pct.png`: una composición tipográfica elegante titulada \"Cherry Blossom Time\" con texto en cursiva, ejemplo de aplicación editorial de grillas.\n- `frame-55pct.png`: el presentador hablando directamente a cámara en un entorno con iluminación morada, confirmando los tramos en los que el creador se dirige al espectador entre ejemplos.\n- `frame-60pct.png`: un fondo negro con un único círculo rosa, posiblemente parte de la explicación de la regla de tercios o de la grilla circular.\n- `frame-65pct.png`: una ilustración con el rótulo \"FISHEYE\" y dos peces estilizados junto a una línea ondulada dibujada a mano, un ejemplo visual de distorsión que no tiene una cita textual exacta en el transcript más cercano pero que se asocia contextualmente al bloque de grillas y proporciones.\n- `frame-70pct.png`: una composición con una fotografía de retrato en tonos morados sobre una cuadrícula visible de puntos, ejemplo de grilla aplicada a fotografía editorial.\n- `frame-75pct.png`: una pieza de branding con el texto \"SAPFORCE.\" y una esfera 3D con textura orgánica verde y gris, ejemplo de identidad visual con grilla subyacente.\n- `frame-80pct.png`: un collage de portadas de películas o pósters (incluyendo \"Interstellar\" y \"THE RIFT\") junto al texto \"Use spacing and positioning to control the speed of engagement: fast rhythm for simple, skimmable content; slower more deliberate flow for dense or complex information\", que resume explícitamente el principio de ritmo.\n- `frame-85pct.png`: un collage de portadas de revista de moda, ilustrando ejemplos editoriales de composición.\n- `frame-90pct.png`: un cubo 3D con el texto \"MOVE THEM ACROSS FORMATS. Would this design work in print? Web? App? A digital graphic?\", correspondiente directamente a la sección de transferibilidad (00:26:31–00:28:07).\n- `frame-95pct.png`: una pantalla final con el texto \"COMMUNITY\" y \"Catch offer: a creative working environment for thinkers, achievers and imagineers... an online and offline education platform for all individuals\", que corresponde al cierre promocional del canal, no al método de diseño en sí.\n\nNo se advirtieron demostraciones de software de diseño (por ejemplo, Photoshop, Illustrator o Figma) en los fotogramas inspeccionados; el video se apoya en ejemplos estáticos ya diseñados y en la narración del presentador, no en una grabación de pantalla de un flujo de trabajo real.\n\n# Flujo integrado para el agente\n\n1. Identificar el objetivo de la composición: ¿qué debe ver el espectador primero, segundo y al final? Definir el punto de apalancamiento antes de diagramar cualquier otra cosa.\n2. Elegir el nivel de movimiento adecuado al mensaje: usar dirección literal solo si el mensaje es simple y urgente; para mensajes más sofisticados, apoyarse en jerarquía visual y flujos múltiples controlados.\n3. Seleccionar un sistema de grilla acorde al medio: columnas para contenido editorial extenso, modular para catálogos o e-commerce, asimétrica o de jerarquía cuando un elemento debe dominar, isométrica o triangular para piezas con volumen o empaques, circular para logotipos orgánicos.\n4. Aplicar la grilla de forma consistente y, si se desea generar impacto, romperla en un único punto de forma deliberada, nunca de manera accidental o generalizada.\n5. Revisar el espacio en blanco micro (entre líneas y elementos cercanos) y macro (entre bloques y secciones), ajustando subdivisiones de la grilla si el resultado se siente apretado o desordenado.\n6. Construir el ritmo interno agrupando elementos relacionados, manteniendo espaciado y alineación predecibles, y verificando que la mirada recorra el diseño en una secuencia lógica desde el punto de apalancamiento.\n7. Introducir fricción solo donde aporte énfasis (tipografía apretada, un recorte, un elemento perturbador), evitando que se acumule en zonas que deban ser de lectura fácil.\n8. Probar la transferibilidad: reducir el diseño a tamaño miniatura, cambiar el fondo claro/oscuro y proyectar el mismo sistema en al menos dos formatos distintos (por ejemplo impreso y digital) antes de darlo por finalizado.\n9. Documentar qué principios se aplicaron y por qué, de modo que el sistema de diseño pueda transferirse a otros miembros de un equipo sin perder coherencia.\n10. Aplicar las salvaguardas profesionales de la sección siguiente antes de presentar el trabajo como definitivo.\n\n# Reglas operativas\n\n- Nunca declarar un mockup o panel visual como prueba de una implementación productiva o comercial en funcionamiento.\n- Distinguir explícitamente entre lo que el creador afirma (declaración directa) y lo que un frame muestra (confirmación visual); no fusionar ambas categorías al redactar conclusiones.\n- Preservar la lista completa de tipos de grilla al reutilizar este contenido: son doce elementos numerados en la fuente y ninguno debe omitirse al resumir.\n- Tratar cifras como \"99 % de los diseñadores\" o afirmaciones de \"resultados\" como no verificadas salvo que se aporte evidencia primaria adicional.\n- Al aplicar la proporción áurea u otras proporciones matemáticas, tratarlas como puntos de partida ajustables, no como reglas rígidas, tal como lo indica explícitamente la fuente.\n- Mantener separada la fricción \"buena\" (intencional, con propósito de énfasis) de la fricción \"mala\" (accidental, que genera ruido o pérdida de mensaje).\n- Verificar la transferibilidad de cualquier sistema de diseño en al menos dos tamaños y dos formatos antes de considerarlo terminado.\n- No presentar la sección final de \"comunidad/plataforma educativa\" del canal como parte del método de diseño; es contenido promocional del creador.\n\n# Antipatrones\n\n- Usar flechas u otros indicadores literales como único recurso de dirección visual en piezas sofisticadas, ignorando los niveles de jerarquía y flujo temporal.\n- Multiplicar rutas visuales secundarias sin balancear su fuerza frente a la ruta principal, generando una composición caótica.\n- Romper una grilla de forma generalizada en lugar de en un único punto intencional, perdiendo el efecto de contraste.\n- Ignorar el espacio en blanco micro al comprimir texto y elementos, dificultando la lectura.\n- Aplicar fricción de manera indiscriminada (demasiadas tipografías, demasiados colores, múltiples focos compitiendo) hasta perder la claridad del mensaje.\n- Diseñar para un único contexto \"ideal\" sin validar que el sistema resista su reducción, su traducción a otro formato o su visualización en fondos claros y oscuros.\n- Confundir un ejemplo ilustrativo mostrado en pantalla con un resultado de negocio comprobado o con una integración de software funcionando en producción.\n\n# Criterios de aceptación\n\n- El diseño define con claridad al menos un punto de apalancamiento identificable en los primeros segundos de visualización.\n- Existe una jerarquía visual perceptible entre elementos primarios y secundarios, lograda mediante tamaño, contraste o posición en la grilla, y no únicamente mediante texto explicativo.\n- El sistema de grilla elegido es coherente con el tipo de contenido (editorial, e-commerce, branding, infografía, etc.) y se aplica de manera consistente salvo en el punto de ruptura intencional, si existe.\n- El espacio en blanco micro y macro es suficiente para que el contenido no se perciba abarrotado.\n- El recorrido visual (ritmo interno) puede describirse verbalmente como una secuencia lógica de pasos, no como saltos arbitrarios.\n- Cualquier fricción presente en el diseño puede justificarse como intencional y ligada a un objetivo de énfasis.\n- El diseño se probó reducido de tamaño y en al menos un formato adicional al original, conservando su identidad y legibilidad.\n\n# Rúbrica de evaluación\n\nEscala de 0 a 3 por cada dimensión:\n\n- **Punto de apalancamiento (0–3):** 0 = no hay foco claro; 1 = foco ambiguo o compitiendo con otros elementos; 2 = foco claro pero sin refuerzo de contraste/escala/aislamiento; 3 = foco inequívoco reforzado por al menos dos recursos (contraste, escala, aislamiento o color).\n- **Uso de la grilla (0–3):** 0 = sin sistema de grilla identificable; 1 = grilla presente pero inconsistente; 2 = grilla consistente sin ruptura intencional cuando sería útil; 3 = grilla consistente con al menos un punto de ruptura deliberada que aporta contraste.\n- **Ritmo y flujo (0–3):** 0 = recorrido visual confuso; 1 = recorrido parcialmente guiado; 2 = recorrido guiado con espaciado predecible; 3 = recorrido guiado con ritmo variable intencional (rápido/lento) acorde al contenido.\n- **Fricción calculada (0–3):** 0 = ausencia total de fricción en un diseño que la necesitaría, o fricción excesiva no controlada; 1 = fricción presente pero no clara en su propósito; 2 = fricción intencional en al menos una zona; 3 = fricción intencional balanceada con zonas de flujo suave claramente diferenciadas.\n- **Transferibilidad (0–3):** 0 = no probado en más de un formato/tamaño; 1 = probado en un tamaño reducido únicamente; 2 = probado en tamaño y un formato adicional; 3 = probado en múltiples tamaños, fondos claro/oscuro y al menos dos formatos distintos.\n\nMínimo aceptable: promedio de 2 sobre 3 en todas las dimensiones, sin ninguna dimensión en 0.\n\nFallas bloqueantes: ausencia total de punto de apalancamiento; grilla inexistente o inconsistente en todo el diseño; fricción no intencional que impide leer el mensaje principal; ausencia de cualquier prueba de transferibilidad.\n\n# Resumen compacto\n\nEl video enseña que la composición gráfica es, ante todo, control del tiempo y la atención del espectador. Primero, describe seis niveles crecientes de movimiento visual: dirección literal, jerarquía sin flechas, flujos múltiples, movimiento implícito, disrupción intencional del flujo y flujo temporal (el nivel más avanzado, que dosifica impacto, permanencia y liberación). Segundo, presenta las grillas como la infraestructura que hace posible construir jerarquía, espacio en blanco y orden, listando doce tipos completos (columnas, modular, manuscrito, jerarquía, proporción áurea, asimétrica, cuadrada, regla de tercios, compuesta, isométrica, circular y triangular), cada uno con un caso de uso y un consejo de aplicación concretos. Tercero, integra todo en un \"lift system\" de cuatro componentes: puntos de apalancamiento (qué se ve primero), ritmo interno o coreografía del ojo (cómo se recorre el resto), fricción y flujo (dónde se genera tensión intencional y dónde se permite descanso visual) y transferibilidad (si el sistema resiste su traducción a distintos tamaños y formatos). El video no demuestra un flujo de trabajo de software; se apoya en ejemplos estáticos ya diseñados y en explicación hablada, por lo que toda afirmación sobre resultados de negocio, popularidad de un estilo o cifras de comportamiento del diseñador promedio debe tratarse como una afirmación no verificada del creador, no como un dato comprobado.",
+      "token_count": 8645
+    },
+    {
+      "citation_id": "S53",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Contexto autónomo para un agente",
+      "token_count": 8
+    },
+    {
+      "citation_id": "S54",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [],
+      "unit_type": "context_document",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "# Contexto autónomo para un agente\n\n## Propósito\n\nEste documento reconstruye, de forma autosuficiente, el video \"Why Minimalism\nDominates Modern Graphic Design\" del canal **Kittl** (una plataforma de diseño\ngráfico y branding). El video es un tutorial hablado a cámara, sin locución en\noff, en el que un presentador de Kittl explica por qué el diseño gráfico\nminimalista sigue vigente y cómo aplicarlo: layout y grillas, espacio en\nblanco, tipografía, paletas de color y los contextos donde se usa. El objetivo\nde este documento es que otro agente pueda entender, enseñar y aplicar el\nmétodo completo sin necesitar ver ni escuchar el video original.\n\nEl video dura 9 minutos y 52 segundos (592 segundos) y combina, en partes\niguales, al presentador hablando a cámara y capturas de pantalla intercaladas\nde piezas de diseño reales (afiches, portadas editoriales, tarjetas de\npresentación, sitios web) que ilustran los principios que va explicando. No\nhay demostraciones de software: no se muestra ningún editor, herramienta o\ninterfaz de Kittl en uso durante el cuerpo del video; las imágenes mostradas\nson ejemplos terminados de diseño minimalista, no un paso a paso de\nproducción.\n\n## Evidencia y límites\n\nLa fuente primaria es el subtítulo automático en inglés (`en`, generado por\nreconocimiento de voz de YouTube), normalizado y agrupado en segmentos de\naproximadamente 30 segundos con `vtt-to-clean-transcript.py`. El video no\ntiene subtítulos manuales (`subtitles` vacío en los metadatos); solo existen\n`automatic_captions`. El campo `language` de los metadatos es `en` y coincide\ncon el idioma hablado, confirmado además por el contenido del audio\ntranscrito y por la descripción del video, también en inglés. No se detectó\nningún fragmento en un idioma distinto del inglés.\n\nSe inspeccionaron veinte fotogramas uniformes (0% a 95% de la duración) reunidos\nen `visual/frames/contact-sheet.jpg`, y un fotograma suplementario en el\nsegundo 124 (`supplemental-124s.png`), elegido porque ese tramo del audio\n(el minuto 2:04, donde el presentador menciona un libro sobre sistemas de\ngrilla) no quedaba cubierto por el muestreo uniforme; al extraerlo se\ncomprobó que en ese instante preciso la pantalla mostraba, en cambio, otro\ngrupo de ejemplos de branding minimalista (empaque de una vela \"RAMA\",\ntarjetas \"Social Club\" y una pieza de \"L Studio\"), no el libro mencionado en\nel audio. Este documento reporta lo que el fotograma realmente muestra, no lo\nque el audio hacía esperar, precisamente para no inventar evidencia visual.\n\nLímites explícitos de la evidencia:\n\n- El transcript proviene de reconocimiento automático de voz, no de una\n  transcripción manual verificada por el canal. Puede contener errores menores\n  de puntuación o de nombres propios (por ejemplo, nombres de tipografías que\n  suenan ambiguos en el audio, como \"Aanir\" o \"Hot Take\"/\"New Hoscrotesque\",\n  que se preservan tal como fueron transcritos porque no hay evidencia visual\n  en pantalla que permita corregirlos con certeza).\n- Las imágenes de diseño mostradas en pantalla son ejemplos curados por Kittl\n  o el presentador, no trabajos creados en vivo durante el video. No se puede\n  afirmar que sean obra del presentador salvo que el audio lo diga\n  explícitamente (no lo dice).\n- El video incluye promoción activa de la suscripción Kittl Pro y de una\n  lista de libros recomendados; estas secciones se documentan como\n  promoción, separadas del método.\n- No hay cifras de resultados, casos de éxito medibles ni afirmaciones de\n  producción verificables: el video es puramente instructivo/opinativo.\n\n## Tesis central\n\nEl diseño gráfico minimalista domina el diseño moderno porque logra\ncomunicar con claridad usando el mínimo número de elementos posible: layout\nintencional, tipografía protagonista, paletas de color reducidas y uso\ngeneroso del espacio en blanco. Según el presentador, esta economía de\nrecursos no es survivalismo estético fácil, sino una disciplina exigente\n(\"hacer que algo se vea bien con tan pocos elementos es realmente, realmente\ndifícil y requiere mucha práctica\", 02:36–03:07) que se sostiene en el\ntiempo precisamente porque no depende de tendencias pasajeras, sino de\nprincipios estables: claridad, equilibrio y función (07:16–07:49).\n\n## Mapa temporal de procedencia\n\nEsta línea de tiempo documenta la procedencia de cada bloque temático; no\nsustituye la explicación del método, que se desarrolla íntegramente en la\nsección siguiente.\n\n| Tiempo | Contenido | Evidencia |\n|---|---|---|\n| 00:00–00:32 | Introducción: qué es el minimalismo gráfico y por qué divide opiniones | Transcript directo |\n| 00:32–01:02 | Origen histórico: Bauhaus y diseño suizo, mediados del siglo XX | Transcript directo |\n| 01:02–02:04 | Layout: grillas, jerarquía visual, asimetría equilibrada | Transcript directo + frame-15pct.png (póster con grilla visible, incluye una pieza tipo \"Heinz\") |\n| 02:04–02:36 | Mención de un libro sobre sistemas de grilla (recurso recomendado) | Transcript directo; supplemental-124s.png muestra en ese instante otros ejemplos de branding, no el libro |\n| 02:36–03:07 | Espacio en blanco: función y dificultad de dominarlo | Transcript directo |\n| 03:07–04:11 | Tipografía: fuentes sans-serif y serif recomendadas | Transcript directo + frame-35pct.png y frame-40pct.png (pósters y portadas tipográficas) |\n| 04:11–04:42 | Ética de pago a diseñadores de tipografías | Transcript directo |\n| 04:42–05:13 | Estilo editorial y uso intensivo de texto | Transcript directo + frame-40pct.png / frame-45pct.png (portadas de revista) |\n| 05:13–06:13 | Paletas de color: neutros + un acento, \"off-white\"/\"off-black\" | Transcript directo + frame-50pct.png / frame-55pct.png (pósters con paleta reducida y acentos) |\n| 06:13–06:44 | Consejo práctico: guardar y recrear pines de Pinterest | Transcript directo |\n| 06:44–07:16 | Referencia cruzada a otro video del canal sobre diseño suizo (promoción interna) | Transcript directo |\n| 07:16–08:19 | Dónde se usa el minimalismo: logos, packaging, redes, UX | Transcript directo + frame-60pct.png (portadas/portfolio) |\n| 08:19–08:50 | Por qué perdura: simplicidad como libertad con límites | Transcript directo |\n| 08:50–09:20 | Cierre, pregunta a la audiencia, promoción de plantillas y descuento Kittl | Transcript directo |\n| 09:20–09:52 | Despedida y llamado a suscribirse | Transcript directo |\n\n# Método completo de la fuente\n\n## Principio / paso 1 — Origen y mentalidad del minimalismo\n\nEl presentador ubica el origen del minimalismo gráfico moderno a mediados\ndel siglo XX, inspirado en movimientos como la Bauhaus y el diseño suizo:\n*\"artistas y diseñadores simplemente querían eliminar todo lo innecesario y\nenfocarse en la forma y la función pura, en lugar de una montaña de\nadornos\"* (00:32–01:02). La mentalidad central es \"hacer\nmás con menos\", de modo que cada detalle que permanece en la pieza importa\nmás, porque no hay ruido visual que lo tape ni lo diluya. Esta base histórica\nno es un dato decorativo: explica por qué las reglas de las secciones\nsiguientes (grilla, tipografía, color, espacio) no son una moda sino una\ncontinuación directa de una tradición de diseño centrada en la función.\n\n## Principio / paso 2 — Layout y sistema de grilla\n\nUn layout minimalista fuerte se apoya en:\n\n- **Balance y colocación intencional.** Nada debe sentirse tirado al azar; la\n  composición debe transmitir que cada elemento está donde está por una\n  razón.\n- **Sistema de grilla.** Ayuda a mantener los elementos alineados y a que la\n  composición se sienta estable incluso cuando hay mucho espacio vacío o\n  elementos colocados de forma asimétrica.\n- **Jerarquía visual clara.** Se logra ubicando el contenido más importante\n  arriba, o usando tipografía más grande para los mensajes clave, de modo\n  que el ojo del espectador sea guiado de forma natural.\n- **Asimetría controlada.** Puede funcionar muy bien siempre que se mantenga\n  equilibrada dentro de la grilla; no es sinónimo de desorden.\n\n`frame-15pct.png` confirma visualmente este principio: muestra un póster\ncompuesto sobre una grilla explícita (líneas rosadas de referencia visibles\nsobre el diseño) junto a otra pieza con un layout circular tipo \"Heinz\",\nambas ejemplificando composición deliberada y alineación modular. Esta es\nevidencia visual directa de la técnica descrita en el audio, no una\ninferencia.\n\n## Principio / paso 3 — El libro sobre sistemas de grilla (recurso recomendado)\n\nEl presentador menciona un libro sobre sistemas de grilla que considera útil\ny estéticamente atractivo, y remite a una lista de libros (\"book list\") en\nla descripción del video (02:04–02:36). Esto se documenta como **recurso\nrecomendado / promoción de contenido asociado al canal**, no como parte del\nmétodo en sí: el video no explica el contenido del libro, solo lo señala\ncomo lectura complementaria. El fotograma capturado en ese instante exacto\n(`supplemental-124s.png`) no muestra el libro sino otro conjunto de piezas de\nbranding minimalista (packaging de una vela, tarjetas de presentación,\nidentidad de marca), lo que indica que el corte de edición del video no\ncoincide de forma exacta con el minuto citado o que la referencia visual al\nlibro ocurre en otro instante no capturado por el muestreo. Se reporta esto\nexplícitamente para no fabricar una correspondencia que la evidencia visual\nno respalda.\n\n## Principio / paso 4 — Espacio en blanco (whitespace)\n\nEl espacio en blanco no es \"espacio vacío\": es una herramienta activa que le\nda a la pieza espacio para respirar y dirige el foco de atención exactamente\nadonde debe ir. Cuando se elimina el desorden visual, lo que queda tiene que\n\"trabajar más duro\": cada línea, color y palabra pesa más (02:36). Esta es,\nsegún el presentador, la parte más difícil del minimalismo: muchos\ndiseñadores encuentran más sencillo trabajar con estilos que permiten\n\"esconderse\" detrás de capas, color y textura, mientras que lograr que algo\nse vea bien con muy pocos elementos exige mucha práctica e intencionalidad\n(02:36–03:07).\n\n> \"Hacer que algo luzca bien con tan pocos elementos es en verdad muy, muy\n> difícil y requiere mucha práctica.\" (02:36–03:07)\n\n## Principio / paso 5 — Tipografía\n\nLa tipografía es, para el presentador, el elemento visual protagonista del\ndiseño minimalista: cuando hay pocos elementos, la elección de fuente carga\ncon buena parte de la personalidad del diseño. Recomendaciones concretas\nmencionadas en el audio:\n\n- Fuentes sans-serif limpias, con tamaños y pesos cuidadosamente elegidos.\n- Fuentes populares por sentirse atemporales pero fuertes: Helvetica, Futura\n  y una tercera fuente cuyo nombre el reconocimiento automático de voz\n  transcribió como \"Aanir\" (posible variante o error de transcripción de un\n  nombre de fuente no identificado con certeza; se preserva tal cual sin\n  corregirlo arbitrariamente).\n- Preferencias personales del presentador: una fuente transcrita como \"New\n  Hoscrotesque\", otra llamada \"Hot Take\" (que considera incluso más limpia\n  que Helvetica) e \"Inter Variable\".\n- En el terreno serif, menciona \"Instrument Serif\" (gratuita) y \"Perfectly\n  '90s\" (de pago), a la que califica como la fuente serif más limpia que\n  conoce.\n- Insiste explícitamente en pagar por tipografías de calidad como forma de\n  reconocer el trabajo de los diseñadores de fuentes y letristas, aunque\n  reconoce el valor de las fuentes gratuitas con licencia comercial.\n\n> \"Piensa en tus fuentes como la ropa que usan tus palabras. No puedes verte\n> limpio, moderno y directo si vas vestido de la cabeza a los pies con las\n> vestiduras de un rey.\" (03:07–03:38)\n\n`frame-35pct.png` y `frame-40pct.png` muestran pósters y portadas donde la\ntipografía es el elemento dominante de la composición (títulos grandes,\npalabras sueltas como \"the rain\", portadas de revista con jerarquía\ntipográfica clara), lo que confirma visualmente que la tipografía funciona\ncomo protagonista visual, consistente con lo dicho en el audio.\n\n## Principio / paso 6 — El estilo editorial como caso especial\n\nCuando una pieza contiene mucho texto (formato editorial), el desafío del\nminimalismo se intensifica: es imprescindible mantener todo simple, guiado,\nestructurado y equilibrado para no abrumar al lector (04:11–04:42).\n`frame-40pct.png` y `frame-45pct.png` muestran portadas y maquetas\neditoriales (revistas, páginas de presentación de proyecto) que ilustran\nesta idea con bloques de texto organizados y jerarquizados.\n\n## Principio / paso 7 — Paleta de color\n\nLa paleta de color es otra vía por la que el minimalismo mantiene la\nsimplicidad:\n\n- La mayoría de los diseños minimalistas se limitan a uno o dos colores\n  principales, casi siempre tonos neutros (negro, blanco, gris).\n- A veces se suma un único color de acento audaz (amarillo, azul, rojo,\n  naranja) que ayuda a unificar la pieza.\n- El presentador recomienda usar variantes suaves de blanco y negro\n  (\"off-white\" y lo que llama \"off-black\") en lugar de blanco y negro puros,\n  porque el blanco y negro verdaderos pueden sentirse fríos y \"digitales\",\n  especialmente en pantallas, sumando frialdad a un estilo ya de por sí muy\n  reducido. Una paleta ligeramente modificada aporta calidez y suavidad.\n- Usar colores simples no solo mantiene la calma visual, también refuerza el\n  reconocimiento de marca cuando se usa bien.\n\n> \"Si has visto un póster en blanco y negro con solo un toque de color de\n> acento, eso es minimalismo en acción. Y cumple muy bien su función.\"\n> (05:43–06:13)\n\n`frame-50pct.png` y `frame-55pct.png` muestran piezas con paletas reducidas\n(fondos neutros con tipografía de alto contraste, un póster con bloques de\ncolor limitado) que respaldan visualmente esta descripción.\n\n## Principio / paso 8 — Método práctico de aprendizaje (Pinterest)\n\nRecomendación accionable para quien quiere aprender el estilo: buscar\n\"minimalist graphic design\" en Pinterest, guardar entre diez y quince pines\nque gusten, y recrearlos. El punto no es copiar sin más, sino usar la\nrecreación para entender por qué un diseño resulta atractivo y qué\ncontribuye a eso; entender esa razón es, según el presentador, lo que\nproduce un salto real en la habilidad y en la lógica de diseño de una\npersona (06:13–06:44).\n\n## Principio / paso 9 — Dónde se usa el minimalismo y por qué perdura\n\nEl minimalismo aparece en logos de marca, sitios web, packaging, gráficos de\nredes sociales, empresas de tecnología, marcas de lujo y blogs de estilo de\nvida. Todos lo usan para sentirse modernos y premium mientras comunican su\nmensaje de un vistazo, algo especialmente valioso en un contexto donde la\natención de las personas es escasa y está distraída (07:16–08:19).\nFunciona particularmente bien en espacios digitales, donde el exceso de\nelementos puede ralentizar a los usuarios o generar confusión; layouts\nlimpios y espaciado generoso hacen que la experiencia de usuario se sienta\nfluida, lo cual explica por qué minimalismo y diseño UX van tan de la mano\n(07:16–07:49).\n\nLa razón de su permanencia, según la tesis del video, es que no persigue\ntendencias: se ancla en principios que siempre han funcionado —claridad,\nequilibrio y función— en lugar de en modas pasajeras (07:49–08:19).\n`frame-60pct.png` muestra un conjunto de portadas y piezas de portafolio\n(incluye títulos como \"KALISLYNX\", \"NREI\", páginas de presentación de\nnegocio) coherentes con esta idea de aplicación transversal del estilo en\ndistintos formatos (editorial, portafolio, branding).\n\n## Principio / paso 10 — Minimalismo como libertad con límites\n\nEl cierre conceptual del video invierte la crítica habitual de que el\nminimalismo \"quita creatividad\": el presentador argumenta que, al contrario,\ndeja espacio para la interpretación, el silencio y la exploración. Cuando el\nlogo de una marca es simple, puede adaptarse a cualquier estilo o caso de\nuso.\n\n> \"Me gusta decir que la libertad no es la ausencia de límites, sino el\n> conocimiento adecuado de ellos.\" (08:19–08:50)\n\n# Demostraciones y ejemplos visibles\n\nEl video no incluye demostraciones de software ni un proceso de diseño en\nvivo. Todo lo \"demostrado\" son fotografías o capturas de piezas de diseño ya\nterminadas, mostradas como ejemplos ilustrativos mientras el presentador\nhabla. Inventario de lo verificado en los fotogramas inspeccionados:\n\n- **frame-00pct.png a frame-10pct.png, frame-20pct.png, frame-30pct.png,\n  frame-45pct.png, frame-55pct.png, frame-65pct.png a frame-95pct.png**:\n  el presentador hablando a cámara en un estudio con iluminación violeta,\n  micrófono de brazo articulado visible, sin gráficos superpuestos. Confirman\n  el formato \"talking head\" del video.\n- **frame-15pct.png**: dos piezas de diseño con grilla explícita (líneas de\n  guía rosadas sobre un póster) y un afiche circular estilo \"Heinz\".\n  Evidencia visual directa del principio de layout/grilla.\n- **frame-25pct.png**: afiches de eventos (\"Robust\", \"Shoegaze / Dreaming\n  Night\", flyer de \"Encore Bar\") con tipografía y composición minimalistas.\n- **frame-35pct.png**: pósters tipográficos, uno con la palabra parcial\n  \"...Design...ess\" y otro con el texto \"the rain\" como elemento dominante.\n- **frame-40pct.png**: tres piezas de portada/branding, incluida una\n  identidad llamada \"KALISLYNX\" y una portada numerada \"01\" tipo\n  informe/revista.\n- **frame-50pct.png**: póster de \"The School of Life\" y un texto sobre\n  \"límites entre moda y arte que se han vuelto difusos\" (\"Boundaries between\n  fashion & art have become blurred\"), ejemplos editoriales.\n- **frame-55pct.png**: composición con el texto \"Positive Focus On Th...\"\n  (recortado en el fotograma), coherente con piezas editoriales de tipografía\n  grande.\n- **frame-60pct.png**: portadas de revista/portafolio adicionales, incluida\n  una titulada \"NREI\" y una página de \"Introducción y resumen de negocio\".\n- **supplemental-124s.png**: tres piezas de branding minimalista —empaque\n  de una vela con la marca parcialmente visible como \"...RAMA\", un mazo de\n  tarjetas de presentación de \"Social Club\" en rosa y verde menta, y una\n  pieza corporativa con el texto \"L Studio\" sobre fondo mostaza—. Este\n  fotograma se generó porque el instante mencionado en el audio para el\n  libro de sistemas de grilla no estaba cubierto por el muestreo uniforme;\n  lo que realmente aparece en pantalla en ese segundo es este otro grupo de\n  ejemplos de branding, no el libro.\n\nNo se observó ningún elemento de interfaz de software, ningún dato numérico\nde resultados de negocio, ni ninguna demostración en tiempo real de un\nproceso de diseño. Todas las piezas mostradas son productos terminados\nusados como referencia visual.\n\n# Flujo integrado para el agente\n\nUn agente que necesite aplicar o enseñar este método puede seguir esta\nsecuencia operativa, derivada del orden del video:\n\n1. Explicar el origen histórico (Bauhaus, diseño suizo) para justificar por\n   qué el minimalismo no es una moda sino una tradición de diseño funcional.\n2. Establecer el layout: definir una grilla, decidir jerarquía visual\n   (qué elemento va primero) y decidir si la composición será simétrica o\n   asimétrica controlada.\n3. Reservar espacio en blanco de forma deliberada: no rellenar el lienzo;\n   dejar que cada elemento remanente cargue con más peso visual.\n4. Elegir tipografía como elemento protagonista: una sans-serif limpia para\n   la mayoría de los casos, o una serif limpia si se busca un tono editorial;\n   evaluar presupuesto para tipografías de pago si el proyecto lo permite.\n5. Definir la paleta: uno o dos colores neutros (preferentemente variantes\n   suaves de blanco y negro) más, opcionalmente, un único color de acento.\n6. Verificar que el resultado comunique el mensaje \"de un vistazo\",\n   especialmente si el destino es una pantalla o una interfaz digital.\n7. Si el objetivo es aprender el estilo, usar el método de Pinterest:\n   guardar referencias, recrearlas y analizar por qué funcionan antes de\n   generalizar el principio.\n8. Antes de cerrar cualquier pieza, contrastarla contra los antipatrones\n   listados abajo.\n\n# Reglas operativas\n\n- Priorizar función y claridad por sobre la decoración; cada elemento debe\n  justificar su presencia.\n- Usar una grilla como base de alineación, incluso en composiciones\n  asimétricas.\n- Limitar la paleta a uno o dos colores neutros más, como máximo, un acento.\n- Preferir variantes suaves de negro y blanco puros para evitar frialdad\n  excesiva en pantalla.\n- Dejar espacio en blanco intencional: no es \"espacio desperdiciado\", es\n  parte activa del diseño.\n- Elegir tipografía consciente del \"peso\" comunicativo que va a cargar,\n  dado que hay pocos otros elementos que aporten personalidad.\n- Adaptar el nivel de exigencia tipográfica y estructural al volumen de\n  texto (más texto, más disciplina estructural, como en el estilo\n  editorial).\n- Separar siempre la recomendación de recursos o productos (libros,\n  plantillas, suscripciones) del principio de diseño en sí.\n\n**Extensión profesional** (salvaguardas añadidas por este documento, no\ndeclaradas por el video):\n\n- **Accesibilidad y contraste.** Al reducir la paleta a tonos neutros más un\n  acento, verificar que el contraste entre texto y fondo cumpla al menos\n  WCAG AA; un \"off-black\" sobre \"off-white\" puede bajar el contraste por\n  debajo del umbral legible si no se calibra.\n- **Tipografía y legibilidad responsiva.** Probar los tamaños tipográficos\n  elegidos como elemento protagonista en distintos anchos de pantalla; una\n  palabra grande que funciona en un póster fijo puede desbordar o volverse\n  ilegible en un layout responsivo.\n- **Movimiento reducido.** Si el diseño minimalista se traslada a un entorno\n  digital con animaciones o transiciones, respetar la preferencia de\n  usuario `prefers-reduced-motion`.\n- **Licencias tipográficas.** Confirmar la licencia real de cada tipografía\n  mencionada o similar antes de usarla en un producto comercial; el video\n  recomienda pagar por fuentes, pero no cubre cómo verificar el alcance de\n  una licencia comercial concreta.\n- **Atribución y derechos de las piezas de referencia.** Antes de usar como\n  inspiración cualquiera de las piezas mostradas en los fotogramas (afiches,\n  portadas, branding de terceros), verificar derechos de autor y evitar la\n  copia pixel por pixel; usarlas solo como referencia de principios, no como\n  plantilla a reproducir literalmente.\n- **Transparencia en la promoción.** Cualquier código de descuento,\n  suscripción o producto propio mencionado (en este caso, la suscripción\n  Kittl Pro y las plantillas de Kittl) debe presentarse de forma clara como\n  contenido patrocinado o de interés comercial del propio canal, no como\n  parte neutral del método de diseño.\n\n# Antipatrones\n\n- Confundir \"menos elementos\" con \"menos esfuerzo\": el video advierte\n  explícitamente que lograr un resultado atractivo con pocos elementos es\n  más difícil, no más fácil, que un estilo recargado.\n- Usar blanco y negro puros sin ninguna calidez cuando el medio es una\n  pantalla, generando una sensación fría no intencionada.\n- Llenar el espacio en blanco disponible \"porque sí\", perdiendo la función\n  de foco y respiro que le da el propio principio.\n- Tratar la variedad tipográfica como sustituto de jerarquía: agregar más\n  fuentes en vez de trabajar mejor la jerarquía de tamaños y pesos de una\n  misma familia.\n- Presentar una captura de pantalla de un diseño ajeno como si fuera un\n  proceso propio en vivo: el video mismo no hace esto (usa las imágenes solo\n  como referencia ilustrativa) y un agente no debería tampoco.\n- Mezclar la recomendación de un libro, plantilla o suscripción de pago\n  dentro de la explicación del principio de diseño, sin marcarla como\n  contenido promocional separado.\n- Asumir que cualquier interfaz o panel mostrado en un video equivale a un\n  producto en producción o a una funcionalidad activa: en este video no hay\n  interfaces de software en absoluto, por lo que ninguna afirmación de este\n  tipo tiene respaldo.\n\n# Criterios de aceptación\n\nUna pieza o explicación de diseño puede considerarse alineada con este\nmétodo si:\n\n- Existe una grilla o sistema de alineación identificable, aunque la\n  composición sea asimétrica.\n- La paleta de color no supera dos colores base más un acento opcional.\n- La tipografía elegida es coherente y limitada (no hay mezcla arbitraria de\n  familias sin jerarquía).\n- Hay espacio en blanco perceptible que dirige la atención hacia el\n  contenido principal.\n- El mensaje central de la pieza puede identificarse \"de un vistazo\", sin\n  necesidad de leer todo el contenido.\n- Cualquier recurso recomendado (libro, plantilla, software) está señalado\n  explícitamente como recurso externo, no como parte intrínseca del\n  principio de diseño.\n\n# Rúbrica de evaluación\n\nEscala de 0 a 3 por dimensión:\n\n- **Layout y grilla** — 0: sin alineación reconocible; 1: alineación parcial\n  o inconsistente; 2: grilla clara con jerarquía básica; 3: grilla clara,\n  jerarquía visual evidente y balance intencional incluso con asimetría.\n- **Espacio en blanco** — 0: composición saturada; 1: algo de aire pero sin\n  función clara; 2: espacio en blanco usado para dirigir el foco en la\n  mayoría de la pieza; 3: el espacio en blanco es un elemento activo y\n  consistente en toda la pieza.\n- **Tipografía** — 0: mezcla de fuentes sin criterio; 1: fuente adecuada pero\n  sin jerarquía de pesos/tamaños; 2: tipografía coherente y con jerarquía\n  clara; 3: la tipografía funge como elemento visual protagonista, con\n  jerarquía y peso bien resueltos.\n- **Paleta de color** — 0: más de dos colores base sin justificación; 1: dos\n  colores base sin acento ni intención de calidez; 2: paleta reducida con\n  acento intencional; 3: paleta reducida, con tonos suaves de negro/blanco y\n  acento bien dosificado.\n- **Separación de promoción y método** — 0: se mezclan sin distinción; 3:\n  toda mención de productos, libros o suscripciones está claramente marcada\n  como recurso externo o promoción.\n\nResultado mínimo aceptable: promedio igual o superior a 2 en las primeras\ncuatro dimensiones, y 3 (cumplimiento total) en la dimensión de separación\nde promoción y método, dado que mezclar ambas cosas invalida la fiabilidad\nde la explicación para un tercero.\n\nFallas bloqueantes: presentar una captura de pantalla de una pieza de diseño\najena como evidencia de una funcionalidad de software o de una integración\nen producción; u omitir que una recomendación de recurso (libro, plantilla,\nsuscripción) es contenido promocional.\n\n# Resumen compacto\n\nEl diseño gráfico minimalista, según este video de Kittl, se construye sobre\ncinco pilares reforzados mutuamente: (1) un layout basado en grilla con\njerarquía visual clara, incluso cuando es asimétrico; (2) espacio en blanco\nusado de forma activa y no como sobra; (3) tipografía protagonista, con\npocas familias bien elegidas y, preferentemente, con inversión en fuentes de\npago cuando el proyecto lo permite; (4) una paleta de uno o dos colores\nneutros —idealmente variantes suaves de blanco y negro— más, como máximo, un\ncolor de acento; y (5) una aplicación transversal a logos, packaging, sitios\nweb, redes sociales y UX, que explica su vigencia porque no depende de\ntendencias sino de principios estables de claridad, equilibrio y función. El\nvideo no demuestra ningún software en uso ni un proceso de diseño en vivo:\ntodo lo visual son ejemplos terminados usados como referencia. Contiene\npromoción activa de una suscripción Kittl Pro, plantillas propias y una\nlista de libros recomendados, que este documento mantiene deliberadamente\nseparada del método de diseño en sí.",
+      "token_count": 6868
+    },
+    {
+      "citation_id": "S55",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "tbf6XDqCWFE",
+      "video_title": "BRUTALISM: Best Website Examples for Your Web Design Inspiration |  TemplateMonster",
+      "creator": "TemplateMonster",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Dado que no hay explicación verbal, el \"método\" reconstruido aquí combina dos\ncapas que se mantienen separadas explícitamente: (1) los rasgos de diseño\n**visualmente confirmados** en cada uno de los doce sitios mostrados, y (2) la\nsíntesis de **por qué esos rasgos se consideran brutalistas**, que es una\nextensión profesional apoyada en la evidencia visual, no una cita del canal.",
+      "token_count": 96
+    },
+    {
+      "citation_id": "S56",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "qthkkHPNAYQ",
+      "video_title": "You Should Try These 5 Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Interactive 3D"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "01:03",
+      "visual_evidence": [
+        "sequence-three-d-000080000ms-00.png shows the Spline site.",
+        "sequence-three-d-000080000ms-04.png shows a touch interaction with a 3D product."
+      ],
+      "content": "Interactive 3D\n\nPrinciple: Use 3D when depth, material, variants, or direct manipulation explain a product better than a flat image.\n\nProblem: Prevents ornamental 3D from adding cost without improving understanding.\n\nSource basis: The presenter names Spline and says elements can be exported as iframe or script around 01:03.\n\nProfessional extension: Fallbacks, accessibility, and third-party security checks are added safeguards.",
+      "token_count": 108
+    },
+    {
+      "citation_id": "S57",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "qthkkHPNAYQ",
+      "video_title": "You Should Try These 5 Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "5 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S58",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "OjaciP_fBwU",
+      "video_title": "30 Graphic Design Styles in 15 Minutes",
+      "creator": "Maria Tokar",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Bloque 2 — Estilos contemporáneos (llevan años en circulación)"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Bloque 2 — Estilos contemporáneos (llevan años en circulación)",
+      "token_count": 16
+    },
+    {
+      "citation_id": "S59",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "OjaciP_fBwU",
+      "video_title": "30 Graphic Design Styles in 15 Minutes",
+      "creator": "Maria Tokar",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "A continuación se documenta cada uno de los 30 estilos exactamente como los\npresenta la fuente, agrupados en los tres bloques que la propia creadora\nanuncia. Para cada estilo: origen, rasgos visuales, y vigencia actual.",
+      "token_count": 55
+    },
+    {
+      "citation_id": "S60",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Afrofuturism"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": null,
+      "visual_evidence": [
+        "supplemental-375s.png shows the AFROFUTURISM label over a turquoise-and-gold book cover portrait, a neon-typography poster, and a circular pink portrait design.",
+        "supplemental-385s.png confirms the on-screen search-terms slide (afrofuturism / afrofuturism art / afrofuturism editorial / afrofuturism poster)."
+      ],
+      "content": "Afrofuturism\n\nPrinciple: Blends African art and culture with futuristic sci-fi and cosmic themes: bold patterns, symbolic imagery, celestial elements, powerful portraiture.\n\nProblem: Names a viewer-requested, visually rich, narrative-heavy style for posters, book/album covers, fashion, and editorial design.\n\nSource basis: The source names the style, notes it was viewer-requested, describes its visual traits, and gives use cases.\n\nProfessional extension: Recommendation to research cultural context before superficial application.",
+      "token_count": 134
+    },
+    {
+      "citation_id": "S61",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "20 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S62",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Trend 7: Scrollytelling"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "11:11",
+      "visual_evidence": [
+        "frame-65pct.png shows an editorial panel with a trend-prediction headline, a photo, and a sidebar of content thumbnails, consistent with a scroll-driven editorial format."
+      ],
+      "content": "Trend 7: Scrollytelling\n\nPrinciple: Content and imagery are revealed progressively as the user scrolls, tying narrative pacing to the scroll gesture, often within a visually fixed section.\n\nProblem: Extends marketing storytelling principles into an interactive, scroll-driven format for editorial or narrative content.\n\nSource basis: The source states at 11:11-11:46: 'you're trying to tell a story as the user scrolls... it can be a really great and effective way to keep people engaged, if you do it right.'\n\nProfessional extension: The requirement for reduced-motion alternatives is a professional extension not discussed in the source.",
+      "token_count": 160
+    },
+    {
+      "citation_id": "S63",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "10 validated rule patterns.",
+      "token_count": 7
+    }
+  ],
+  "sources": [
+    {
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=PKfZ1gnVJ44"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=_DHiyzRN4gY"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "canonical_url": "https://www.youtube.com/watch?v=DU6vjWnH2p0"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "tbf6XDqCWFE",
+      "video_title": "BRUTALISM: Best Website Examples for Your Web Design Inspiration |  TemplateMonster",
+      "creator": "TemplateMonster",
+      "canonical_url": "https://www.youtube.com/watch?v=tbf6XDqCWFE"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "8ahnUt_A5eA",
+      "video_title": "Popular Web Design Trends",
+      "creator": "Codex Community",
+      "canonical_url": "https://www.youtube.com/watch?v=8ahnUt_A5eA"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=xpLUouSZHi8"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "canonical_url": "https://www.youtube.com/watch?v=25UwZDuHfiQ"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "canonical_url": "https://www.youtube.com/watch?v=AXpxZMRM1EY"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "uZWnxa4mkKA",
+      "video_title": "15 More Design Styles You've Never Heard Of",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=uZWnxa4mkKA"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "rFyOIWMwRdg",
+      "video_title": "2026 Web Design Trends You Need to Know",
+      "creator": "Sam Crawford | Web Design Expert",
+      "canonical_url": "https://www.youtube.com/watch?v=rFyOIWMwRdg"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "vwVg1sBShH8",
+      "video_title": "7 ESTILOS de Diseño Gráfico que No conocías",
+      "creator": "Crealondra",
+      "canonical_url": "https://www.youtube.com/watch?v=vwVg1sBShH8"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "canonical_url": "https://www.youtube.com/watch?v=waHuVF3XuMA"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "bT1tG_E8g-4",
+      "video_title": "🚨 Top 6 Design Trends 2026: Flat Design is DEAD",
+      "creator": "Grayson's Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=bT1tG_E8g-4"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "8Z_MEP-_kxA",
+      "video_title": "Web Design Trends 2026",
+      "creator": "DesignSense",
+      "canonical_url": "https://www.youtube.com/watch?v=8Z_MEP-_kxA"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "canonical_url": "https://www.youtube.com/watch?v=DRmnkaWQp4o"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "OjaciP_fBwU",
+      "video_title": "30 Graphic Design Styles in 15 Minutes",
+      "creator": "Maria Tokar",
+      "canonical_url": "https://www.youtube.com/watch?v=OjaciP_fBwU"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "Vs2oSkw4VHM",
+      "video_title": "8 advanced rules of minimal Web Design",
+      "creator": "BONT",
+      "canonical_url": "https://www.youtube.com/watch?v=Vs2oSkw4VHM"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "jqTC8sk__CQ",
+      "video_title": "The Future of Web Design: Trends in 2026",
+      "creator": "Design from Nick",
+      "canonical_url": "https://www.youtube.com/watch?v=jqTC8sk__CQ"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "0BTp6w5yhhw",
+      "video_title": "Brutalism Graphic Design: Why It’s Ugly, Bold, and Trending in 2025!",
+      "creator": "Spoon Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=0BTp6w5yhhw"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "meACC0ud-7o",
+      "video_title": "Web Design Trends 2026 (And How To Design In an Oversaturated Market)",
+      "creator": "Tilda",
+      "canonical_url": "https://www.youtube.com/watch?v=meACC0ud-7o"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "qthkkHPNAYQ",
+      "video_title": "You Should Try These 5 Web Design Trends",
+      "creator": "Codex Community",
+      "canonical_url": "https://www.youtube.com/watch?v=qthkkHPNAYQ"
+    }
+  ],
+  "coverage": {
+    "units_by_type": {
+      "context_section": 52,
+      "avoid_item": 1,
+      "rule_item": 2,
+      "context_document": 2,
+      "rule_pattern": 3,
+      "rules_section": 3
+    },
+    "units_by_source": {
+      "auto-design": 63
+    },
+    "omitted_for_budget": 23,
+    "budget_exhausted": true
+  },
+  "warnings": [],
+  "limitations": [
+    "The token budget was exhausted; 23 additional block(s) with real evidence were left out."
+  ]
+}

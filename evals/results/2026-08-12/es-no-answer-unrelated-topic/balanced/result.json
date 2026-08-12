@@ -1,0 +1,1167 @@
+{
+  "schema_version": "1.0",
+  "status": "ok",
+  "request": {
+    "query": "recetas de cocina vegana para principiantes",
+    "depth": "balanced",
+    "max_tokens": 32000,
+    "sources": []
+  },
+  "metrics": {
+    "candidates_considered": 50,
+    "units_selected": 55,
+    "sources_used": 25,
+    "estimated_tokens": 31944
+  },
+  "units": [
+    {
+      "citation_id": "S01",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–00:30",
+      "visual_evidence": [],
+      "content": "| Tiempo | Contenido |\n|---|---|\n| 00:00–00:30 | Introducción: qué se va a aprender (jerarquía visual, cinco reglas) y definición de jerarquía visual como orden de percepción, con el concepto de \"primacía\". |\n| 00:30–01:01 | Regla 1: la jerarquía está diseñada para guiar al espectador. Por qué se rankean elementos por primacía. |\n| 01:01–01:33 | Regla 2: la cantidad de elementos y su primacía están correlacionadas. Introducción de contraste, uniformidad y composición como los tres pilares. |\n| 01:33–02:05 | Explicación del contraste con el ejemplo de una cuadrícula de puntos idénticos (evidencia visual: `supplemental-108s.png`). Regla 3: no hay jerarquía sin contraste. |\n| 02:05–02:35 | Introducción a la lista de diez formas de crear contraste. Técnica 1: movimiento. |\n| 02:35–03:05 | Uso recomendado del movimiento: como impulso inicial, no como distracción sostenida. Técnica 2: información relacionada con la tarea del usuario. |\n| 03:05–03:35 | Ejemplo de la receta de cocina y el botón \"jump to recipe\" (evidencia: `frame-35pct.png`, receta de galletas). |\n| 03:35–04:07 | Técnica 3: puntos focales mediante espacio en blanco. Definición de \"white space\" (evidencia: `frame-20pct.png`). |\n| 04:07–04:38 | Técnica 4: rostros humanos. Por qué los rostros captan atención más rápido que casi cualquier otro elemento (evidencia: `supplemental-260s.png`, portada de revista). |\n| 04:38–05:09 | Advertencia sobre el uso irrelevante de rostros de stock; ejemplo de venta de clases de guitarra vs. venta de productos horneados. |\n| 05:09–05:40 | Técnica 5: color. Introducción a mover valores de color en la rueda cromática para generar distancia. |",
+      "token_count": 500
+    },
+    {
+      "citation_id": "S02",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "bdC2BtJNt9s",
+      "video_title": "The Art of Minimalism",
+      "creator": "Seth Curl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso 4 — Convertir la auditoría en hábito diario mediante microacciones"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "02:45–04:18",
+      "visual_evidence": [],
+      "content": "El video enumera, de forma casi literal, una lista de microacciones diarias\nque sostienen el hábito de minimalismo una vez hecha la auditoría inicial\n(02:45–04:18). Se preserva la lista completa porque el creador la presenta\ncomo una enumeración exhaustiva de ejemplos aplicables:\n\n1. Cerrar aplicaciones abiertas en el teléfono.\n2. Cerrar pestañas del navegador que no se están usando.\n3. Borrar archivos que ya no se necesitan, con frecuencia.\n4. Limpiar las superficies de la cocina inmediatamente después de usarlas.\n5. Sacar uno o dos objetos del auto cada vez que se sale de él.\n6. Anotar una compra en el momento para mantener el control del presupuesto\n   (10 segundos).\n7. Poner eventos importantes en el calendario cada semana.\n8. Crear un recordatorio en el teléfono en el instante en que se piensa algo.\n9. Usar \"leer todo\" en el correo o, mejor aún, darse de baja de correos que\n   no se necesitan.\n10. Quitar una canción de una lista de reproducción si ya no gusta.\n11. Agregar una canción a una lista de reproducción si sí gusta.\n12. Vender una prenda que no se ha usado en dos años.\n13. Cancelar notificaciones de texto de tiendas que ya no se frecuentan.\n14. Tirar cualquier basura o trasto en el momento en que se ve, en cualquier\n    parte de la casa.\n\nEl creador aclara el mecanismo por el cual estas microacciones funcionan:\n\"Lo que parece mucho trabajo para empezar todos estos hábitos... en realidad\nestá agregando menos para mañana, e incluso menos para el día siguiente, e\nincluso menos para el día después de eso.\" (03:47–04:18) Es decir, el costo\nde instaurar el hábito es alto al principio y decreciente después, porque\ncada microacción evita la acumulación de una tarea mayor futura.",
+      "token_count": 400
+    },
+    {
+      "citation_id": "S03",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio 4: diez formas de crear contraste, ordenadas de mayor a menor poder"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "El video reconoce que existen \"un millón\" de formas distintas de crear contraste, pero elige explicar las diez que considera más importantes, ordenadas de la que genera más contraste a la que genera menos. Es una lista explícitamente numerada y completa dentro del video; a continuación se reconstruye cada elemento sin omitir ninguno.\n\n1. **Movimiento.** El ojo humano —y por extensión la mente humana— está programado para detectar movimiento, un mecanismo evolutivo de detección de amenazas. Estudios de escaneo cerebral citados en el video muestran que un elemento en movimiento es el primero en notarse. Sin embargo, el propio video advierte que \"menos es más\": si un elemento consume demasiada atención o se percibe como irrelevante o exagerado, frustra al usuario. La recomendación operativa es usar el movimiento para atraer la mirada inicialmente, y luego reducirlo al mínimo o detenerlo una vez que el usuario ya está mirando.\n\n2. **Información relacionada con la tarea del usuario.** Después del movimiento, lo segundo que el ojo busca es lo conocido, es decir, lo que el usuario ya está buscando activamente. El video da el ejemplo de las recetas de cocina online: los usuarios ignoran automáticamente la imagen del blog, el título y la historia personal del autor, y van directo al botón \"jump to recipe\" (evidencia visual: `frame-35pct.png` muestra efectivamente una receta de galletas con chips de chocolate con texto extenso, ejemplificando ese tipo de página). La implicación para el diseñador es alinear lo que es prominente en el diseño con lo que el visitante realmente busca: en un póster de evento, los detalles del evento deben ser claros; en una página de ventas, el botón de compra y el precio deben ser obvios.",
+      "token_count": 405
+    },
+    {
+      "citation_id": "S04",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 2 — Recolectar todos los activos en Figma (paso 1 del proceso)"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "04:44",
+      "visual_evidence": [],
+      "content": "El primer paso operativo del proceso mostrado es reunir, dentro de un único\narchivo de Figma, todos los elementos que se van a usar: imágenes (obtenidas\ninspeccionando el sitio original para extraer logo, imagen de héroe, fotos de\nproducto), y todos los bloques de texto relevantes del sitio de referencia.\n\n> \"Basically, the first step I do is I grab all of the assets and put them in\n> Figma.\" (04:44)\n\nTraducción: \"Básicamente, el primer paso que hago es tomar todos los activos\ny ponerlos en Figma.\" (04:44)\n\n`frame-20pct.png` y `supplemental-320s.png` muestran el archivo de Figma con\nel sitio original \"The Rider\" (una torre residencial de lujo en Miami) junto\na un panel de propiedades de Figma abierto, confirmando visualmente que el\nsitio de referencia se importó como imagen/objeto dentro del lienzo de\ndiseño.\n\n**Regla operativa:** no empezar a maquetar sin haber centralizado antes todos\nlos \"ingredientes\" (textos, imágenes, logo) en el mismo espacio de trabajo.\nEl video usa explícitamente la metáfora de una receta de cocina: \"This is\nlike grabbing all the ingredients so that you can make the recipe\" (05:16).",
+      "token_count": 295
+    },
+    {
+      "citation_id": "S05",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. **Definir la jerarquía deseada.** Antes de tocar cualquier valor visual, listar mentalmente (o en un documento) qué elemento debe notarse primero, cuál segundo, cuál tercero, etc., en función de lo que el usuario realmente necesita para completar su tarea, no en función de qué contenido \"parece\" más importante en abstracto.\n2. **Aplicar contraste solo al elemento o los pocos elementos que deben tener primacía**, eligiendo entre las diez técnicas descritas (movimiento, información relacionada con la tarea, puntos focales por espacio en blanco, rostros, color, tamaño, peso, imágenes, elementos extra, desalineación), priorizando las de mayor impacto (movimiento, información relevante para la tarea) cuando el objetivo sea captar atención inmediata, y las de impacto más sutil (peso, elementos extra) cuando se busque guiar sin saturar.\n3. **Aplicar uniformidad a todos los elementos que no deban competir por primacía**, igualando explícitamente tamaño, fuente, peso, color de borde, radio de esquina y otros valores repetibles dentro de cada grupo de elementos del mismo tipo (por ejemplo, todas las tarjetas de un mismo bloque).\n4. **Agrupar elementos similares** para reforzar la cohesión visual y facilitar el escaneo.\n5. **Elegir un patrón de composición según el medio y la audiencia**: arriba-abajo para cartas o audiencias con ese hábito de lectura; izquierda-derecha simple; patrón en Z para diseños minimalistas, pósteres o pantallas con poco texto; patrón en F para páginas web con abundante texto.\n6. **Verificar el contraste de color con una herramienta de accesibilidad** (el video cita específicamente la calculadora de WebAIM) y apuntar a un ratio de al menos 4.5:1 quirúrgicamente cuando el objetivo sea legibilidad de texto o distinción de un elemento sobre el fondo.\n7. **Aplicar moderación en el uso de rostros e imágenes**: usarlos solo cuando estén directamente relacionados con lo que el diseño promociona, evitando fotografías de stock genéricas que puedan robar atención sin aportar al mensaje.",
+      "token_count": 470
+    },
+    {
+      "citation_id": "S06",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 3: Catálogo de tipos de sistemas de grilla"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- **Regla de tercios.** Divide el diseño en nueve partes iguales mediante dos líneas horizontales y dos verticales, útil para ubicar elementos clave de forma natural; se puede romper deliberadamente colocando el sujeto principal ligeramente fuera de la grilla para generar tensión o sorpresa.\n- **Grilla compuesta (compound grid).** Combina, por ejemplo, una grilla de columnas para listados de producto con una grilla modular para los detalles del producto, manteniendo espacio de respiro entre elementos.\n- **Grilla isométrica.** Aporta un efecto 3D a ilustraciones o infografías (edificios, estructuras de datos); se recomienda usar sombras y colores más claros arriba y más oscuros debajo para reforzar la sensación de volumen.\n- **Grilla circular.** Útil para logotipos con formas orgánicas y redondeadas, ayuda tanto al posicionamiento como a generar formas interesantes en los espacios entre elementos.\n- **Grilla triangular.** Sirve para crear patrones geométricos o posicionar elementos (logo, detalles de producto) en puntos de interés específicos, por ejemplo en el empaque de un producto; puede combinarse con gradientes o acabados metálicos a lo largo de los ángulos.",
+      "token_count": 280
+    },
+    {
+      "citation_id": "S07",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. **Diseñar primero la versión de escritorio** completa del sitio,\nmaximizando riqueza de interacción, animaciones y jerarquía tipográfica\n(Principio 2).\n2. **Definir el objetivo de conversión** de la página antes de defender\ncualquier decisión estética: identificar qué acción debe realizar el\nusuario y verificar que la composición la señale (Principio 1).\n3. **Elegir como máximo dos o tres tamaños de referencia** (Full HD para\nescritorio, opcionalmente un tamaño de laptop, y un tamaño de teléfono\npequeño como referencia mobile), evitando diseñar para diez breakpoints\ndistintos salvo proyectos de presupuesto alto y alta escala (Principio 4).\n4. **Traducir el diseño de escritorio a mobile aplicando las seis reglas**:\nocultar navegación, permitir resumir/empujar contenido, invertir\norientación horizontal/vertical, empujar botones hacia abajo para\naccesibilidad táctil, reducir solo los títulos manteniendo el cuerpo en\n16px, y usar una grilla de 6 columnas para preservar proporciones\nasimétricas (Principio 8).\n5. **Revisar tamaños de texto y espaciados** de forma iterativa: no asumir\nque los valores de escritorio son correctos para mobile; en particular,\nvalidar que el cuerpo de texto use 16px como mínimo (Principio 5).\n6. **Diseñar componentes interactivos** (como carruseles) pensando\nexplícitamente en el área táctil, reutilizando bordes de alineación de\nforma consistente y ofreciendo variantes visuales para evitar monotonía\n(Principio 7).\n7. **Preparar el archivo de handoff** con sistema tipográfico, sistema de\ncolor documentado por uso, grilla rehecha en rectángulos con márgenes y\ngutters explícitos, kit de botones/UI y notas de comportamiento simples;\nevitar sobre-especificar cada breakpoint (Principio 9).\n8. **Seleccionar un desarrollador de nivel comparable** al del diseñador, o\ndelegar solo cuando exista una relación de confianza mutua (Principio\n10).\n9. **Ajustar en conjunto con el desarrollador** los puntos de quiebre reales\nuna vez codificado el sitio, en vez de intentar anticipar cada breakpoint\nen el diseño (Principio 3).",
+      "token_count": 500
+    },
+    {
+      "citation_id": "S08",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "11. **Evaluar la tendencia 9 (anti-usabilidad)** de forma muy restringida:\nsolo para marcas explícitamente experimentales o de alto diseño, nunca\npara sitios transaccionales, de e-commerce críticos, gubernamentales o de\nservicios esenciales, dado que introduce fricción deliberada.\n12. **Separar siempre la recomendación de diseño de la promoción de Showit**:\nel hecho de que el video sea contenido patrocinado por Showit para\npromover su constructor no invalida el análisis de tendencias, pero no\ndebe presentarse como si Showit fuera la única vía técnica para\nimplementarlas.\n13. **Citar la evidencia visual por su nombre de archivo exacto** cuando se\nreutilice este dossier en otro documento, para mantener la trazabilidad.",
+      "token_count": 167
+    },
+    {
+      "citation_id": "S09",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "8. **Ajustar el tracking (letter-spacing) de forma inversamente proporcional al tamaño**: reducir el espaciado en textos grandes; aumentarlo levemente en textos pequeños para preservar la distinción entre caracteres.\n9. **Verificar el contraste de color de cada combinación de texto y fondo** usando una calculadora de contraste dedicada (el video menciona webaim.org), confirmando una relación mínima de 7 a 1 antes de aprobar el diseño.\n10. **Definir un sistema de rejilla coherente** con el medio de salida: 12 columnas para web, 2 columnas para impresos generales, 6 columnas para formatos tipo periódico, 3 columnas para formatos tipo revista, o razón áurea para pósters, y mantener esa elección de forma consistente en todo el proyecto.\n11. **Separar cualquier ajuste de kerning manual** (espaciado entre pares de letras específicos, típicamente en logotipos) del resto del flujo de trabajo tipográfico general, reservándolo para piezas de marca de alto impacto donde se justifique la inversión de tiempo.\n12. **Documentar el sistema resultante** (familia tipográfica, escala de tamaños, pesos, interlineados, tracking, rejilla) como un artefacto reutilizable del proyecto, de forma que futuras piezas de comunicación puedan ensamblarse \"como piezas de Lego\" sin rehacer estas decisiones desde cero.",
+      "token_count": 314
+    },
+    {
+      "citation_id": "S10",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "bT1tG_E8g-4",
+      "video_title": "🚨 Top 6 Design Trends 2026: Flat Design is DEAD",
+      "creator": "Grayson's Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. Formular el problema del producto y la acción principal antes de hablar de tendencias.\n2. Elegir una hipótesis: profundidad/transparencia, materialidad, 3D, gradiente, futurismo o personalización.\n3. Escribir qué señal funcional debe aportar esa hipótesis y qué no debe sacrificar.\n4. Crear dos rutas visuales: una base sobria y una ruta con el efecto; comparar comprensión, contraste, foco y rendimiento.\n5. Prototipar estados estáticos y, si corresponde, movimiento reducido. No inferir interacción de una captura.\n6. Validar con personas reales, teclado, lector de pantalla, pantallas pequeñas y conexiones limitadas.\n7. Revisar licencias, marcas, datos personales, consentimiento y promesas temporales antes de publicar.\n8. Documentar tokens, variantes y criterios de reversión para que la personalización no fracture el sistema.",
+      "token_count": 197
+    },
+    {
+      "citation_id": "S11",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "nlGr4GRIzAg",
+      "video_title": "The REAL 2026 Color Theory Knowledge Designers Need To Know!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Secuencia ejecutable para que un agente aplique este método a un proyecto\nreal de diseño o branding:\n\n1. **Diagnosticar la capa funcional primero.** Antes de discutir estética,\n   verificar que cualquier color usado para señalizar estado, acción o\n   navegación cumpla su función de forma inequívoca (principio 2).\n2. **Mapear la capa emocional deseada.** Definir en 2-3 palabras la\n   sensación que debe transmitir la paleta (energética, calmada, lúdica,\n   seria) y usarla como guía, no como regla rígida (principio 3).\n3. **Verificar la capa cultural para cada mercado objetivo.** Si el\n   proyecto tiene audiencia internacional o multicultural, listar\n   explícitamente las asociaciones de color relevantes por región antes de\n   fijar la paleta (principio 4).\n4. **Auditar la capa competitiva.** Identificar los colores dominantes en la\n   categoría o industria del proyecto y decidir conscientemente si la\n   estrategia es integrarse o diferenciarse (principio 5).\n5. **Formular la capa estratégica como pregunta explícita.** Para el color\n   principal elegido, responder por escrito: ¿qué debe lograr este color:\n   atención, confianza, diferenciación? (principio 6).\n6. **Asignar los cuatro roles del sistema práctico.** Elegir un color\n   primario (identidad), uno o más secundarios (apoyo y variación), un\n   acento (llamada a la acción y jerarquía) y neutros (estructura y\n   legibilidad) (principio 7).\n7. **Excluir contenido patrocinado del análisis de color.** Si se reutiliza\n   este video como referencia, extraer el segmento de Superhuman Mail del\n   cuerpo de reglas de color; tratarlo solo como nota de procedencia\n   (principio 8).\n8. **Aplicar los criterios de aceptación** (ver sección siguiente) antes de\n   dar por cerrada cualquier decisión de paleta.\n9. **Documentar qué fue evidencia directa y qué fue extensión\n   profesional** al presentar el resultado a un humano, siguiendo el\n   límite de evidencia declarado en este documento.",
+      "token_count": 437
+    },
+    {
+      "citation_id": "S12",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Este documento describe, sin necesidad de ver el video original, el contenido completo del video de YouTube con ID `kK1TOpI948o`, titulado \"The Beginner's Guide To Visual Hierarchy\" (\"La guía para principiantes sobre jerarquía visual\"), publicado por el canal DesignSpo. El video dura 928 segundos (15 minutos y 28 segundos) y fue subido el 22 de abril de 2026. Todo el audio está en inglés; no se detectaron fragmentos materiales en otros idiomas. El documento fue construido a partir de la pista de subtítulos automáticos original (`en-orig`), un video descargado en baja resolución, veinte fotogramas muestreados uniformemente entre el 0% y el 95% de la duración, y siete fotogramas suplementarios extraídos en instantes puntuales identificados como material relevante durante la inspección visual.",
+      "token_count": 197
+    },
+    {
+      "citation_id": "S13",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "qthkkHPNAYQ",
+      "video_title": "You Should Try These 5 Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Resumen compacto"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "El video presenta cinco recursos, no cinco recetas obligatorias. Ilustración manual aporta humanidad; 3D comunica objeto y profundidad; IA abre exploración pero no sustituye implementación; Bento ordena información para escaneo; gradientes y glows construyen atmósfera. La evidencia visual inspeccionada confirma los ejemplos y sus transiciones, mientras que las garantías de facilidad, rendimiento o impacto permanecen fuera del alcance de la fuente. Un agente debe elegir el recurso que resuelva una necesidad concreta, implementarlo con accesibilidad y fallbacks, y mantener una frontera clara entre lo que el video muestra y lo que requiere validación profesional.",
+      "token_count": 147
+    },
+    {
+      "citation_id": "S14",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "u-JtFKXL_jY",
+      "video_title": "4 Graphic Design Tips For ELITE Design Thinkers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Antipatrones"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Diseñar una pieza aislada usando solo referencias de Pinterest o inspiración genérica, sin analizar el estado de saturación visual del nicho específico del cliente.\n- Copiar las convenciones visuales dominantes de un nicho sin una decisión consciente, resultando en un diseño \"invisible\" por indistinguible del resto.\n- Describir el propio trabajo de forma casual o cronológica en un portafolio o propuesta, sin contexto estratégico, restricción ni resultado.\n- Redactar propuestas o correos vagos, reactivos o poco estructurados, generando incertidumbre en el cliente.\n- Entregar una pieza para redes sociales sin probarla nunca a tamaño miniatura, asumiendo que si se ve bien a tamaño completo funcionará igual en un feed de scroll rápido.\n- Sobrecargar una pieza de consumo rápido con múltiples elementos compitiendo por la atención (varios logos, texturas, formas decorativas y titulares al mismo nivel de énfasis).\n- Diseñar cada pieza de una secuencia (carrusel, campaña) con la misma estructura, grilla y jerarquía, cambiando solo texto e imágenes, sin planificar una progresión de tensión y resolución.\n- Presentar una demostración de interfaz de una herramienta patrocinada como si fuera parte del método estratégico central, mezclando promoción con contenido educativo.\n- Tratar afirmaciones no verificadas del presentador (como \"duplicar tu valor\" o cifras exactas de \"2 segundos\" de atención) como hechos comprobados al aplicarlas en informes a clientes.",
+      "token_count": 335
+    },
+    {
+      "citation_id": "S15",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "bdC2BtJNt9s",
+      "video_title": "The Art of Minimalism",
+      "creator": "Seth Curl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Secuencia ejecutable que otro agente puede seguir para aplicar o explicar el\nmétodo completo, en orden:\n\n1. Adoptar la definición estricta de minimalismo (paso 1) antes de dar\n   cualquier consejo, para evitar confundirlo con simple organización.\n2. Explicar la diferencia entre organización y minimalismo (paso 2) cuando el\n   usuario mezcle ambos conceptos.\n3. Guiar una auditoría inicial de posesiones y espacios físicos y digitales,\n   pidiendo al usuario que liste por escrito qué necesita realmente (paso 3).\n4. Traducir la auditoría en una lista concreta de microacciones diarias\n   (paso 4), priorizando acciones de bajo costo y alta frecuencia (cerrar\n   apps, borrar archivos, ordenar mientras se usa un espacio) sobre grandes\n   purgas puntuales.\n5. Incluir siempre una verificación de propósito (paso 5): antes de recomendar\n   más tareas de orden, preguntar por qué se están haciendo y hacia qué\n   objetivo intencional apuntan, para evitar que el minimalismo se vuelva\n   compulsivo.\n6. Sugerir una práctica de inicio de día lento y deliberado (paso 6) como\n   ancla diaria, adaptable (diario, meditación, silencio, oración) según las\n   preferencias del usuario.\n7. Conectar explícitamente cada acción con el objetivo de reducir\n   distracciones (paso 7), no solo reducir objetos.\n8. Si el usuario busca beneficios creativos o de productividad, presentar el\n   testimonio del creador (paso 8) como experiencia personal declarada, no\n   como garantía de resultado.\n9. Cerrar cualquier plan de minimalismo señalando el beneficio relacional\n   (paso 9): más tiempo de calidad con las personas, como motivación de alto\n   nivel, no solo eficiencia personal.\n10. Separar siempre, en cualquier resumen generado, las promociones del\n    creador (equipo de cámara, servicios de música, marcas) de las\n    recomendaciones del método.",
+      "token_count": 401
+    },
+    {
+      "citation_id": "S16",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "bdC2BtJNt9s",
+      "video_title": "The Art of Minimalism",
+      "creator": "Seth Curl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Propósito"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Este documento convierte el video de YouTube \"The Art of Minimalism\" (ID\n`bdC2BtJNt9s`), publicado por el creador de cine y contenido personal Seth Curl,\nen un paquete de conocimiento autosuficiente. El objetivo es que otro agente\npueda entender, explicar y aplicar el método de minimalismo personal que\npresenta el video sin necesidad de verlo, escucharlo ni consultar la fuente\noriginal. El video es un monólogo directo a cámara —no un tutorial técnico ni\nuna demostración de software— en el que el creador expone su filosofía y\nrutina personal de minimalismo, ilustrada con metraje casero (su cocina, su\noficina, su auto, una libreta de \"cosas por hacer\") y tarjetas de título\neditadas (\"CHAPTER 2: THE WHY\", \"less\").",
+      "token_count": 176
+    },
+    {
+      "citation_id": "S17",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "bdC2BtJNt9s",
+      "video_title": "The Art of Minimalism",
+      "creator": "Seth Curl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- No confundir minimalismo con organización doméstica; son conceptos\n  relacionados pero distintos según la fuente.\n- No presentar las microacciones diarias como opcionales aisladas: el video\n  las presenta como un conjunto que sostiene el hábito, no como una lista de\n  la que basta elegir una.\n- No recomendar purgas masivas puntuales como sustituto de la práctica diaria\n  continua; la fuente enfatiza explícitamente la constancia sobre el\n  esfuerzo puntual.\n- Incluir siempre la verificación de propósito (paso 5) al recomendar tareas\n  de organización repetidas, para prevenir que el hábito se vuelva\n  compulsivo o controlador, tal como advierte el propio creador.\n- No presentar los enlaces de afiliados, descuentos o promociones de la\n  descripción del video como parte del método de minimalismo.\n- No citar ningún fotograma como prueba de un resultado medible (por ejemplo,\n  \"más rápido como editor\"); los fotogramas confirman solo lo que aparece en\n  pantalla, no métricas de desempeño.\n- Mantener las citas traducidas siempre con su marca de tiempo original para\n  que sean verificables contra `transcript/source.txt`.\n\n**Extensión profesional (salvaguardas añadidas por este dossier, no\ndeclaradas por el video):**",
+      "token_count": 280
+    },
+    {
+      "citation_id": "S18",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- No agregar sombras, degradados, texturas 3D, bordes decorativos ni\n  patrones como solución por defecto a un problema de composición; primero\n  intentar resolverlo con tipografía, color, grilla, imágenes o espacio en\n  blanco.\n- Limitar la paleta a un máximo de dos colores de acento más neutros (fondo\n  claro, negro/oscuro con distintas opacidades).\n- Limitar la tipografía a una o dos familias.\n- Usar una escala de espaciado cerrada y no valores arbitrarios.\n- Alinear cada elemento tanto vertical como horizontalmente contra los\n  elementos vecinos, no solo contra la grilla base.\n- Declarar el objetivo del sitio antes de diseñar el layout y usarlo para\n  priorizar visualmente el contenido relacionado con ese objetivo.\n- No presentar contenido promocional (cursos, mentorías) como parte de los\n  pasos técnicos del método.\n- No afirmar que el rediseño mostrado está en producción: es un ejercicio de\n  portafolio/tutorial sobre un caso real, no una entrega confirmada al\n  cliente.\n- Tratar el tiempo de producción declarado (\"1 h 30 min\") como una\n  afirmación no verificada del creador, útil como referencia orientativa,\n  no como benchmark validado.",
+      "token_count": 267
+    },
+    {
+      "citation_id": "S19",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Propósito"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Este documento convierte el video de YouTube \"The ULTIMATE Guide To Typography For Beginners\" (ID de YouTube: AXpxZMRM1EY), publicado por el canal DesignSpo, en un paquete de conocimiento autocontenido para que otro agente pueda trabajar sobre tipografía sin necesidad de ver, escuchar o consultar el video original. El video dura 810 segundos (13 minutos y 30 segundos) y está dirigido a principiantes en diseño: recorre qué es la tipografía, las familias de tipos de letra existentes, las variables que controlan la apariencia de un bloque de texto y cómo combinarlas en un sistema tipográfico coherente para un producto digital o impreso.\n\nLa fuente es en inglés hablado (`source_language: en`) y no se detectaron idiomas secundarios materiales: el narrador habla en inglés durante todo el metraje y las interfaces mostradas en pantalla (Figma, un editor de código, un sitio web llamado \"June\") también están en inglés. Este documento en español traduce el contenido íntegro del video, incluidas las citas textuales, que conservan su marca de tiempo para que puedan verificarse contra `transcript/source.txt`.\n\nEl objetivo de este dossier es que un agente de diseño, desarrollo de producto o generación de interfaces pueda: (1) explicar con precisión las categorías de tipos de letra y cuándo usar cada una; (2) aplicar correctamente las variables tipográficas (tamaño, peso, línea base, interlineado, tracking, kerning, contraste); (3) construir una jerarquía tipográfica y un sistema de rejilla coherente; y (4) hacerlo citando el origen exacto de cada afirmación, distinguiendo lo que el video demuestra de lo que este dossier añade como extensión profesional.",
+      "token_count": 379
+    },
+    {
+      "citation_id": "S20",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "8XWX5EIxBz8",
+      "video_title": "BRUTALIST WEB DESIGNS - The UGLIEST Design Trend of 2020 | TemplateMonster",
+      "creator": "TemplateMonster",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Rúbrica de evaluación",
+        "Extensiones profesionales (salvaguardas no atribuidas al video)"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Estas recomendaciones no provienen del video; se agregan como buena práctica\nprofesional al proponer o implementar brutalismo web.\n\n- **Accesibilidad**: verificar contraste de color suficiente incluso en\n  paletas \"ácidas\" o de alto contraste, asegurar navegación completa por\n  teclado, proporcionar texto alternativo en imágenes decorativas\n  superpuestas, y probar con lectores de pantalla, ya que las jerarquías\n  visuales \"rotas\" pueden producir un orden de lectura confuso para\n  tecnología asistiva.\n- **Comportamiento responsivo**: los elementos superpuestos y las\n  cuadrículas asimétricas requieren pruebas explícitas en pantallas\n  pequeñas; lo que en escritorio se ve como \"caos intencional\" puede volverse\n  ilegible o solaparse de forma no controlada en móvil.\n- **Movimiento reducido**: si se añaden animaciones o cursores personalizados\n  grandes (mencionados en la fuente como rasgo típico), respetar la\n  preferencia `prefers-reduced-motion` del sistema operativo del usuario.\n- **Rendimiento**: tipografías grandes personalizadas, imágenes de alta\n  resolución superpuestas y efectos visuales pesados deben optimizarse para\n  no penalizar el tiempo de carga, especialmente en conexiones móviles.\n- **Claridad de contenido**: en cualquier variante comercial, mantener\n  legibles y accesibles las acciones críticas (compra, contacto, navegación\n  principal) aunque el resto del layout sea deliberadamente caótico.\n- **Licencias y atribución**: si se reutiliza cualquier plantilla comercial\n  (como las mostradas del catálogo de TemplateMonster) verificar los\n  términos de licencia antes de reutilizar código, tipografías o activos\n  visuales.\n- **Autenticidad de ejemplos**: al presentar capturas de sitios de terceros\n  como inspiración, evitar dar a entender que se tiene autorización para\n  copiarlos; el brutalismo como estilo es libre de imitar, pero los activos\n  concretos (imágenes, logotipos, código) de cada ejemplo no lo son.\n- **Vigencia temporal**: advertir siempre que los ejemplos mostrados\n  corresponden a una fecha de publicación de enero de 2020 y que los sitios\n  reales pueden haber cambiado o dejado de existir.",
+      "token_count": 487
+    },
+    {
+      "citation_id": "S21",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. Cuando un usuario describe una necesidad visual vaga (\"quiero algo como\n   esto pero no sé cómo se llama\"), consultar primero esta lista de veinte\n   nombres (más los de entregas anteriores de la serie, si están disponibles\n   como contexto) para ver si alguno coincide con la intención descrita.\n2. Verificar la coincidencia contra al menos tres rasgos observables del\n   estilo elegido (paleta, tipografía, composición, motivo temático), no\n   solo el nombre.\n3. Formular una consulta de búsqueda combinando el nombre del estilo con un\n   modificador de medio o intención: \"poster\", \"branding\", \"illustration\",\n   \"packaging\", según recomienda el propio video.\n4. Al presentar referencias al usuario, aclarar explícitamente que son\n   ejemplos de estilo, no activos con licencia verificada ni plantillas\n   listas para usar; el video no establece la procedencia legal de ninguna\n   pieza mostrada.\n5. Distinguir para el usuario entre estilos con raíz histórica documentada\n   (Chinoiserie, Regencycore, Diesel Punk, Rocket Punk) y estilos que son más\n   bien etiquetas de tendencia contemporánea o de subcultura (Cottagecore,\n   Kidcore, Trinket design, Anti-design), ya que el rigor de la referencia\n   histórica varía.\n6. Si el usuario pide un estilo con temática cultural sensible (por ejemplo,\n   Afrofuturism, o Chinoiserie, que reinterpreta motivos históricos chinos\n   desde una perspectiva occidental), recomendar investigar la procedencia\n   cultural del motivo y evitar apropiación superficial o estereotipada\n   (ver \"Reglas operativas\").\n7. No presentar ningún ejemplo visual citado en este documento como\n   \"disponible para usar\" o \"libre de derechos\": son evidencia de estilo, no\n   activos verificados.",
+      "token_count": 374
+    },
+    {
+      "citation_id": "S22",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. **Establecer primero la marca y el objetivo.** Antes de evaluar cualquier\n   tendencia, escribir en una línea qué hace el negocio y qué debe lograr el\n   sitio. Este paso es la regla explícita de la fuente y condiciona todo lo demás.\n2. **Elegir un eje, no nueve.** Las tendencias 1 y 2 son opuestas; las 3 y 6\n   tiran en direcciones distintas. Seleccionar como máximo dos tendencias\n   compatibles y descartar el resto conscientemente.\n3. **Definir el nivel de intensidad.** Para cada tendencia elegida, la fuente\n   recomienda sistemáticamente la dosis baja: una pizca de nostalgia, un acento\n   de color, unas pocas líneas técnicas, un sonido suave.\n4. **Construir la base sobria.** Tipografía (una familia si el eje es la\n   tendencia 1), escala de espaciado, paleta reducida con un solo acento.\n5. **Aplicar el acento de la tendencia** sobre esa base, no al revés. El\n   degradado, el cursor, la textura o la animación entran como capa, no como\n   fundamento.\n6. **Verificar contra el objetivo.** Preguntar por cada elemento agregado: ¿esto\n   comunica algo del sitio o solo demuestra que conozco la tendencia? Si es lo\n   segundo, quitarlo.\n7. **Extensión profesional — verificar accesibilidad.** Comprobar contraste de\n   texto sobre degradados y sobre bloques de color saturado, tamaño de área\n   clicable con cursores personalizados, y que ninguna información dependa solo\n   del color o solo del sonido.\n8. **Extensión profesional — verificar rendimiento.** Medir el peso y el tiempo de\n   carga que agregan las escenas WebGL en dispositivos de gama media y en\n   conexiones lentas antes de aprobarlas.\n9. **Extensión profesional — respetar preferencias del sistema.** Honrar\n   `prefers-reduced-motion` en animaciones y nunca reproducir audio sin acción\n   deliberada del usuario.\n10. **Extensión profesional — resolver licencias.** Verificar derechos de fuentes,\n    texturas, ilustraciones y assets 3D antes de publicar.\n11. **Documentar la decisión.** Registrar qué tendencias se adoptaron y por qué,\n    para que la revisión posterior evalúe encaje y no gusto.",
+      "token_count": 500
+    },
+    {
+      "citation_id": "S23",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "T96O8dTzi2Q",
+      "video_title": "NO MORE AI SLOP | Claude Design Full Tutorial",
+      "creator": "Sergei Chyrkov",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–00:32",
+      "visual_evidence": [],
+      "content": "| 07:11–07:46 | Aplicación del sistema de diseño recién creado sobre el proyecto original mediante el ícono \"+\" y un nuevo prompt de refinamiento (hero a pantalla completa, animaciones de parallax con ingredientes). |\n| 07:46–08:23 | El creador menciona haber alcanzado el límite de uso de la herramienta en ese punto de la grabación, e inserta una mención promocional a sus sesiones de mentoría y boletín. |\n| 08:23–08:58 | Resultado tras aplicar el sistema de diseño: layout a pantalla completa, cursor personalizado, efecto parallax, sección de scroll horizontal sobre fondo color tomate. |\n| 08:58–09:32 | Incorporación de imágenes generadas con ChatGPT (personas) y reemplazo de la ilustración de pizza por una fotografía real. |\n| 09:32–10:04 | Resultado con las imágenes reales integradas: pizza más grande, animaciones de deslizamiento, calculadora funcional dentro del nuevo diseño. |\n| 10:04–10:38 | El creador valora el resultado como muy superior al genérico inicial y explica la opción de enviar el proyecto a Claude Code (agente local, sesión web o descarga como zip). |\n| 10:38–11:13 | Envío efectivo del prompt/diseño a Claude Code, creación de una carpeta local nueva y elección del modelo \"Sonnet 5\" para abaratar el consumo de tokens. |\n| 11:13–11:46 | Mientras Claude Code trabaja, el creador vuelve a Claude Design para generar un menú de producto reutilizando el mismo sistema de diseño, mediante la plantilla de documento. |\n| 11:46–12:17 | Configuración del menú mediante preguntas guiadas: una sola página, categorías (pizzas, bebidas, ensaladas), veinte ítems, sin fotos, solo estilos. |\n| 12:17–12:51 | Resultado del menú: coherente visualmente con el sitio web, generado en minutos. |\n| 12:51–13:27 | Generación de piezas para Instagram reutilizando el mismo sistema de diseño y una foto adjunta como referencia. |",
+      "token_count": 490
+    },
+    {
+      "citation_id": "S24",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "tbf6XDqCWFE",
+      "video_title": "BRUTALISM: Best Website Examples for Your Web Design Inspiration |  TemplateMonster",
+      "creator": "TemplateMonster",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–00:04",
+      "visual_evidence": [],
+      "content": "Los tiempos siguientes provienen de los capítulos oficiales de YouTube y de la\nlista de créditos de la descripción del video; ambos coinciden. Se listan como\nprocedencia, no como sustituto de la explicación del método (que se desarrolla\nen la sección siguiente).\n\n| Marca de tiempo | Sitio / estudio | URL (según descripción, marzo 2020) |\n|---|---|---|\n| 00:00–00:04 | Cortina de apertura sin título | — |\n| 00:04–00:20 | Radical Everything | radicaleverything.wolffolins.com |\n| 00:20–00:35 | Twenty Nine \\| New York City & Berlin | xxix.co |\n| 00:35–00:50 | QI Catalog (Qode Interactive) | qodeinteractive.com/catalog |\n| 00:50–01:06 | TIGHT Top 2018 | en-2018.tight.media |\n| 01:06–01:22 | De Vlieg | devlieg.eu |\n| 01:22–01:38 | Lazy Eyes | lazyeyes.cool |\n| 01:38–01:53 | Laurel Halo | laurelhalo.com |\n| 01:53–02:09 | Jack Wild | isjackwild.com |\n| 02:09–02:25 | Chrissie Abbott | chrissieabbott.com |\n| 02:25–02:38 | One & All Conference | oneandall.io/2 |\n| 02:38–02:45 | Zipeng Zhu Loves You | zz-is.it |\n| 02:45–03:05 | High Five | highfivebro.com |\n| (superpuesto, cierre) | Cortina de cierre con marca TemplateMonster | — |",
+      "token_count": 434
+    },
+    {
+      "citation_id": "S25",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. Identificar el objetivo de la composición: ¿qué debe ver el espectador primero, segundo y al final? Definir el punto de apalancamiento antes de diagramar cualquier otra cosa.\n2. Elegir el nivel de movimiento adecuado al mensaje: usar dirección literal solo si el mensaje es simple y urgente; para mensajes más sofisticados, apoyarse en jerarquía visual y flujos múltiples controlados.\n3. Seleccionar un sistema de grilla acorde al medio: columnas para contenido editorial extenso, modular para catálogos o e-commerce, asimétrica o de jerarquía cuando un elemento debe dominar, isométrica o triangular para piezas con volumen o empaques, circular para logotipos orgánicos.\n4. Aplicar la grilla de forma consistente y, si se desea generar impacto, romperla en un único punto de forma deliberada, nunca de manera accidental o generalizada.\n5. Revisar el espacio en blanco micro (entre líneas y elementos cercanos) y macro (entre bloques y secciones), ajustando subdivisiones de la grilla si el resultado se siente apretado o desordenado.\n6. Construir el ritmo interno agrupando elementos relacionados, manteniendo espaciado y alineación predecibles, y verificando que la mirada recorra el diseño en una secuencia lógica desde el punto de apalancamiento.\n7. Introducir fricción solo donde aporte énfasis (tipografía apretada, un recorte, un elemento perturbador), evitando que se acumule en zonas que deban ser de lectura fácil.\n8. Probar la transferibilidad: reducir el diseño a tamaño miniatura, cambiar el fondo claro/oscuro y proyectar el mismo sistema en al menos dos formatos distintos (por ejemplo impreso y digital) antes de darlo por finalizado.\n9. Documentar qué principios se aplicaron y por qué, de modo que el sistema de diseño pueda transferirse a otros miembros de un equipo sin perder coherencia.\n10. Aplicar las salvaguardas profesionales de la sección siguiente antes de presentar el trabajo como definitivo.",
+      "token_count": 444
+    },
+    {
+      "citation_id": "S26",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Antipatrones"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Aplicar varias tendencias simultáneamente porque todas están en la lista.\n- Tomar la tendencia 1 y la 2 a la vez sin resolver cuál domina.\n- Usar la etiqueta \"wabi-sabi\" para justificar un diseño simplemente descuidado.\n- Poner líneas y etiquetas de plano técnico sobre un producto sin ninguna\n  dimensión técnica, solo para parecer sofisticado.\n- Agregar WebGL porque las herramientas lo permiten, sin relación con el mensaje\n  del sitio. La fuente lo desaconseja explícitamente.\n- Perseguir un sitio premiado cuando el cliente necesita un sitio que le sirva al\n  negocio.\n- Reproducir sonido automáticamente o sin control del usuario.\n- Cursores personalizados exagerados del tipo que el propio autor señala como el\n  error de la generación anterior.\n- Texto de bajo contraste sobre degradados púrpura-azul.\n- Presentar una captura de pantalla de un sitio de terceros como prueba de que la\n  tendencia produce resultados de negocio.\n- Copiar píxel a píxel cualquiera de los sitios exhibidos en el video.\n- Tratar las causas que el autor atribuye a cada tendencia como hechos\n  documentados en lugar de hipótesis.",
+      "token_count": 254
+    },
+    {
+      "citation_id": "S27",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "8Z_MEP-_kxA",
+      "video_title": "Web Design Trends 2026",
+      "creator": "DesignSense",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. Define usuario, tarea crítica, contenido indispensable, riesgo y métrica de comprensión.\n2. Elige una tendencia primaria y, como máximo, una secundaria compatible; redacta por qué ayuda a la tarea.\n3. Diseña la versión estática, jerarquía, navegación y CTA antes de efectos.\n4. Añade el recurso expresivo: automatización confirmable, arte, revelado progresivo, profundidad, textura, tipo, cinética o nostalgia.\n5. Implementa alternativas: HTML semántico, foco, teclado, contraste, texto alternativo, reducción de movimiento y fallback de fuentes/3D.\n6. Mide carga, interacción y comprensión en móviles y equipos modestos; elimina efectos que no aporten evidencia de valor.\n7. Verifica permiso, privacidad, licencias y autorización antes de personalizar, automatizar o reutilizar assets.",
+      "token_count": 183
+    },
+    {
+      "citation_id": "S28",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio 4: tipos de letra de display — diseñados para destacar, no para leer en párrafo"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "03:36",
+      "visual_evidence": [],
+      "content": "Cuando se busca un tipo de letra específicamente para logotipos, encabezados o títulos, se habla de un tipo de letra \"display\" (03:36). Los tipos display pueden ser serif, sans-serif, estar hechos de símbolos extraños o de cualquier otra forma; reciben su propia categoría porque están diseñados para ser únicos. El video es explícito en su limitación: \"they don't make good paragraphs, buttons or labels\" [no funcionan bien en párrafos, botones o etiquetas], pero si se busca que un fragmento corto de texto realmente destaque, un tipo display es la elección correcta (03:36).\n\n`frame-30pct.png` muestra el texto \"BE UNIQUE\" en un tipo de letra tipo estarcido (stencil) de gran impacto visual, evidencia visual directa de un tipo de letra display usado precisamente para destacar un mensaje corto, tal como describe el narrador.\n\n**Antipatrón explícito señalado por la fuente**: usar un tipo de letra display en párrafos largos, botones o etiquetas de interfaz, donde perjudica la legibilidad en lugar de ayudarla.",
+      "token_count": 253
+    },
+    {
+      "citation_id": "S29",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "vwVg1sBShH8",
+      "video_title": "7 ESTILOS de Diseño Gráfico que No conocías",
+      "creator": "Crealondra",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Un agente que reciba el encargo de **reconocer, clasificar o aplicar** uno de estos siete estilos de diseño gráfico puede seguir esta secuencia, basada en el método reconstruido de la fuente:",
+      "token_count": 48
+    },
+    {
+      "citation_id": "S30",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Priorizar función y claridad por sobre la decoración; cada elemento debe\n  justificar su presencia.\n- Usar una grilla como base de alineación, incluso en composiciones\n  asimétricas.\n- Limitar la paleta a uno o dos colores neutros más, como máximo, un acento.\n- Preferir variantes suaves de negro y blanco puros para evitar frialdad\n  excesiva en pantalla.\n- Dejar espacio en blanco intencional: no es \"espacio desperdiciado\", es\n  parte activa del diseño.\n- Elegir tipografía consciente del \"peso\" comunicativo que va a cargar,\n  dado que hay pocos otros elementos que aporten personalidad.\n- Adaptar el nivel de exigencia tipográfica y estructural al volumen de\n  texto (más texto, más disciplina estructural, como en el estilo\n  editorial).\n- Separar siempre la recomendación de recursos o productos (libros,\n  plantillas, suscripciones) del principio de diseño en sí.\n\n**Extensión profesional** (salvaguardas añadidas por este documento, no\ndeclaradas por el video):",
+      "token_count": 235
+    },
+    {
+      "citation_id": "S31",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Elegir la familia tipográfica en función del tono comunicativo requerido, no de preferencia estética aislada del contexto (Principio 1).\n- No usar tipos de letra display en párrafos, botones o etiquetas; reservarlos para fragmentos cortos de alto impacto como logotipos o títulos (Principio 4).\n- No confundir tipos script con tipos handwritten: los primeros imitan caligrafía elegante, los segundos imitan escritura a mano real y suelen ser más informales (Principio 5).\n- Reservar tipos monoespaciados para código o datos tabulares, nunca para texto de lectura general (Principio 6).\n- Usar unidades relativas (em/rem) en lugar de píxeles fijos para tipografía en proyectos digitales, configurando la variable raíz en CSS (Principio 7).\n- Ajustar peso, interlineado y tracking de forma inversamente proporcional al tamaño del texto: textos grandes más ajustados, textos pequeños más espaciados (Principios 8, 10, 11).\n- Verificar siempre el contraste de color entre texto y fondo contra un umbral mínimo (7:1 según el video) antes de finalizar un diseño (Principio 12).\n- Construir la jerarquía tipográfica de mayor a menor, definiendo primero el encabezado más grande y derivando los demás niveles de forma proporcional (Principio 13).\n- Dar a los botones mayor peso que el párrafo circundante, compensando con letter-spacing adicional, para señalar interactividad sin sacrificar legibilidad (Principio 13).\n- Elegir el número de columnas de la rejilla según el medio de salida (12 para web, 2 para impresos, 6 para periódicos, 3 para revistas, razón áurea para pósters) y mantenerlo consistente en todo el proyecto (Principio 14).\n- Tratar cualquier cifra estadística citada verbalmente en el video (por ejemplo, \"90 % de los sitios web\" o \"90 % de los productos de consumo\") como una afirmación no verificada del narrador, no como un dato validado por este dossier.\n- Tratar la atribución del rediseño del logo de Southern Living a Jessica Hische como una afirmación directa no verificada visualmente por este dossier.",
+      "token_count": 499
+    },
+    {
+      "citation_id": "S32",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "WxZHUe8mvhU",
+      "video_title": "11 Years of Brutally Honest Web Design Advice in 7 Minutes",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Un agente que reciba una tarea de diseño o revisión de un sitio web y quiera\naplicar el método completo de este video debería seguir esta secuencia:",
+      "token_count": 34
+    },
+    {
+      "citation_id": "S33",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. Reunir todos los activos del sitio o marca a rediseñar (imágenes, logo,\ntextos) en un único archivo de trabajo (Figma o equivalente).\n2. Leer y \"digerir\" todo el contenido textual: identificar qué frases o\ndatos merecen convertirse en elementos tipográficos destacados.\n3. Declarar explícitamente el objetivo principal del sitio (la acción que se\nquiere que el usuario realice) antes de diseñar cualquier layout.\n4. Reunir referencias visuales variadas, incluyendo al menos una fuera del\npropio medio (por ejemplo, un póster impreso si el proyecto es web), y\nevitar apoyarse en una sola referencia.\n5. Restringir el kit de diseño a cinco elementos: una o dos tipografías, uno\no dos colores de acento (más neutros), una grilla simple, imágenes dentro\nde contenedores definidos, y espacio en blanco.\n6. Seleccionar imágenes que combinen el producto/lugar en sí con personas\nusándolo, cuando el objetivo sea contar una historia de uso.\n7. Iterar el layout duplicando versiones antes de cambios grandes; si una\ncomposición se satura, reducir elementos en lugar de acomodarlos todos.\n8. Introducir profundidad visual con capas de imagen en primer y segundo\nplano cuando corresponda, manteniendo la paleta de color acotada definida\nen el paso 5.\n9. Si una sesión produjo un resultado demasiado cercano a una referencia\npuntual, retomar el trabajo sin esa referencia a la vista.\n10. Definir y aplicar consistentemente un sistema de espaciado en múltiplos\nfijos (por ejemplo 10/20/40/80/160 px) y una grilla de columnas con\nmárgenes fijos (por ejemplo 12 columnas, 40 px de margen).\n11. Verificar alineación cruzada (vertical y horizontal) de cada elemento\nnuevo contra los elementos ya posicionados, no solo contra la grilla.\n12. Cuando haya texto superpuesto a imágenes, evaluar modos de fusión (por\nejemplo \"diferencia\") en vez de overlays planos, para mantener contraste\nsin perder textura.\n13. Posicionar bloques compuestos como unidades, eligiendo entre proporción\nfija, alineación con otro elemento o distancia a un elemento estructural\nde referencia.\n14. Antes de entregar el diseño, revisar precisión al píxel en cada bloque",
+      "token_count": 498
+    },
+    {
+      "citation_id": "S34",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "8Z_MEP-_kxA",
+      "video_title": "Web Design Trends 2026",
+      "creator": "DesignSense",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Demostraciones y ejemplos visibles"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "La progresión visual está construida por tarjetas de capítulo y referencias de sitios. Se distinguen flujos tipo dashboard al inicio; obras con collage y tipografía ornamental para la dirección artística; páginas de producto/documentación compactas para TL;DR; una narrativa de sectores en 300FeetOut para scroll; formas redondas, stickers y reseñas para calidez; Solare y Mars Rejects para capas; Al Murphy para imperfección; composiciones tipográficas enormes para maximalismo; páginas de comida/producto para movimiento; y pantallas de monitores retro para future-past. Los rótulos de capítulo y marcos rosas en la edición ayudan a identificar cada ejemplo, pero son elementos del video, no componentes recomendados de una web.",
+      "token_count": 169
+    },
+    {
+      "citation_id": "S35",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "uZWnxa4mkKA",
+      "video_title": "15 More Design Styles You've Never Heard Of",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 4 — Wabi-sabi"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "05:45",
+      "visual_evidence": [],
+      "content": "Descrito como una estética japonesa orientada más al diseño de interiores pero aplicable al diseño gráfico, que \"finds beauty in the imperfection and aging in nature... opposite of loud and flashy\" (05:45). El presentador invoca imágenes de cuencos de cerámica agrietados, lino desgastado y bosques con niebla, insistiendo en una sensación de desaceleración y aprecio por lo hecho a mano.\n\nRasgos centrales: \"earthy organic color palettes. Think clay, mossy green, natural textures, stone, linen, wood grain... minimalist layout... irregular shapes, irregular spacing\" (06:15). El fotograma `frame-30pct.png` confirma visualmente el estilo: muestra un logotipo caligráfico \"wabi-sabi\" en tinta negra sobre fondo claro, junto a fotografías de interiores minimalistas con muebles de madera y luz natural, y una textura de piedra/cerámica agrietada en el borde izquierdo.\n\nCasos de uso: branding de productos sostenibles, empaques minimalistas, contenido de estilo de vida o hogar orientado a la vida tranquila, apps de bienestar o mindfulness, y moodboards de diseño de interiores (06:15-06:46). El presentador menciona además Japandi como un estilo \"hermano\" de wabi-sabi cubierto en un video anterior del canal (06:46), lo cual se registra como referencia cruzada, no como parte del contenido de este video.",
+      "token_count": 322
+    },
+    {
+      "citation_id": "S36",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "AzjbRybUX3M",
+      "video_title": "Why Your Designs Still Look Amateur! (Hidden Rules Pros Use)",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "9. **Documentar la decisión de diseño** (qué principio se aplicó y por qué), de forma que el resultado sea defendible ante un cliente o revisor, especialmente cuando se elige romper deliberadamente uno de los principios (por ejemplo, optar por la simetría estática para un cliente financiero).",
+      "token_count": 67
+    },
+    {
+      "citation_id": "S37",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Reglas operativas"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "1. Ninguna tendencia se adopta sin una justificación explícita de encaje con la\n   marca y el objetivo del sitio.\n2. Preferir la dosis mínima: la fuente recomienda contención en las nueve\n   tendencias sin excepción.\n3. Una familia tipográfica es suficiente cuando el eje es la interfaz apenas\n   presente.\n4. Un solo color de acento sobre una base neutra basta para leer como paleta\n   contemporánea.\n5. Las animaciones deben aportar a lo que el sitio comunica; si solo decoran, no\n   se implementan.\n6. Los elementos \"hechos a mano\" deben sentirse humanos, no desprolijos: la\n   diferencia es intencionalidad, no cantidad.\n7. Las etiquetas y líneas de estilo plano técnico son decorativas por definición;\n   nunca deben ocupar el lugar de información real que el usuario necesita.\n8. El sonido en la interfaz es opcional para el usuario, nunca impuesto.\n   *(Regla de la fuente, reforzada como extensión profesional.)*\n9. **Extensión profesional:** todo degradado debe validarse contra contraste\n   mínimo AA en el texto que lo atraviesa.\n10. **Extensión profesional:** todo cursor personalizado debe conservar un estado\n    visible de foco y no reducir el área efectiva de clic.\n11. **Extensión profesional:** toda experiencia WebGL debe tener una degradación\n    definida para dispositivos que no la soporten o que la ejecuten mal.\n12. **Extensión profesional:** las predicciones sobre 2026 se tratan como\n    hipótesis con fecha de vencimiento y se revalidan antes de basarse en ellas.\n13. Las promociones del creador —like, suscripción, recurso de la biografía,\n    remisión al video sobre el \"top 1 % de diseñadores web\"— quedan fuera del\n    método y no se replican como parte del consejo técnico.",
+      "token_count": 388
+    },
+    {
+      "citation_id": "S38",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "WxZHUe8mvhU",
+      "video_title": "11 Years of Brutally Honest Web Design Advice in 7 Minutes",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–00:14",
+      "visual_evidence": [],
+      "content": "Este mapa temporal existe solo como procedencia. Cada lección se explica de\nforma completa y autónoma en la siguiente sección, sin depender de consultar\nel video para entenderla.",
+      "token_count": 39
+    },
+    {
+      "citation_id": "S39",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Antipatrones"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "02:06",
+      "visual_evidence": [],
+      "content": "- Añadir efectos visuales decorativos para \"salvar\" una composición débil en\n  lugar de corregir tipografía, color, grilla, imágenes o espacio en blanco.\n- Usar imágenes \"sin límites\" o composiciones inmersivas sin contenedores\n  claros, contradiciendo explícitamente el criterio de \"cajas claras\" del\n  video (02:06).\n- Maquetar párrafos asignándoles solo un ancho fijo sin antes comprender ni\n  priorizar el contenido (\"digerirlo\").\n- Diseñar sin haber declarado antes el objetivo del sitio.\n- Apoyarse en una sola referencia visual y replicarla de forma reconocible.\n- Usar valores de espaciado y márgenes arbitrarios en lugar de una escala\n  fija.\n- Alinear elementos solo en un eje (por ejemplo, solo verticalmente) y dar\n  por cerrado el layout.\n- Mezclar contenido promocional (cursos, mentorías) dentro de la explicación\n  del método de diseño, presentándolo como un paso técnico necesario.\n- Afirmar que una demostración de Figma implica un sitio en producción o una\n  integración funcional real.",
+      "token_count": 247
+    },
+    {
+      "citation_id": "S40",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00",
+      "visual_evidence": [],
+      "content": "El mapa indica procedencia; la explicación completa de cada estilo está en la\nsección siguiente, de modo que el lector no necesita consultar las marcas de\ntiempo para entender el método.",
+      "token_count": 39
+    },
+    {
+      "citation_id": "S41",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "Kzx8iw4hEc0",
+      "video_title": "Alex Hormozi's Advice on Web Design",
+      "creator": "Sam Crawford | Web Design Expert",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–02:03",
+      "visual_evidence": [],
+      "content": "| Tiempo | Evidencia principal | Uso correcto |\n|---|---|---|\n| 00:00–02:03 | Conversión frente a tráfico y diferencia entre belleza/claridad | Definir el trabajo de la página y comprobar comprensión inmediata. |\n| 02:03–04:38 | Pocas decisiones, un test semanal, titular e imagen | Priorizar un experimento interpretable en la primera pantalla. |\n| 04:38–05:41 | Imágenes reales frente a stock | Sustituir señales genéricas por evidencia visual creíble cuando sea posible. |\n| 05:41–07:45 | Ecuación de valor, prueba y rapidez | Presentar resultado deseado y disminuir demora/esfuerzo percibidos. |\n| 07:45–09:17 | Inacción, riesgo, Amazon, reseñas y garantía | Resolver objeciones justo antes de la acción. |\n| 09:17–10:45 | Diferenciación | Convertir sin parecer intercambiable con competidores. |",
+      "token_count": 245
+    },
+    {
+      "citation_id": "S42",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "u-JtFKXL_jY",
+      "video_title": "4 Graphic Design Tips For ELITE Design Thinkers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Flujo integrado para el agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Un agente que reciba un encargo de diseño gráfico y quiera aplicar el método completo de este video debería seguir esta secuencia operativa:",
+      "token_count": 32
+    },
+    {
+      "citation_id": "S43",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "WxZHUe8mvhU",
+      "video_title": "11 Years of Brutally Honest Web Design Advice in 7 Minutes",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Antipatrones"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- **Ejecutor de píxeles sin criterio**: aplicar visualmente lo que pide el\n  cliente sin diagnosticar el problema real detrás del pedido (contradice el\n  Principio 11).\n- **Purismo de reglas**: tratar la proporción áurea, la regla de los tercios\n  o cualquier framework de composición como una ley que no puede romperse,\n  perdiendo de vista si el resultado final realmente se ve bien (contradice\n  el Principio 5).\n- **Saturación decorativa**: acumular colores, elementos y micro-detalles\n  \"porque se puede\", en lugar de partir de un diseño reducido y añadir solo\n  lo justificado (contradice el Principio 3).\n- **Jerarquía plana**: diseñar una pantalla donde el titular, el subtítulo y\n  el botón de acción tienen un peso visual similar, dejando al usuario sin\n  pistas claras de qué mirar primero (contradice el Principio 8).\n- **Mobile-first ciego**: diseñar siempre partiendo de la versión móvil sin\n  analizar los problemas de contexto propios de cada tamaño de pantalla\n  (contradice el Principio 6).\n- **Silencio ante el cliente**: entregar un diseño sin explicar el motivo de\n  cada decisión y luego frustrarse cuando el cliente pide cambios (contradice\n  el Principio 12).\n- **Optimismo de alcance total**: prometer que un proyecto será el mejor\n  posible en SEO, UX, rendimiento, accesibilidad y diseño simultáneamente,\n  sin reconocer que existen compensaciones (contradice el Principio 9).\n- **Aceptación por necesidad económica**: tomar un proyecto con señales de\n  alerta evidentes solo porque hace falta el ingreso, ignorando el criterio\n  profesional (contradice el Principio 14).\n- **Aislamiento profesional**: intentar resolver solo cada obstáculo de\n  negocio o de diseño en lugar de buscar apoyo externo (contradice el\n  Principio 15).",
+      "token_count": 402
+    },
+    {
+      "citation_id": "S44",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "nlGr4GRIzAg",
+      "video_title": "The REAL 2026 Color Theory Knowledge Designers Need To Know!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–01:36",
+      "visual_evidence": [],
+      "content": "Este mapa orienta la procedencia, pero cada principio se explica de forma\ncompleta en las secciones siguientes: el lector no necesita consultar las\nmarcas de tiempo para entender el método.",
+      "token_count": 39
+    },
+    {
+      "citation_id": "S45",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "bZ1vbmV5gk8",
+      "video_title": "40 Design Style Names You've Been Looking For (Find References Faster)",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "1. Clásico, ornamental y romántico"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "**Neoclásico**: referencia a la Antigüedad grecorromana, composición formal y sensación monumental; `adaptive-contact-sheet-01.jpg` muestra arquitectura clásica y ejemplos tipográficos. **Barroco**: ornamentación dramática, contraste intenso y paletas ricas; el rótulo y el patrón dorado se ven en las primeras hojas. **Filigrana**: volutas finas, trabajo tipo metal o encaje, apropiado para invitación o packaging premium; los ejemplos visibles de `adaptive-contact-sheet-03.jpg` combinan marcos y líneas ornamentales. **Acanto**: hojas clásicas y bordes decorativos inspirados en columnas grecorromanas. **Victoriano**: exceso ornamental, flores, color rico y lettering de época. **Art Déco**: geometría simétrica, glamour y acentos metálicos; las hojas muestran carteles de líneas rectas y abanicos. **Art Nouveau**: línea orgánica, flora, figura e integración de ilustración con tipo; la fuente propone buscar Alphonse Mucha. **Tenebrismo**: foco luminoso contra sombras profundas. **Gótico**: arcos, tallas, dramatismo y aura oscura. **Steampunk**: mezcla victoriana y mecánica a vapor, visible en composiciones de engranajes. No mezclar estos nombres sólo por ser “vintage”: decidir si el proyecto pide rigidez geométrica, flora fluida, sombra teatral o maquinaria retro.",
+      "token_count": 349
+    },
+    {
+      "citation_id": "S46",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "u-JtFKXL_jY",
+      "video_title": "4 Graphic Design Tips For ELITE Design Thinkers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente",
+        "Mapa temporal de procedencia"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:00–00:37",
+      "visual_evidence": [],
+      "content": "Este mapa temporal indica procedencia, no reemplaza la explicación: cada principio se desarrolla en detalle en la sección siguiente para que el agente lo entienda sin necesidad de consultar las marcas de tiempo.",
+      "token_count": 44
+    },
+    {
+      "citation_id": "S47",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Rúbrica de evaluación"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Escala de 0 a 3 por dimensión:\n\n- **Cobertura de los veinte estilos** (0 = omite estilos o los mezcla; 3 =\n  cubre los veinte con nombre correcto, origen y rasgos visuales).\n- **Uso correcto de evidencia visual** (0 = inventa apariencia sin citar\n  fotograma; 3 = cada afirmación visual cita un archivo de fotograma\n  existente y describe lo que realmente se ve en él).\n- **Separación de clases de evidencia** (0 = mezcla fuente directa, inferencia\n  visual y extensión profesional sin distinguirlas; 3 = las distingue de\n  forma explícita y consistente).\n- **Manejo de afirmaciones acotadas en el tiempo y no verificadas** (0 = las\n  presenta como hechos firmes; 3 = las marca explícitamente como tales).\n- **Sensibilidad cultural** (0 = aplica estilos con raíz cultural sin\n  contexto; 3 = recomienda investigación adicional y evita apropiación\n  superficial).\n- **Autonomía del documento** (0 = requiere consultar el video original para\n  entender un estilo; 3 = cada estilo se entiende completamente solo con este\n  documento).\n\nResultado mínimo aceptable: promedio de 2 o más en todas las dimensiones, sin\nningún puntaje de 0.",
+      "token_count": 260
+    },
+    {
+      "citation_id": "S48",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "8XWX5EIxBz8",
+      "video_title": "BRUTALIST WEB DESIGNS - The UGLIEST Design Trend of 2020 | TemplateMonster",
+      "creator": "TemplateMonster",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso 5 — Proyectos apropiados para brutalismo pleno"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "03:13",
+      "visual_evidence": [],
+      "content": "Cuando se opta por una aplicación completa y no moderada del estilo, la\nfuente da una lista explícita y cerrada de tipos de proyecto recomendados\n(03:13): portafolio personal, sitio de agencia creativa o estudio, un blog\nsobre videojuegos estilo años 80, o páginas para eventos estacionales o de\nuna sola vez que necesiten volverse virales y atraer mucha atención en poco\ntiempo. Esta lista debe preservarse completa: es un criterio operativo de\n\"encaja / no encaja\" que un agente puede aplicar directamente al recomendar\no desaconsejar el estilo para un proyecto concreto.",
+      "token_count": 132
+    },
+    {
+      "citation_id": "S49",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "T96O8dTzi2Q",
+      "video_title": "NO MORE AI SLOP | Claude Design Full Tutorial",
+      "creator": "Sergei Chyrkov",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Demostraciones y ejemplos visibles"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- **Configurador de pizza interactivo (versión genérica inicial)**: selección\nde tamaño, tipo de masa (aparentemente no funcional: \"the crust is not\nchanging\"), salsa, ajo, queso (sin funcionalidad de arrastrar y soltar),\nproteínas (pepperoni, tocino, pollo a la parrilla, salchicha italiana) y\nvegetales (alcachofa), con vista previa y confirmación final.\nConfirmado en `frame-20pct.png` y `frame-25pct.png` (interfaz de\nconstrucción de pizza y vista de confirmación/checkout).\n- **Sistema de diseño \"Pitalio\"/\"Pizzalio\"**: recorrido completo por\nnavegación, tipografía, escala numérica, paleta de colores, formas,\nlogotipo, animaciones, elevaciones y radios, generado a partir de una\nimagen de Pinterest. Confirmado en `frame-40pct.png`, `frame-45pct.png` y\n`frame-50pct.png`.\n- **Antes y después del mismo layout de landing page**: el estado inicial\n(\"Build your perfect pizza\" en tipografía mediana, calculadora compacta) se\nconfirma en `supplemental-3s.png` y `supplemental-431s.png`, aún idéntico\nantes de reaplicar el sistema de diseño; el estado posterior\n(\"THE builder\" con un círculo de arrastre grande, y \"THREE STEPS, ONE\nPIZZA\" con hero de pantalla completa en rojo) se confirma en\n`frame-60pct.png` y `frame-65pct.png`.\n- **Integración de fotografías reales**: reemplazo de una ilustración de\npizza por una fotografía real y adición de fotografías de personas\ngeneradas con ChatGPT, visible en `frame-70pct.png` (fotografía de pizza\ncon overlay de opciones de publicación).\n- **Menú de producto generado con el mismo sistema de diseño**: flujo de\nconfiguración guiado (una página, categorías de pizzas/bebidas/ensaladas,\nveinte ítems, sin fotos), confirmado en `frame-80pct.png`.\n- **Piezas de Instagram generadas con el mismo sistema de diseño**: mosaico\nde publicaciones visualmente coherentes con la paleta roja del proyecto,",
+      "token_count": 512
+    },
+    {
+      "citation_id": "S50",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "YlN28RNChl0",
+      "video_title": "This Video Will Take You From Junior to Senior UX/UI Designer",
+      "creator": "uxpeak",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Reconocimiento en lugar de recuerdo para personas/entidades"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-60pct.png muestra tarjetas de destinatarios apiladas, cada una con una foto de perfil circular.",
+        "frame-80pct.png muestra la pantalla 'Transfer money to' con la foto de 'Jenny Spenser' junto a su numero de cuenta."
+      ],
+      "content": "Reconocimiento en lugar de recuerdo para personas/entidades\n\nPrinciple: Mostrar una foto o icono reconocible junto al identificador textual reduce el riesgo de error al confirmar una persona o cuenta.\n\nProblem: Identificar personas o cuentas solo por texto o numero obliga al usuario a recordar o releer detalles para confirmar que son correctos.\n\nSource basis: El video nombra explicitamente el principio de 'reconocimiento sobre recuerdo' y su beneficio de reducir transferencias accidentales.\n\nProfessional extension: Al usar fotos reales de usuarios, obtener consentimiento/autorizacion apropiados y aplicar politicas reales de privacidad y retencion de datos.",
+      "token_count": 139
+    },
+    {
+      "citation_id": "S51",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "bdC2BtJNt9s",
+      "video_title": "The Art of Minimalism",
+      "creator": "Seth Curl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Método completo de la fuente",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S52",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "bdC2BtJNt9s",
+      "video_title": "The Art of Minimalism",
+      "creator": "Seth Curl",
+      "file": "deliverables/context.md",
+      "heading_path": [],
+      "unit_type": "context_document",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "# Contexto autónomo para un agente\n\n## Propósito\n\nEste documento convierte el video de YouTube \"The Art of Minimalism\" (ID\n`bdC2BtJNt9s`), publicado por el creador de cine y contenido personal Seth Curl,\nen un paquete de conocimiento autosuficiente. El objetivo es que otro agente\npueda entender, explicar y aplicar el método de minimalismo personal que\npresenta el video sin necesidad de verlo, escucharlo ni consultar la fuente\noriginal. El video es un monólogo directo a cámara —no un tutorial técnico ni\nuna demostración de software— en el que el creador expone su filosofía y\nrutina personal de minimalismo, ilustrada con metraje casero (su cocina, su\noficina, su auto, una libreta de \"cosas por hacer\") y tarjetas de título\neditadas (\"CHAPTER 2: THE WHY\", \"less\").\n\n## Evidencia y límites\n\n**Fuente de transcripción**: pista de subtítulos automáticos original en\ninglés (`en-orig`), la única disponible (no hay subtítulos manuales). Se\nutilizó exclusivamente esta pista, nunca una traducción automática, como\nexige la disciplina de la fuente. El idioma hablado real es el inglés,\nconfirmado tanto por la pista `en-orig` como por el campo `language: en` de\nlos metadatos y por el contenido mismo del audio transcrito.\n\n**Evidencia visual**: veinte fotogramas uniformes (0 % a 95 % de la duración)\nmás tres fotogramas suplementarios en los segundos 40, 255 y 450, todos\ninspeccionados directamente con la herramienta de lectura de imágenes, no\nsolo enumerados como archivos.\n\n**Límites explícitos**:\n\n- El video es un testimonio personal y una pieza de contenido de un canal de\n  cine/estilo de vida, no un estudio, ni una guía clínica, ni un documento con\n  evidencia empírica externa. Todas las afirmaciones sobre beneficios\n  (creatividad, foco, relaciones) son la experiencia subjetiva declarada por\n  el creador, no resultados verificados.\n- El video contiene autopromoción y enlaces de afiliados en su descripción\n  (prueba gratuita de Musicbed, descuento de Dehancer, descuento de\n  Zhiyun-Tech, enlaces de Amazon a su equipo de cámara). Ninguno de estos\n  elementos forma parte del método de minimalismo enseñado; se documentan\n  aparte como promociones.\n- Los fotogramas muestran una escena doméstica y de oficina real del creador,\n  pero no permiten verificar de forma independiente cuánto tiempo lleva\n  practicando minimalismo ni el efecto medible en su carrera creativa: esas\n  son afirmaciones directas de la fuente, no verificadas externamente.\n- No hay segmento de subtítulos entre aproximadamente el minuto 13:41 y el\n  15:34: en ese tramo el video pasa a una secuencia de cierre visual (auto,\n  casa, créditos de música y agradecimientos) sin narración relevante nueva,\n  consistente con los fotogramas del 80 % al 95 %.\n\n## Tesis central\n\nSeth Curl sostiene que el minimalismo no es sinónimo de organización, sino un\nestilo de vida intencional que consiste en poseer y usar solo lo esencial y\nvalioso, reduciendo deliberadamente el exceso de posesiones, distracciones y\ncompromisos. Su tesis es que practicar minimalismo de forma constante y en\npequeñas acciones diarias —no como un evento único de deshacerse de cosas—\nlibera espacio mental, reduce distracciones y, como consecuencia, mejora la\nconcentración, la eficiencia creativa y la calidad del tiempo que se pasa con\nlas personas que importan. Resume el principio con su propia frase repetida:\n\"less is more\" (menos es más).\n\n## Mapa temporal de procedencia\n\nEsta línea de tiempo documenta la procedencia de la evidencia; no sustituye la\nexplicación del método, que se desarrolla íntegramente en las secciones\nsiguientes.\n\n- **00:10** — Definición inicial de minimalismo: posesión intencional de solo\n  lo esencial, reducción de exceso, \"less is more\".\n- **00:44–01:14** — El creador se presenta como practicante de minimalismo y\n  explica que descubrió que podía practicarlo intencionalmente.\n- **01:14–02:15** — Distinción explícita entre organización y minimalismo:\n  no son lo mismo.\n- **02:15–02:45** — Primer paso práctico: revisar pertenencias físicas\n  (clóset, cajones, auto, apps del teléfono) y preguntarse qué es realmente\n  necesario. `frame-25pct.png` y `supplemental-255s.png` muestran la lista de\n  tareas manuscrita \"THINGS TO DO\" que ilustra este proceso.\n- **02:45–04:18** — Cómo mantener el hábito: pequeñas acciones diarias\n  repetidas (cerrar apps, borrar archivos, limpiar mostradores, sacar objetos\n  del auto, anotar gastos, poner recordatorios, cancelar suscripciones).\n- **04:18–05:51** — Advertencia: el hábito de minimalismo puede volverse\n  controlador o adictivo si se practica sin propósito consciente.\n- **05:51–06:55** — El paso final: reducir el ritmo al empezar el día, con la\n  metáfora del árbol que enraíza lento antes de crecer con poco mantenimiento.\n- **06:55–07:57** — Transición de \"el cómo\" a \"el porqué\"; tarjeta de\n  capítulo \"CHAPTER 2: THE WHY\" visible en `frame-45pct.png`, hacia el\n  segundo 455 (45 % de la duración total).\n- **07:57–09:30** — El beneficio central: minimizar distracciones deja más\n  espacio y tiempo mental para lo que realmente importa.\n- **09:30–11:05** — Impacto declarado en su carrera creativa: mayor calma,\n  foco y determinación mental.\n- **11:05–11:36** — Impacto declarado en su flujo de edición de video:\n  organización de archivos, interfaz de edición simplificada, línea de\n  tiempo despejada.\n- **11:36–12:39** — El beneficio que más valora: más tiempo de calidad con\n  las personas que ama, gracias a menos distracciones y menos que procesar\n  mentalmente.\n- **12:39–13:41** — Cierre: por qué decidió compartir esto en YouTube y\n  reflexión final sobre intencionalidad y propósito.\n- **~15:34** — Fragmento residual de subtítulo (\"You.\") dentro de la\n  secuencia visual de cierre (auto, casa al anochecer, créditos musicales y\n  agradecimientos), visible en `frame-80pct.png` a `frame-95pct.png`.\n\n# Método completo de la fuente\n\n## Principio / paso 1 — Definir minimalismo con precisión\n\nEl creador insiste en una definición estricta antes de dar cualquier consejo\npráctico: minimalismo es \"poseer y usar solo lo que es esencial y valioso,\nreduciendo intencionalmente el exceso de posesiones, distracciones y\ncompromisos\". No es solamente deshacerse de objetos físicos: incluye tiempo,\nenergía y espacio mental. Cita textual traducida: \"En términos aún más\nsimples, es minimizar en qué está enfocada mi mente para poder concentrarme\nen lo que necesito. O en términos aún más simples, menos es más.\" (00:10)\n\nEsta definición es la base de todo lo demás: sin ella, el resto de la\nmetodología se confunde fácilmente con simple organización doméstica.\n\n## Principio / paso 2 — Separar minimalismo de organización\n\nUno de los puntos más enfatizados del video es que \"organización\" y\n\"minimalismo\" no son sinónimos, aunque suelen complementarse. Cita traducida:\n\"La organización es el proceso de crear estructura y un sistema para tus\npertenencias, mientras que el minimalismo es un estilo de vida enfocado en\nvivir intencionalmente con menos, priorizando la simplicidad y poseyendo solo\nlo que realmente es necesario o valioso.\" (01:14–01:44)\n\nConsecuencias prácticas que el creador extrae de esta distinción:\n\n- Se puede ser organizado sin ser minimalista.\n- Se puede ser minimalista sin tener todo perfectamente organizado (\"minimalista\n  desordenado\").\n- Ser ambas cosas a la vez es lo ideal, pero no es un requisito para empezar.\n- Si una persona ya es organizada, el minimalismo le resultará más natural;\n  si no lo es, el minimalismo se aprende como cualquier práctica, con tiempo.\n\n## Principio / paso 3 — Auditoría inicial de posesiones y espacios\n\nEl primer paso operativo consiste en revisar sistemáticamente las\npertenencias físicas y digitales y preguntarse, para cada una, si realmente\nse necesita. Cita traducida: \"Uno de los puntos clave para ser minimalista es\neliminar lo que no necesitas. Revisa tu casa, tu laptop, tu auto, todo, y\npregúntate: ¿qué necesito realmente para vivir la vida que tengo ahora mismo\ny para ser eficiente en las cosas que quiero perseguir?\" (02:15–02:45)\n\nÁreas explícitamente mencionadas para auditar: clóset, cajones del baño,\nauto, aplicaciones del teléfono, el \"cajón de trastos\" que nunca se abre,\nlaptop. `frame-25pct.png` y, con más nitidez, `supplemental-255s.png`\nmuestran la evidencia visual directa de este paso: una hoja de papel\nmanuscrita con el encabezado \"THINGS TO DO\" y una lista numerada de tareas\ndomésticas (por ejemplo, \"sacar la basura\", \"ir de compras\", \"limpiar la\ncasa\", \"vender ropa\", \"hacer una cita\", \"llamar a nuevos clientes\" según se\nlee en `frame-25pct.png`), sostenida en la mano del creador. Esta imagen\nconfirma materialmente que el método incluye escribir listas de tareas\nconcretas, no solo una intención abstracta.\n\n## Principio / paso 4 — Convertir la auditoría en hábito diario mediante microacciones\n\nEl video enumera, de forma casi literal, una lista de microacciones diarias\nque sostienen el hábito de minimalismo una vez hecha la auditoría inicial\n(02:45–04:18). Se preserva la lista completa porque el creador la presenta\ncomo una enumeración exhaustiva de ejemplos aplicables:\n\n1. Cerrar aplicaciones abiertas en el teléfono.\n2. Cerrar pestañas del navegador que no se están usando.\n3. Borrar archivos que ya no se necesitan, con frecuencia.\n4. Limpiar las superficies de la cocina inmediatamente después de usarlas.\n5. Sacar uno o dos objetos del auto cada vez que se sale de él.\n6. Anotar una compra en el momento para mantener el control del presupuesto\n   (10 segundos).\n7. Poner eventos importantes en el calendario cada semana.\n8. Crear un recordatorio en el teléfono en el instante en que se piensa algo.\n9. Usar \"leer todo\" en el correo o, mejor aún, darse de baja de correos que\n   no se necesitan.\n10. Quitar una canción de una lista de reproducción si ya no gusta.\n11. Agregar una canción a una lista de reproducción si sí gusta.\n12. Vender una prenda que no se ha usado en dos años.\n13. Cancelar notificaciones de texto de tiendas que ya no se frecuentan.\n14. Tirar cualquier basura o trasto en el momento en que se ve, en cualquier\n    parte de la casa.\n\nEl creador aclara el mecanismo por el cual estas microacciones funcionan:\n\"Lo que parece mucho trabajo para empezar todos estos hábitos... en realidad\nestá agregando menos para mañana, e incluso menos para el día siguiente, e\nincluso menos para el día después de eso.\" (03:47–04:18) Es decir, el costo\nde instaurar el hábito es alto al principio y decreciente después, porque\ncada microacción evita la acumulación de una tarea mayor futura.\n\n## Principio / paso 5 — Vigilar que el hábito no se vuelva controlador\n\nEste es el paso de advertencia y autorregulación, presentado como\nigual de importante que la práctica misma. Cita traducida: \"Una vez que se\nvuelve un hábito, puede ser un buen hábito o un mal hábito... Caí en la\ntrampa de la necesidad de limpiar, organizar, completar, eliminar, restar\nconstantemente durante el día sin un propósito o meta real para ello.\"\n(04:49–05:21)\n\nEl creador identifica el riesgo específico: \"Lo que es más peligroso que no\nvivir intencionalmente hacia algo es vivir intencionalmente hacia un ciclo\ninterminable de nada.\" (05:21) Su recomendación concreta es detenerse\nperiódicamente, preguntarse por qué se está haciendo cada tarea y recordar\nhacia qué se está viviendo intencionalmente. En un fotograma de este tramo\n(alrededor del minuto 05:21–05:51) el creador aparece señalando una planta en\nsu escritorio mientras dice, casi como aparte, que le gusta esa planta —un\ndetalle que ilustra el tono personal y no guionado del video, sin que\nconstituya evidencia de ningún método adicional.\n\n## Principio / paso 6 — Empezar el día despacio como práctica ancla\n\nEl paso final del \"cómo\" es ralentizar el inicio del día antes de lanzarse a\nlas tareas. El creador usa una metáfora explícita: \"Cuando un árbol empieza a\ncrecer, es lento al principio, pero una vez que las raíces están\nestablecidas, prosperan con poco mantenimiento. Lo mismo pasa con nuestra\nvida diaria.\" (05:51–06:24) Ejemplos que da de esta pausa inicial: llevar un\ndiario, orar, sentarse en silencio. El objetivo declarado no es la lentitud\npor sí misma, sino \"establecer raíces\" en lo que se quiere lograr y en lo que\nse quiere ser intencional ese día.\n\n## Principio / paso 7 — El porqué: minimizar distracciones como beneficio central\n\nA partir del minuto 07:25, marcado visualmente por la tarjeta de capítulo\n\"CHAPTER 2: THE WHY\" (visible en `frame-45pct.png`, aproximadamente en el\nsegundo 455, 45 % de la duración), el video cambia de \"cómo\" a \"por qué\".\nCita traducida: \"El punto focal del minimalismo y el beneficio más fuerte\npara tu vida, creatividad, relaciones y cualquier otra cosa es minimizar las\ndistracciones.\" (07:25–07:57)\n\nEl razonamiento que ofrece: no es posible eliminar por completo ciertas\ndistracciones de la vida (redes sociales, tareas, compromisos, personas,\nlugares), pero sí es posible minimizarlas. Menos \"desorden\" (clutter) implica\nmenos distracciones, lo que implica más espacio y tiempo mental para lo que\nsí importa.\n\n## Principio / paso 8 — Impacto declarado en la mente y en la creatividad\n\nEl creador conecta explícitamente la práctica física con un efecto mental:\n\"Reducir el ritmo por la mañana para crear un hábito de minimalismo resultará\nentonces en una mente más calmada durante el día, lo que a su vez hace que\nreducir el ritmo se vuelva más fácil de hacer. Es un círculo que se vuelve\nmás sano con el tiempo y la práctica.\" (09:00–09:30) Declara que, para su\ntrabajo creativo específicamente, esto se traduce en foco y determinación: se\nha vuelto \"un editor mucho más rápido en los últimos años\" gracias a hábitos\nde eliminar lo que no necesita y organizar lo que tiene, incluyendo organizar\narchivos al subirlos a su unidad de almacenamiento, un diseño simplificado en\nsu software de edición y una línea de tiempo despejada durante la edición\n(11:05–11:36). Estas afirmaciones sobre productividad de edición son\ndeclaraciones directas de la fuente sin evidencia externa verificable; se\netiquetan como afirmaciones no verificadas en el resumen de evidencia.\n\n## Principio / paso 9 — El beneficio que el creador valora más: tiempo de calidad con personas\n\nEl video cierra su argumentación de \"el porqué\" señalando que el mayor\nbeneficio no es la productividad ni el ahorro económico, sino la calidad del\ntiempo compartido con otras personas. Cita traducida: \"Otro subproducto del\nminimalismo, y el mejor subproducto del minimalismo, es la capacidad de\npasar tiempo de calidad con la gente que amas y menos tiempo en cantidad con\ntodo lo demás en la vida.\" (11:36–12:07) El mecanismo que propone: menos\ndistracciones y menos que procesar mentalmente deja más capacidad para\nconexión humana genuina y presencia real con otros.\n\n# Demostraciones y ejemplos visibles\n\nEste video no contiene demostraciones de software, interfaces digitales\ncomplejas ni procesos técnicos paso a paso; es principalmente metraje de vida\ncotidiana que ilustra, sin narrarlo explícitamente, el estilo de vida\ndescrito. Inventario de lo verificado visualmente:\n\n- **Lista de tareas manuscrita (\"THINGS TO DO\")**: `frame-25pct.png` y\n  `supplemental-255s.png` muestran una hoja de papel sostenida en la mano del\n  creador con una lista numerada de tareas domésticas y de trabajo. Es la\n  evidencia visual más directa del \"paso 3\" (auditoría convertida en lista\n  escrita).\n- **Rutina doméstica y de organización**: `frame-30pct.png` muestra al\n  creador revisando el refrigerador/despensa; `frame-35pct.png` muestra una\n  mano ajustando una planta en una maceta, coherente con el hábito de\n  cuidado del entorno mencionado en el paso 5.\n  `frame-10pct.png` y `frame-15pct.png` muestran manos manipulando objetos\n  pequeños (posiblemente productos de limpieza o cuidado personal), consistentes\n  con la idea de pequeñas tareas domésticas, aunque el objeto exacto no es\n  identificable con certeza y no se afirma qué es específicamente.\n- **Tarjeta de capítulo \"CHAPTER 2: THE WHY\"**: `frame-45pct.png` (segundo\n  ≈455, 45 % de la duración) confirma visualmente la estructura editorial en\n  dos partes del video (el cómo / el porqué) frente a una casa al atardecer.\n  No existe una tarjeta equivalente \"CHAPTER 1\" en los fotogramas\n  muestreados ni en los suplementarios; la primera mitad no está marcada con\n  una tarjeta de título visible en la muestra inspeccionada.\n- **Espacio de oficina/edición**: `frame-55pct.png` y `frame-60pct.png`\n  muestran al creador sentado frente a monitores de computadora en una\n  oficina en casa con decoración minimalista (paredes claras, pocos\n  objetos), consistente con la afirmación de un flujo de trabajo de edición\n  simplificado, aunque los fotogramas no muestran el software de edición en\n  uso ni permiten verificar su interfaz.\n- **Tarjeta tipográfica \"less\"**: `frame-65pct.png` muestra una tarjeta de\n  título con la palabra \"less\" sobre fondo rojo oscuro, refuerzo visual\n  directo del lema \"less is more\" repetido en el guion.\n- **Actividad deportiva**: `frame-50pct.png` muestra pies con tacos de fútbol\n  sobre césped, una escena de vida personal del creador sin narración\n  específica asociada en la transcripción inspeccionada; se interpreta como\n  metraje ilustrativo genérico de \"vida con propósito\", no como parte\n  explicada del método.\n- **Auto y trayecto nocturno**: `frame-80pct.png` (interior del auto) y\n  `supplemental-450s.png` (auto y casa al anochecer) forman parte de la\n  secuencia de cierre visual del video, coherente con el hueco de\n  subtítulos entre 13:41 y 15:34.\n- **Créditos finales**: `frame-85pct.png`, `frame-90pct.png` y\n  `frame-95pct.png` muestran texto de créditos con nombres de canciones,\n  artistas, ubicaciones de grabación (Charlotte NC, Indian Trail NC,\n  Appalachian Mountains, Reykjavik Iceland, Madrid Spain, Chicago IL,\n  Pensacola FL, entre otras) y un apartado de agradecimientos especiales.\n  Esto es evidencia de la producción del video, no del método de\n  minimalismo en sí.\n\nNingún fotograma muestra evidencia de una aplicación, panel de control o\nintegración de software que respalde afirmaciones de \"productividad\", por lo\nque cualquier mejora de eficiencia de edición declarada por el creador se\nmantiene como afirmación directa no verificada visualmente, nunca como\ndemostración técnica confirmada.\n\n# Flujo integrado para el agente\n\nSecuencia ejecutable que otro agente puede seguir para aplicar o explicar el\nmétodo completo, en orden:\n\n1. Adoptar la definición estricta de minimalismo (paso 1) antes de dar\n   cualquier consejo, para evitar confundirlo con simple organización.\n2. Explicar la diferencia entre organización y minimalismo (paso 2) cuando el\n   usuario mezcle ambos conceptos.\n3. Guiar una auditoría inicial de posesiones y espacios físicos y digitales,\n   pidiendo al usuario que liste por escrito qué necesita realmente (paso 3).\n4. Traducir la auditoría en una lista concreta de microacciones diarias\n   (paso 4), priorizando acciones de bajo costo y alta frecuencia (cerrar\n   apps, borrar archivos, ordenar mientras se usa un espacio) sobre grandes\n   purgas puntuales.\n5. Incluir siempre una verificación de propósito (paso 5): antes de recomendar\n   más tareas de orden, preguntar por qué se están haciendo y hacia qué\n   objetivo intencional apuntan, para evitar que el minimalismo se vuelva\n   compulsivo.\n6. Sugerir una práctica de inicio de día lento y deliberado (paso 6) como\n   ancla diaria, adaptable (diario, meditación, silencio, oración) según las\n   preferencias del usuario.\n7. Conectar explícitamente cada acción con el objetivo de reducir\n   distracciones (paso 7), no solo reducir objetos.\n8. Si el usuario busca beneficios creativos o de productividad, presentar el\n   testimonio del creador (paso 8) como experiencia personal declarada, no\n   como garantía de resultado.\n9. Cerrar cualquier plan de minimalismo señalando el beneficio relacional\n   (paso 9): más tiempo de calidad con las personas, como motivación de alto\n   nivel, no solo eficiencia personal.\n10. Separar siempre, en cualquier resumen generado, las promociones del\n    creador (equipo de cámara, servicios de música, marcas) de las\n    recomendaciones del método.\n\n# Reglas operativas\n\n- No confundir minimalismo con organización doméstica; son conceptos\n  relacionados pero distintos según la fuente.\n- No presentar las microacciones diarias como opcionales aisladas: el video\n  las presenta como un conjunto que sostiene el hábito, no como una lista de\n  la que basta elegir una.\n- No recomendar purgas masivas puntuales como sustituto de la práctica diaria\n  continua; la fuente enfatiza explícitamente la constancia sobre el\n  esfuerzo puntual.\n- Incluir siempre la verificación de propósito (paso 5) al recomendar tareas\n  de organización repetidas, para prevenir que el hábito se vuelva\n  compulsivo o controlador, tal como advierte el propio creador.\n- No presentar los enlaces de afiliados, descuentos o promociones de la\n  descripción del video como parte del método de minimalismo.\n- No citar ningún fotograma como prueba de un resultado medible (por ejemplo,\n  \"más rápido como editor\"); los fotogramas confirman solo lo que aparece en\n  pantalla, no métricas de desempeño.\n- Mantener las citas traducidas siempre con su marca de tiempo original para\n  que sean verificables contra `transcript/source.txt`.\n\n**Extensión profesional (salvaguardas añadidas por este dossier, no\ndeclaradas por el video):**\n\n- **Privacidad y consentimiento**: si se aplican estas prácticas a espacios\n  compartidos (casa, oficina) con otras personas, obtener su consentimiento\n  antes de desechar, vender o fotografiar pertenencias que no son propias.\n- **Seguridad de datos**: al \"borrar archivos\" o \"cerrar apps\" como\n  microacción, verificar que no se eliminen respaldos necesarios ni se cierren\n  sesiones con pérdida de datos no guardados; aplicar buenas prácticas de\n  copia de seguridad antes de purgas digitales.\n- **Accesibilidad**: al recomendar reorganizar espacios físicos o digitales,\n  considerar necesidades de accesibilidad de quienes conviven en el espacio\n  (movilidad reducida, uso de lectores de pantalla en dispositivos, etc.).\n- **Autorización y bienes de terceros**: no vender, donar ni desechar objetos\n  que pertenezcan a otras personas sin autorización explícita.\n- **Licencias y derechos**: al aplicar el método a archivos digitales\n  (fotos, documentos, proyectos), verificar licencias y obligaciones\n  contractuales antes de eliminar material que pueda tener valor legal,\n  fiscal o contractual (comprobantes, contratos, backups regulatorios).\n- **Transparencia comercial**: cualquier reproducción de este contenido debe\n  distinguir claramente las recomendaciones de equipo, servicios o productos\n  patrocinados (Musicbed, Dehancer, Zhiyun-Tech, enlaces de Amazon) de los\n  principios del método, evitando que una audiencia confunda una promoción\n  con un consejo neutral.\n- **Bienestar y salud mental**: dado que el propio video advierte sobre el\n  riesgo de que el hábito se vuelva compulsivo, se recomienda adicionalmente\n  que cualquier aplicación asistida por un agente incluya límites de\n  frecuencia sugeridos y evite reforzar patrones de conducta obsesivo-\n  compulsiva relacionados con el orden o el descarte de objetos.\n\n# Antipatrones\n\n- Tratar el minimalismo como un evento único de \"deshacerse de cosas\" en vez\n  de un hábito diario sostenido, contradiciendo el énfasis explícito de la\n  fuente en la práctica continua.\n- Perseguir la organización o la limpieza sin un propósito consciente,\n  cayendo en el \"ciclo interminable de nada\" que el propio creador identifica\n  como el riesgo central de esta práctica.\n- Presentar el minimalismo como incompatible con la creatividad o como una\n  orden de \"reducir ideas creativas\"; la fuente aclara explícitamente que no\n  se trata de minimizar la cantidad de ideas, sino de ser más eficiente al\n  perseguirlas.\n- Usar las imágenes del video (oficina, lista de tareas, auto) como prueba de\n  que una integración, aplicación o flujo de trabajo específico está en\n  producción o funciona técnicamente: los fotogramas muestran un entorno,\n  no un sistema verificado.\n- Mezclar las recomendaciones de equipo de cámara, música o software\n  patrocinado con los principios de minimalismo enseñados en el cuerpo del\n  video.\n\n# Criterios de aceptación\n\n- El resumen o plan generado a partir de este contexto distingue\n  explícitamente entre organización y minimalismo.\n- Incluye al menos las cuatro fases del método: auditoría inicial,\n  microacciones diarias, verificación de propósito y ancla de inicio de día\n  lento.\n- Cualquier cita usada está en español, traducida fielmente y acompañada de\n  su marca de tiempo original.\n- Ninguna afirmación de resultado (productividad, velocidad de edición,\n  beneficio relacional) se presenta como hecho verificado externamente; se\n  mantiene etiquetada como testimonio personal del creador.\n- Las promociones (Musicbed, Dehancer, Zhiyun-Tech, enlaces de Amazon) quedan\n  fuera de cualquier explicación del método.\n- Toda referencia a un fotograma cita un archivo que existe físicamente en\n  `visual/frames`.\n\n# Rúbrica de evaluación\n\nEscala 0–3 para evaluar una respuesta o plan derivado de este contexto:\n\n- **0 — Inaceptable**: confunde minimalismo con organización, omite la\n  verificación de propósito, o presenta promociones como parte del método.\n- **1 — Insuficiente**: menciona el método de forma genérica sin las cuatro\n  fases concretas ni evidencia trazable a marcas de tiempo.\n- **2 — Aceptable**: cubre las cuatro fases con fidelidad, pero no separa\n  claramente afirmaciones verificadas de testimonios personales no\n  verificados.\n- **3 — Ejemplar**: cubre las cuatro fases, incluye la verificación de\n  propósito como salvaguarda explícita, distingue afirmaciones directas de\n  extensiones profesionales, y evita cualquier promoción o inferencia de\n  producción a partir de evidencia visual.\n\n# Resumen compacto\n\n\"The Art of Minimalism\" de Seth Curl (16:51 minutos) presenta el\nminimalismo como un hábito diario intencional —no un evento único de\ndescarte ni sinónimo de organización— compuesto por cuatro fases: auditar\nposesiones y espacios físicos y digitales para identificar lo esencial;\nsostener esa auditoría con microacciones diarias de bajo costo (cerrar apps,\nborrar archivos, ordenar al usar un espacio, cancelar suscripciones);\nvigilar constantemente el propósito detrás de cada tarea para que el hábito\nno se vuelva compulsivo o controlador; y anclar el día con un inicio lento y\ndeliberado antes de lanzarse a las tareas. El \"porqué\" declarado del\ncreador es que menos posesiones y compromisos significan menos distracciones,\nlo cual libera espacio mental para la creatividad, el foco en el trabajo y,\nsobre todo, tiempo de calidad genuino con las personas que importan. La\nevidencia visual —una lista de tareas manuscrita, una oficina ordenada, una\ntarjeta de capítulo \"THE WHY\"— respalda la existencia de la rutina, pero no\nverifica externamente los resultados de productividad o creatividad que el\ncreador atribuye a la práctica, los cuales permanecen como testimonio\npersonal. El video incluye promociones de equipo de cámara y servicios\n(Musicbed, Dehancer, Zhiyun-Tech) que deben mantenerse separadas del método.",
+      "token_count": 6829
+    },
+    {
+      "citation_id": "S53",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/context.md",
+      "heading_path": [],
+      "unit_type": "context_document",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "# Contexto autónomo para un agente\n\nEste documento describe, sin necesidad de ver el video original, el contenido completo del video de YouTube con ID `kK1TOpI948o`, titulado \"The Beginner's Guide To Visual Hierarchy\" (\"La guía para principiantes sobre jerarquía visual\"), publicado por el canal DesignSpo. El video dura 928 segundos (15 minutos y 28 segundos) y fue subido el 22 de abril de 2026. Todo el audio está en inglés; no se detectaron fragmentos materiales en otros idiomas. El documento fue construido a partir de la pista de subtítulos automáticos original (`en-orig`), un video descargado en baja resolución, veinte fotogramas muestreados uniformemente entre el 0% y el 95% de la duración, y siete fotogramas suplementarios extraídos en instantes puntuales identificados como material relevante durante la inspección visual.\n\n## Propósito\n\nEl video enseña qué es la jerarquía visual, por qué existe y cómo se construye, organizando la explicación en cinco reglas y, dentro de la tercera regla (contraste), una lista clasificada de diez técnicas concretas para generar contraste. El propósito declarado por el creador es que, al final del video, el espectador entienda: (1) qué es la jerarquía visual; (2) cómo se crea, mediante contraste, uniformidad y composición; y (3) cómo aplicar esos tres elementos para producir diseños compuestos y bien organizados. Es explícitamente un video \"para principiantes\" (\"this is a beginner video\"), por lo que el propio creador reconoce que no cubre todos los matices posibles del tema, sino los diez mecanismos de contraste \"más comunes\", listados de mayor a menor poder de contraste.\n\nEl video está pensado como una pieza de enseñanza aplicable a cualquier disciplina de diseño de comunicación visual: interfaces web, carteles, páginas de ventas, portadas de revista y materiales impresos se mencionan indistintamente como ejemplos, lo que indica que el método se presenta como transversal y no limitado a un solo medio.\n\n## Evidencia y límites\n\nEste contexto se construyó a partir de tres fuentes verificables:\n\n1. **Transcripción**: derivada de la pista de subtítulos automáticos original en inglés (`en-orig`), normalizada en segmentos de aproximadamente 30 segundos con `vtt-to-clean-transcript.py`. Se revisaron el inicio, dos segmentos intermedios y el final; no se detectó duplicación incremental anómala ni huecos de contenido. El ritmo aproximado (3390 palabras en 928 segundos, ~219 palabras por minuto) es consistente con una locución explicativa pausada.\n2. **Veinte fotogramas uniformes**, muestreados cada 5% de la duración (frame-00pct a frame-95pct), inspeccionados directamente mediante el contact sheet generado (`contact-sheet.jpg`).\n3. **Siete fotogramas suplementarios**, extraídos en instantes puntuales donde el muestreo uniforme no capturó demostraciones visuales relevantes mencionadas en el guion: una cuadrícula de puntos (contraste), una portada de revista (rostros), una paleta de colores junto con una captura de un verificador de contraste web, un ejemplo tipográfico de legibilidad, una maqueta de landing page móvil y una sección de tarjetas de \"beneficios de producto\".\n\nLímites explícitos de esta evidencia:\n\n- El video no muestra ninguna herramienta de diseño en uso en tiempo real (no hay screencast de Figma, Photoshop u otro software); todos los ejemplos visuales son imágenes o mockups estáticos superpuestos sobre la locución del presentador.\n- No hay métricas de conversión, pruebas A/B ni datos de negocio que respalden empíricamente ninguna de las reglas expuestas: son principios de diseño presentados como saber consolidado del oficio, no como resultados de un experimento propio del creador.\n- El único dato cuantitativo citado en el video proviene de una fuente externa (WebAIM) sobre ratios de contraste de color; el resto de las afirmaciones son cualitativas.\n- El video menciona, pero no explica en profundidad, la teoría del color («ya hice un video completo sobre eso»), por lo que este contexto no puede sustituir un análisis de teoría del color; solo recoge lo que efectivamente se dice aquí.\n- Al final del video hay una promoción de un boletín de correo del propio creador (newsletter gratuito de \"tips\" de diseño) y una referencia cruzada a otro video del canal sobre teoría del color. Ambas cosas se registran como procedencia/promoción y no como parte del método.\n\n## Tesis central\n\nLa jerarquía visual es el orden en que un espectador percibe los elementos de un diseño, y se construye deliberadamente combinando tres fuerzas: **contraste** (que separa un elemento del resto y le da primacía), **uniformidad** (que da estructura repetible y predecible al resto del diseño para que no todo compita por la atención) y **composición** (que organiza los elementos según patrones de escaneo visual que el público ya conoce, como de arriba hacia abajo, de izquierda a derecha, en Z o en F). La idea que atraviesa todo el video es que la jerarquía no determina qué elemento es \"más importante\" en términos absolutos, sino en qué orden el espectador debe notarlo; y que un buen diseño necesita, al mismo tiempo, unos pocos elementos con mucha primacía y una base grande de elementos uniformes que le den soporte y contexto.\n\n## Mapa temporal de procedencia\n\n| Tiempo | Contenido |\n|---|---|\n| 00:00–00:30 | Introducción: qué se va a aprender (jerarquía visual, cinco reglas) y definición de jerarquía visual como orden de percepción, con el concepto de \"primacía\". |\n| 00:30–01:01 | Regla 1: la jerarquía está diseñada para guiar al espectador. Por qué se rankean elementos por primacía. |\n| 01:01–01:33 | Regla 2: la cantidad de elementos y su primacía están correlacionadas. Introducción de contraste, uniformidad y composición como los tres pilares. |\n| 01:33–02:05 | Explicación del contraste con el ejemplo de una cuadrícula de puntos idénticos (evidencia visual: `supplemental-108s.png`). Regla 3: no hay jerarquía sin contraste. |\n| 02:05–02:35 | Introducción a la lista de diez formas de crear contraste. Técnica 1: movimiento. |\n| 02:35–03:05 | Uso recomendado del movimiento: como impulso inicial, no como distracción sostenida. Técnica 2: información relacionada con la tarea del usuario. |\n| 03:05–03:35 | Ejemplo de la receta de cocina y el botón \"jump to recipe\" (evidencia: `frame-35pct.png`, receta de galletas). |\n| 03:35–04:07 | Técnica 3: puntos focales mediante espacio en blanco. Definición de \"white space\" (evidencia: `frame-20pct.png`). |\n| 04:07–04:38 | Técnica 4: rostros humanos. Por qué los rostros captan atención más rápido que casi cualquier otro elemento (evidencia: `supplemental-260s.png`, portada de revista). |\n| 04:38–05:09 | Advertencia sobre el uso irrelevante de rostros de stock; ejemplo de venta de clases de guitarra vs. venta de productos horneados. |\n| 05:09–05:40 | Técnica 5: color. Introducción a mover valores de color en la rueda cromática para generar distancia. |\n| 05:40–06:11 | Cita de WebAIM y su calculadora de contraste de color; ratio recomendado de 4.5:1 o superior (evidencia: `supplemental-345s.png`, `supplemental-410s.png`, captura con ratio 8.59:1). |\n| 06:11–06:42 | Matización sobre luminancia vs. tono, y sobre accesibilidad para personas con deficiencias de visión del color. Dato sobre el rojo como el color que más capta la atención humana. |\n| 06:42–07:14 | Técnica 6: tamaño. El tamaño es relativo al resto del diseño. |\n| 07:14–07:44 | Técnica 7: peso (grosor) tipográfico. Ejemplo de encabezado y párrafo con jerarquía oculta (evidencia: `supplemental-440s.png`, ejemplo tipográfico \"On Lying In Bed\"). |\n| 07:44–08:15 | Técnica 8: imágenes. Ejemplo de sección hero de \"PopSci\" donde el texto se lee primero y la imagen aporta evidencia de soporte (evidencia aproximada: `supplemental-495s.png`, maqueta de landing page móvil). |\n| 08:15–08:46 | Técnica 9: elementos extra, como una etiqueta \"best value\" sobre una tarjeta de precios. |\n| 08:46–09:16 | Técnica 10: desalineación deliberada de un elemento para atraer la mirada. |\n| 09:16–09:48 | Cierre de la lista de diez técnicas; recordatorio de que es una lista de principiante, no exhaustiva. |\n| 09:48–10:19 | Regla 4: la uniformidad da estructura al diseño. Introducción del concepto de predictibilidad. |\n| 10:19–10:49 | Ejemplo de sección de beneficios con tarjetas: por qué las tarjetas deben ser visualmente iguales entre sí (evidencia: `supplemental-640s.png`, sección \"Benefits Of Our Product\" con tres tarjetas). |\n| 10:49–11:20 | Detalle de qué valores deben igualarse entre elementos del mismo tipo (tamaño de imagen, fuente, peso, alto de párrafo, radio de esquina). Concepto de \"cohesión\". |\n| 11:20–11:51 | Regla 5: la composición es clave para una buena jerarquía. Transición a la segunda mitad del video. |\n| 11:51–12:22 | Reconstrucción del proceso de creación de jerarquía en tres pasos: ordenar mentalmente por primacía, aplicar contraste, agrupar elementos similares por uniformidad. |\n| 12:22–12:52 | Patrón de composición 1: de arriba hacia abajo (top-to-bottom), y su inversión para audiencias que escanean de abajo hacia arriba. |\n| 12:52–13:24 | Ejemplo de landing page con video: encabezado arriba, video debajo. Patrón de composición 2: de izquierda a derecha, y su inversión para audiencias que leen de derecha a izquierda. |\n| 13:24–13:55 | Patrón de composición 3: patrón en Z, combinando arriba-abajo e izquierda-derecha. |\n| 13:55–14:26 | Ejemplo del patrón en Z: encabezado y subtítulo arriba a la izquierda, imagen de soporte, tarjetas debajo (evidencia: `frame-90pct.png`, `frame-95pct.png`, maqueta \"Launch Your Online Store\" con flechas de recorrido en Z). |\n| 14:26–14:56 | Patrón de composición 4: patrón en F, típico de diseños con mucho texto y muy común en la web. |\n| 14:56–15:28 | Cierre: resumen de lo aprendido, promoción del video sobre teoría del color y del newsletter gratuito del creador, despedida. |\n\nEste mapa registra procedencia; el cuerpo de las secciones siguientes explica cada principio sin necesidad de consultar los minutos.\n\n# Método completo de la fuente\n\n## Principio 1: la jerarquía visual es un orden de percepción, no un juicio de importancia absoluta\n\nLa jerarquía visual se define como el orden en que un espectador nota los elementos de un diseño. El video insiste en que llamarla \"jerarquía\" no implica que un elemento sea intrínsecamente más importante o más esencial que otro — de hecho, se afirma explícitamente que en un buen diseño todos los elementos son \"absolutamente esenciales\" — sino que el espectador humano solo puede procesar los elementos de a uno por vez, y el diseñador decide en qué orden ocurre esa lectura. El elemento que se busca que se note primero recibe el nombre de \"primario\" o se dice que tiene \"primacía\" sobre los demás.\n\nEsta distinción es importante para un agente que aplique el método: la pregunta correcta al diseñar no es \"¿qué elemento es más importante en abstracto?\", sino \"¿qué necesita ver el usuario primero, segundo, tercero, etc., para completar su tarea o entender el mensaje?\". Por ejemplo, el video usa el caso de una landing page con un video incrustado: aunque el video en sí podría considerarse \"más importante\" que el encabezado en términos de contenido, el usuario necesita el encabezado primero para entender el contexto del video, así que el encabezado recibe primacía en el orden de lectura, no en abstracto.\n\n## Principio 2: la primacía debe ser escasa para que funcione (Regla 1 y Regla 2)\n\nRegla 1: la jerarquía está diseñada para guiar al espectador. Regla 2: el número de elementos y su primacía están correlacionados. El razonamiento es directo: si todos los elementos de un diseño tuvieran el mismo nivel de importancia visual, nada destacaría, y entonces la jerarquía —y con ella la posibilidad de guiar la mirada— desaparecería. Por eso solo puede haber un elemento verdaderamente primario, y solo unos pocos elementos \"secundarios\" que reciban un nivel de atención intermedio. La mayor parte del diseño, si va a funcionar, tiene que ser relativamente uniforme: unos pocos elementos concentran la primacía y dan contexto y soporte al resto.\n\nEsto conecta directamente con por qué la jerarquía visual importa profesionalmente: es trabajo del diseñador organizar información de forma que sea fácil de entender y agradable de mirar, y la vía para lograrlo es manipular los valores de los elementos (tamaño, peso, color) para darles primacía y construir una estructura.\n\n## Principio 3: no hay jerarquía sin contraste (Regla 3)\n\nEl contraste se define como las diferencias en un elemento que lo hacen destacar, y es el mecanismo por el cual el espectador sabe qué elementos tienen primacía. El ejemplo usado en el video es el de una cuadrícula de puntos idénticos: mientras todos los puntos comparten tamaño, color y espaciado, ninguno destaca; en cuanto se modifica el tamaño, el color y el espaciado de un solo punto, ese punto se vuelve inmediatamente el primero en notarse. `supplemental-108s.png` confirma visualmente esta cuadrícula de puntos negros idénticos usada como demostración didáctica de partida (el fotograma capturado corresponde al estado \"antes\", sin el punto modificado, ya que es el instante en que se introduce el concepto).\n\n## Principio 4: diez formas de crear contraste, ordenadas de mayor a menor poder\n\nEl video reconoce que existen \"un millón\" de formas distintas de crear contraste, pero elige explicar las diez que considera más importantes, ordenadas de la que genera más contraste a la que genera menos. Es una lista explícitamente numerada y completa dentro del video; a continuación se reconstruye cada elemento sin omitir ninguno.\n\n1. **Movimiento.** El ojo humano —y por extensión la mente humana— está programado para detectar movimiento, un mecanismo evolutivo de detección de amenazas. Estudios de escaneo cerebral citados en el video muestran que un elemento en movimiento es el primero en notarse. Sin embargo, el propio video advierte que \"menos es más\": si un elemento consume demasiada atención o se percibe como irrelevante o exagerado, frustra al usuario. La recomendación operativa es usar el movimiento para atraer la mirada inicialmente, y luego reducirlo al mínimo o detenerlo una vez que el usuario ya está mirando.\n\n2. **Información relacionada con la tarea del usuario.** Después del movimiento, lo segundo que el ojo busca es lo conocido, es decir, lo que el usuario ya está buscando activamente. El video da el ejemplo de las recetas de cocina online: los usuarios ignoran automáticamente la imagen del blog, el título y la historia personal del autor, y van directo al botón \"jump to recipe\" (evidencia visual: `frame-35pct.png` muestra efectivamente una receta de galletas con chips de chocolate con texto extenso, ejemplificando ese tipo de página). La implicación para el diseñador es alinear lo que es prominente en el diseño con lo que el visitante realmente busca: en un póster de evento, los detalles del evento deben ser claros; en una página de ventas, el botón de compra y el precio deben ser obvios.\n\n3. **Puntos focales mediante espacio en blanco.** Lo tercero que se nota en un diseño es lo que falta: el espacio en blanco (\"white space\"), que genera contraste por ausencia. Cuando se coloca un objeto en el centro de ese espacio, se crea un punto focal que dirige la mirada. `frame-20pct.png` confirma visualmente una tarjeta de definición con el término \"White Space\" y su definición (\"el espacio alrededor de un punto focal dejado intencionalmente en blanco o vacío para atraer la mirada hacia algún elemento de un diseño\"). El video advierte del efecto contrario: si se abarrota el diseño y se elimina todo el espacio en blanco, el resultado se parece a una página de \"¿Dónde está Wally?\", y se pierde la primacía y, con ella, la jerarquía.\n\n4. **Rostros humanos.** Los humanos detectan otros rostros humanos —reales o ilustrados— más rápido que casi cualquier otro elemento de un diseño; por eso aparecen tan a menudo en anuncios, portadas de revista, pósteres y sitios web. `supplemental-260s.png` confirma esto con una portada de revista de moda (estilo Vogue) con un rostro femenino como elemento dominante, acompañada en pantalla del rótulo \"4. Humans & Faces\". El video matiza esta técnica con la Regla 2: solo un elemento puede ser el primero, así que incluir una persona —especialmente una foto de stock sin relación con el producto— puede en realidad restar atención al mensaje real: el usuario mira el rostro un instante y luego sigue su camino sin leer el titular. La recomendación es usar rostros solo cuando estén directamente relacionados con lo que el diseño promociona (un modelo tocando guitarra para vender clases de guitarra; en cambio, para una venta de productos horneados, es preferible mostrar los productos horneados en vez de un chef).\n\n5. **Color.** Para usar el color como generador de contraste, la regla básica es separar los valores de color en la rueda cromática: crear distancia entre valores claros y oscuros, o entre matices (hues). Los ejemplos dados son un color claro sobre fondo oscuro, un color oscuro sobre fondo claro, o un elemento naranja sobre fondo azul. El video cita a WebAIM —descrita como una organización enfocada en accesibilidad web— y su calculadora de contraste de color, recomendando apuntar a un ratio de contraste de 4.5:1 o superior si se busca que un elemento destaque frente al fondo o sea visualmente distinguible de otros elementos. `supplemental-345s.png` y `supplemental-410s.png` confirman visualmente una paleta de colores tipo selector y una captura de pantalla de una herramienta \"Contrast Checker\" de WebAIM que muestra un ratio calculado de 8.59:1, consistente con la explicación verbal. El video aclara que ese ratio se refiere a la luminancia relativa (el valor de claridad percibida), que debe ser al menos cuatro veces y media más brillante que el fondo, y que esto es especialmente útil para la legibilidad de texto. También señala que, al diseñar un gráfico contra un fondo de color distinto, no siempre hace falta cambiar la luminancia —cambiar el matiz también aporta contraste—, aunque advierte que evitar cambios de luminancia perjudica la accesibilidad para personas con deficiencias de visión del color. Como dato adicional (curiosidad del creador, marcada explícitamente como tal —\"one final note on color science because I find it so interesting\"), se afirma que el rojo es el color que más capta la atención del ojo humano, con circuitos cerebrales dedicados a detectarlo, mientras que el significado del resto de los colores es subjetivo y depende del contexto cultural.\n\n6. **Tamaño.** El tamaño de los elementos influye en qué se nota primero: aumentar el tamaño de un titular hace que sea más probable que se lea primero, incluso si su posición es algo incómoda. Pero, igual que con las otras técnicas, el tamaño es relativo al resto de los elementos del diseño: si todo es grande, nada destaca. La recomendación no es hacer elementos enormes, sino usar tamaños contrastantes: un titular solo necesita ser un poco más grande para leerse como titular, y un párrafo solo un poco más pequeño para leerse después.\n\n7. **Peso (grosor tipográfico).** El peso es esencialmente el grosor de un elemento y, como el tamaño, dirige al espectador y da estructura al diseño. El video usa un ejemplo de encabezado y párrafo donde, aunque por posición y tamaño se intuye que hay que leer primero el titular, es fácil pasar por alto una lista estructurada oculta dentro del párrafo; cambiar el peso del texto más importante guía el ojo a lo largo del párrafo y facilita organizar la información. `supplemental-440s.png` confirma un ejemplo tipográfico con el título \"On Lying In Bed\" y un párrafo de cuerpo debajo, consistente con una demostración de jerarquía tipográfica mediante peso y tamaño relativos. La ventaja señalada del peso frente al movimiento es que no es tan llamativo, por lo que puede usarse para guiar al visitante a lo largo de un artículo o facilitar el escaneo de información útil sin romper la jerarquía general.\n\n8. **Imágenes.** Más allá de los rostros, otros tipos de imágenes también captan atención y añaden contraste. Las imágenes pueden funcionar como elementos secundarios que dan soporte y contexto a otros elementos: el ejemplo dado es una sección \"hero\" de un sitio llamado \"PopSci\", donde el usuario lee primero el texto y luego ve las maquetas del sitio web como evidencia de soporte para la afirmación del titular. `supplemental-495s.png` (una maqueta de landing page móvil con el titular \"Make a stunning site, easily\" y varias capturas de pantalla de teléfono) es consistente con este tipo de composición texto-primero-imagen-de-soporte-después, aunque no se puede confirmar con certeza que corresponda exactamente al ejemplo \"PopSci\" mencionado verbalmente, dado que el nombre de marca no es legible en el fotograma disponible. Las imágenes también pueden ser el elemento primario de un diseño, en cuyo caso el contexto se entiende en relación con la imagen. El video advierte que, igual que con los rostros, hay que usar imágenes con moderación: si son irrelevantes o hay demasiadas, el ojo no sabe dónde enfocarse y se pierde la jerarquía.\n\n9. **Elementos extra.** Añadir elementos adicionales que rompan un patrón de alguna manera es otra forma de generar contraste. El ejemplo dado es agregar una etiqueta como \"best value\" (mejor valor) sobre una de varias tarjetas de precios para hacerla destacar. Se describe como una forma sutil de aumentar el contraste sin romper la armonía estructural ya establecida: si hay una fila de elementos igualmente importantes pero se quiere que uno destaque primero, añadir un borde o una etiqueta es una manera efectiva de lograrlo.\n\n10. **Desalineación.** La última técnica común es la desalineación deliberada: cualquier cosa fuera de lugar tiende a notarse. Si se desplaza levemente un elemento fuera de su posición esperada, esto atrae la mirada hacia él. El video advierte explícitamente que hay que ser cuidadoso con esta técnica, porque el objetivo final sigue siendo un diseño visualmente agradable, no añadir contraste de forma aleatoria: desalinear demasiados elementos puede hacer perder el flujo del diseño. Tomar un solo elemento y desplazarlo ligeramente (\"out of place\") puede aumentar el contraste y a menudo el interés y la intriga del resultado final.\n\nEl video cierra esta lista recordando que es un video de nivel principiante y que existen muchas otras formas sutiles de añadir contraste, pero que estas diez son, con diferencia, las más comunes.\n\n## Principio 5: la uniformidad da estructura al diseño (Regla 4)\n\nSin uniformidad, el contraste (y por extensión la jerarquía) no funcionaría: si todo fuera diferente entre sí, nada destacaría por comparación. Se necesita un layout repetible y predecible para la mayoría de los elementos de un diseño si se quiere que el público pueda leerlo y comprenderlo. El secreto de la uniformidad, según el video, está en la predictibilidad: se puede diseñar un elemento exactamente como se quiera, siempre que los demás elementos del mismo tipo compartan los mismos valores.\n\nEl ejemplo desarrollado es una sección de sitio web que presenta los beneficios de un producto, con un titular, un subtítulo y varias tarjetas. Como cada tarjeta es igual de importante que las demás, no conviene que ninguna destaque individualmente con mucho contraste; en cambio, se busca que toda la fila de tarjetas se lea como una sección unificada, lo que aporta armonía visual y equilibra el titular de alto contraste. `supplemental-640s.png` confirma visualmente una sección titulada \"Benefits Of Our Product\" con tres tarjetas idénticas en estructura (marcador de imagen circular, \"Card headline\" y texto de relleno), consistente exactamente con este ejemplo.\n\nPara lograr esa uniformidad, el video especifica qué valores deben igualarse entre elementos del mismo tipo: cada imagen debe tener el mismo tamaño; cada título de tarjeta debe usar la misma fuente, el mismo tamaño de fuente y el mismo peso; cada párrafo debe ser exactamente igual, incluso ocupando la misma altura; cada tarjeta debe tener el mismo color de borde y el mismo radio de esquina. Si se quiere cambiar un valor —por ejemplo, el peso de los títulos de tarjeta— debe cambiarse para todas las tarjetas por igual. Esta práctica recibe el nombre de \"cohesión\", y es, según el video, la razón por la que algunos diseños se perciben perfectamente equilibrados y armoniosos, mientras que otros se ven desordenados.\n\nLa conclusión de esta sección es que el secreto de una buena jerarquía visual es el equilibrio entre contraste y uniformidad.\n\n## Principio 6: la composición ordena la jerarquía según patrones de escaneo conocidos (Regla 5)\n\nLa composición se define como la disposición de los elementos de forma visualmente agradable y fácil de leer, y constituye la quinta regla: la composición es clave para una buena jerarquía. Antes de explicar los patrones de composición, el video reconstruye el proceso completo en tres pasos, retomando lo ya aprendido:\n\n1. Ordenar mentalmente cada elemento según su primacia: qué debe verse primero, segundo, tercero, etc. Esto define la jerarquía.\n2. Usar las herramientas de contraste ya explicadas (tamaño, peso, color y otros valores) para dar contraste a los elementos importantes.\n3. Agrupar los elementos similares entre sí, lo que aporta uniformidad y cohesión al diseño.\n\nCon esa base, el video describe cuatro patrones de composición basados en hábitos de escaneo visual naturales del público:\n\n- **De arriba hacia abajo (top-to-bottom).** El patrón más básico: la mayoría de las personas en el mundo están acostumbradas a escanear una página de arriba hacia abajo (y el patrón se invierte para audiencias que escanean de abajo hacia arriba). Se colocan los elementos más importantes arriba y los que dan contexto adicional debajo. El ejemplo dado es una landing page con video: el titular arriba, el video debajo; aunque como diseñador se podría pensar que el video es más importante que el titular, el visitante necesita el titular para entender el contexto del video, de modo que la jerarquía no es sobre qué es esencial, sino sobre qué debe verse primero, segundo, tercero.\n\n- **De izquierda a derecha.** Para audiencias que leen de izquierda a derecha, este es su hábito natural de escaneo (y se invierte para quienes leen de derecha a izquierda). Una forma sencilla de crear un diseño fácil de escanear es organizar los elementos de más a menos importante, de izquierda a derecha.\n\n- **Patrón en Z.** Al combinar los dos patrones anteriores, se observa que gran parte del público occidental escanea primero de izquierda a derecha y luego de arriba hacia abajo, lo que da lugar al llamado \"patrón en Z\", común en diseños más minimalistas. El ejemplo dado ubica el elemento más importante (titular y subtítulo) arriba a la izquierda, apoyado por una imagen, y con tarjetas debajo. `frame-90pct.png` y `frame-95pct.png` confirman visualmente una maqueta de landing page titulada \"Launch Your Online Store\" con flechas rojas superpuestas que trazan explícitamente un recorrido en zigzag (patrón Z) sobre los elementos de la página, incluyendo una segunda versión de la misma maqueta con marcadores numerados (1, 2, 3) que refuerzan el orden de lectura sugerido.\n\n- **Patrón en F.** Para diseños con mucho texto, las personas escanean como si leyeran un libro: primero de arriba hacia abajo, luego de izquierda a derecha, en un patrón llamado \"F\", que el video señala como el más común en la web, donde el texto suele ocupar más espacio relativo que en un póster o una valla publicitaria. El ejemplo dado es un sitio web con titular, subtítulo y tarjetas debajo, con un gráfico de soporte a la derecha.\n\nEl video cierra señalando que la elección del patrón depende del medio y de la audiencia: el patrón en Z puede ser más efectivo en pósteres, vallas publicitarias o diseños más minimalistas; el patrón de arriba hacia abajo puede ser más efectivo en una carta o tarjeta enviada a otra persona; y el patrón en F, al menos para las primeras secciones de un diseño, tiende a ser el más común y efectivo en la web.\n\n# Demostraciones y ejemplos visibles\n\nEsta sección enumera exclusivamente lo que fue confirmado por inspección directa de fotogramas, distinguiéndolo de lo que solo se afirma verbalmente.\n\n- `frame-00pct.png`, `frame-05pct.png`, `frame-15pct.png` (parcial), `frame-20pct.png` (parcial), `frame-25pct.png`, `frame-30pct.png`, `frame-55pct.png`, `frame-60pct.png`, `frame-70pct.png`, `frame-75pct.png`, `frame-80pct.png`, `frame-85pct.png` muestran al presentador hablando a cámara en un set con estantería de libros de fondo, gesticulando activamente: es el formato dominante del video (locución directa a cámara).\n- `frame-10pct.png` muestra una tarjeta de título de sección \"Building Blocks Of Hierarchy\" (\"bloques de construcción de la jerarquía\") seguida del rótulo \"1. Motion\", confirmando visualmente el inicio de la lista numerada de técnicas de contraste.\n- `frame-20pct.png` muestra la tarjeta de definición \"White Space\", con el texto \"the space around a focal point left intentionally blank or bare in order to draw the eye towards some element in a design\", confirmando la explicación verbal sobre puntos focales.\n- `frame-35pct.png` muestra una receta de galletas con chips de chocolate (\"Chocolate Chip Cookie Recipe\") con texto extenso de instrucciones, consistente con el ejemplo verbal de páginas de recetas y el botón \"jump to recipe\".\n- `frame-40pct.png` muestra una tarjeta de texto titulada \"On Lying In Bed\" con un párrafo de cuerpo, un ejemplo tipográfico reutilizado también en `supplemental-440s.png`.\n- `frame-65pct.png` muestra una tarjeta \"Rule #4 — Uniformity gives our design structure\" con un bloque de colores (rosa, azul, verde) a modo de icono, confirmando visualmente la introducción textual de la cuarta regla.\n- `frame-90pct.png` y `frame-95pct.png` muestran una maqueta de landing page \"Launch Your Online Store\" con flechas rojas trazando un recorrido en Z, y una segunda versión con marcadores numerados 1-2-3, confirmando visualmente el patrón de composición en Z.\n- `supplemental-108s.png` muestra una cuadrícula de puntos negros idénticos sobre fondo blanco, confirmando el ejemplo de partida usado para introducir el concepto de contraste.\n- `supplemental-260s.png` muestra una portada de revista de moda con un rostro femenino como elemento dominante, junto al rótulo en pantalla \"4. Humans & Faces\", confirmando la técnica de contraste número 4.\n- `supplemental-345s.png` muestra una paleta de selección de color junto a una captura de pantalla parcial de una herramienta con el logo \"WebAIM\" y un \"Contrast Checker\" visible.\n- `supplemental-410s.png` confirma con mayor detalle la misma herramienta \"WebAIM Contrast Checker\", mostrando un ratio de contraste calculado de 8.59:1, un botón \"Run Contrast Test\" y otros campos de la interfaz, consistente con la cita textual de WebAIM y su recomendación de un ratio mínimo de 4.5:1.\n- `supplemental-440s.png` confirma la tarjeta tipográfica \"On Lying In Bed\" ya vista en `frame-40pct.png`, reforzando que corresponde a un ejemplo sostenido en pantalla durante varios segundos (una franja horaria consistente con la explicación de peso tipográfico, aproximadamente entre 07:14 y 07:44).\n- `supplemental-495s.png` muestra una maqueta de landing page móvil con el titular \"Make a stunning site, easily\" y varias capturas de pantalla de teléfono alineadas, consistente con un ejemplo de \"imágenes como elemento secundario de soporte\", aunque no se pudo confirmar con certeza visual que corresponda específicamente a la marca \"PopSci\" mencionada verbalmente por el nombre.\n- `supplemental-640s.png` muestra una sección \"Benefits Of Our Product\" con tres tarjetas idénticas en estructura, confirmando directamente el ejemplo verbal de uniformidad entre tarjetas.\n\nNo se encontró, ni en el muestreo uniforme ni en los fotogramas suplementarios adicionales, una demostración visual explícita y nítida de: la técnica de \"elementos extra\" (etiqueta \"best value\" sobre tarjetas de precios), la técnica de \"desalineación\", el ejemplo de tamaño de titular (técnica 6) de forma aislada, ni el patrón de composición en F de forma explícita con un gráfico dedicado. Estas afirmaciones permanecen respaldadas únicamente por la transcripción (evidencia directa de fuente), no por confirmación visual, y se marcan así en el resto del documento.\n\n# Flujo integrado para el agente\n\nUn agente que use este documento para producir o auditar un diseño debería seguir esta secuencia operativa, derivada directamente del método reconstruido:\n\n1. **Definir la jerarquía deseada.** Antes de tocar cualquier valor visual, listar mentalmente (o en un documento) qué elemento debe notarse primero, cuál segundo, cuál tercero, etc., en función de lo que el usuario realmente necesita para completar su tarea, no en función de qué contenido \"parece\" más importante en abstracto.\n2. **Aplicar contraste solo al elemento o los pocos elementos que deben tener primacía**, eligiendo entre las diez técnicas descritas (movimiento, información relacionada con la tarea, puntos focales por espacio en blanco, rostros, color, tamaño, peso, imágenes, elementos extra, desalineación), priorizando las de mayor impacto (movimiento, información relevante para la tarea) cuando el objetivo sea captar atención inmediata, y las de impacto más sutil (peso, elementos extra) cuando se busque guiar sin saturar.\n3. **Aplicar uniformidad a todos los elementos que no deban competir por primacía**, igualando explícitamente tamaño, fuente, peso, color de borde, radio de esquina y otros valores repetibles dentro de cada grupo de elementos del mismo tipo (por ejemplo, todas las tarjetas de un mismo bloque).\n4. **Agrupar elementos similares** para reforzar la cohesión visual y facilitar el escaneo.\n5. **Elegir un patrón de composición según el medio y la audiencia**: arriba-abajo para cartas o audiencias con ese hábito de lectura; izquierda-derecha simple; patrón en Z para diseños minimalistas, pósteres o pantallas con poco texto; patrón en F para páginas web con abundante texto.\n6. **Verificar el contraste de color con una herramienta de accesibilidad** (el video cita específicamente la calculadora de WebAIM) y apuntar a un ratio de al menos 4.5:1 quirúrgicamente cuando el objetivo sea legibilidad de texto o distinción de un elemento sobre el fondo.\n7. **Aplicar moderación en el uso de rostros e imágenes**: usarlos solo cuando estén directamente relacionados con lo que el diseño promociona, evitando fotografías de stock genéricas que puedan robar atención sin aportar al mensaje.\n8. **Revisar que solo un elemento tenga primacía absoluta** y que el resto del diseño sea deliberadamente uniforme; si varios elementos compiten por la máxima atención, hay que retroceder y reforzar la uniformidad de los que no deban destacar.\n9. **Separar explícitamente las afirmaciones de tiempo limitado o no verificadas** (por ejemplo, cualquier cifra de conversión o \"buenas prácticas\" de una marca externa) de los principios estructurales estables del método.\n\n# Reglas operativas\n\n- Nunca dar a más de un elemento primacía absoluta en una misma vista o sección; si el negocio pide destacar varias cosas a la vez, negociar cuál va primero.\n- Antes de aumentar el contraste de un elemento, confirmar que el resto de los elementos del mismo nivel jerárquico compartan exactamente los mismos valores visuales (tamaño, fuente, peso, color de borde, radio de esquina).\n- Verificar cuantitativamente el contraste de color de cualquier texto o elemento crítico contra su fondo, con un objetivo mínimo de 4.5:1, usando una herramienta de verificación de contraste como la citada (WebAIM) u otra equivalente vigente.\n- Usar movimiento con moderación: solo para atraer la atención inicial hacia un elemento, reduciéndolo o eliminándolo una vez que el usuario ya está mirando ese elemento.\n- Alinear el elemento con mayor primacía con lo que el usuario realmente busca al llegar al diseño (precio y botón de compra en una página de ventas; detalles del evento en un póster), no con lo que el diseñador cree más atractivo.\n- Usar rostros e imágenes de personas únicamente cuando tengan relación directa con lo que se está promocionando.\n- Elegir el patrón de composición (arriba-abajo, izquierda-derecha, Z o F) en función del medio (impreso vs. web) y de la cantidad relativa de texto, no de forma arbitraria.\n- Al usar desalineación como técnica de contraste, limitarla a un único elemento por composición para no perder el flujo general del diseño.\n- Etiquetar cualquier elemento extra (insignias, etiquetas tipo \"más vendido\") como una técnica de contraste sutil, no como parte de la estructura base del diseño.\n\n# Antipatrones\n\n- Dar a todos los elementos el mismo nivel de contraste, lo que elimina la jerarquía y hace que nada destaque (contradice directamente la Regla 3).\n- Usar movimiento de forma sostenida o exagerada, lo que frustra al usuario en lugar de guiarlo (advertencia explícita del video sobre la técnica 1).\n- Incluir rostros o imágenes de stock sin relación con el producto, lo que puede robar atención del mensaje real (advertencia explícita del video sobre la técnica 4).\n- Eliminar todo el espacio en blanco de un diseño, produciendo un efecto de sobrecarga visual tipo \"¿Dónde está Wally?\" donde el ojo no sabe qué mirar primero (advertencia explícita del video sobre la técnica 3).\n- Dar a cada tarjeta o elemento repetido de una sección valores ligeramente distintos entre sí (tamaños, fuentes o colores de borde inconsistentes), lo que rompe la cohesión y hace que el diseño se perciba desordenado (contradice directamente el principio de uniformidad).\n- Desalinear demasiados elementos a la vez, lo que hace perder el flujo general de la composición (advertencia explícita del video sobre la técnica 10).\n- Ignorar la relación entre luminancia y accesibilidad al elegir dos colores que solo difieren en matiz mientras se mantiene la misma luminancia, lo que perjudica a personas con deficiencias de visión del color (advertencia explícita del video en la sección de color).\n- Elegir un patrón de composición sin considerar el medio o la audiencia (por ejemplo, aplicar un patrón en Z a una página web muy larga y cargada de texto, en lugar del patrón en F recomendado para ese contexto).\n\n# Criterios de aceptación\n\nUn diseño puede considerarse alineado con el método de este video si cumple, de forma observable, lo siguiente:\n\n- Existe un único elemento (o un conjunto muy reducido de elementos) que un observador identifica de inmediato como el primero en notarse, sin ambigüedad.\n- Los elementos de un mismo grupo repetido (tarjetas, íconos, bloques de texto equivalentes) comparten tamaño, fuente, peso tipográfico, color de borde y radio de esquina de forma exacta.\n- El contraste de color entre cualquier texto crítico y su fondo alcanza o supera un ratio de 4.5:1, verificable con una herramienta de contraste.\n- El orden de lectura observable en el diseño (de arriba hacia abajo, izquierda a derecha, en Z o en F) corresponde de forma justificable al medio (impreso o web) y a la cantidad relativa de texto.\n- Ningún elemento decorativo (movimiento, rostro o imagen no esencial) compite en atención con el elemento de mayor primacía.\n- El espacio en blanco alrededor del elemento con mayor primacía es suficiente para que actúe como punto focal, sin saturación visual circundante.\n- Cualquier elemento con desalineación deliberada es único dentro de su composición inmediata, no un patrón repetido de forma indiscriminada.\n\n# Rúbrica de evaluación\n\nEscala de 0 a 3 por dimensión (0 = ausente o contradictorio, 1 = presente pero débil, 2 = aplicado correctamente, 3 = ejemplar y verificable):\n\n| Dimensión | 0 | 1 | 2 | 3 |\n|---|---|---|---|---|\n| Primacía clara | No hay elemento dominante identificable | Hay un elemento dominante, pero compite con otros | Un único elemento domina de forma clara | El orden completo (primero, segundo, tercero) es evidente e intencional |\n| Uniformidad estructural | Elementos repetidos con valores inconsistentes | Uniformidad parcial, con inconsistencias menores | Elementos repetidos comparten todos los valores clave | Uniformidad exacta, verificada valor por valor (tamaño, fuente, peso, borde, radio) |\n| Contraste de color accesible | Sin verificación de contraste, legibilidad dudosa | Contraste aparente pero no verificado numéricamente | Ratio verificado igual o superior a 4.5:1 en los elementos críticos | Ratio verificado y documentado, con consideración explícita de deficiencias de visión del color |\n| Uso moderado de movimiento, rostros e imágenes | Uso excesivo o irrelevante que distrae del mensaje | Uso presente pero con relación débil al contenido | Uso relacionado directamente con el contenido, en dosis moderada | Uso relacionado, moderado, y reforzando explícitamente el mensaje principal |\n| Composición según patrón de escaneo | Disposición arbitraria sin patrón reconocible | Patrón presente pero inconsistente con el medio o la audiencia | Patrón elegido correctamente según medio y cantidad de texto | Patrón aplicado con justificación explícita y verificable en el propio diseño |\n\nResultado mínimo aceptable: promedio de 2 o superior en las cinco dimensiones, sin ninguna dimensión en 0.\n\nFallos bloqueantes (invalidan la aceptación sin importar el promedio):\n- Más de un elemento con primacía absoluta simultánea en la misma vista.\n- Contraste de color por debajo de 3:1 en texto considerado crítico para completar una tarea.\n- Elementos repetidos del mismo tipo con valores visuales visiblemente distintos entre sí (rompe la cohesión).\n\n# Resumen compacto\n\nLa jerarquía visual es el orden en que un espectador nota los elementos de un diseño, y se construye combinando tres fuerzas: contraste, que separa y da primacía a unos pocos elementos mediante diez técnicas posibles (movimiento, información relacionada con la tarea, puntos focales por espacio en blanco, rostros, color, tamaño, peso, imágenes, elementos extra y desalineación, ordenadas de mayor a menor poder relativo); uniformidad, que da estructura predecible al resto del diseño igualando los valores visuales de los elementos repetidos del mismo tipo (cohesión); y composición, que organiza todo según patrones de escaneo ya conocidos por la audiencia (arriba-abajo, izquierda-derecha, en Z o en F, según el medio y la cantidad de texto). Solo puede haber un elemento con primacía absoluta; el resto del diseño debe ser deliberadamente uniforme para que ese elemento realmente destaque. La verificación de contraste de color con una herramienta como la de WebAIM (ratio mínimo recomendado 4.5:1) es la única comprobación cuantitativa citada en el video; el resto de las reglas son cualitativas y de criterio de diseño. El video es explícitamente de nivel principiante y no exhaustivo, y cierra con una promoción de un video propio sobre teoría del color y de un boletín gratuito del creador, ambos marcados aquí como procedencia/promoción y no como parte del método central.",
+      "token_count": 10788
+    },
+    {
+      "citation_id": "S54",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "bdC2BtJNt9s",
+      "video_title": "The Art of Minimalism",
+      "creator": "Seth Curl",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Contexto autónomo para un agente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Contexto autónomo para un agente",
+      "token_count": 8
+    },
+    {
+      "citation_id": "S55",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "YlN28RNChl0",
+      "video_title": "This Video Will Take You From Junior to Senior UX/UI Designer",
+      "creator": "uxpeak",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "12 validated rule patterns.",
+      "token_count": 7
+    }
+  ],
+  "sources": [
+    {
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "canonical_url": "https://www.youtube.com/watch?v=kK1TOpI948o"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "bdC2BtJNt9s",
+      "video_title": "The Art of Minimalism",
+      "creator": "Seth Curl",
+      "canonical_url": "https://www.youtube.com/watch?v=bdC2BtJNt9s"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "canonical_url": "https://www.youtube.com/watch?v=DU6vjWnH2p0"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=PKfZ1gnVJ44"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "canonical_url": "https://www.youtube.com/watch?v=25UwZDuHfiQ"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "canonical_url": "https://www.youtube.com/watch?v=DRmnkaWQp4o"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "canonical_url": "https://www.youtube.com/watch?v=AXpxZMRM1EY"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "bT1tG_E8g-4",
+      "video_title": "🚨 Top 6 Design Trends 2026: Flat Design is DEAD",
+      "creator": "Grayson's Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=bT1tG_E8g-4"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "nlGr4GRIzAg",
+      "video_title": "The REAL 2026 Color Theory Knowledge Designers Need To Know!",
+      "creator": "Satori Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=nlGr4GRIzAg"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "qthkkHPNAYQ",
+      "video_title": "You Should Try These 5 Web Design Trends",
+      "creator": "Codex Community",
+      "canonical_url": "https://www.youtube.com/watch?v=qthkkHPNAYQ"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "u-JtFKXL_jY",
+      "video_title": "4 Graphic Design Tips For ELITE Design Thinkers!",
+      "creator": "Satori Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=u-JtFKXL_jY"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "8XWX5EIxBz8",
+      "video_title": "BRUTALIST WEB DESIGNS - The UGLIEST Design Trend of 2020 | TemplateMonster",
+      "creator": "TemplateMonster",
+      "canonical_url": "https://www.youtube.com/watch?v=8XWX5EIxBz8"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=xpLUouSZHi8"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "canonical_url": "https://www.youtube.com/watch?v=waHuVF3XuMA"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "T96O8dTzi2Q",
+      "video_title": "NO MORE AI SLOP | Claude Design Full Tutorial",
+      "creator": "Sergei Chyrkov",
+      "canonical_url": "https://www.youtube.com/watch?v=T96O8dTzi2Q"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "tbf6XDqCWFE",
+      "video_title": "BRUTALISM: Best Website Examples for Your Web Design Inspiration |  TemplateMonster",
+      "creator": "TemplateMonster",
+      "canonical_url": "https://www.youtube.com/watch?v=tbf6XDqCWFE"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "8Z_MEP-_kxA",
+      "video_title": "Web Design Trends 2026",
+      "creator": "DesignSense",
+      "canonical_url": "https://www.youtube.com/watch?v=8Z_MEP-_kxA"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "vwVg1sBShH8",
+      "video_title": "7 ESTILOS de Diseño Gráfico que No conocías",
+      "creator": "Crealondra",
+      "canonical_url": "https://www.youtube.com/watch?v=vwVg1sBShH8"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=_DHiyzRN4gY"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "WxZHUe8mvhU",
+      "video_title": "11 Years of Brutally Honest Web Design Advice in 7 Minutes",
+      "creator": "Self-Made Web Designer",
+      "canonical_url": "https://www.youtube.com/watch?v=WxZHUe8mvhU"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "uZWnxa4mkKA",
+      "video_title": "15 More Design Styles You've Never Heard Of",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=uZWnxa4mkKA"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "AzjbRybUX3M",
+      "video_title": "Why Your Designs Still Look Amateur! (Hidden Rules Pros Use)",
+      "creator": "Satori Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=AzjbRybUX3M"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "Kzx8iw4hEc0",
+      "video_title": "Alex Hormozi's Advice on Web Design",
+      "creator": "Sam Crawford | Web Design Expert",
+      "canonical_url": "https://www.youtube.com/watch?v=Kzx8iw4hEc0"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "bZ1vbmV5gk8",
+      "video_title": "40 Design Style Names You've Been Looking For (Find References Faster)",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=bZ1vbmV5gk8"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "YlN28RNChl0",
+      "video_title": "This Video Will Take You From Junior to Senior UX/UI Designer",
+      "creator": "uxpeak",
+      "canonical_url": "https://www.youtube.com/watch?v=YlN28RNChl0"
+    }
+  ],
+  "coverage": {
+    "units_by_type": {
+      "context_section": 51,
+      "rule_pattern": 1,
+      "context_document": 2,
+      "rules_section": 1
+    },
+    "units_by_source": {
+      "auto-design": 55
+    },
+    "omitted_for_budget": 24,
+    "budget_exhausted": true
+  },
+  "warnings": [],
+  "limitations": [
+    "The token budget was exhausted; 24 additional block(s) with real evidence were left out."
+  ]
+}

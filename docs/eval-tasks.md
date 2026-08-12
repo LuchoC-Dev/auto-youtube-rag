@@ -82,7 +82,7 @@ profundidad, y sólo detrás de las interfaces ya sustituibles
 
 ### M4. Ejecución real sobre `auto-design`
 
-- [ ] Correr M2 sobre una copia temporal de la colección real con el modelo
+- [x] Correr M2 sobre una copia temporal de la colección real con el modelo
       E5 real y guardar los 24 bundles.
   - Depende de: M1–M3.
   - Aceptación: digest SHA-256 del árbol fuente idéntico antes y después;
@@ -97,6 +97,41 @@ profundidad, y sólo detrás de las interfaces ya sustituibles
 
 Checkpoint M: los 24 bundles reales existen, pasan integridad de citas y la
 tabla de Capa A está lista para alimentar el reporte final.
+
+**Ejecutado el 12 de agosto de 2026.** Resultado en
+`evals/results/2026-08-12/` (24 bundles + `layer-a-report.md`). Hallazgos:
+
+- **Deriva de esquema en el manifest real, fuera del alcance de este
+  repositorio.** La colección real `auto-design` creció de 34 a 51 videos
+  desde la última validación (2.1). 17 de los 51 usan una clave
+  `resources.analysis` en vez de `resources.rules` (probablemente un cambio
+  del pipeline productor de paquetes), lo que hace que el manifest completo
+  falle `MANIFEST_SCHEMA_INVALID` si se intenta sincronizar sin filtrar. Esto
+  reprodujo el comportamiento correcto y ya documentado de `sync`: falla el
+  run entero, registra el issue, no borra paquetes existentes — no es un bug
+  de `auto-youtube-rag`. La ejecución de M4 se hizo sobre una copia temporal
+  filtrada a los 34 videos con `resources.rules` válido (los mismos 34 ya
+  validados en el gate de 2.1). Corregir el parser para aceptar `analysis`
+  como alias de `rules`, o coordinar con el pipeline productor para que deje
+  de emitir la clave vieja, queda fuera de 3.2 y requiere aprobación
+  explícita antes de tocar `src/infrastructure/filesystem/manifest-reader.ts`.
+- Las 24 consultas devolvieron `status: "ok"` salvo las 3 profundidades de
+  `es-no-answer-unrelated-topic`, que también devolvieron `"ok"` — divergencia
+  esperada y ya documentada (ausencia de piso de similitud vectorial), no un
+  hallazgo nuevo.
+- Ninguna consulta emitió `warnings`.
+- El presupuesto se agota en casi todas las combinaciones: 100% en `focused`
+  y `balanced`, 88% en `deep` (7/8). Señal a tener en cuenta para O1: la
+  biblioteca real tiene más evidencia relevante por consulta que la que
+  incluso `deep` (64k tokens) puede citar completa.
+- Digest SHA-256 del árbol fuente (la copia temporal) idéntico antes de
+  `sync`, después de `sync`, y después de las 24 consultas.
+- Revisión cualitativa rápida de `es-concept-brutalism/balanced` (resumen
+  compacto coherente, citas resueltas, procedencia con timestamps) y
+  `es-no-answer-unrelated-topic/focused` (confirma el comportamiento sin
+  piso de similitud) sin problemas.
+- Worktree limpio salvo `evals/results/2026-08-12/`; copia temporal y base
+  SQLite temporal eliminadas.
 
 ## Bloque N — Juicio de Capa B
 

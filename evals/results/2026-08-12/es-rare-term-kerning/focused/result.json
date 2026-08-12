@@ -1,0 +1,1520 @@
+{
+  "schema_version": "1.0",
+  "status": "ok",
+  "request": {
+    "query": "kerning",
+    "depth": "focused",
+    "max_tokens": 12000,
+    "sources": []
+  },
+  "metrics": {
+    "candidates_considered": 50,
+    "units_selected": 67,
+    "sources_used": 22,
+    "estimated_tokens": 11941
+  },
+  "units": [
+    {
+      "citation_id": "S01",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Agent workflow"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Write a one-line statement of what the business does and what the website must achieve, before any aesthetic decision.\n- Select at most two compatible trends from the nine and record why the others were discarded.\n- Set the intensity to the minimum the source recommends: a sprinkle of nostalgia, one color accent, a few technical lines, one soft sound.\n- Build the sober base first: type scale (one family if the axis is barely-there UI), spacing scale, and a reduced palette with a single accent.\n- Apply the trend as a layer on top of that base, never as its foundation.\n- Review every added element and remove anything that only demonstrates familiarity with the trend.\n- Verify accessibility: AA contrast over gradients and saturated blocks, click target size with custom cursors, and no information carried by color or sound alone.\n- Measure weight and load time of any WebGL scene on a mid-range device and a slow connection before approving it.\n- Honor prefers-reduced-motion and never play audio without a deliberate user action.\n- Resolve licensing for fonts, textures, illustrations and 3D assets before publishing.\n- Document which trends were adopted and why, so review evaluates fit rather than taste.\n- Label every 2026 prediction carried into the work as a time-bound hypothesis.",
+      "token_count": 312
+    },
+    {
+      "citation_id": "S02",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 6 — Elegir imágenes que cuenten una historia (lifestyle images)"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "09:29",
+      "visual_evidence": [],
+      "content": "Un criterio concreto de selección de imágenes: combinar tomas del producto o\nlugar en sí con tomas de personas usando ese producto o lugar.\n\n> \"When you combine images, you want to show the place or the product and\n> you want to show some people in the place using the product [...] It\n> connects the dots. It's what we call lifestyle images [...] because stories\n> sell products.\" (09:29)\n\nTraducción: \"Cuando combinas imágenes, querés mostrar el lugar o el producto\ny también mostrar personas en el lugar usando el producto [...] Conecta los\npuntos. Es lo que llamamos imágenes de estilo de vida [...] porque las\nhistorias venden productos.\" (09:29)\n\n`frame-40pct.png`, `frame-45pct.png` y `supplemental-770s.png` muestran\ncomposiciones finales donde una imagen arquitectónica del edificio se combina\ncon una imagen de personas dentro de un espacio interior, confirmando\nvisualmente la aplicación de este criterio.\n\n**Regla operativa:** en proyectos que venden un lugar o producto físico,\ncombinar como mínimo una imagen del objeto/lugar en sí con una imagen de\npersonas interactuando con él, en vez de usar solo fotografías arquitectónicas\no de producto aisladas.",
+      "token_count": 272
+    },
+    {
+      "citation_id": "S03",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "YlN28RNChl0",
+      "video_title": "This Video Will Take You From Junior to Senior UX/UI Designer",
+      "creator": "uxpeak",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Antipatrones"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Equal visual weight for primary and secondary data on the same screen.\n- Selection controls placed against the natural reading direction.\n- Emoji/icon sets used decoratively without consistent valence mapping.\n- Static, uncolored selection indicators with no specific feedback message.\n- Multiple redundant entry points to the same underlying list or action.\n- Equal-sized fields for values of unequal importance or change frequency.\n- Identifying people/accounts by text/number alone with no visual\n  identifier.\n- Showing an input amount without its downstream effect on existing state.\n- Omitting the acting account/context in a multi-account transaction.\n- Defaulting to free-text entry for a small, well-known set of possible\n  values.\n- Presenting a promotional testimonial screenshot as independent proof of\n  product quality.\n- Presenting any of these mockups as evidence that a production system\n  already implements the behavior shown.",
+      "token_count": 219
+    },
+    {
+      "citation_id": "S04",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "Vs2oSkw4VHM",
+      "video_title": "8 advanced rules of minimal Web Design",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente",
+        "Principio / paso / elemento 2: Dominar pocas tipografías"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "02:35–03:36",
+      "visual_evidence": [],
+      "content": "**El video afirma** (02:35–03:36) que la mayoría de los diseños del\npresentador usan una o dos tipografías, tomadas de un repertorio personal\nconstruido a lo largo de \"los últimos 12 o 13 años\" de carrera, en lugar de\nbuscar constantemente tipografías nuevas. Cita el caso de Futura como\nejemplo: no tiene sentido buscar \"la nueva Futura\" cuando ya existe una\ntipografía perfeccionada durante décadas. Menciona también su preferencia por\nfuentes de sistema como Arial, Helvetica y Times New Roman.\n\nComo refuerzo, el presentador cita al diseñador **Massimo Vignelli**,\ndescrito como \"uno de los últimos modernistas\", conocido por su uso extensivo\nde Helvetica: según el video, Vignelli utilizó solo diez tipografías en toda\nsu carrera, a pesar de haber diseñado piezas de alto perfil como el mapa del\nmetro de Nueva York y el logotipo de American Airlines (03:36–04:07). Esta\ncifra es una **afirmación sin verificar** por esta fuente: se reporta tal\ncomo aparece en el video, sin confirmación documental externa.\n\nLa razón que da el presentador para limitar el repertorio tipográfico es que\ndominar una tipografía —conocer sus espacios en blanco internos, su\ncomportamiento (kerning) en tamaños grandes y pequeños, su relación con\nfondos de mayor o menor contraste— toma tiempo, y ese aprendizaje se pierde\nsi se cambia de tipografía constantemente (04:07–04:39).\n\n- Regla operativa: construir y reutilizar un repertorio tipográfico personal\n  limitado en lugar de elegir tipografía nueva en cada proyecto.\n- Antipatrón: perseguir tendencias tipográficas sin llegar a dominar el\n  comportamiento de ninguna fuente en profundidad.",
+      "token_count": 377
+    },
+    {
+      "citation_id": "S05",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Agent workflow"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "- Explain the historical grounding (Bauhaus, Swiss design) to frame minimalism as a functional tradition, not a trend.\n- Establish layout: define a grid, decide visual hierarchy, decide on symmetric or controlled-asymmetric composition.\n- Reserve purposeful white space; avoid filling the canvas by default.\n- Choose a limited, coherent typographic system appropriate to the amount of text and the desired tone (sans-serif vs. serif).\n- Define a restrained color palette: one or two neutral base colors, optionally softened, plus at most one accent.\n- Verify the piece communicates its core message at a glance, especially for digital/UX contexts.\n- If teaching the style, use a reference-and-recreate method (save curated examples, recreate them, articulate why they work).\n- Before finalizing, check the piece against the antipattern list.\n- Clearly separate any recommended external resource (book, template, subscription) from the design principle being taught.",
+      "token_count": 237
+    },
+    {
+      "citation_id": "S06",
+      "section": "highest_relevance",
+      "source_name": "auto-design",
+      "video_id": "tbf6XDqCWFE",
+      "video_title": "BRUTALISM: Best Website Examples for Your Web Design Inspiration |  TemplateMonster",
+      "creator": "TemplateMonster",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Demostraciones y ejemplos visibles"
+      ],
+      "unit_type": "context_section",
+      "timestamp": "00:04–00:20",
+      "visual_evidence": [],
+      "content": "1. **Radical Everything** (00:04–00:20, `frame-05pct.png`): estudio de\nbranding y diseño de producto. Tipografía enorme sobre foto de objetos 3D\ncoloridos; texto cortado por el marco.\n2. **Twenty Nine** (00:20–00:35, `frame-10pct.png`, `frame-15pct.png`):\nestudio con sede en Nueva York y Berlín. Combina un titular tipográfico\nmasivo con un bloque de texto editorial denso a la derecha (\"...launched\nthis temporary web-...\", \"...it does...\", \"...people make... wants\nventure... call it a... agency, branding...\"), y una tarjeta amarilla tipo\n\"workspace/exchange\" superpuesta — mezcla de escala tipográfica extrema con\ntexto de cuerpo convencional en la misma pantalla.\n3. **QI Catalog / Qode Interactive** (00:35–00:50, `frame-20pct.png`,\n`frame-25pct.png`): catálogo de temas/plantillas. Pregunta retórica \"Who\nSays WordPress Can't Be Art?\" en tipografía gigante superpuesta a una\nilustración floral, seguida de una pantalla de índice con nombres de\nproductos en columna (Monolab, Haar, Amedeo, Tetsuo, Penumbra, Galatia,\nKoto, Blaze, Kenozoik, Dieter, Smilte, Manon, Ion).\n4. **TIGHT Top 2018** (00:50–01:06, `frame-30pct.png`, `frame-35pct.png`):\nranking o resumen anual de un estudio o publicación digital. Fondo\namarillo saturado con formas geométricas metálicas flotantes y luego un\ncírculo amarillo sólido a pantalla completa sobre fondo azul-gris\nmetalizado.\n5. **De Vlieg** (01:06–01:22, `frame-40pct.png`, `supplemental-70s.png`):\n`supplemental-70s.png` confirma de forma legible el nombre \"DE VLIEG\" y una\ncomposición de portada de revista/producto (\"GRAND OPENING\") sobre fondo\nlila, con un menú superior derecho (\"contact / about\") en texto plano\ndiminuto.",
+      "token_count": 486
+    },
+    {
+      "citation_id": "S07",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Adjust tracking inversely to size; use kerning for specific pairs",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "09:16",
+      "visual_evidence": [
+        "frame-75pct.png shows the word 'Figma' with horizontal spacing measurement arrows around the letters, consistent with inter-character spacing measurement, though the video does not visually confirm the specific Southern Living kerning case it references verbally."
+      ],
+      "content": "Manually kerning long-form body text instead of relying on the typeface's built-in kerning tables.",
+      "token_count": 32
+    },
+    {
+      "citation_id": "S08",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "AzjbRybUX3M",
+      "video_title": "Why Your Designs Still Look Amateur! (Hidden Rules Pros Use)",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Emotional typography (kerning and stroke weight)",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-15pct.png shows the 'Y2K26' poster with tight kerning on the headline and large body text.",
+        "supplemental-210s.png shows the same poster with a 'Typography / Heavy Type' overlay label and a 'USE THIS TECHNIQUE WHEN:' prompt.",
+        "supplemental-225s.png shows a close, unobstructed view of the 'Y2K26' wordmark used across the typography demonstration."
+      ],
+      "content": "Using tight kerning or italics in contexts that call for a relaxed or premium feeling, or vice versa.",
+      "token_count": 29
+    },
+    {
+      "citation_id": "S09",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "AzjbRybUX3M",
+      "video_title": "Why Your Designs Still Look Amateur! (Hidden Rules Pros Use)",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Emotional typography (kerning and stroke weight)",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-15pct.png shows the 'Y2K26' poster with tight kerning on the headline and large body text.",
+        "supplemental-210s.png shows the same poster with a 'Typography / Heavy Type' overlay label and a 'USE THIS TECHNIQUE WHEN:' prompt.",
+        "supplemental-225s.png shows a close, unobstructed view of the 'Y2K26' wordmark used across the typography demonstration."
+      ],
+      "content": "Use tight kerning combined with italics when the design needs to communicate urgency or forward motion.",
+      "token_count": 27
+    },
+    {
+      "citation_id": "S10",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "AzjbRybUX3M",
+      "video_title": "Why Your Designs Still Look Amateur! (Hidden Rules Pros Use)",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Emotional typography (kerning and stroke weight)"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-15pct.png shows the 'Y2K26' poster with tight kerning on the headline and large body text.",
+        "supplemental-210s.png shows the same poster with a 'Typography / Heavy Type' overlay label and a 'USE THIS TECHNIQUE WHEN:' prompt.",
+        "supplemental-225s.png shows a close, unobstructed view of the 'Y2K26' wordmark used across the typography demonstration."
+      ],
+      "content": "Emotional typography (kerning and stroke weight)\n\nPrinciple: Letter spacing (kerning) and stroke weight are emotional levers: tight kerning and italics suggest urgency, generous kerning suggests relaxation and premium feel, heavy strokes suggest authority, and thin strokes suggest elegance.\n\nProblem: Typography chosen only for visual style, without matching the emotional register the brief requires, can undercut the intended tone of a design even when the layout itself is sound.\n\nSource basis: The source directly demonstrates all four typographic states (tight kerning, generous kerning, heavy type, thin type) on the same poster and states explicitly the emotional association of each.\n\nProfessional extension: The acceptance criterion about preserving legibility and negative space is a professional safeguard added by this dossier, not stated verbatim in the source.",
+      "token_count": 190
+    },
+    {
+      "citation_id": "S11",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "AzjbRybUX3M",
+      "video_title": "Why Your Designs Still Look Amateur! (Hidden Rules Pros Use)",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Emotional typography (kerning and stroke weight)",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-15pct.png shows the 'Y2K26' poster with tight kerning on the headline and large body text.",
+        "supplemental-210s.png shows the same poster with a 'Typography / Heavy Type' overlay label and a 'USE THIS TECHNIQUE WHEN:' prompt.",
+        "supplemental-225s.png shows a close, unobstructed view of the 'Y2K26' wordmark used across the typography demonstration."
+      ],
+      "content": "Use generous kerning (optionally paired with a serif typeface) when the design needs to feel relaxed or premium.",
+      "token_count": 32
+    },
+    {
+      "citation_id": "S12",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Adjust tracking inversely to size; use kerning for specific pairs"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "09:16",
+      "visual_evidence": [
+        "frame-75pct.png shows the word 'Figma' with horizontal spacing measurement arrows around the letters, consistent with inter-character spacing measurement, though the video does not visually confirm the specific Southern Living kerning case it references verbally."
+      ],
+      "content": "Adjust tracking inversely to size; use kerning for specific pairs\n\nPrinciple: Tracking (uniform letter-spacing) should be inversely proportional to text size; kerning adjusts spacing between specific letter pairs (not uniformly) to prevent visual collisions between certain shapes.\n\nProblem: Prevents applying uniform letter-spacing rules to problems that require pair-specific kerning, and prevents leaving large headline text with default spacing that increases eye strain.\n\nSource basis: The source explains tracking/letter-spacing as inversely proportional to size (09:16-09:46), explains kerning as pair-specific spacing given the 'w' and 'a' example (09:46), and cites designer Jessica Hische's kerning adjustment to the Southern Living logo (10:17).\n\nProfessional extension: This dossier flags the Southern Living/Jessica Hische attribution as an unverified direct claim in evidence.limitations, since no frame in the video visually confirms this specific case.",
+      "token_count": 226
+    },
+    {
+      "citation_id": "S13",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Adjust tracking inversely to size; use kerning for specific pairs",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": "09:16",
+      "visual_evidence": [
+        "frame-75pct.png shows the word 'Figma' with horizontal spacing measurement arrows around the letters, consistent with inter-character spacing measurement, though the video does not visually confirm the specific Southern Living kerning case it references verbally."
+      ],
+      "content": "Use manual kerning adjustments only for specific letter pairs in high-impact contexts such as logotypes, not as a substitute for tracking.",
+      "token_count": 37
+    },
+    {
+      "citation_id": "S14",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Adjust tracking inversely to size; use kerning for specific pairs",
+        "Acceptance criteria"
+      ],
+      "unit_type": "acceptance_criterion",
+      "timestamp": "09:16",
+      "visual_evidence": [
+        "frame-75pct.png shows the word 'Figma' with horizontal spacing measurement arrows around the letters, consistent with inter-character spacing measurement, though the video does not visually confirm the specific Southern Living kerning case it references verbally."
+      ],
+      "content": "Manual kerning adjustments, if present, are limited to logotypes or short high-impact text, not applied across body copy.",
+      "token_count": 32
+    },
+    {
+      "citation_id": "S15",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Establishing a clear leverage point"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "21:35",
+      "visual_evidence": [
+        "frame-05pct.png (Nike-style poster) supports the leverage-point example described around 20:29-21:35, where the model dominates through contrast, scale and isolation."
+      ],
+      "content": "Establishing a clear leverage point\n\nPrinciple: A design needs an unambiguous element that the eye lands on first, reinforced by contrast, scale, isolation, or color, before any other flow or rhythm decision is made.\n\nProblem: Prevents designs where multiple elements compete for first attention with no clear winner, leaving the viewer without a starting point.\n\nSource basis: The source directly analyzes two examples (a Nike campaign and an editorial poster) to demonstrate how contrast, scale and isolation create a leverage point, quoting 'That's leverage. That is control.' (21:35).\n\nProfessional extension: The 'two-second viewer test' acceptance criterion is a professional extension added to make the concept independently testable outside the video's own narration.",
+      "token_count": 175
+    },
+    {
+      "citation_id": "S16",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "rFyOIWMwRdg",
+      "video_title": "2026 Web Design Trends You Need to Know",
+      "creator": "Sam Crawford | Web Design Expert",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Performance-first creativity"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": null,
+      "visual_evidence": [
+        "adaptive-000540000ms.png and adaptive-000550000ms.png introduce Performance-First Creativity."
+      ],
+      "content": "Performance-first creativity\n\nPrinciple: Treat speed, efficient code, image optimization and hosting as design inputs, not post-launch repair.\n\nProblem: A visually attractive site that is slow or frustrating.\n\nSource basis: The source connects optimized images, efficient code and hosting to experience and search visibility.\n\nProfessional extension: Budgets and device testing make the advice operational.",
+      "token_count": 89
+    },
+    {
+      "citation_id": "S17",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Establishing a clear leverage point",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "21:35",
+      "visual_evidence": [
+        "frame-05pct.png (Nike-style poster) supports the leverage-point example described around 20:29-21:35, where the model dominates through contrast, scale and isolation."
+      ],
+      "content": "Centering an element and assuming that alone establishes it as the leverage point without reinforcing scale or isolation.",
+      "token_count": 31
+    },
+    {
+      "citation_id": "S18",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "WxZHUe8mvhU",
+      "video_title": "11 Years of Brutally Honest Web Design Advice in 7 Minutes",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Communicate value and manage client process to be well paid",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": "01:35",
+      "visual_evidence": [
+        "frame-25pct.png shows a diagram of two overlapping circles containing a heart-in-speech-bubble icon and a gear icon, next to a question-mark icon box, plausibly representing communication, process, and client-intent ambiguity discussed in this segment."
+      ],
+      "content": "Establish and follow a clear, repeatable client process from intake to delivery.",
+      "token_count": 22
+    },
+    {
+      "citation_id": "S19",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "T96O8dTzi2Q",
+      "video_title": "NO MORE AI SLOP | Claude Design Full Tutorial",
+      "creator": "Sergei Chyrkov",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Refine visually in short, directed iterations, not one master prompt",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "08:23",
+      "visual_evidence": [
+        "frame-70pct.png shows a real pizza photograph integrated into the layout alongside publishing options, consistent with a later, smaller iteration on top of the reapplied design system."
+      ],
+      "content": "Trying to specify every visual refinement (animation, imagery, color tweaks) in a single prompt before ever previewing the result.",
+      "token_count": 37
+    },
+    {
+      "citation_id": "S20",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "WxZHUe8mvhU",
+      "video_title": "11 Years of Brutally Honest Web Design Advice in 7 Minutes",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Diagnose the client's real problem before executing their request",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "05:20",
+      "visual_evidence": [],
+      "content": "Treating every client request as needing the same type of solution regardless of the underlying problem ('if the only tool you have is a hammer, every problem looks like a nail').",
+      "token_count": 45
+    },
+    {
+      "citation_id": "S21",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "Vs2oSkw4VHM",
+      "video_title": "8 advanced rules of minimal Web Design",
+      "creator": "BONT",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Master a few typefaces"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "02:48",
+      "visual_evidence": [],
+      "content": "Master a few typefaces\n\nPrinciple: Build and reuse a small personal repertoire of typefaces across projects instead of choosing new ones for every project.\n\nProblem: Prevents shallow familiarity with any single typeface's whitespace, kerning, and contrast behavior across sizes and backgrounds.\n\nSource basis: The source states this directly (02:48-04:39), including the presenter's personal typeface preferences and the Massimo Vignelli example (unverified claim of ten typefaces across his career).\n\nProfessional extension: None added; the Vignelli figure is flagged in evidence.limitations as an unverified claim rather than extended.",
+      "token_count": 144
+    },
+    {
+      "citation_id": "S22",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Rework a session's output without the specific reference in view",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "13:42",
+      "visual_evidence": [],
+      "content": "Continuing to build directly on top of a composition recognized as too close to one reference.",
+      "token_count": 24
+    },
+    {
+      "citation_id": "S23",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "T96O8dTzi2Q",
+      "video_title": "NO MORE AI SLOP | Claude Design Full Tutorial",
+      "creator": "Sergei Chyrkov",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Find a real visual reference before creating the design system"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "03:56",
+      "visual_evidence": [
+        "frame-30pct.png (Instagram post layouts) is visually consistent with the reference-driven palette described around this step of the workflow."
+      ],
+      "content": "Find a real visual reference before creating the design system\n\nPrinciple: Before asking the tool to define a visual language, search moodboard/inspiration tools for a real image that represents the desired style, and use it strictly as inspiration, never as material to copy.\n\nProblem: Prevents the design system from being generated from an abstract text description with no concrete visual anchor, which is a major source of generic-looking output.\n\nSource basis: At 03:56 the creator searches Pinterest for 'fun website design', explicitly states 'we're not copying anyone's work, we're just using it for inspiration', and selects an image based on liked typography.\n\nProfessional extension: None; this is a direct source observation.",
+      "token_count": 162
+    },
+    {
+      "citation_id": "S24",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "There is no hierarchy without contrast",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "01:33",
+      "visual_evidence": [
+        "supplemental-108s.png shows a grid of visually identical black dots, the baseline example used to introduce contrast before a single dot's size, color and spacing are changed to give it primacy."
+      ],
+      "content": "Leaving all elements of a group with identical size, color, and spacing when one of them needs to stand out.",
+      "token_count": 30
+    },
+    {
+      "citation_id": "S25",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Partner with a developer of comparable skill level",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "17:26",
+      "visual_evidence": [],
+      "content": "Delegating development to someone with a clearly lower skill level and expecting the same quality outcome.",
+      "token_count": 23
+    },
+    {
+      "citation_id": "S26",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "The ten ranked techniques for creating contrast",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "02:05",
+      "visual_evidence": [
+        "frame-10pct.png shows the '1. Motion' title card opening the ranked list.",
+        "frame-35pct.png shows a chocolate chip cookie recipe page, matching the 'task-related information' example of a recipe site where users skip to what they need.",
+        "frame-20pct.png shows the 'White Space' definition card matching the focal-point technique.",
+        "supplemental-260s.png shows a magazine cover with a dominant human face alongside the on-screen label '4. Humans & Faces'.",
+        "supplemental-345s.png and supplemental-410s.png show a color palette and a WebAIM 'Contrast Checker' interface displaying an 8.59:1 ratio, matching the color-contrast technique.",
+        "frame-40pct.png and supplemental-440s.png show the 'On Lying In Bed' typographic example used to illustrate the weight technique.",
+        "supplemental-495s.png shows a mobile landing-page mockup with a headline and supporting phone screenshots, consistent with the imagery-as-secondary-support technique."
+      ],
+      "content": "Making every element in a design large, which removes the relative size contrast needed for hierarchy.",
+      "token_count": 26
+    },
+    {
+      "citation_id": "S27",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Restrict the design toolkit to five elements",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "02:06",
+      "visual_evidence": [
+        "frame-55pct.png shows the final hero using only large typography, a limited color palette, one grid, images and white space, with no visible decorative effects.",
+        "frame-60pct.png shows the same restrained palette (off-white, brown, dark neutrals) applied consistently across the layout."
+      ],
+      "content": "Using boundaryless or immersive image treatments that remove clear containers.",
+      "token_count": 22
+    },
+    {
+      "citation_id": "S28",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "rFyOIWMwRdg",
+      "video_title": "2026 Web Design Trends You Need to Know",
+      "creator": "Sam Crawford | Web Design Expert",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Strategic design thinking",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-20pct.png lists business goals, target audience and market position."
+      ],
+      "content": "Treating a client request as its own success criterion.",
+      "token_count": 16
+    },
+    {
+      "citation_id": "S29",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Hierarchy is a perception order, not an importance judgment",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "00:00",
+      "visual_evidence": [
+        "frame-10pct.png shows the 'Building Blocks Of Hierarchy' title card introducing the numbered technique list."
+      ],
+      "content": "Assigning top visual weight to content because it 'feels' most important rather than because the user needs it first.",
+      "token_count": 29
+    },
+    {
+      "citation_id": "S30",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Composition follows known audience scanning patterns",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "12:22",
+      "visual_evidence": [
+        "frame-90pct.png and frame-95pct.png show a 'Launch Your Online Store' landing-page mockup with red arrows tracing a Z-shaped path across the headline, image, and cards, including a version with numbered markers (1, 2, 3) reinforcing the intended reading order."
+      ],
+      "content": "Placing supporting content above the primary element when the audience's natural scanning direction is top-to-bottom.",
+      "token_count": 30
+    },
+    {
+      "citation_id": "S31",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "The human touch (wabi-sabi) and anti-UX",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "supplemental-205s.png shows the video's section card with the word 'IMPERFECTIONS' in yellow, confirming imperfection as the declared axis of this segment."
+      ],
+      "content": "Faking handmade texture with obviously generated assets, which defeats the purpose of the trend.",
+      "token_count": 25
+    },
+    {
+      "citation_id": "S32",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "8ahnUt_A5eA",
+      "video_title": "Popular Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Structured emphasis through space and grids"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-45pct.png shows a modular bento-like information layout.",
+        "frame-55pct.png shows a restrained composition with extensive whitespace."
+      ],
+      "content": "Structured emphasis through space and grids\n\nPrinciple: Use full-screen headers, bento modules, negative space, and CSS grids to clarify priority and relationships.\n\nProblem: Crowded or uniformly weighted pages make scanning and comparison difficult.\n\nSource basis: The video presents full-screen headers, Bento UI, negative space, and grid design.\n\nProfessional extension: Responsive and semantic ordering criteria are added for production use.",
+      "token_count": 104
+    },
+    {
+      "citation_id": "S33",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Surveillance design",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-65pct.png shows the SURVEILLANCE DESIGN label over a data-overlay portrait, a night-vision-style target map, and a black-and-white street scene reading 'PRIVACY AT RISK'."
+      ],
+      "content": "Pair with messaging that is explicitly about data, technology, or surveillance for best effect, per the source.",
+      "token_count": 31
+    },
+    {
+      "citation_id": "S34",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "u-JtFKXL_jY",
+      "video_title": "4 Graphic Design Tips For ELITE Design Thinkers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Niche saturation audit and intentional positioning",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "00:37",
+      "visual_evidence": [
+        "frame-15pct.png shows the on-screen diagram titled 'Elite Designers Method' listing the saturation-audit steps and the align-vs-disrupt decision tree."
+      ],
+      "content": "Designing from generic inspiration (e.g., Pinterest boards) without analyzing the specific niche's current visual saturation.",
+      "token_count": 34
+    },
+    {
+      "citation_id": "S35",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "T96O8dTzi2Q",
+      "video_title": "NO MORE AI SLOP | Claude Design Full Tutorial",
+      "creator": "Sergei Chyrkov",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Reapply the design system onto the existing project instead of regenerating from scratch",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "07:11",
+      "visual_evidence": [
+        "frame-60pct.png ('THE builder', large drag-circle interaction) and frame-65pct.png ('THREE STEPS, ONE PIZZA', full-viewport red hero) show the structurally changed result after the design system was reapplied, contrasted with the pre-reapplication state confirmed in supplemental-3s.png and supplemental-431s.png."
+      ],
+      "content": "Writing a vague refinement prompt like 'make it look more professional' without concrete layout instructions.",
+      "token_count": 25
+    },
+    {
+      "citation_id": "S36",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "OjaciP_fBwU",
+      "video_title": "30 Graphic Design Styles in 15 Minutes",
+      "creator": "Maria Tokar",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Historical classic design styles (block 1)",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-05pct.png shows a punk-style ransom-note concert poster ('Dead Fingers Talk', The Round House).",
+        "frame-10pct.png shows a psychedelic 1960s-style concert poster ('Turtles').",
+        "frame-15pct.png shows an Art Nouveau-style ornamented floral 'Salon Album' cover.",
+        "frame-20pct.png shows a pulp/pin-up style magazine cover ('Women in Crime').",
+        "frame-25pct.png shows a Pop Art illustration with a comic-book 'POW!' onomatopoeia.",
+        "frame-30pct.png and frame-35pct.png show magazine covers ('Shimmi', 'Girl Talk') with mixed, unconventional typography consistent with postmodern design."
+      ],
+      "content": "Grunge (early 1990s, Seattle scene, associated with David Carson / Ray Gun magazine): near-illegible wild layouts, rough textures, torn edges.",
+      "token_count": 42
+    },
+    {
+      "citation_id": "S37",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "nlGr4GRIzAg",
+      "video_title": "The REAL 2026 Color Theory Knowledge Designers Need To Know!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Separate sponsored content from the reusable color method"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-65pct.png shows the Superhuman Mail AI chat interface with the prompt 'Where should we start?'",
+        "frame-70pct.png shows a drafted email reply addressed to 'Arlene' about meeting availability."
+      ],
+      "content": "Separate sponsored content from the reusable color method\n\nPrinciple: The video contains an explicitly declared sponsored segment about the 'Superhuman Mail' email tool (approximately 05:20-06:59), including an affiliate link offer; this segment is unrelated to the color-theory method and must be excluded from any reusable design rules extracted from the video.\n\nProblem: Prevents mixing promotional content with the operational design method when this dossier or its rules are reused by another agent.\n\nSource basis: The creator explicitly states the segment is sponsored and offers an affiliate link and free-month promotion.\n\nProfessional extension: The explicit exclusion rule for reuse is added by this dossier; the video itself does not instruct future reusers to separate the segment.",
+      "token_count": 171
+    },
+    {
+      "citation_id": "S38",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Trend 7: Scrollytelling"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "11:11",
+      "visual_evidence": [
+        "frame-65pct.png shows an editorial panel with a trend-prediction headline, a photo, and a sidebar of content thumbnails, consistent with a scroll-driven editorial format."
+      ],
+      "content": "Trend 7: Scrollytelling\n\nPrinciple: Content and imagery are revealed progressively as the user scrolls, tying narrative pacing to the scroll gesture, often within a visually fixed section.\n\nProblem: Extends marketing storytelling principles into an interactive, scroll-driven format for editorial or narrative content.\n\nSource basis: The source states at 11:11-11:46: 'you're trying to tell a story as the user scrolls... it can be a really great and effective way to keep people engaged, if you do it right.'\n\nProfessional extension: The requirement for reduced-motion alternatives is a professional extension not discussed in the source.",
+      "token_count": 147
+    },
+    {
+      "citation_id": "S39",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Cross-context application and durability",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": "07:16",
+      "visual_evidence": [
+        "frame-60pct.png shows multiple finished portfolio and magazine-cover pieces (including titles transcribed as 'KALISLYNX' and 'NREI') illustrating cross-format use.",
+        "supplemental-124s.png shows additional finished branding examples (candle packaging, business cards, a corporate identity piece) consistent with cross-context minimalist branding."
+      ],
+      "content": "Apply the same core principles (grid, white space, typography, restrained color) regardless of medium (print, web, packaging, social).",
+      "token_count": 37
+    },
+    {
+      "citation_id": "S40",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "bZ1vbmV5gk8",
+      "video_title": "40 Design Style Names You've Been Looking For (Find References Faster)",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Synthesize rather than reproduce references"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": null,
+      "visual_evidence": [
+        "adaptive-001444000ms.png shows mixed-media example covers.",
+        "adaptive-001747500ms.png shows scrapbook/collage examples."
+      ],
+      "content": "Synthesize rather than reproduce references\n\nPrinciple: Transfer high-level cues while creating new composition, content, and assets.\n\nProblem: Prevents copyright, trademark, and authorship problems.\n\nSource basis: The video supplies examples and search terms, not reuse permissions.\n\nProfessional extension: Licensing and originality controls are added for safe production.",
+      "token_count": 81
+    },
+    {
+      "citation_id": "S41",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Pair product/place images with human-use ('lifestyle') images",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "09:29",
+      "visual_evidence": [
+        "frame-40pct.png and supplemental-770s.png show an architectural image of the building combined with an interior lifestyle image of people in a space."
+      ],
+      "content": "Using only isolated architectural or product photography with no human context when the goal benefits from a usage narrative.",
+      "token_count": 29
+    },
+    {
+      "citation_id": "S42",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "T96O8dTzi2Q",
+      "video_title": "NO MORE AI SLOP | Claude Design Full Tutorial",
+      "creator": "Sergei Chyrkov",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Reapply the design system onto the existing project instead of regenerating from scratch",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "07:11",
+      "visual_evidence": [
+        "frame-60pct.png ('THE builder', large drag-circle interaction) and frame-65pct.png ('THREE STEPS, ONE PIZZA', full-viewport red hero) show the structurally changed result after the design system was reapplied, contrasted with the pre-reapplication state confirmed in supplemental-3s.png and supplemental-431s.png."
+      ],
+      "content": "Regenerating the whole project from a new prompt instead of layering the design system onto the existing one.",
+      "token_count": 27
+    },
+    {
+      "citation_id": "S43",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "rFyOIWMwRdg",
+      "video_title": "2026 Web Design Trends You Need to Know",
+      "creator": "Sam Crawford | Web Design Expert",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Accessibility-first design",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-75pct.png and adaptive-000450000ms.png list accessibility-first design and color-palette contrast examples."
+      ],
+      "content": "Test keyboard order, contrast, image alternatives and clear copy.",
+      "token_count": 17
+    },
+    {
+      "citation_id": "S44",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Brand fit as the gate for every trend"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-25pct.png shows the video's 'Trend #3' section card, evidencing the segmented structure in which the fit rule is restated per trend.",
+        "frame-95pct.png shows the closing segment where the author returns to the fit question before referring viewers to another video."
+      ],
+      "content": "Brand fit as the gate for every trend\n\nPrinciple: No trend is adopted without an explicit justification that it fits the brand of the business and the goal of the website; the operative question is what skill is needed to decide well, not which trend to join.\n\nProblem: Prevents trend-chasing that produces individually attractive pages which fail the client's actual objective.\n\nSource basis: The video states the fit rule at the first trend and declares it applies to every trend discussed, then closes by reframing the question as one of skill rather than trend selection, and warns that a design that does not fit the big picture makes the site worse.\n\nProfessional extension: The two-trend ceiling, the written brand statement, the explicit labelling of time-bound claims and the separation of promotion from method are added by this dossier.",
+      "token_count": 183
+    },
+    {
+      "citation_id": "S45",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Catalog of twelve grid systems and their use cases",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": "12:40",
+      "visual_evidence": [
+        "frame-45pct.png shows a red button labeled 'COLUMN GRIDS' on a pink background introducing the column-grid explanation.",
+        "frame-50pct.png shows an editorial typographic composition titled 'Cherry Blossom Time' used as a grid-in-practice example.",
+        "frame-70pct.png shows a portrait photograph over a visible dot grid, illustrating a grid applied to editorial photography."
+      ],
+      "content": "Using an isometric or triangular grid without adding the color/lighting cues needed to sell the sense of depth.",
+      "token_count": 32
+    },
+    {
+      "citation_id": "S46",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "uZWnxa4mkKA",
+      "video_title": "15 More Design Styles You've Never Heard Of",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Swiss Punk Typography",
+        "Rules"
+      ],
+      "unit_type": "rule_item",
+      "timestamp": "19:42",
+      "visual_evidence": [
+        "supplemental-1240s.png shows a 'CORE FEATURES' slide listing clashing sans-serif sizes/weights, sharp black-and-white contrast, misaligned broken-grid layouts, and cut-and-paste collage energy, alongside overlapping rotated black-and-white typographic examples."
+      ],
+      "content": "Layer and overlap elements with a cut-and-paste, DIY scrapbook energy.",
+      "token_count": 23
+    },
+    {
+      "citation_id": "S47",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Maximalism with an asterisk",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "frame-35pct.png shows a dense magazine-style layout with a saturated yellow block and the oversized headline 'We're a megaphone for your business'.",
+        "supplemental-275s.png shows the same maximalist site with stacked modules and small photographs surrounding the headline."
+      ],
+      "content": "Treating loudness as a substitute for hierarchy.",
+      "token_count": 18
+    },
+    {
+      "citation_id": "S48",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Define site purpose before selecting any trend"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "00:33",
+      "visual_evidence": [],
+      "content": "Define site purpose before selecting any trend\n\nPrinciple: No design trend should be adopted until the concrete action the site wants a user to take (purchase, subscribe, download a lead magnet, etc.) is explicitly defined.\n\nProblem: Prevents cosmetic trend-chasing that does not serve business goals and can actively work against them.\n\nSource basis: The source states this explicitly at 00:33-01:34: 'what is the purpose of my website? ... It should be to get a user to do something.'\n\nProfessional extension: Formalizing this as a mandatory gate before evaluating each of the nine trends, rather than a one-time preamble, is an operational structure added by this dossier.",
+      "token_count": 158
+    },
+    {
+      "citation_id": "S49",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Trinket design",
+        "Avoid"
+      ],
+      "unit_type": "avoid_item",
+      "timestamp": null,
+      "visual_evidence": [
+        "supplemental-660s.png shows the TRINKET DESIGN label over a summer-catalog grid of small objects and a breakfast-item breakdown."
+      ],
+      "content": "Using a single large object instead of a curated collection/grid; the defining trait is the catalog-like arrangement of many small items.",
+      "token_count": 34
+    },
+    {
+      "citation_id": "S50",
+      "section": "related_rules",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Cross-format and cross-size transferability"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "26:31",
+      "visual_evidence": [
+        "frame-80pct.png shows on-screen text reading 'Use spacing and positioning to control the speed of engagement: fast rhythm for simple, skimmable content; slower more deliberate flow for dense or complex information' next to a collage of film/poster covers.",
+        "frame-90pct.png shows a 3D cube labeled 'MOVE THEM ACROSS FORMATS' with the question 'Would this design work in print? Web? App? A digital graphic?', matching the transferability section directly."
+      ],
+      "content": "Cross-format and cross-size transferability\n\nPrinciple: A design system is only complete once it has been verified to hold up when shrunk, placed on different backgrounds, and moved across formats (print, web, mobile, motion), not just in its original ideal presentation.\n\nProblem: Prevents shipping a layout that only works in one perfect context and breaks down or loses legibility/identity in any other size or medium.\n\nSource basis: The source directly states the principle and testing steps, quoting 'If your design only works in one perfect setting, an ideal setting, then it's not a solution. It is a problem.' (26:31) and walks through the exhibition-identity example across formats.\n\nProfessional extension: None beyond restating the source's own testing checklist as acceptance criteria.",
+      "token_count": 181
+    },
+    {
+      "citation_id": "S51",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "AzjbRybUX3M",
+      "video_title": "Why Your Designs Still Look Amateur! (Hidden Rules Pros Use)",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "4 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S52",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "AzjbRybUX3M",
+      "video_title": "Why Your Designs Still Look Amateur! (Hidden Rules Pros Use)",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [],
+      "unit_type": "rules_document",
+      "timestamp": null,
+      "visual_evidence": [
+        "visual/frames/contact-sheet.jpg"
+      ],
+      "content": "Graphic design that reads as amateur versus professional is mostly governed by four subconscious, largely invisible perceptual rules -- visual weight distribution, emotional typography, balance calibrated to the project brief, and layered information hierarchy -- that a designer must apply deliberately rather than leaving to chance, and that must always be weighed against the specific brief instead of applied as fixed formulas.\n\nVisual weight distribution\n\nPrinciple: Tone, density, isolation and vertical position determine how heavy an element feels, and therefore where the viewer's eye enters and travels across a composition; this must be controlled intentionally.\n\nProblem: Uncontrolled tonal contrast and element placement silently dictate the viewer's entry point and reading order, producing compositions that feel unbalanced or unintentional.\n\nSource basis: The source explicitly states and visually demonstrates that darker/denser elements feel heavier, that isolation increases weight, and that upper areas of a frame feel heavier due to a subconscious association with instability and gravity.\n\nProfessional extension: None added beyond the source for this pattern; the rules stated here are a direct restatement of the source's explanation.\n\nEmotional typography (kerning and stroke weight)\n\nPrinciple: Letter spacing (kerning) and stroke weight are emotional levers: tight kerning and italics suggest urgency, generous kerning suggests relaxation and premium feel, heavy strokes suggest authority, and thin strokes suggest elegance.\n\nProblem: Typography chosen only for visual style, without matching the emotional register the brief requires, can undercut the intended tone of a design even when the layout itself is sound.\n\nSource basis: The source directly demonstrates all four typographic states (tight kerning, generous kerning, heavy type, thin type) on the same poster and states explicitly the emotional association of each.\n\nProfessional extension: The acceptance criterion about preserving legibility and negative space is a professional safeguard added by this dossier, not stated verbatim in the source.\n\nBalance calibrated to the project brief\n\nPrinciple: Balance is the distribution of visual weight to create stability, through symmetrical balance (elements mirror each other) or asymmetrical balance (different elements arranged to feel visually equal); neither perfect symmetry nor uncontrolled asymmetry is inherently correct, and the right choice depends entirely on the brief.\n\nProblem: Treating perfect symmetry as the design goal produces static, lifeless compositions, while pushing asymmetry without control produces chaotic, unsettling ones; both failures come from applying a fixed idea of balance regardless of context.\n\nSource basis: The source explicitly states the definition of balance, shows both failure extremes (too static, too chaotic), demonstrates controlled imbalance, and explicitly says the entire section 'might be considered false' depending on the brief, citing law firms and financial institutions as cases needing static symmetry.\n\nProfessional extension: None added beyond the source for the core rule; the source itself already frames balance as brief-dependent rather than absolute.\n\nLayered information hierarchy (delayed hierarchy)\n\nPrinciple: Layering arranges elements in overlapping levels of visual, structural and textual information so a design communicates instantly at a glance but reveals additional depth and meaning only through sustained attention.\n\nProblem: Informational or conceptual designs that present all content at the same visual level compete for attention simultaneously, leaving the viewer without a clear entry point or reading order.\n\nSource basis: The source explicitly narrates the three-layer breakdown (color/impact, word 'Plastic' as anchor, body text defining 'plastic') on the 'How Plastic Are we?' poster, including the 3-second and 15-second timing claims shown on screen.\n\nProfessional extension: None added beyond the source; the layer breakdown and timing claims are restated as given.\n\n- Diagnose the current visual weight of the composition: identify dark, dense or isolated elements and where they direct the viewer's eye, paying special attention to the top of the frame.\n- Decide the intended entry point for the viewer's eye and adjust tone, density or isolation of key elements to achieve it, rather than relying on size or position alone.\n- Apply deliberate isolation to elements that should gain perceived weight without enlarging them.\n- Select a typographic treatment (kerning tightness, stroke weight, italics, serif vs. sans) that matches the emotion required by the brief: urgency, relaxation/premium, authority, or elegance.\n- Evaluate the project brief before deciding the balance strategy: favor symmetrical, static composition for institutional trust; favor controlled asymmetry for energy and personality.\n- Avoid both extremes of balance: neither so symmetrical that the design feels lifeless, nor so asymmetric that it feels chaotic or unstable.\n- For informational or conceptual pieces, design deliberate reading layers: an immediate visual-impact layer, a structural/conceptual anchor layer, and a detailed body-text layer.\n- Review the resulting design against all four principles as a checklist, treating them as tools rather than rigid formulas.\n- Document which principle was applied and why, especially when deliberately breaking one of them (for example, choosing static symmetry for a financial client).",
+      "token_count": 1386
+    },
+    {
+      "citation_id": "S53",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "14 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S54",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [],
+      "unit_type": "rules_document",
+      "timestamp": null,
+      "visual_evidence": [
+        "visual/frames/contact-sheet.jpg"
+      ],
+      "content": "Typography is a language of tone as much as a system of technical rules: choosing a typeface communicates energy and intent before any word is read, and mastering the technical variables that shape text (units, weight, baseline, cap line, x-height, line height, tracking, kerning, contrast) allows a designer to assemble a coherent typographic system built on a hierarchy of headings, paragraphs, buttons and labels, over an output-appropriate grid.\n\nMatch typeface tone to project intent\n\nPrinciple: A typeface communicates a tone of voice before its content is read; the choice of typeface must match the communicative energy required by the project.\n\nProblem: Prevents choosing a typeface based purely on aesthetic taste while ignoring whether its tone fits the project's audience and purpose (e.g. a playful font for a law firm).\n\nSource basis: The source states typography is 'the Art and Science of arranging text to be both legible and appealing' (00:00) and explicitly compares font choice to choosing a tone of voice, citing a clown vs. a lawyer and a wedding photographer vs. an eye doctor (00:30).\n\nProfessional extension: None; this pattern is drawn directly from the source's stated method.\n\nSerif typefaces for tradition and stability\n\nPrinciple: Serif typefaces, descended from Nicolas Jenson's 1470 Roman typeface, are associated with tradition, stability and enduring value.\n\nProblem: Prevents using a serif typeface where a contemporary or playful feel is required, and prevents using a non-serif typeface where institutional trust must be signaled.\n\nSource basis: The source explains Gutenberg's original calligraphic type, Nicolas Jenson's 1470 Roman typeface (01:00), Times New Roman's origin (01:32), and states 'tradition, stability and enduring value is exactly what people associate serif fonts with' (02:03), citing banks, jewelers and lawyers as typical users.\n\nProfessional extension: None; this pattern reflects the source's explanation directly.\n\nSans-serif typefaces for versatility and legibility\n\nPrinciple: Sans-serif typefaces are versatile and legible because they lack a distinct decorative personality, and modern variable sans-serif families offer far more weight variability than serif families.\n\nProblem: Prevents underusing sans-serif families' variability (defaulting to only one or two weights) and prevents choosing serif where broad brand versatility across many use cases is required.\n\nSource basis: The source explains sans-serif origin and modern association (02:03-02:33), states sans-serifs are versatile because they 'lack a distinct personality' (03:05), describes variable sans-serif families offering thousands of weight/width combinations versus two options for serif (03:05), and states they are preferred for packaging, road signs, license plates, key caps and billboards, citing roughly 90% of consumer products (03:36).\n\nProfessional extension: None for the core claim; this dossier flags the '90% of consumer products' figure as an unverified statistic in evidence.limitations rather than treating it as validated data.\n\nRestrict display typefaces to short, high-impact text\n\nPrinciple: Display typefaces are designed to be unique and eye-catching for logos, headings or titles, but do not perform well as paragraph, button, or label text.\n\nProblem: Prevents sacrificing paragraph, button or label legibility by applying a display typeface outside its intended short-text use case.\n\nSource basis: The source explicitly defines display typefaces as designed for logos, headings or titles that need to stand out, and states 'they don't make good paragraphs, buttons or labels' (03:36).\n\nProfessional extension: None; this is a direct restriction stated by the source.\n\nDistinguish script elegance from handwritten informality\n\nPrinciple: Script typefaces imitate refined, classic calligraphy for an elegant and timeless feel, while handwritten typefaces are digitized from a real designer's handwriting and read as more playful and less elegant.\n\nProblem: Prevents confusing script and handwritten typefaces, which produce opposite emotional effects despite both appearing 'handwriting-like'.\n\nSource basis: The source states script typefaces are 'designed to be beautiful, classy and timeless' (04:07) and explicitly distinguishes them from handwritten typefaces, which come from a designer's own handwriting and read as 'more playful and less elegant' (04:07).\n\nProfessional extension: This dossier flags, in evidence.limitations, that no uniformly sampled frame directly demonstrates this specific distinction, since the closest available frame serves a different narrative purpose in the source.\n\nReserve monospace for code and tabular alignment\n\nPrinciple: Proportional typefaces vary character width by shape; monospace typefaces give every character identical width, which is why they are used for code.\n\nProblem: Prevents using monospace typefaces for general reading text (where proportional spacing improves legibility) and prevents using proportional typefaces where strict vertical character alignment is functionally required.\n\nSource basis: The source defines proportional vs. monospace typefaces and states monospace fonts are used for coding because it is easier to navigate code 'arranged more like rows in a spreadsheet' (04:37).\n\nProfessional extension: None; this is a direct restriction stated by the source.\n\nUse relative units (em/rem) for digital typography\n\nPrinciple: Points and pixels are print- and screen-oriented sizing conventions, but em and rem are size-relative units that let users scale typography by changing a root value, keeping designs responsive to zoom and accessibility preferences.\n\nProblem: Prevents hard-coding fixed pixel sizes for text in digital products, which breaks user-controlled zoom and accessibility scaling.\n\nSource basis: The source explains the point as 1/12 inch (05:08), explains that typographic pixels are a sizing convention rather than literal screen pixels (05:40), defines em relative to font size (05:40-06:11), defines rem as 'root em' tied to the CSS `:root` element (06:11), and states roughly 90% of websites use this em/rem model (06:42).\n\nProfessional extension: This dossier flags the '90% of websites' figure as an unverified statistic in evidence.limitations rather than presenting it as validated data.\n\nUse weight to build attention hierarchy without harming legibility\n\nPrinciple: Bolder weights command more visual attention and suit titles and buttons; thinner weights are more legible at small sizes and suit paragraphs and labels; extreme weights in either direction harm legibility.\n\nProblem: Prevents using an extremely thin headline (hard to read) or an extremely bold paragraph (visually straining) purely for stylistic effect.\n\nSource basis: The source states bolder fonts command more attention and suit titles/buttons while thinner fonts suit paragraphs/labels (07:12), and that extremely thin headlines and bold paragraphs both harm legibility (07:12).\n\nProfessional extension: None; this is a direct rule stated by the source.\n\nRespect baseline, cap line and x-height as structural anchors\n\nPrinciple: Baseline, cap line and x-height are the invisible structural lines that define a character's proportions; a large gap between baseline and cap line reads as luxurious or fancy.\n\nProblem: Prevents ignoring a typeface's structural proportions when matching it to a desired feel (e.g. choosing a typeface with a small baseline-to-cap-line gap when a luxurious feel is required).\n\nSource basis: The source defines baseline, cap line and x-height (07:42-08:14) and states fonts with large baseline-to-cap-line differences 'often feel very fancy or luxurious' and are often used for fashion magazines or high-end clothing articles (08:14).\n\nProfessional extension: None; this is a direct explanation from the source.\n\nScale line height inversely to font size\n\nPrinciple: Line height (leading) should be inversely proportional to font size: large headlines need tighter line height near 100% of the font size, while small paragraph text needs looser line height up to about 150%.\n\nProblem: Prevents relying on a design tool's default line height (around 125%), which is a compromise value that does not fit any specific size perfectly.\n\nSource basis: The source states default line height is about 125% of font size and is a compromise (08:45), and gives the rule of thumb that line height is inversely proportional to font size, with large headlines potentially at 1x and small paragraphs up to 1.5x (08:45-09:16), noting these are not hard rules and vary by typeface (09:16).\n\nProfessional extension: None; this is a direct rule of thumb stated by the source, explicitly flagged by the source itself as approximate.\n\nAdjust tracking inversely to size; use kerning for specific pairs\n\nPrinciple: Tracking (uniform letter-spacing) should be inversely proportional to text size; kerning adjusts spacing between specific letter pairs (not uniformly) to prevent visual collisions between certain shapes.\n\nProblem: Prevents applying uniform letter-spacing rules to problems that require pair-specific kerning, and prevents leaving large headline text with default spacing that increases eye strain.\n\nSource basis: The source explains tracking/letter-spacing as inversely proportional to size (09:16-09:46), explains kerning as pair-specific spacing given the 'w' and 'a' example (09:46), and cites designer Jessica Hische's kerning adjustment to the Southern Living logo (10:17).\n\nProfessional extension: This dossier flags the Southern Living/Jessica Hische attribution as an unverified direct claim in evidence.limitations, since no frame in the video visually confirms this specific case.\n\nVerify text-to-background contrast against a minimum ratio\n\nPrinciple: Legible typography requires sufficient color contrast between text and background, measured with a documented contrast ratio, with the source citing a 7:1 minimum guideline traced to 1999 W3C accessibility guidelines.\n\nProblem: Prevents shipping designs where text is visually present but functionally illegible due to insufficient contrast against its background.\n\nSource basis: The source explains accessible contrast as the color difference between typography and background, traces the concern to Flash-era illegible websites and 1999 W3C accessibility guidelines, and cites a recommended minimum contrast ratio of 7:1 and the tool webaim.org (10:17-10:49).\n\nProfessional extension: None beyond restating the source's own recommended verification step; this dossier does not add a different ratio.\n\nBuild a four-category typographic hierarchy\n\nPrinciple: A coherent typographic system divides text into headings, paragraphs, buttons, and labels, defined top-down from the largest heading, with buttons as an explicit weight exception.\n\nProblem: Prevents ad hoc, inconsistent text styling across a project by establishing a documented, top-down hierarchy that scales predictably.\n\nSource basis: The source explains the four-category hierarchy (headings, paragraphs, buttons, labels), the top-down heading design process, the six H1-H6 levels with two-or-three being often sufficient, and the button weight/letter-spacing exception (11:19-12:21).\n\nProfessional extension: None; this pattern reflects the source's stated system directly.\n\nChoose grid column count by output medium\n\nPrinciple: The spacing system between typographic elements should follow a grid whose column count matches the output medium: 12 columns for web, 2 for general print, 6 for newspapers, 3 for magazines, and the golden ratio for posters.\n\nProblem: Prevents inconsistent or arbitrary text-wrapping widths across a project by tying column structure to a medium-appropriate convention.\n\nSource basis: The source recommends 12 columns for web design due to divisibility (12:52), describes a typical 2-column print layout, cites 6-column newspaper grids, 3-column magazine grids, and golden-ratio poster layouts (12:52), and stresses consistency of whatever spacing system is chosen (12:52).\n\nProfessional extension: None; this pattern reflects the source's stated grid conventions directly.\n\n- Define the required communicative tone of the project before evaluating specific typefaces.\n- Select a primary typeface family matching that tone, preferring a variable family if multiple hierarchy levels are needed from one family.\n- Reserve monospace typefaces exclusively for code or tabular data.\n- Define the sizing system in relative units (em/rem) with a configurable root value, for digital projects.\n- Design the largest heading style first, then derive smaller heading levels proportionally; use only as many H1-H6 levels as needed.\n- Design paragraph, button, and label styles following the same size-weight-spacing logic, giving buttons extra weight and letter-spacing.\n- Set line height inversely proportional to font size across the scale.\n- Set tracking (letter-spacing) inversely proportional to font size across the scale.\n- Verify every text/background color pairing against a contrast calculator, targeting at least a 7:1 ratio unless the project specifies otherwise.\n- Choose and document a grid column system matched to the output medium (12 for web, 2 for print, 6 for newspaper-style, 3 for magazine-style, golden ratio for posters) and apply it consistently.\n- Reserve manual kerning adjustments for logotypes or short high-impact text, not general body copy.\n- Document the resulting typographic system (typeface, scale, weights, line heights, tracking, grid) as a reusable project artifact.\n- Flag any adoption statistic or specific named attribution drawn from this source as unverified in any derived documentation.",
+      "token_count": 3431
+    },
+    {
+      "citation_id": "S55",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "7 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S56",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "file": "deliverables/rules.json",
+      "heading_path": [],
+      "unit_type": "rules_document",
+      "timestamp": null,
+      "visual_evidence": [
+        "visual/frames/contact-sheet.jpg"
+      ],
+      "content": "Composition and layout are fundamentally about controlling a viewer's attention over time, not just arranging elements in space. A designer builds this control in layers: six escalating levels of visual movement and flow (literal direction, hierarchy, multiple flows, implied motion, flow disruption, and temporal flow), a grid system that provides the structural scaffolding for hierarchy and white space, and a four-part 'lift system' (leverage points, internal rhythm/eye choreography, calculated friction, and cross-format transferability) that keeps the design coherent across every size and medium it will be used in.\n\nSix levels of movement and visual flow\n\nPrinciple: Visual movement should be built as an escalating system: literal direction, hierarchy-driven flow, multiple simultaneous flows, implied motion, deliberate flow disruption, and temporal flow (pacing impact, lingering, and release over time).\n\nProblem: Prevents designs that rely only on the most obvious cue (an arrow) and never develop subtler, more sophisticated ways of guiding attention, which makes work feel simplistic or predictable.\n\nSource basis: The source explicitly describes and demonstrates all six levels in sequence over a single evolving poster example, narrating why each works (e.g. 'the human eye instinctively follows directional cues', 01:07; 'Punch, slow, pull, release', 08:15).\n\nProfessional extension: The explicit self-check questions and the acceptance criteria formalizing 'describe the eye's order of attention' are added by this dossier to make the concept testable, since the source states the principle narratively without a formal checklist.\n\nFive reasons to use a grid system\n\nPrinciple: Grids are not a stylistic constraint but a structural tool that actively creates hierarchy, controlled rule-breaking impact, format versatility, deliberate white space, and easier eye-guidance through content.\n\nProblem: Prevents treating grids as an optional or purely historical convention, which leads to inconsistent hierarchy, uncontrolled white space, and text blocks that are too long or too short to read comfortably.\n\nSource basis: The source states all five reasons directly with concrete examples (the 'mixd' web page for hierarchy, 09:51; the four-column grid broken with intent, 10:28; the definition of micro white space, 12:08; baseline grid sizing example, 13:18).\n\nProfessional extension: None beyond restating the source's own five reasons as actionable rules; no additional safeguard was necessary for this pattern.\n\nCatalog of twelve grid systems and their use cases\n\nPrinciple: Different content types call for different grid systems; matching the grid family to the medium (editorial, e-commerce, book, hierarchy-driven, proportion-based, gallery, packaging, branding) produces more coherent and purposeful layouts.\n\nProblem: Prevents applying a single generic grid to every project regardless of content type, which produces layouts that fight against the medium instead of supporting it.\n\nSource basis: The source explicitly names, defines and gives a use case plus an application tip for all twelve grid types in sequence (12:40-20:29), preserved here as a complete numbered inventory per the source integrity rule against omitting list items.\n\nProfessional extension: The instruction to 'explicitly consider all twelve types before finalizing a layout' is a professional extension added to turn the source's descriptive catalog into a checkable step.\n\nEstablishing a clear leverage point\n\nPrinciple: A design needs an unambiguous element that the eye lands on first, reinforced by contrast, scale, isolation, or color, before any other flow or rhythm decision is made.\n\nProblem: Prevents designs where multiple elements compete for first attention with no clear winner, leaving the viewer without a starting point.\n\nSource basis: The source directly analyzes two examples (a Nike campaign and an editorial poster) to demonstrate how contrast, scale and isolation create a leverage point, quoting 'That's leverage. That is control.' (21:35).\n\nProfessional extension: The 'two-second viewer test' acceptance criterion is a professional extension added to make the concept independently testable outside the video's own narration.\n\nInternal rhythm and eye choreography\n\nPrinciple: After the leverage point is set, the rest of the layout must guide the eye through a deliberate, choreographed sequence using consistent spacing, predictable alignment, and controlled contrast.\n\nProblem: Prevents layouts where the leverage point is strong but everything after it feels like a series of unrelated jumps rather than a guided path.\n\nSource basis: The source directly explains and demonstrates eye choreography on a web-style layout example, quoting 'This path isn't accidental. It's actually choreographed.' (23:13) and 'Predictable spacing builds trust.' (23:45).\n\nProfessional extension: The explicit self-check questions listed under the workflow section ('are related elements visually grouped?') are restated by this dossier as acceptance criteria to make the pattern verifiable.\n\nCalculated friction balanced with flow\n\nPrinciple: Friction (tight spacing, jarring elements, uncomfortable typography) is a legitimate design tool when used intentionally in specific zones, as long as it is balanced by clearly defined zones of smooth flow elsewhere.\n\nProblem: Prevents both extremes: designs with no friction that feel flat and forgettable, and designs with uncontrolled friction that lose the message in visual noise.\n\nSource basis: The source directly defines friction, gives a worked example (tight leading, blurred faces, a cut-off word), and states the good-vs-bad friction distinction and the 'seasoning' metaphor ('just enough add some flavor... too much will ruin the whole thing', 25:58).\n\nProfessional extension: None beyond restating the source's own self-check questions as acceptance criteria; the pattern is presented largely as directly stated.\n\nCross-format and cross-size transferability\n\nPrinciple: A design system is only complete once it has been verified to hold up when shrunk, placed on different backgrounds, and moved across formats (print, web, mobile, motion), not just in its original ideal presentation.\n\nProblem: Prevents shipping a layout that only works in one perfect context and breaks down or loses legibility/identity in any other size or medium.\n\nSource basis: The source directly states the principle and testing steps, quoting 'If your design only works in one perfect setting, an ideal setting, then it's not a solution. It is a problem.' (26:31) and walks through the exhibition-identity example across formats.\n\nProfessional extension: None beyond restating the source's own testing checklist as acceptance criteria.\n\n- Read the metadata header and evidence/limitations sections before using any claim from this dossier.\n- Identify the target medium and content type (editorial, e-commerce, branding, packaging, digital interface) before selecting a grid type from the catalog pattern.\n- Define a single primary leverage point and reinforce it with contrast, scale, isolation or color before working on secondary layout decisions.\n- Apply the chosen grid consistently, allowing at most one deliberate, clearly intentional break for contrast.\n- Plan micro and macro white space explicitly as part of the grid subdivision, not as leftover space.\n- Build internal rhythm by grouping related elements and keeping spacing/alignment consistent, matching pacing speed to content density.\n- Add friction only in zones intended to demand attention, and confirm at least one zone of smooth flow exists elsewhere.\n- Before finalizing, test the design at thumbnail size, on light and dark backgrounds, and in at least two different formats.\n- Flag any business-outcome, popularity, or percentage claim inherited from this source as unverified unless independent evidence is supplied.\n- Never cite a static frame or mockup as proof of a working software integration or a production deployment.",
+      "token_count": 2011
+    },
+    {
+      "citation_id": "S57",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "rFyOIWMwRdg",
+      "video_title": "2026 Web Design Trends You Need to Know",
+      "creator": "Sam Crawford | Web Design Expert",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "10 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S58",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "WxZHUe8mvhU",
+      "video_title": "11 Years of Brutally Honest Web Design Advice in 7 Minutes",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns",
+        "Communicate value and manage client process to be well paid"
+      ],
+      "unit_type": "rule_pattern",
+      "timestamp": "01:35",
+      "visual_evidence": [
+        "frame-25pct.png shows a diagram of two overlapping circles containing a heart-in-speech-bubble icon and a gear icon, next to a question-mark icon box, plausibly representing communication, process, and client-intent ambiguity discussed in this segment."
+      ],
+      "content": "Communicate value and manage client process to be well paid\n\nPrinciple: Being a well-paid web designer requires communicating value, guiding clients through a clear process, and interpreting what clients actually mean by ambiguous requests, not just visual design skill.\n\nProblem: Prevents skilled designers from being underpaid because they neglect the communication and process skills that determine compensation.\n\nSource basis: The source states at 01:35-02:05 that the best designers are sometimes the worst paid because pay also depends on communicating value, running a clean client process, and decoding ambiguous requests.\n\nProfessional extension: None; this pattern is derived directly from the source's stated method. Note: this segment also contains a paid-resource promotion (02:05-02:31) excluded from the operational rules.",
+      "token_count": 210
+    },
+    {
+      "citation_id": "S59",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "WxZHUe8mvhU",
+      "video_title": "11 Years of Brutally Honest Web Design Advice in 7 Minutes",
+      "creator": "Self-Made Web Designer",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "15 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S60",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "Vs2oSkw4VHM",
+      "video_title": "8 advanced rules of minimal Web Design",
+      "creator": "BONT",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "9 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S61",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "12 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S62",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "6 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S63",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "8 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S64",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "file": "deliverables/context.md",
+      "heading_path": [
+        "Método completo de la fuente"
+      ],
+      "unit_type": "context_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "Método completo de la fuente",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S65",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "8ahnUt_A5eA",
+      "video_title": "Popular Web Design Trends",
+      "creator": "Codex Community",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "5 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S66",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "20 validated rule patterns.",
+      "token_count": 7
+    },
+    {
+      "citation_id": "S67",
+      "section": "additional_context",
+      "source_name": "auto-design",
+      "video_id": "OjaciP_fBwU",
+      "video_title": "30 Graphic Design Styles in 15 Minutes",
+      "creator": "Maria Tokar",
+      "file": "deliverables/rules.json",
+      "heading_path": [
+        "Patterns"
+      ],
+      "unit_type": "rules_section",
+      "timestamp": null,
+      "visual_evidence": [],
+      "content": "3 validated rule patterns.",
+      "token_count": 7
+    }
+  ],
+  "sources": [
+    {
+      "source_name": "auto-design",
+      "video_id": "waHuVF3XuMA",
+      "video_title": "Steal These Web Design Trends 2026",
+      "creator": "Self-Made Web Designer",
+      "canonical_url": "https://www.youtube.com/watch?v=waHuVF3XuMA"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "DU6vjWnH2p0",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 1)",
+      "creator": "BONT",
+      "canonical_url": "https://www.youtube.com/watch?v=DU6vjWnH2p0"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "YlN28RNChl0",
+      "video_title": "This Video Will Take You From Junior to Senior UX/UI Designer",
+      "creator": "uxpeak",
+      "canonical_url": "https://www.youtube.com/watch?v=YlN28RNChl0"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "Vs2oSkw4VHM",
+      "video_title": "8 advanced rules of minimal Web Design",
+      "creator": "BONT",
+      "canonical_url": "https://www.youtube.com/watch?v=Vs2oSkw4VHM"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "_DHiyzRN4gY",
+      "video_title": "Why Minimalism Dominates Modern Graphic Design",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=_DHiyzRN4gY"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "tbf6XDqCWFE",
+      "video_title": "BRUTALISM: Best Website Examples for Your Web Design Inspiration |  TemplateMonster",
+      "creator": "TemplateMonster",
+      "canonical_url": "https://www.youtube.com/watch?v=tbf6XDqCWFE"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "AXpxZMRM1EY",
+      "video_title": "The ULTIMATE Guide To Typography For Beginners",
+      "creator": "DesignSpo",
+      "canonical_url": "https://www.youtube.com/watch?v=AXpxZMRM1EY"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "AzjbRybUX3M",
+      "video_title": "Why Your Designs Still Look Amateur! (Hidden Rules Pros Use)",
+      "creator": "Satori Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=AzjbRybUX3M"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "PKfZ1gnVJ44",
+      "video_title": "The FULL 2026 Guide To Layout & Composition For Designers!",
+      "creator": "Satori Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=PKfZ1gnVJ44"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "rFyOIWMwRdg",
+      "video_title": "2026 Web Design Trends You Need to Know",
+      "creator": "Sam Crawford | Web Design Expert",
+      "canonical_url": "https://www.youtube.com/watch?v=rFyOIWMwRdg"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "WxZHUe8mvhU",
+      "video_title": "11 Years of Brutally Honest Web Design Advice in 7 Minutes",
+      "creator": "Self-Made Web Designer",
+      "canonical_url": "https://www.youtube.com/watch?v=WxZHUe8mvhU"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "T96O8dTzi2Q",
+      "video_title": "NO MORE AI SLOP | Claude Design Full Tutorial",
+      "creator": "Sergei Chyrkov",
+      "canonical_url": "https://www.youtube.com/watch?v=T96O8dTzi2Q"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "kK1TOpI948o",
+      "video_title": "The Beginner's Guide To Visual Hierarchy",
+      "creator": "DesignSpo",
+      "canonical_url": "https://www.youtube.com/watch?v=kK1TOpI948o"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "25UwZDuHfiQ",
+      "video_title": "How I design websites with EDITORIAL style layouts (part 2)",
+      "creator": "BONT",
+      "canonical_url": "https://www.youtube.com/watch?v=25UwZDuHfiQ"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "8ahnUt_A5eA",
+      "video_title": "Popular Web Design Trends",
+      "creator": "Codex Community",
+      "canonical_url": "https://www.youtube.com/watch?v=8ahnUt_A5eA"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "xpLUouSZHi8",
+      "video_title": "20 More Design Styles You've Been Searching For",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=xpLUouSZHi8"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "u-JtFKXL_jY",
+      "video_title": "4 Graphic Design Tips For ELITE Design Thinkers!",
+      "creator": "Satori Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=u-JtFKXL_jY"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "OjaciP_fBwU",
+      "video_title": "30 Graphic Design Styles in 15 Minutes",
+      "creator": "Maria Tokar",
+      "canonical_url": "https://www.youtube.com/watch?v=OjaciP_fBwU"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "nlGr4GRIzAg",
+      "video_title": "The REAL 2026 Color Theory Knowledge Designers Need To Know!",
+      "creator": "Satori Graphics",
+      "canonical_url": "https://www.youtube.com/watch?v=nlGr4GRIzAg"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "DRmnkaWQp4o",
+      "video_title": "9 Web Design Trends 2025 to Spruce Up Your Site",
+      "creator": "Showit",
+      "canonical_url": "https://www.youtube.com/watch?v=DRmnkaWQp4o"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "bZ1vbmV5gk8",
+      "video_title": "40 Design Style Names You've Been Looking For (Find References Faster)",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=bZ1vbmV5gk8"
+    },
+    {
+      "source_name": "auto-design",
+      "video_id": "uZWnxa4mkKA",
+      "video_title": "15 More Design Styles You've Never Heard Of",
+      "creator": "Kittl",
+      "canonical_url": "https://www.youtube.com/watch?v=uZWnxa4mkKA"
+    }
+  ],
+  "coverage": {
+    "units_by_type": {
+      "rules_section": 14,
+      "context_section": 5,
+      "avoid_item": 21,
+      "rule_item": 9,
+      "rule_pattern": 14,
+      "acceptance_criterion": 1,
+      "rules_document": 3
+    },
+    "units_by_source": {
+      "auto-design": 67
+    },
+    "omitted_for_budget": 43,
+    "budget_exhausted": true
+  },
+  "warnings": [],
+  "limitations": [
+    "The token budget was exhausted; 43 additional block(s) with real evidence were left out."
+  ]
+}
