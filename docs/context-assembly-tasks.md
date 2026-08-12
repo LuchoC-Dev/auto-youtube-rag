@@ -186,7 +186,7 @@ Checkpoint J: las cuatro políticas puras pasan sin instanciar SQLite, sin
 
 ### K4. Escritura del bundle
 
-- [ ] Implementar `writeContextBundle` en infraestructura.
+- [x] Implementar `writeContextBundle` en infraestructura.
   - Depende de: K3.
   - Aceptación: crea `<outputDir>/<request_id>/context.md` y `result.json`;
     `request_id` usa el mismo generador ad-hoc que `SyncId`, inyectable para
