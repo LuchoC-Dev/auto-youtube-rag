@@ -198,8 +198,9 @@ El orden de entrada al presupuesto es fijo y determinista:
    descendente → alimentan "Related rules and patterns".
 3. Bloques de ancestro, ordenados por el `fusedScore` del candidato que los
    originó (descendente) y, dentro de un mismo candidato, por `depth`
-   ascendente (el padre inmediato antes que el abuelo) → alimentan
-   "Additional relevant context".
+   descendente —`depth` 0 es la raíz del documento, así que un `depth` mayor
+   es más cercano a la hoja— para que el padre inmediato preceda siempre al
+   abuelo → alimentan "Additional relevant context".
 
 Cada categoría de `unitType` cae en una sola sección: una unidad no aparece
 dos veces aunque coincida por ambas vías de búsqueda, porque ya llega

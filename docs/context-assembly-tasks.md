@@ -104,11 +104,12 @@ KnowledgeUnit>` (clave = `unitId.value`, para conocer el `parentId` de
 
 ### J3. Presupuesto y truncamiento
 
-- [ ] Implementar `allocateBudget` sobre la secuencia ordenada de bloques.
+- [x] Implementar `allocateBudget` sobre la secuencia ordenada de bloques.
   - Depende de: J1, J2, I1.
   - Aceptación: orden fijo (documento/sección por `fusedScore` desc, luego
     reglas/patrones por `fusedScore` desc, luego ancestros por `fusedScore`
-    del candidato de origen desc y `depth` asc); nunca corta un bloque a la
+    del candidato de origen desc y `depth` desc, padre inmediato antes que
+    abuelo); nunca corta un bloque a la
     mitad; incluye el primer bloque aunque exceda el presupuesto por sí solo
     y marca `budgetExhausted` de inmediato; `omittedCount` y
     `estimatedTokens` son exactos; determinista.
