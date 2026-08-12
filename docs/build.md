@@ -18,7 +18,7 @@
 |                            | 2.3 | Ensamblado de contexto         |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve` |
 |                            | 2.4 | Skill general                  |   ✅   | 100% | `skill/SKILL.md` verificada en frío        |
 | **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos       |
-|                            | 3.2 | Evaluaciones del MVP           |   ⚪   |  0%  | Recall, precisión y cobertura              |
+|                            | 3.2 | Evaluaciones del MVP           |   🔵   | 11%  | M1 completado; M2–O2 en curso              |
 
 ---
 
@@ -124,9 +124,15 @@ Diseño y checklist fino propuestos y aprobados el 12 de agosto de 2026 en
 `docs/eval-design.md` y `docs/eval-tasks.md` (bloques M–O). Sin ground truth
 etiquetado: mide en dos capas independientes, mecánica (cobertura, integridad
 de citas) y juzgada (rúbrica respondida por Codex y por Claude sobre el mismo
-bundle). Implementación todavía no iniciada.
+bundle). Checklist fino en `docs/eval-tasks.md`, bloques M–O.
 
-- [ ] Preparar consultas reales
-- [ ] Medir recall y precisión
-- [ ] Medir cobertura temática
-- [ ] Evaluar con Codex y Claude
+- [x] M1. Verificador de integridad de citas (`evals/citation-integrity.ts`)
+- [ ] M2. Script de orquestación de consultas semilla
+- [ ] M3. Agregador de métricas de Capa A
+- [ ] M4. Ejecución real sobre `auto-design`
+- [ ] N1. Plantilla de rúbrica
+- [ ] N2. Juicio de Claude
+- [ ] N3. Juicio de Codex
+- [ ] N4. Comparación Codex vs. Claude
+- [ ] O1. Decisión sobre pesos RRF y presupuestos
+- [ ] O2. Reporte final y cierre de 3.2
