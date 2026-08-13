@@ -149,6 +149,8 @@ export function describeDocument(document: PackageDocumentSnapshot): string {
       return document.content.sections.length.toString();
     case "rules":
       return document.content.patterns.length.toString();
+    case "analysis":
+      return document.content.topics.length.toString();
     case "metadata":
       return document.content.title ?? "untitled";
   }

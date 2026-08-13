@@ -65,6 +65,65 @@ export interface RulesDocumentSnapshot {
   readonly agentWorkflow: readonly string[];
 }
 
+export const analysisEvidenceClasses = [
+  "direct",
+  "visual",
+  "time_bound",
+  "unverified",
+] as const;
+export type AnalysisEvidenceClass = (typeof analysisEvidenceClasses)[number];
+
+export const analysisConfidenceLevels = ["high", "medium", "low"] as const;
+export type AnalysisConfidence = (typeof analysisConfidenceLevels)[number];
+
+export interface AnalysisTopicSnapshot {
+  readonly id: string;
+  readonly title: string;
+  readonly whatTheSourceSays: string;
+  readonly evidenceClass: AnalysisEvidenceClass;
+  readonly timestamps: readonly string[];
+  readonly visualEvidence: readonly string[];
+  readonly analystNote: string | null;
+}
+
+export interface AnalysisRecommendationSnapshot {
+  readonly id: string;
+  readonly recommendation: string;
+  readonly rationale: string;
+  readonly confidence: AnalysisConfidence;
+}
+
+export interface AnalysisAssessmentSnapshot {
+  readonly strengths: readonly string[];
+  readonly weaknesses: readonly string[];
+  readonly verdict: string;
+  readonly basis: string;
+}
+
+export interface AnalysisEvidenceBoundarySnapshot {
+  readonly transcript: string;
+  readonly frames: string;
+  readonly analystOpinion: string;
+  readonly unverified: string;
+}
+
+export interface AnalysisLensSnapshot {
+  readonly lens: string;
+  readonly rationale: string;
+  readonly chosenBy: "agent" | "user";
+}
+
+export interface AnalysisDocumentSnapshot {
+  readonly kind: "analysis";
+  readonly schemaVersion: string;
+  readonly analysisLens: AnalysisLensSnapshot;
+  readonly summary: string;
+  readonly topics: readonly AnalysisTopicSnapshot[];
+  readonly recommendations: readonly AnalysisRecommendationSnapshot[];
+  readonly assessment: AnalysisAssessmentSnapshot;
+  readonly evidenceBoundary: AnalysisEvidenceBoundarySnapshot;
+}
+
 export interface SelectedMetadataSnapshot {
   readonly kind: "metadata";
   readonly videoId: VideoId;
@@ -84,7 +143,7 @@ export interface SelectedMetadataSnapshot {
 }
 
 interface PackageDocumentSnapshotBase<
-  TKind extends "context" | "rules" | "metadata",
+  TKind extends "context" | "rules" | "analysis" | "metadata",
   TContent,
 > {
   readonly kind: TKind;
@@ -105,6 +164,11 @@ export type RulesPackageDocumentSnapshot = PackageDocumentSnapshotBase<
   RulesDocumentSnapshot
 >;
 
+export type AnalysisPackageDocumentSnapshot = PackageDocumentSnapshotBase<
+  "analysis",
+  AnalysisDocumentSnapshot
+>;
+
 export type MetadataPackageDocumentSnapshot = PackageDocumentSnapshotBase<
   "metadata",
   SelectedMetadataSnapshot
@@ -113,6 +177,7 @@ export type MetadataPackageDocumentSnapshot = PackageDocumentSnapshotBase<
 export type PackageDocumentSnapshot =
   | ContextPackageDocumentSnapshot
   | RulesPackageDocumentSnapshot
+  | AnalysisPackageDocumentSnapshot
   | MetadataPackageDocumentSnapshot;
 
 export interface PackageSnapshot {
