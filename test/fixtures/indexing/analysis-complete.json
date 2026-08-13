@@ -1,0 +1,63 @@
+{
+  "schema_version": "2.0",
+  "source": {
+    "video_id": "video_456",
+    "title": "Tendencias de diseño 2026",
+    "url": "https://example.com/watch?v=video_456",
+    "creator": "Example Channel",
+    "duration_seconds": 720,
+    "language": "es"
+  },
+  "analysis_lens": {
+    "lens": "Diseño gráfico editorial",
+    "rationale": "El video cubre publicaciones editoriales recientes.",
+    "chosen_by": "agent"
+  },
+  "summary": "El video repasa tendencias editoriales recientes con énfasis en tipografía expresiva.",
+  "topics": [
+    {
+      "id": "expressive_typography",
+      "title": "Tipografía expresiva",
+      "what_the_source_says": "La fuente muestra tipografía de gran escala como recurso editorial dominante.",
+      "evidence_class": "direct",
+      "timestamps": ["00:01:12-00:02:03"],
+      "visual_evidence": ["visual/frames/frame-012.jpg"],
+      "analyst_note": "Coincide con tendencias ya observadas en otros videos de la colección."
+    },
+    {
+      "id": "muted_palettes",
+      "title": "Paletas apagadas",
+      "what_the_source_says": "Se observan paletas de baja saturación en varias piezas mostradas.",
+      "evidence_class": "visual",
+      "timestamps": [],
+      "visual_evidence": ["visual/frames/frame-030.jpg"],
+      "analyst_note": null
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "adopt_expressive_type",
+      "recommendation": "Usar tipografía expresiva como elemento dominante en piezas editoriales.",
+      "rationale": "La evidencia directa del video respalda esta dirección.",
+      "confidence": "high"
+    },
+    {
+      "id": "test_muted_palette",
+      "recommendation": "Probar paletas apagadas en variantes de una misma pieza.",
+      "rationale": "La evidencia visual es sugerente pero no exhaustiva.",
+      "confidence": "medium"
+    }
+  ],
+  "assessment": {
+    "strengths": ["Ejemplos visuales abundantes y bien encuadrados."],
+    "weaknesses": ["No se discuten limitaciones de accesibilidad tipográfica."],
+    "verdict": "Contenido útil como referencia de tendencias, no como manual normativo.",
+    "basis": "Basado en la cobertura visual y la ausencia de guía prescriptiva explícita."
+  },
+  "evidence_boundary": {
+    "transcript": "La transcripción confirma el enfoque editorial declarado.",
+    "frames": "Los frames muestran ejemplos consistentes con lo narrado.",
+    "analyst_opinion": "La clasificación de tendencia es interpretación del analista.",
+    "unverified": "No se verificó la fuente original de cada pieza mostrada."
+  }
+}

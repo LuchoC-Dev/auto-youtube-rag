@@ -88,7 +88,7 @@ existente. Todavía no hay ningún parser ni caso de uso que los use.
 
 ### Q1. `analysis-json-parser.ts`
 
-- [ ] Crear `parseAnalysisJson`, espejo de `parseRulesJson`: valida forma
+- [x] Crear `parseAnalysisJson`, espejo de `parseRulesJson`: valida forma
       exacta de schema 2.0, exige los seis campos de cada `topic`, los
       cuatro de cada `recommendation`, valida `evidence_class`/`confidence`/
       `chosen_by` contra las listas cerradas, detecta ids de topic o
