@@ -139,11 +139,41 @@ function readOptionalText(
 
 function readResource(
   resources: Record<string, unknown>,
-  key: keyof ManifestResourceSnapshot,
+  key: "context" | "metadata",
   context: ManifestParseContext,
   field: string,
 ): boolean {
   const value = resources[key];
+
+  if (typeof value !== "boolean") {
+    manifestError(
+      "MANIFEST_SCHEMA_INVALID",
+      context,
+      `${field}.${key}`,
+      `${field}.${key} must be a boolean`,
+    );
+  }
+
+  return value;
+}
+
+/**
+ * `rules` and `analysis` are each optional in the raw manifest — a schema
+ * 1.0 manifest never declares `analysis`, a schema 2.0 manifest never
+ * declares `rules` — so an absent key means `false`, unlike `context`/
+ * `metadata` which stay required.
+ */
+function readOptionalStructuredContentFlag(
+  resources: Record<string, unknown>,
+  key: "rules" | "analysis",
+  context: ManifestParseContext,
+  field: string,
+): boolean {
+  const value = resources[key];
+
+  if (value === undefined) {
+    return false;
+  }
 
   if (typeof value !== "boolean") {
     manifestError(
@@ -171,9 +201,34 @@ function readResources(
     );
   }
 
+  const hasRules = readOptionalStructuredContentFlag(
+    input,
+    "rules",
+    context,
+    field,
+  );
+  const hasAnalysis = readOptionalStructuredContentFlag(
+    input,
+    "analysis",
+    context,
+    field,
+  );
+
+  if (hasRules && hasAnalysis) {
+    manifestError(
+      "MANIFEST_SCHEMA_INVALID",
+      context,
+      field,
+      `${field} must not declare both rules and analysis`,
+    );
+  }
+
+  const structuredContent: ManifestResourceSnapshot["structuredContent"] =
+    hasRules ? "rules" : hasAnalysis ? "analysis" : "none";
+
   return Object.freeze({
     context: readResource(input, "context", context, field),
-    rules: readResource(input, "rules", context, field),
+    structuredContent,
     metadata: readResource(input, "metadata", context, field),
   });
 }

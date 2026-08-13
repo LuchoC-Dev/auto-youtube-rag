@@ -189,9 +189,12 @@ export interface PackageSnapshot {
   readonly documents: readonly PackageDocumentSnapshot[];
 }
 
+export const structuredContentKinds = ["rules", "analysis", "none"] as const;
+export type StructuredContentKind = (typeof structuredContentKinds)[number];
+
 export interface ManifestResourceSnapshot {
   readonly context: boolean;
-  readonly rules: boolean;
+  readonly structuredContent: StructuredContentKind;
   readonly metadata: boolean;
 }
 
