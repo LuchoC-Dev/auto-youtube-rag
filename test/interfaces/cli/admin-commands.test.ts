@@ -6,6 +6,7 @@ import { test } from "node:test";
 
 import { runCli, type CliWriter } from "../../../src/interfaces/cli/run-cli.js";
 import { createApplication } from "../../../src/main/create-application.js";
+import { installFakeModel } from "../../helpers/install-fake-model.js";
 
 class BufferWriter implements CliWriter {
   public value = "";
@@ -27,14 +28,17 @@ function json(text: string): Record<string, unknown> {
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "auto-youtube-rag-cli-"));
   const collection = join(root, "collection");
+  const modelCachePath = join(root, "models");
   await mkdir(join(collection, "videos"), { recursive: true });
   await writeFile(join(collection, "manifest.json"), '{"videos":[]}', "utf8");
+  await mkdir(modelCachePath, { recursive: true });
+  await installFakeModel(modelCachePath);
   return {
     root,
     collection,
     config: {
       databasePath: join(root, "data", "index.sqlite"),
-      modelCachePath: join(root, "models"),
+      modelCachePath,
     },
   };
 }
