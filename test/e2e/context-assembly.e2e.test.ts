@@ -35,10 +35,70 @@ const designVideo: TestVideo = {
   videoId: "design_video",
   slug: "design-video",
 };
+const analysisVideo: TestVideo = {
+  videoId: "analysis_video",
+  slug: "analysis-video",
+  structuredContent: "analysis",
+};
 const catalogVideo: TestVideo = {
   videoId: "catalog_video",
   slug: "catalog-video",
 };
+
+function grungeAnalysisFixture(): unknown {
+  return {
+    schema_version: "2.0",
+    source: {
+      video_id: analysisVideo.videoId,
+      title: "Texturas grunge en carteles",
+      url: "https://example.com/watch?v=analysis_video",
+      creator: "Example Channel",
+      duration_seconds: 480,
+      language: "es",
+    },
+    analysis_lens: {
+      lens: "Diseño de carteles",
+      rationale: "El video analiza técnicas de textura en carteles.",
+      chosen_by: "agent",
+    },
+    summary: "El video explora texturas grunge aplicadas a carteles impresos.",
+    topics: [
+      {
+        id: "grunge_texture",
+        title: "Textura grunge",
+        what_the_source_says:
+          "El video usa texturas grunge para dar textura orgánica a los carteles.",
+        evidence_class: "direct",
+        timestamps: [],
+        visual_evidence: [],
+        analyst_note: null,
+      },
+    ],
+    recommendations: [
+      {
+        id: "use_grunge_texture",
+        recommendation:
+          "Aplicar texturas grunge en fondos para lograr una sensación orgánica.",
+        rationale:
+          "La evidencia directa muestra el uso consistente de grunge en el video.",
+        confidence: "high",
+      },
+    ],
+    assessment: {
+      strengths: ["Ejemplos visuales consistentes de textura grunge."],
+      weaknesses: ["No se discuten alternativas de textura."],
+      verdict: "Útil como referencia de una técnica de textura específica.",
+      basis: "Basado en la cobertura visual del video.",
+    },
+    evidence_boundary: {
+      transcript: "La transcripción confirma el enfoque en textura grunge.",
+      frames: "Los frames muestran ejemplos consistentes de grunge.",
+      analyst_opinion:
+        "La clasificación de técnica es interpretación del analista.",
+      unverified: "No se verificó la fuente original de cada cartel mostrado.",
+    },
+  };
+}
 
 async function withoutMutating<T>(
   collections: readonly TestCollection[],
@@ -58,7 +118,9 @@ async function withoutMutating<T>(
 void test("assembles, budgets and cites context end to end through the retrieve command", async () => {
   const design = await createTestCollection([designVideo]);
   const catalog = await createTestCollection([catalogVideo]);
-  const collections = [design, catalog];
+  const analysis = await createTestCollection([analysisVideo]);
+  const collections = [design, catalog, analysis];
+  await analysis.writeAnalysis(analysisVideo, grungeAnalysisFixture());
 
   // Nested headings produce a real ancestor chain to expand: the H1 slug
   // section is the child of the synthetic document root, "Método completo"
@@ -127,10 +189,20 @@ void test("assembles, budgets and cites context end to end through the retrieve 
         "catalog",
       ]);
       assert.equal(addCatalog.exitCode, 0);
+      const addAnalysis = await retrieve([
+        "source",
+        "add",
+        analysis.collectionPath,
+        "--name",
+        "analysis",
+      ]);
+      assert.equal(addAnalysis.exitCode, 0);
       const syncDesign = await retrieve(["sync", "--source", "design"]);
       assert.equal(syncDesign.exitCode, 0);
       const syncCatalog = await retrieve(["sync", "--source", "catalog"]);
       assert.equal(syncCatalog.exitCode, 0);
+      const syncAnalysis = await retrieve(["sync", "--source", "analysis"]);
+      assert.equal(syncAnalysis.exitCode, 0);
     });
 
     // The rare term resolves through the lexical path, source-filtered to
@@ -205,6 +277,36 @@ void test("assembles, budgets and cites context end to end through the retrieve 
         Number(generousReceipt.estimated_tokens),
     );
 
+    // A query matching analysis.json content (schema 2.0) cites both an
+    // analysis_topic and an analysis_recommendation, each in the section
+    // classifyContextSection assigns them.
+    const grunge = await retrieve([
+      "retrieve",
+      "grunge",
+      "--source",
+      "analysis",
+      "--out",
+      outDir,
+    ]);
+    assert.equal(grunge.exitCode, 0);
+    const grungeReceipt = json(grunge.stdout);
+    assert.equal(grungeReceipt.status, "ok");
+    const grungeMarkdown = await readFile(
+      grungeReceipt.context_path as string,
+      "utf8",
+    );
+    const grungeResult = json(
+      await readFile(grungeReceipt.result_path as string, "utf8"),
+    );
+    const grungeUnits = grungeResult.units;
+    assert.ok(Array.isArray(grungeUnits));
+    const unitTypes = grungeUnits.map((unit) => record(unit).unit_type);
+    assert.ok(unitTypes.includes("analysis_topic"));
+    assert.ok(unitTypes.includes("analysis_recommendation"));
+    assert.match(grungeMarkdown, /Textura grunge/u);
+    assert.match(grungeMarkdown, /Aplicar texturas grunge/u);
+    assert.match(grungeMarkdown, /\[S0\d\]/u);
+
     // The vector path has no similarity floor (see retrieval-design.md): a
     // query over a non-empty library always ranks something. The only
     // reliable no_results case is a filter that empties the candidate
@@ -229,5 +331,6 @@ void test("assembles, budgets and cites context end to end through the retrieve 
     await rm(outDir, { recursive: true, force: true });
     await design.cleanup();
     await catalog.cleanup();
+    await analysis.cleanup();
   }
 });
