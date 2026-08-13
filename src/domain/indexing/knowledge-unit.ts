@@ -10,6 +10,10 @@ export const knowledgeUnitTypes = [
   "rule_item",
   "avoid_item",
   "acceptance_criterion",
+  "analysis_document",
+  "analysis_section",
+  "analysis_topic",
+  "analysis_recommendation",
 ] as const;
 
 export type KnowledgeUnitType = (typeof knowledgeUnitTypes)[number];
@@ -17,6 +21,7 @@ export type KnowledgeUnitType = (typeof knowledgeUnitTypes)[number];
 const documentUnitTypes = new Set<KnowledgeUnitType>([
   "context_document",
   "rules_document",
+  "analysis_document",
 ]);
 
 export interface KnowledgeUnitInput {
