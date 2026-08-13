@@ -340,8 +340,18 @@ es su contrato lógico.
 10. Confirmar el run como `ok` o `partial` y actualizar el índice vectorial en
     memoria sólo después del commit SQLite.
 
-Si el manifest completo es ilegible, no se interpretan todos los paquetes como
-eliminados. El run falla y el índice previo permanece intacto.
+Si el manifest completo es ilegible (raíz no es un objeto, `videos` no es un
+array, JSON inválido o archivo no leíble), no se interpretan todos los
+paquetes como eliminados. El run falla y el índice previo permanece intacto.
+
+**Una entrada individual inválida de `manifest.videos` no aborta el manifest
+completo.** Desde el 13 de agosto de 2026 (ver `docs/decisions.md`,
+"Validación tolerante por video"), un video con esquema roto o un id/slug
+duplicado se descarta como `ManifestVideoIssue` y el resto del manifest se
+procesa igual. `syncSource` registra cada una como `SyncIssue` y, si el video
+tenía una versión previa indexada, la marca vista para que sobreviva a la
+eliminación por "no visto en este run" — un video que retrocede a un esquema
+inválido nunca debe parecer eliminado de la colección.
 
 ## Invariantes
 

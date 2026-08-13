@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import type {
   ManifestResourceSnapshot,
   ManifestSnapshot,
+  ManifestVideoIssue,
   ManifestVideoSnapshot,
 } from "../../application/indexing/package-snapshots.js";
 import { sha256 } from "../../domain/indexing/content-identity.js";
@@ -72,6 +73,24 @@ function readVideoId(
     }
 
     throw error;
+  }
+}
+
+/**
+ * Best-effort identification for a manifest entry that failed validation
+ * elsewhere, used only to attribute a `ManifestVideoIssue` to a video.
+ * Returns `null` instead of throwing when `video_id` itself is what is
+ * missing or malformed — there is nothing safe to attribute the issue to.
+ */
+function tryReadVideoId(input: unknown): VideoId | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  try {
+    return VideoId.create(input.video_id);
+  } catch {
+    return null;
   }
 }
 
@@ -195,6 +214,19 @@ function readVideo(
   });
 }
 
+/**
+ * Parses a manifest, tolerating per-video problems: a malformed or
+ * duplicated entry is skipped and reported as a `ManifestVideoIssue` instead
+ * of aborting the whole manifest. Only structural failures with no
+ * per-video meaning — the root not being an object, `videos` not being an
+ * array, unreadable or malformed JSON (see `readManifest`) — remain fatal,
+ * because there is no video list left to salvage.
+ *
+ * This exists so a single video generated under a different package schema
+ * (see `docs/decisions.md`, "manifest schema drift") can never block sync
+ * for the rest of a source, which was the amplifying failure mode found
+ * during 3.2's real-collection evaluation.
+ */
 export function parseManifest(
   input: unknown,
   context: ManifestParseContext,
@@ -219,31 +251,56 @@ export function parseManifest(
 
   const seenVideoIds = new Set<string>();
   const seenSlugs = new Set<string>();
-  const videos = input.videos.map((video, index) => {
-    const snapshot = readVideo(video, index, context);
+  const videos: ManifestVideoSnapshot[] = [];
+  const issues: ManifestVideoIssue[] = [];
+
+  input.videos.forEach((video, index) => {
+    let snapshot: ManifestVideoSnapshot;
+
+    try {
+      snapshot = readVideo(video, index, context);
+    } catch (error: unknown) {
+      if (error instanceof ManifestReadError) {
+        issues.push({
+          index,
+          videoId: tryReadVideoId(video),
+          field: error.field,
+          code: "SCHEMA_INVALID",
+          message: error.message,
+        });
+        return;
+      }
+
+      throw error;
+    }
+
     const videoId = snapshot.ref.videoId.value;
 
     if (seenVideoIds.has(videoId)) {
-      manifestError(
-        "MANIFEST_DUPLICATE",
-        context,
-        `videos[${String(index)}].video_id`,
-        `video id is duplicated: ${videoId}`,
-      );
+      issues.push({
+        index,
+        videoId: snapshot.ref.videoId,
+        field: `videos[${String(index)}].video_id`,
+        code: "DUPLICATE",
+        message: `video id is duplicated: ${videoId}`,
+      });
+      return;
     }
 
     if (seenSlugs.has(snapshot.slug)) {
-      manifestError(
-        "MANIFEST_DUPLICATE",
-        context,
-        `videos[${String(index)}].slug`,
-        `slug is duplicated: ${snapshot.slug}`,
-      );
+      issues.push({
+        index,
+        videoId: snapshot.ref.videoId,
+        field: `videos[${String(index)}].slug`,
+        code: "DUPLICATE",
+        message: `slug is duplicated: ${snapshot.slug}`,
+      });
+      return;
     }
 
     seenVideoIds.add(videoId);
     seenSlugs.add(snapshot.slug);
-    return snapshot;
+    videos.push(snapshot);
   });
 
   return Object.freeze({
@@ -251,6 +308,7 @@ export function parseManifest(
     sourceName: context.sourceName,
     contentHash: context.contentHash,
     videos: Object.freeze(videos),
+    issues: Object.freeze(issues),
   });
 }
 

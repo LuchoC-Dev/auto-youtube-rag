@@ -140,6 +140,7 @@ const manifest = {
       resources: { context: true, rules: true, metadata: true },
     },
   ],
+  issues: [],
 } as const satisfies ManifestSnapshot;
 
 export function describeDocument(document: PackageDocumentSnapshot): string {
