@@ -4,7 +4,11 @@ import type { PackageSourceReader } from "../ports/package-source-reader.js";
 import type { VectorIndexSink } from "../ports/vector-index-sink.js";
 import { sha256 } from "../../domain/indexing/content-identity.js";
 import { EmbeddingRecord } from "../../domain/indexing/embedding-record.js";
-import { DocumentId, SyncId } from "../../domain/indexing/identifiers.js";
+import {
+  DocumentId,
+  PackageRef,
+  SyncId,
+} from "../../domain/indexing/identifiers.js";
 import { SourceDocument } from "../../domain/indexing/source-document.js";
 import type { SourceRoot } from "../../domain/indexing/source-root.js";
 import {
@@ -193,6 +197,39 @@ export async function syncSource(
 
   const model = await dependencies.embeddingGenerator.describe();
   const previousRefs = await dependencies.store.listPackageRefs(source.name);
+
+  // Manifest entries that failed schema validation or duplicated an id/slug
+  // were already skipped from manifest.videos (see parseManifest); record
+  // each as an issue and, when the entry still resolves to a known video,
+  // protect any previously indexed package of it from the "not seen this
+  // run" deletion pass below. A manifest entry that regresses to an invalid
+  // schema must never look like the video was removed from the collection.
+  for (const manifestIssue of manifest.issues) {
+    counters.packagesSeen += 1;
+    counters.packagesFailed += 1;
+    const issue = SyncIssue.create({
+      syncId,
+      videoId: manifestIssue.videoId,
+      relativePath: null,
+      code:
+        manifestIssue.code === "DUPLICATE"
+          ? "MANIFEST_ENTRY_DUPLICATE"
+          : "MANIFEST_ENTRY_SCHEMA_INVALID",
+      message: `videos[${String(manifestIssue.index)}]: ${manifestIssue.message}`,
+      retryable: false,
+    });
+    issues.push(issue);
+    await dependencies.store.recordIssue(issue);
+
+    if (manifestIssue.videoId !== null) {
+      const ref = PackageRef.create(source.name, manifestIssue.videoId);
+      const previous = await dependencies.store.getPackageState(ref);
+      if (previous !== null) {
+        await dependencies.store.markPackageSeen(ref, syncId);
+      }
+    }
+  }
+
   const manifestRefs = new Set(
     manifest.videos.map((video) => video.ref.serialize()),
   );

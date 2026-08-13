@@ -740,6 +740,22 @@ lo capturó de inmediato al implementar J3. La regla correcta —ya aplicada en
 código y documentación— es `depth` **descendente**. Si alguna referencia
 vieja (memoria de sesión, comentario) dice "ascendente", está desactualizada.
 
+### Un solo video con esquema roto bloqueaba la sincronización de toda la fuente
+
+Descubierto en M4 (3.2) contra la colección real `auto-design`: `sync`
+antes procesaba `manifest.videos` con un `.map()` síncrono que tiraba
+`ManifestReadError` en la primera entrada inválida, abortando la lectura del
+manifest completo. Un solo video con un campo de esquema roto (por ejemplo,
+`resources.analysis` en vez de `resources.rules`, ver "Deriva de esquema
+real" más arriba) bloqueaba la sincronización de los otros 50 videos de la
+fuente, incluidos los válidos. Corregido el 13 de agosto: `parseManifest`
+ahora descarta la entrada inválida y la reporta como `ManifestVideoIssue`
+en vez de abortar; sólo los fallos de raíz del manifest (root no objeto,
+`videos` no array, JSON inválido, archivo no legible) siguen siendo
+fatales. Detalle en `docs/decisions.md`, sección "Validación tolerante por
+video en el manifest". No revertir a un `.map()`/`throw` síncrono sin
+recrear este mismo aislamiento.
+
 ## Invariantes y límites obligatorios
 
 - Nunca escribir, mover ni eliminar archivos de las fuentes registradas.
@@ -927,15 +943,48 @@ motivo (registrados también en `decisions.md` y en el reporte final):
   ensamblado). El criterio de éxito del producto es cobertura amplia y
   citada, no coincidencia puntual contra una lista de "fragmentos
   correctos".
-- **Deriva de esquema real en `auto-design`, fuera de este repositorio.** La
-  colección creció de 34 a 51 videos; 17 usan `resources.analysis` en vez de
-  `resources.rules`, y hacen fallar el manifest completo con
-  `MANIFEST_SCHEMA_INVALID` si se sincroniza sin filtrar. `sync` se comportó
-  exactamente como diseñado (falla el run, preserva paquetes existentes). La
-  ejecución real de M4 se hizo sobre una copia filtrada a los 34 videos con
-  esquema válido. Aceptar `resources.analysis` como alias, o coordinar con
-  el pipeline productor, queda fuera de 3.2 y requiere aprobación explícita
-  antes de tocar `manifest-reader.ts`.
+- **Deriva de esquema real en `auto-design`, con causa raíz identificada
+  fuera de este repositorio.** La colección creció de 34 a 51 videos; 17
+  usan `resources.analysis` en vez de `resources.rules`. Investigación
+  posterior a 3.2 (13 de agosto) contra el repositorio real de la skill
+  productora (`youtube-video-context`) encontró la causa exacta: el 2 de
+  agosto esa skill reemplazó `rules.json`/schema 1.0 por
+  `analysis.json`/schema 2.0 en un breaking change deliberado y documentado
+  (commit `aecdde9`, "deja de producir un manual de reglas de diseño para
+  producir un análisis general"). No es un rename de campo — la forma de
+  `analysis.json` (`topics`/`recommendations`/`assessment`/
+  `evidence_boundary`) es incompatible con la de `rules.json`
+  (`patterns`/`principle`/`rules`/`avoid`/`acceptanceCriteria`). Los 34
+  videos "válidos" son los generados **antes** del pivot; los 17 "rotos" son
+  los generados **con la skill actual** — es `auto-youtube-rag` el que
+  quedó atrás, no al revés, y todo video nuevo de acá en adelante va a usar
+  schema 2.0. Detalle completo en `docs/decisions.md`, sección "Pendientes
+  de decisión" → "Soporte de `analysis.json` (schema 2.0)".
+
+  **Ya resuelto (13 de agosto): la mitad "amplificadora" del problema.**
+  Antes, una sola entrada de video con esquema roto abortaba la lectura de
+  _todo_ el manifest (`parseManifest` tiraba en el primer video inválido),
+  así que ningún video de la fuente podía sincronizar — ni siquiera los 34
+  válidos. `parseManifest` (`manifest-reader.ts`) ahora es tolerante por
+  video: sólo los fallos de raíz (root no objeto, `videos` no array, JSON
+  inválido, archivo no legible) siguen siendo fatales; una entrada de video
+  con esquema inválido o un id/slug duplicado se descarta y se reporta como
+  `ManifestVideoIssue` en `ManifestSnapshot.issues`, sin tumbar el resto.
+  `syncSource` traduce cada una en un `SyncIssue`
+  (`MANIFEST_ENTRY_SCHEMA_INVALID`/`MANIFEST_ENTRY_DUPLICATE`) y protege de
+  borrado cualquier paquete previamente indexado de ese video. Ver
+  `docs/decisions.md`, sección "Validación tolerante por video en el
+  manifest", y `docs/indexing-design.md`.
+
+  **Todavía pendiente: la mitad "de fondo".** Los 17 videos con
+  `resources.analysis` siguen sin indexarse — ahora aislados como `issue`
+  en vez de bloquear la fuente entera, pero su contenido real
+  (`analysis.json`) sigue sin tener parser ni modelo de dominio en
+  `auto-youtube-rag`. Requiere diseño propio (parser nuevo, snapshot nuevo,
+  decisión de bucketing en `assembleContext`, decisión sobre sostener ambos
+  esquemas o congelar schema 1.0) y aprobación explícita antes de
+  implementar — no se resuelve con un alias de campo.
+
 - **Precisión aparente limitada por ruido de catálogo compartido, no por
   errores de recuperación.** La mayoría de consultas semilla recupera del
   mismo subconjunto de videos sobre catálogos de estilos/tendencias; más
@@ -982,9 +1031,12 @@ explícita del usuario:
   clara" desde 2.2; 3.2 no encontró esa evidencia).
 - Señal adicional de densidad/relevancia temática para que RRF distinga
   contenido específico de catálogo tangencial (hallazgo de 3.2, no un bug).
-- Alias o corrección de esquema para `resources.analysis` en el manifest
-  real, o coordinación con el pipeline productor (hallazgo de 3.2, no un
-  bug de este repositorio).
+- Soporte de `analysis.json`/schema 2.0 de la skill productora
+  `youtube-video-context` (parser, snapshot de dominio y decisión de
+  bucketing en `assembleContext`) para que los 17 videos reales que ya usan
+  ese esquema puedan indexarse. La validación tolerante por video (13 de
+  agosto) ya evita que bloqueen al resto de la fuente; ver
+  `docs/decisions.md`.
 - Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad que
   encontró N4, antes de una futura pasada de evaluación.
 - Verificación de `skill/SKILL.md` específicamente desde Codex real (2.4 se

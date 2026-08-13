@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import type {
   ManifestSnapshot,
+  ManifestVideoIssue,
   PackageSnapshot,
 } from "../../../src/application/indexing/package-snapshots.js";
 import { syncSource } from "../../../src/application/indexing/sync-source.js";
@@ -77,6 +78,7 @@ function snapshot(
 
 class FakeReader implements PackageSourceReader {
   public manifestError: Error | null = null;
+  public manifestIssues: ManifestVideoIssue[] = [];
   public readonly packageErrors = new Map<string, Error>();
   public constructor(
     public videos: PackageRef[],
@@ -106,6 +108,7 @@ class FakeReader implements PackageSourceReader {
             }),
           ),
         ),
+        issues: Object.freeze(this.manifestIssues),
       }),
     );
   }
@@ -235,6 +238,52 @@ void test("keeps processing after one invalid package and preserves its previous
     previousBroken?.packageHash,
   );
   assert.equal(setup.store.issues.at(-1)?.videoId?.value, "broken");
+});
+
+void test("tolerates a regressed manifest entry: records an issue, protects its previous package and still syncs the rest", async () => {
+  const regressed = ref("regressed");
+  const valid = ref("valid");
+  const reader = new FakeReader(
+    [regressed, valid],
+    new Map([
+      [regressed.serialize(), snapshot(regressed, "a", "old valid")],
+      [valid.serialize(), snapshot(valid, "b", "first")],
+    ]),
+  );
+  const setup = dependencies(reader);
+  await syncSource(setup.input, source);
+  const previousRegressed = await setup.store.getPackageState(regressed);
+  assert.ok(previousRegressed);
+
+  // The regressed video's manifest entry no longer parses (e.g. a package
+  // schema drift), so the reader drops it from `videos` and reports it as a
+  // manifest-level issue instead, the same shape parseManifest produces.
+  reader.videos = [valid];
+  reader.manifestIssues = [
+    {
+      index: 0,
+      videoId: regressed.videoId,
+      field: "videos[0].resources.rules",
+      code: "SCHEMA_INVALID",
+      message: "videos[0].resources.rules must be a boolean",
+    },
+  ];
+  reader.packages.set(valid.serialize(), snapshot(valid, "c", "changed"));
+
+  const result = await syncSource(setup.input, source);
+  assert.equal(result.status, "partial");
+  assert.equal(result.counters.packagesFailed, 1);
+  assert.equal(result.counters.packagesIndexed, 1);
+  assert.equal(result.counters.packagesDeleted, 0);
+  assert.equal(
+    (await setup.store.getPackageState(regressed))?.packageHash,
+    previousRegressed.packageHash,
+  );
+  const manifestIssue = result.issues.find(
+    (issue) => issue.videoId?.value === "regressed",
+  );
+  assert.ok(manifestIssue);
+  assert.equal(manifestIssue.code, "MANIFEST_ENTRY_SCHEMA_INVALID");
 });
 
 void test("fails an unreadable manifest without deleting the previous index", async () => {

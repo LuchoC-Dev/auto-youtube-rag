@@ -217,8 +217,63 @@ instrumento de evaluación (`evals/rubric-template.md`), que quedan anotadas
 como mejora para una futura pasada de evaluación, no como motivo de cambio
 de código en 3.2.
 
+## Validación tolerante por video en el manifest
+
+El 13 de agosto de 2026 se resolvió la primera mitad del hallazgo de deriva
+de esquema encontrado en M4 (ver `evals/results/2026-08-12/report.md`,
+"Hallazgos accionables" — 17 de 51 videos reales de `auto-design` con
+`resources.analysis` en vez de `resources.rules`): un solo video con esquema
+inválido ya no aborta la lectura de todo el manifest.
+
+- `parseManifest` (`src/infrastructure/filesystem/manifest-reader.ts`) ahora
+  distingue dos niveles de fallo: los **estructurales de raíz** (root no es
+  un objeto, `videos` no es un array, JSON inválido, archivo no legible)
+  siguen siendo fatales — no hay lista de videos que salvar. Los
+  **por-entrada** (un video con campo de esquema inválido, o un id/slug
+  duplicado) ya no tiran `ManifestReadError`: se descartan del array
+  `videos` y se acumulan como `ManifestVideoIssue` en el nuevo campo
+  `ManifestSnapshot.issues`, con identificación best-effort del video
+  (`videoId: VideoId | null`, `null` sólo cuando el propio `video_id` es lo
+  que falló).
+- `syncSource` (`src/application/indexing/sync-source.ts`) traduce cada
+  `ManifestVideoIssue` a un `SyncIssue` (`MANIFEST_ENTRY_SCHEMA_INVALID` o
+  `MANIFEST_ENTRY_DUPLICATE`) y lo cuenta en `packagesSeen`/`packagesFailed`,
+  igual que un fallo de indexación por paquete. Cuando la entrada rota
+  todavía resuelve a un `VideoId` conocido, marca visto (`markPackageSeen`)
+  cualquier paquete previamente indexado de ese video **antes** del paso de
+  borrado por "no visto en este run" — un video que retrocede a un esquema
+  inválido nunca debe parecer eliminado de la colección. Un run con al menos
+  una entrada así termina en `partial`, igual que cualquier otro fallo
+  parcial ya soportado.
+- No cambia el esquema de SQLite ni el contrato público de la CLI. El
+  cambio es enteramente de `manifest-reader.ts` y `sync-source.ts`, cubierto
+  por pruebas nuevas en ambos archivos de test.
+
+Esto resuelve el efecto amplificador (un video roto bloqueaba los 51), no el
+hallazgo de fondo: los 17 videos con `resources.analysis` siguen sin
+indexarse — ahora aislados como `issue` en vez de tumbar todo el run — porque
+`analysis.json` (schema 2.0 de la skill productora `youtube-video-context`)
+tiene una forma de contenido incompatible con `rules.json` (schema 1.0), no
+es un simple alias de clave. Ver "Pendientes de decisión" abajo.
+
 ## Pendientes de decisión
 
-Ninguno. La calibración de pesos RRF y presupuestos por profundidad, único
-punto pendiente, se resolvió arriba en "Decisión de calibración (O1, punto
-3.2)".
+- **Soporte de `analysis.json` (schema 2.0)**: la skill productora
+  `youtube-video-context` reemplazó `rules.json`/schema 1.0 por
+  `analysis.json`/schema 2.0 el 2 de agosto de 2026 (commit `aecdde9` del
+  repositorio de esa skill, breaking change explícito y documentado: "deja
+  de producir un manual de reglas de diseño para producir un análisis
+  general"). `auto-youtube-rag` nunca soportó schema 2.0. La forma de
+  `analysis.json` (`topics`/`recommendations`/`assessment`/
+  `evidence_boundary`) no es análoga a la de `rules.json`
+  (`patterns`/`principle`/`problem`/`rules`/`avoid`/`acceptanceCriteria`):
+  no es viable un alias de campo en el manifest ni reusar
+  `rules-json-parser.ts`. Requiere un parser nuevo, un snapshot de dominio
+  nuevo, y una decisión de producto explícita sobre cómo (o si)
+  `topics`/`recommendations`/`assessment` encajan en el bucketing fijo de
+  `assembleContext` ("Highest-relevance context" / "Related rules and
+  patterns" / "Additional relevant context"), y si `auto-youtube-rag`
+  sostiene ambos esquemas indefinidamente o trata schema 1.0 como
+  congelado. Necesita diseño propio y aprobación explícita antes de
+  implementar — no se resuelve en el mismo corte que la validación
+  tolerante.

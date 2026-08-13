@@ -139,9 +139,26 @@ export interface ManifestVideoSnapshot {
   readonly resources: ManifestResourceSnapshot;
 }
 
+/**
+ * A manifest entry that failed schema validation or duplicated an id/slug
+ * already seen earlier in the array. The entry is skipped from `videos`
+ * instead of aborting the whole manifest, so one malformed video can never
+ * block the rest of a source from syncing. `videoId` is a best-effort
+ * identification: it is `null` when the entry's own `video_id` field is what
+ * failed validation, so there is nothing safe to attribute the issue to.
+ */
+export interface ManifestVideoIssue {
+  readonly index: number;
+  readonly videoId: VideoId | null;
+  readonly field: string;
+  readonly code: "SCHEMA_INVALID" | "DUPLICATE";
+  readonly message: string;
+}
+
 export interface ManifestSnapshot {
   readonly kind: "manifest";
   readonly sourceName: SourceName;
   readonly contentHash: string;
   readonly videos: readonly ManifestVideoSnapshot[];
+  readonly issues: readonly ManifestVideoIssue[];
 }

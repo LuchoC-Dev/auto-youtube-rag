@@ -56,6 +56,7 @@ void test("reads videos, keeps approved resources and ignores pages", async () =
   assert.equal(manifest.sourceName.equals(sourceName), true);
   assert.equal(manifest.contentHash, sha256(rawManifest));
   assert.equal(manifest.videos.length, 2);
+  assert.deepEqual(manifest.issues, []);
   const [firstVideo, secondVideo] = manifest.videos;
   assert.ok(firstVideo);
   assert.ok(secondVideo);
@@ -73,48 +74,51 @@ void test("reads videos, keeps approved resources and ignores pages", async () =
   });
   assert.equal("pages" in manifest, false);
   assert.equal(Object.isFrozen(manifest.videos), true);
+  assert.equal(Object.isFrozen(manifest.issues), true);
 });
 
-void test("rejects duplicate video ids and slugs with the exact field", async () => {
+void test("skips duplicate video ids and slugs, keeping the first entry as an issue", async () => {
   const invalidPath = join(fixturesDirectory, "manifest-invalid.json");
+  const manifest = await readManifest(sourceFor(invalidPath));
 
-  await assert.rejects(
-    readManifest(sourceFor(invalidPath)),
-    assertManifestError(
-      "MANIFEST_DUPLICATE",
-      invalidPath,
-      "videos[1].video_id",
-    ),
-  );
+  assert.equal(manifest.videos.length, 1);
+  assert.equal(manifest.videos[0]?.slug, "first-video");
+  assert.equal(manifest.issues.length, 1);
+  const [duplicateIdIssue] = manifest.issues;
+  assert.ok(duplicateIdIssue);
+  assert.equal(duplicateIdIssue.code, "DUPLICATE");
+  assert.equal(duplicateIdIssue.field, "videos[1].video_id");
+  assert.equal(duplicateIdIssue.videoId?.value, "duplicate_id");
 
-  assert.throws(
-    () =>
-      parseManifest(
+  const manifest2 = parseManifest(
+    {
+      videos: [
         {
-          videos: [
-            {
-              video_id: "video_one",
-              slug: "same-slug",
-              resources: { context: true, rules: true, metadata: true },
-            },
-            {
-              video_id: "video_two",
-              slug: "same-slug",
-              resources: { context: true, rules: true, metadata: true },
-            },
-          ],
+          video_id: "video_one",
+          slug: "same-slug",
+          resources: { context: true, rules: true, metadata: true },
         },
-        { sourceName, manifestPath: "memory://manifest", contentHash: hash },
-      ),
-    assertManifestError(
-      "MANIFEST_DUPLICATE",
-      "memory://manifest",
-      "videos[1].slug",
-    ),
+        {
+          video_id: "video_two",
+          slug: "same-slug",
+          resources: { context: true, rules: true, metadata: true },
+        },
+      ],
+    },
+    { sourceName, manifestPath: "memory://manifest", contentHash: hash },
   );
+
+  assert.equal(manifest2.videos.length, 1);
+  assert.equal(manifest2.videos[0]?.ref.videoId.value, "video_one");
+  assert.equal(manifest2.issues.length, 1);
+  const [duplicateSlugIssue] = manifest2.issues;
+  assert.ok(duplicateSlugIssue);
+  assert.equal(duplicateSlugIssue.code, "DUPLICATE");
+  assert.equal(duplicateSlugIssue.field, "videos[1].slug");
+  assert.equal(duplicateSlugIssue.videoId?.value, "video_two");
 });
 
-void test("validates unknown structures and resource booleans", () => {
+void test("rejects a manifest whose root is not an object or whose videos field is not an array", () => {
   assert.throws(
     () =>
       parseManifest(null, {
@@ -128,23 +132,63 @@ void test("validates unknown structures and resource booleans", () => {
   assert.throws(
     () =>
       parseManifest(
-        {
-          videos: [
-            {
-              video_id: "video_one",
-              slug: "valid-slug",
-              resources: { context: "yes", rules: true, metadata: true },
-            },
-          ],
-        },
+        { videos: "not-an-array" },
         { sourceName, manifestPath: "memory://manifest", contentHash: hash },
       ),
     assertManifestError(
       "MANIFEST_SCHEMA_INVALID",
       "memory://manifest",
-      "videos[0].resources.context",
+      "videos",
     ),
   );
+});
+
+void test("skips a video with an invalid resource boolean and reports it as an issue", () => {
+  const manifest = parseManifest(
+    {
+      videos: [
+        {
+          video_id: "video_one",
+          slug: "valid-slug",
+          resources: { context: "yes", rules: true, metadata: true },
+        },
+        {
+          video_id: "video_two",
+          slug: "other-slug",
+          resources: { context: true, rules: true, metadata: true },
+        },
+      ],
+    },
+    { sourceName, manifestPath: "memory://manifest", contentHash: hash },
+  );
+
+  assert.equal(manifest.videos.length, 1);
+  assert.equal(manifest.videos[0]?.ref.videoId.value, "video_two");
+  assert.equal(manifest.issues.length, 1);
+  const [invalidResourceIssue] = manifest.issues;
+  assert.ok(invalidResourceIssue);
+  assert.equal(invalidResourceIssue.code, "SCHEMA_INVALID");
+  assert.equal(invalidResourceIssue.field, "videos[0].resources.context");
+  assert.equal(invalidResourceIssue.videoId?.value, "video_one");
+});
+
+void test("skips a video whose own video_id is invalid, with a null issue videoId", () => {
+  const manifest = parseManifest(
+    {
+      videos: [
+        {
+          video_id: "",
+          slug: "valid-slug",
+          resources: { context: true, rules: true, metadata: true },
+        },
+      ],
+    },
+    { sourceName, manifestPath: "memory://manifest", contentHash: hash },
+  );
+
+  assert.equal(manifest.videos.length, 0);
+  assert.equal(manifest.issues.length, 1);
+  assert.equal(manifest.issues[0]?.videoId, null);
 });
 
 void test("accepts canonical Unicode slugs without allowing path separators", () => {
@@ -165,26 +209,27 @@ void test("accepts canonical Unicode slugs without allowing path separators", ()
     manifest.videos[0]?.slug,
     "7-estilos-de-diseño-gráfico-que-no-conocías",
   );
-  assert.throws(
-    () =>
-      parseManifest(
+  assert.equal(manifest.issues.length, 0);
+
+  const rejected = parseManifest(
+    {
+      videos: [
         {
-          videos: [
-            {
-              video_id: "video_es",
-              slug: "diseño/../fuera",
-              resources: { context: true, rules: true, metadata: true },
-            },
-          ],
+          video_id: "video_es",
+          slug: "diseño/../fuera",
+          resources: { context: true, rules: true, metadata: true },
         },
-        { sourceName, manifestPath: "memory://manifest", contentHash: hash },
-      ),
-    assertManifestError(
-      "MANIFEST_SCHEMA_INVALID",
-      "memory://manifest",
-      "videos[0].slug",
-    ),
+      ],
+    },
+    { sourceName, manifestPath: "memory://manifest", contentHash: hash },
   );
+
+  assert.equal(rejected.videos.length, 0);
+  assert.equal(rejected.issues.length, 1);
+  const [slugIssue] = rejected.issues;
+  assert.ok(slugIssue);
+  assert.equal(slugIssue.field, "videos[0].slug");
+  assert.equal(slugIssue.videoId?.value, "video_es");
 });
 
 void test("reports malformed JSON and unreadable files with path and root field", async () => {
