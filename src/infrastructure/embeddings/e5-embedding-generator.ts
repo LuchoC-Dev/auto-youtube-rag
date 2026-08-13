@@ -5,18 +5,19 @@ import type {
   EmbeddingModelDescriptor,
 } from "../../application/ports/embedding-generator.js";
 
-const modelDescriptor: EmbeddingModelDescriptor = Object.freeze({
+// Exported so the model installer adapter (W2) and the install-model use
+// case (W4) share the exact same model identity used to load embeddings
+// here, instead of duplicating it. A future configurable model (see
+// docs/install-design.md, "Nota: qué haría falta para soportar otro
+// modelo") would replace these module constants with a descriptor;
+// changing model identity still requires approval.
+export const modelDescriptor: EmbeddingModelDescriptor = Object.freeze({
   key: "e5-small",
   version: "Xenova/multilingual-e5-small@main:q8",
   dimensions: 384,
   maxInputTokens: 512,
 });
 
-// Exported so the model installer adapter (W2) requests the exact same
-// repository, revision and dtype used to load the model here. A future
-// configurable model (see docs/install-design.md, "Nota: qué haría falta
-// para soportar otro modelo") would replace these module constants with a
-// descriptor; changing model identity still requires approval.
 export const modelRepository = "Xenova/multilingual-e5-small";
 export const modelRevision = "main";
 export const modelDtype = "q8";
