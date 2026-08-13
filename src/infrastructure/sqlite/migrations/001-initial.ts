@@ -55,7 +55,7 @@ CREATE TABLE video_packages (
 CREATE TABLE source_documents (
   id INTEGER PRIMARY KEY,
   package_id INTEGER NOT NULL REFERENCES video_packages(id) ON DELETE CASCADE,
-  kind TEXT NOT NULL CHECK (kind IN ('context', 'rules', 'metadata')),
+  kind TEXT NOT NULL CHECK (kind IN ('context', 'rules', 'analysis', 'metadata')),
   relative_path TEXT NOT NULL,
   content_hash TEXT NOT NULL,
   byte_size INTEGER NOT NULL CHECK (byte_size >= 0),

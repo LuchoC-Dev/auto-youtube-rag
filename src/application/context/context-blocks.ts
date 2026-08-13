@@ -47,6 +47,9 @@ const highestRelevanceTypes = new Set([
   "context_document",
   "rules_section",
   "rules_document",
+  "analysis_document",
+  "analysis_section",
+  "analysis_topic",
 ]);
 
 const relatedRulesTypes = new Set([
@@ -54,6 +57,7 @@ const relatedRulesTypes = new Set([
   "rule_item",
   "avoid_item",
   "acceptance_criterion",
+  "analysis_recommendation",
 ]);
 
 /**
