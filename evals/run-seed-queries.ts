@@ -1,5 +1,6 @@
 #!/usr/bin/env -S node --import tsx
 import { readFile } from "node:fs/promises";
+import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
 import { parseArgs } from "node:util";
@@ -12,6 +13,7 @@ import {
 } from "../src/domain/context/context-budget.js";
 import { RetrievalFilter } from "../src/domain/retrieval/retrieval-filter.js";
 import { RetrievalQuery } from "../src/domain/retrieval/retrieval-query.js";
+import { resolvePaths } from "../src/infrastructure/config/resolve-paths.js";
 import { writeContextBundle } from "../src/infrastructure/filesystem/write-context-bundle.js";
 import type {
   Application,
@@ -67,6 +69,20 @@ export interface RunSeedQueriesResult {
 
 function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Resolves the `--model-cache` default through the same `resolvePaths`
+ * function the product uses (see `docs/install-design.md`, block V), so this
+ * harness can never drift to a different default than `src/main.ts`. The
+ * flag remains an explicit override.
+ */
+export function resolveModelCachePath(
+  flagValue: string | undefined,
+  env: NodeJS.ProcessEnv,
+  homedirFn: () => string,
+): string {
+  return resolve(flagValue ?? resolvePaths(env, homedirFn).modelsPath);
 }
 
 async function loadSeedQueries(path: string): Promise<readonly SeedQuery[]> {
@@ -163,8 +179,10 @@ async function main(): Promise<void> {
 
   const result = await runSeedQueries({
     homeDir: resolve(values.home),
-    modelCachePath: resolve(
-      values["model-cache"] ?? join(process.cwd(), ".cache", "models"),
+    modelCachePath: resolveModelCachePath(
+      values["model-cache"],
+      process.env,
+      homedir,
     ),
     queriesPath: resolve(
       values.queries ?? join(evalsDir, "queries", "seed-queries.json"),
