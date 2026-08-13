@@ -160,10 +160,65 @@ El 12 de agosto de 2026 se aprobó el diseño del punto 3.2, detallado en
   ciegas: sólo se ajustan si la evidencia de 3.2 muestra un problema
   concreto, y el cambio se documenta aquí con esa evidencia.
 
+## Decisión de calibración (O1, punto 3.2)
+
+El 13 de agosto de 2026 se revisó, en conjunto, la Capa A mecánica (M3,
+`evals/results/2026-08-12/layer-a-report.md`) y la Capa B juzgada (N4,
+`evals/results/2026-08-12/report.md`) sobre los 24 bundles reales de
+`auto-design`. **Decisión: mantener los defaults actuales sin cambios** — RRF
+con `k = 60`, `wText = wVector = 1.0`, y presupuestos por profundidad
+`focused` = 12k, `balanced` = 32k, `deep` = 64k tokens estimados. No se
+encontró evidencia suficiente para justificar un cambio, según el mismo
+criterio que ya fijaba `eval-design.md`.
+
+Evidencia considerada y por qué no cruza la barra de "evidencia clara":
+
+- **Agotamiento de presupuesto casi universal** (100% en `focused` y
+  `balanced`, 88% en `deep`, ver M3). No es evidencia de presupuestos mal
+  calibrados: el diseño de 2.2/2.3 recupera deliberadamente un universo
+  amplio de candidatos (`fusedResults = 50`) para sostener cobertura, así que
+  agotar el presupuesto es el comportamiento esperado, no un síntoma de
+  subdimensionamiento. `coverage.budget_exhausted` existe precisamente para
+  que el agente consumidor sepa que hay más evidencia disponible de la que
+  entró, no para disparar un aumento automático de tokens.
+- **La cobertura juzgada (N4) generalmente mejora de `focused` a `balanced`
+  y se aplana de `balanced` a `deep`** en 5 de 8 consultas con contenido real
+  (`en-concept-visual-hierarchy`, `es-concept-brutalism`,
+  `es-paraphrase-saturated-colors`, `es-rules-comparison-brutalism-minimalism`,
+  `multilingual-grid-systems`), y no cambia en absoluto con la profundidad en
+  `es-rare-term-kerning` porque la escasez es del corpus, no del presupuesto.
+  Este patrón es consistente con presets pensados como perfiles de uso
+  distintos (`focused` rápido y acotado, `deep` exhaustivo), no con un preset
+  roto: no hay ninguna consulta donde `deep` rinda peor que `focused`, ni
+  ninguna donde `balanced` deje fuera contenido que un preset mayor
+  recuperaría con una ponderación distinta de RRF.
+- **`es-no-answer-unrelated-topic` nunca produce `status: "no_results"`**
+  (divergencia mecánica en las tres profundidades, heredada de la ausencia de
+  piso de similitud ya documentada en `retrieval-design.md`). Pero la Capa B
+  la neutraliza: ambos jueces, sin divergencia, calificaron
+  `precision_aparente = 0.00` y `cobertura_suficiente = 1` en las tres
+  profundidades. El agente consumidor identifica correctamente, leyendo el
+  bundle, que no hay contenido relevante — la ausencia de un piso de
+  similitud no le impedía llegar a la conclusión correcta. Esto es
+  exactamente el caso que `eval-design.md` dejaba fuera de alcance "salvo
+  evidencia clara", y aquí la evidencia apunta en contra de agregar un
+  umbral: el producto ya comunica la ausencia de contenido relevante sin él.
+- **Ningún dato de 3.2 aísla la contribución de la vía textual frente a la
+  vectorial.** Las métricas de Capa A no separan candidatos por procedencia y
+  ninguna de las 9 discrepancias de N4 se atribuye a una vía dominando a la
+  otra (ver hipótesis en `report.md`): las nueve caen en severidad de
+  `precision_aparente` o ambigüedad de la rúbrica sobre "cobertura
+  suficiente"/"cruce multilingüe". No hay señal para mover `wText`/`wVector`
+  en ninguna dirección.
+
+Ninguna de las 9 discrepancias Codex/Claude de N4 señala un defecto del
+producto — ver la lectura agregada en `report.md`. Son ambigüedades del
+instrumento de evaluación (`evals/rubric-template.md`), que quedan anotadas
+como mejora para una futura pasada de evaluación, no como motivo de cambio
+de código en 3.2.
+
 ## Pendientes de decisión
 
-- Calibración de los pesos RRF y de los presupuestos por profundidad, sujeta
-  a la evidencia que produzca la etapa 3.2 (ver
-  [eval-design.md](eval-design.md)). Si 3.2 no encuentra evidencia
-  suficiente, la decisión final es mantener los defaults actuales, y ese
-  resultado también se registra aquí.
+Ninguno. La calibración de pesos RRF y presupuestos por profundidad, único
+punto pendiente, se resolvió arriba en "Decisión de calibración (O1, punto
+3.2)".
