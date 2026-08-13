@@ -17,6 +17,7 @@ import {
 import { E5EmbeddingGenerator } from "../../infrastructure/embeddings/e5-embedding-generator.js";
 import { E5ModelInstaller } from "../../infrastructure/embeddings/e5-model-installer.js";
 import { writeContextBundle } from "../../infrastructure/filesystem/write-context-bundle.js";
+import { SQLiteMigrationError } from "../../infrastructure/sqlite/open-database.js";
 import { SQLiteDiagnosticsRepository } from "../../infrastructure/sqlite/sqlite-diagnostics.js";
 import type {
   Application,
@@ -148,6 +149,39 @@ async function preflight(
   }
 }
 
+/**
+ * Recognizes a raw SQLite driver failure so it can be translated instead
+ * of propagated (Z4 of docs/install-tasks.md): `SQLiteMigrationError`
+ * (open-database.ts's own schema/version checks) and `ERR_SQLITE_ERROR`
+ * (node:sqlite's code for a file that fails to open as a database, e.g.
+ * "file is not a database").
+ */
+function isDatabaseIntegrityError(error: unknown): boolean {
+  return (
+    error instanceof SQLiteMigrationError ||
+    (error instanceof Error &&
+      "code" in error &&
+      error.code === "ERR_SQLITE_ERROR")
+  );
+}
+
+function doctorIntegrityFailureReceipt(
+  databasePath: string,
+  error: unknown,
+): Record<string, unknown> {
+  const detail = error instanceof Error ? error.message : String(error);
+  return {
+    status: "error",
+    checks: [
+      {
+        code: "SQLITE_INTEGRITY",
+        status: "error",
+        message: `Could not open the database at ${databasePath}: ${detail}`,
+      },
+    ],
+  };
+}
+
 async function runModelsCommand(
   command:
     | {
@@ -221,9 +255,33 @@ export async function runCli(options: RunCliOptions): Promise<number> {
     } else {
       await preflight(command, options);
     }
-    application = (options.applicationFactory ?? createApplication)(
-      options.config,
-    );
+
+    try {
+      application = (options.applicationFactory ?? createApplication)(
+        options.config,
+      );
+    } catch (error: unknown) {
+      if (!isDatabaseIntegrityError(error)) throw error;
+
+      // doctor's whole job is diagnosing what is broken: it must keep
+      // running and report the detail instead of crashing the same way
+      // sync/retrieve do (Z4 of docs/install-tasks.md).
+      if (command.kind === "doctor") {
+        options.stdout.write(
+          renderCliSuccess(
+            doctorIntegrityFailureReceipt(options.config.databasePath, error),
+          ),
+        );
+        return 1;
+      }
+
+      throw Object.assign(
+        new Error(
+          `The library at ${options.config.databasePath} failed an integrity check. Run "auto-youtube-rag doctor" for details.`,
+        ),
+        { code: "DATABASE_INTEGRITY_ERROR", retryable: false, cause: error },
+      );
+    }
 
     switch (command.kind) {
       case "init": {
