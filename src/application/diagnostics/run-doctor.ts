@@ -1,4 +1,4 @@
-import { access, readdir } from "node:fs/promises";
+import { access } from "node:fs/promises";
 
 import type { EmbeddingGenerator } from "../ports/embedding-generator.js";
 import type { SourceRegistry } from "../ports/source-registry.js";
@@ -8,6 +8,20 @@ export interface DoctorCheck {
   readonly code: string;
   readonly status: "ok" | "error";
   readonly message: string;
+}
+
+/**
+ * Installation state of the embedding model, resolved by the caller.
+ *
+ * `runDoctor` receives it already computed instead of inspecting the
+ * filesystem itself: reading the install receipt is infrastructure work, and
+ * a non-empty directory is not evidence that the model is usable. A
+ * truncated download leaves every required file in place with the wrong
+ * size, which is exactly the case this check has to catch.
+ */
+export interface DoctorModelState {
+  readonly state: "installed" | "incomplete" | "absent";
+  readonly issues: readonly { readonly path: string; readonly reason: string }[];
 }
 
 export interface DoctorResult {
@@ -24,11 +38,19 @@ async function readable(path: string): Promise<boolean> {
   }
 }
 
+function describeIssues(
+  issues: readonly { readonly path: string; readonly reason: string }[],
+): string {
+  if (issues.length === 0) return "no install receipt";
+  return issues.map((issue) => `${issue.path}: ${issue.reason}`).join(", ");
+}
+
 export async function runDoctor(
   repository: DiagnosticsRepository,
   sources: SourceRegistry,
   embeddingGenerator: EmbeddingGenerator,
   modelCachePath: string,
+  modelState: DoctorModelState,
 ): Promise<DoctorResult> {
   const checks: DoctorCheck[] = [];
   const health = await repository.checkHealth();
@@ -70,16 +92,17 @@ export async function runDoctor(
     });
   }
 
-  const modelPresent = await readdir(modelCachePath)
-    .then((entries) => entries.length > 0)
-    .catch(() => false);
   const model = await embeddingGenerator.describe();
+  const identity = `${model.key}@${model.version}`;
   checks.push({
     code: "EMBEDDING_MODEL",
-    status: modelPresent ? "ok" : "error",
-    message: modelPresent
-      ? `${model.key}@${model.version} is installed at ${modelCachePath}.`
-      : `${model.key}@${model.version} is not installed at ${modelCachePath}. Run "auto-youtube-rag models install" first.`,
+    status: modelState.state === "installed" ? "ok" : "error",
+    message:
+      modelState.state === "installed"
+        ? `${identity} is installed at ${modelCachePath}.`
+        : modelState.state === "incomplete"
+          ? `${identity} is incomplete at ${modelCachePath} (${describeIssues(modelState.issues)}). Run "auto-youtube-rag models install --force" to repair it.`
+          : `${identity} is not installed at ${modelCachePath}. Run "auto-youtube-rag models install" first.`,
   });
 
   return {
