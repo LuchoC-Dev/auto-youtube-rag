@@ -12,9 +12,14 @@ const modelDescriptor: EmbeddingModelDescriptor = Object.freeze({
   maxInputTokens: 512,
 });
 
-const modelRepository = "Xenova/multilingual-e5-small";
-const modelRevision = "main";
-const modelDtype = "q8";
+// Exported so the model installer adapter (W2) requests the exact same
+// repository, revision and dtype used to load the model here. A future
+// configurable model (see docs/install-design.md, "Nota: qué haría falta
+// para soportar otro modelo") would replace these module constants with a
+// descriptor; changing model identity still requires approval.
+export const modelRepository = "Xenova/multilingual-e5-small";
+export const modelRevision = "main";
+export const modelDtype = "q8";
 const defaultBatchSize = 16;
 
 export type E5EmbeddingErrorCode =
@@ -62,7 +67,7 @@ export interface E5EmbeddingRuntime {
 
 export interface E5EmbeddingGeneratorOptions {
   readonly runtime?: E5EmbeddingRuntime;
-  readonly cacheDir?: string;
+  readonly cacheDir: string;
   readonly batchSize?: number;
 }
 
@@ -252,11 +257,9 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
   private readonly batchSize: number;
   private sessionPromise: Promise<E5EmbeddingSession> | undefined;
 
-  public constructor(options: E5EmbeddingGeneratorOptions = {}) {
+  public constructor(options: E5EmbeddingGeneratorOptions) {
     this.runtime = options.runtime ?? transformersRuntime;
-    this.cacheDir = readCacheDir(
-      options.cacheDir ?? resolve(process.cwd(), ".cache", "models"),
-    );
+    this.cacheDir = readCacheDir(options.cacheDir);
     this.batchSize = readBatchSize(options.batchSize ?? defaultBatchSize);
   }
 
@@ -321,7 +324,7 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
         this.sessionPromise = undefined;
         throw new E5EmbeddingError(
           "MODEL_LOAD_FAILED",
-          `E5 Small could not be loaded from the local cache at ${this.cacheDir}. Run npm run models:download first.`,
+          `E5 Small could not be loaded from ${this.cacheDir}. Run "auto-youtube-rag models install" first.`,
           { cause },
         );
       });
