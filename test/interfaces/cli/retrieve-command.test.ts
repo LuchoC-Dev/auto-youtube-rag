@@ -117,7 +117,7 @@ void test("writes the bundle and emits a compact ok receipt", async () => {
   const setup = await fixture();
   const outDir = join(setup.root, "out");
   try {
-    await command(["init"], setup.config, sampleBundle());
+    await command(["init", "--skip-model"], setup.config, sampleBundle());
 
     const result = await command(
       ["retrieve", "brutalismo", "--out", outDir],
@@ -144,7 +144,7 @@ void test("writes the bundle and emits a compact ok receipt", async () => {
 void test("uses a temporary directory when --out is not given", async () => {
   const setup = await fixture();
   try {
-    await command(["init"], setup.config, sampleBundle());
+    await command(["init", "--skip-model"], setup.config, sampleBundle());
     const result = await command(
       ["retrieve", "brutalismo"],
       setup.config,
@@ -162,7 +162,7 @@ void test("uses a temporary directory when --out is not given", async () => {
 void test("reports no_results with exit code 0", async () => {
   const setup = await fixture();
   try {
-    await command(["init"], setup.config, sampleBundle());
+    await command(["init", "--skip-model"], setup.config, sampleBundle());
     const result = await command(
       ["retrieve", "consulta sin evidencia"],
       setup.config,
@@ -179,7 +179,7 @@ void test("reports no_results with exit code 0", async () => {
 void test("reports partial with exit code 1 when a retrieval path degraded", async () => {
   const setup = await fixture();
   try {
-    await command(["init"], setup.config, sampleBundle());
+    await command(["init", "--skip-model"], setup.config, sampleBundle());
     const result = await command(
       ["retrieve", "brutalismo"],
       setup.config,
@@ -205,7 +205,7 @@ void test("passes depth, max-tokens and repeated source filters through to the r
   const setup = await fixture();
   let captured: ContextRequest | undefined;
   try {
-    await command(["init"], setup.config, sampleBundle());
+    await command(["init", "--skip-model"], setup.config, sampleBundle());
     await command(
       [
         "retrieve",

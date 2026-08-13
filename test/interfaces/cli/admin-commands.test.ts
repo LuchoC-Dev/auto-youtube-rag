@@ -59,10 +59,13 @@ async function command(
 void test("runs init and source administration through the real composition root", async () => {
   const setup = await fixture();
   try {
-    const initialized = await command(["init"], setup.config);
+    const initialized = await command(["init", "--skip-model"], setup.config);
     assert.equal(initialized.exitCode, 0);
     assert.equal(json(initialized.stdout).status, "initialized");
-    assert.equal((await command(["init"], setup.config)).exitCode, 0);
+    assert.equal(
+      (await command(["init", "--skip-model"], setup.config)).exitCode,
+      0,
+    );
 
     const added = await command(
       ["source", "add", setup.collection, "--name", "design"],
@@ -104,7 +107,7 @@ void test("returns 2 for usage, 1 for operations and 130 for interruption", asyn
     assert.equal(usage.exitCode, 2);
     assert.equal(record(json(usage.stdout).error).code, "INVALID_ARGUMENTS");
 
-    await command(["init"], setup.config);
+    await command(["init", "--skip-model"], setup.config);
     const missing = await command(
       ["sync", "--source", "missing"],
       setup.config,
