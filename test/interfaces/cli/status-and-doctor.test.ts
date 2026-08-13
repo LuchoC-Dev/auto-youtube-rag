@@ -7,6 +7,7 @@ import { test } from "node:test";
 import { runCli, type CliWriter } from "../../../src/interfaces/cli/run-cli.js";
 import { createApplication } from "../../../src/main/create-application.js";
 import { FakeEmbeddingGenerator } from "../../fakes/fake-embedding-generator.js";
+import { installFakeModel } from "../../helpers/install-fake-model.js";
 
 class BufferWriter implements CliWriter {
   public value = "";
@@ -28,7 +29,7 @@ async function fixture() {
   await mkdir(join(collection, "videos"), { recursive: true });
   await mkdir(modelCachePath);
   await writeFile(join(collection, "manifest.json"), '{"videos":[]}', "utf8");
-  await writeFile(join(modelCachePath, "model.onnx"), "fixture", "utf8");
+  await installFakeModel(modelCachePath);
   return {
     root,
     collection,
@@ -79,6 +80,41 @@ void test("reports status and runs read-only health checks", async () => {
     assert.equal(doctor.exitCode, 0);
     assert.equal(doctor.output.status, "ok");
     assert.deepEqual(after.output.counts, before.output.counts);
+  } finally {
+    await rm(setup.root, { recursive: true, force: true });
+  }
+});
+
+void test("doctor reports a truncated model as an error, not as healthy", async () => {
+  const setup = await fixture();
+  try {
+    await command(["init", "--skip-model"], setup.config);
+    // A cut-off download leaves every required file in place with the wrong
+    // size. Presence alone cannot catch it; only the receipt can.
+    await writeFile(
+      join(
+        setup.config.modelCachePath,
+        "Xenova",
+        "multilingual-e5-small",
+        "config.json",
+      ),
+      "truncated",
+      "utf8",
+    );
+
+    const doctor = await command(["doctor"], setup.config);
+    assert.equal(doctor.exitCode, 1);
+    assert.equal(doctor.output.status, "error");
+    const checks = doctor.output.checks;
+    assert.ok(Array.isArray(checks));
+    const modelCheck = checks
+      .map(record)
+      .find((check) => check.code === "EMBEDDING_MODEL");
+    assert.ok(modelCheck);
+    assert.equal(modelCheck.status, "error");
+    assert.match(String(modelCheck.message), /incomplete/u);
+    assert.match(String(modelCheck.message), /config\.json: size_mismatch/u);
+    assert.match(String(modelCheck.message), /models install --force/u);
   } finally {
     await rm(setup.root, { recursive: true, force: true });
   }

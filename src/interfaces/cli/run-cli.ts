@@ -402,6 +402,7 @@ export async function runCli(options: RunCliOptions): Promise<number> {
           application.sourceRegistry,
           application.embeddingGenerator,
           options.config.modelCachePath,
+          await describeModelState(options.config.modelCachePath),
         );
         options.stdout.write(renderCliSuccess({ ...result }));
         return result.status === "ok" ? 0 : 1;
