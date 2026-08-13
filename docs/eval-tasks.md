@@ -243,7 +243,7 @@ un bundle o inventado contenido; se agrupan en dos causas:
 
 ### O1. Decisión sobre pesos RRF y presupuestos
 
-- [ ] Revisar M3 y N4 en conjunto y decidir si hay evidencia suficiente para
+- [x] Revisar M3 y N4 en conjunto y decidir si hay evidencia suficiente para
       cambiar `k`/`wText`/`wVector` o los presupuestos por profundidad.
   - Depende de: M4, N4.
   - Aceptación: si hay evidencia, el cambio se implementa detrás de
@@ -257,6 +257,22 @@ un bundle o inventado contenido; se agrupan en dos causas:
   - Archivos: `docs/decisions.md`, y sólo si aplica,
     `src/application/retrieval/rrf-fusion.ts` (valores por defecto) o
     `src/domain/context/context-budget.ts` (presets).
+
+**Ejecutado el 13 de agosto de 2026.** Decisión: mantener los defaults
+actuales sin cambios (`k = 60`, `wText = wVector = 1.0`, presupuestos
+`focused` 12k / `balanced` 32k / `deep` 64k). Ninguna de las señales de M3 o
+N4 cruza la barra de "evidencia clara" que fijaba `eval-design.md`: el
+agotamiento de presupuesto casi universal es el comportamiento esperado de
+recuperar un universo amplio de candidatos, la cobertura juzgada se aplana
+de `balanced` a `deep` sin que ningún preset rinda peor que uno menor, y
+`es-no-answer-unrelated-topic` —el único caso que nunca produce
+`status: "no_results"`— igual obtiene `precision_aparente = 0.00` sin
+divergencia entre jueces, así que el producto ya comunica la ausencia de
+contenido relevante sin necesitar un piso de similitud. No hay datos que
+aíslen la contribución de una vía de recuperación sobre la otra, así que
+tampoco hay señal para mover `wText`/`wVector`. Evidencia completa y
+razonamiento en `docs/decisions.md`, sección "Decisión de calibración (O1,
+punto 3.2)". No hubo cambio de código; verificación por revisión manual.
 
 ### O2. Reporte final y cierre de 3.2
 

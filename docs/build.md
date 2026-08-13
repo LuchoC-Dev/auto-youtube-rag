@@ -18,7 +18,7 @@
 |                            | 2.3 | Ensamblado de contexto         |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve` |
 |                            | 2.4 | Skill general                  |   ✅   | 100% | `skill/SKILL.md` verificada en frío        |
 | **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos       |
-|                            | 3.2 | Evaluaciones del MVP           |   🔵   | 89%  | M y N completos; O1–O2 pendientes          |
+|                            | 3.2 | Evaluaciones del MVP           |   🔵   | 94%  | M, N y O1 completos; O2 pendiente          |
 
 ---
 
@@ -134,5 +134,7 @@ bundle). Checklist fino en `docs/eval-tasks.md`, bloques M–O.
 - [x] N2. Juicio de Claude (`evals/results/2026-08-12/judgments/claude/`, subagente en frío)
 - [x] N3. Juicio de Codex (`evals/results/2026-08-12/judgments/codex/`, corrido por el usuario)
 - [x] N4. Comparación Codex vs. Claude (9/24 pares divergen, sólo por ambigüedad de rúbrica, ver `evals/results/2026-08-12/report.md`)
-- [ ] O1. Decisión sobre pesos RRF y presupuestos
+- [x] O1. Decisión sobre pesos RRF y presupuestos (defaults mantenidos sin
+      cambios; evidencia y razonamiento en `docs/decisions.md`, sección
+      "Decisión de calibración (O1, punto 3.2)")
 - [ ] O2. Reporte final y cierre de 3.2
