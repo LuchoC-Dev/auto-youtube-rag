@@ -73,6 +73,15 @@
       "expected": {
         "notes": "Consulta comparativa entre dos estilos. Debe recuperar contexto y reglas de ambos, permitiendo que el agente construya la comparación; el producto no compara por sí mismo."
       }
+    },
+    {
+      "id": "es-analysis-neumorphism-accessibility",
+      "text": "advertencia de accesibilidad y contraste al usar neumorfismo en interfaces",
+      "language": "es",
+      "kind": "schema2_analysis",
+      "expected": {
+        "notes": "Orientada específicamente a contenido de analysis.json (schema 2.0, punto 4.1), no alcanzable desde rules.json: debe citar al menos un analysis_topic o analysis_recommendation real (por ejemplo, el tema de accesibilidad/contraste ADA del video Aoi-5yYEv3k o el de psyw2_j_5jk en auto-design) con procedencia correcta. Validado el 13 de agosto de 2026 contra una copia temporal de la colección real auto-design con el modelo E5 real: la cita [S45] resolvió a la unidad analysis_topic 'Neumorphism as a middle ground, and its accessibility defense' del video psyw2_j_5jk, en la sección highest_relevance."
+      }
     }
   ]
 }
