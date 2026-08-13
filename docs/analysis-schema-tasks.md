@@ -202,7 +202,7 @@ contenido real de `auto-design`/`design-catalog`.
 
 ### T1. Sincronización real de videos con `analysis.json`
 
-- [ ] Copiar una porción de `auto-design` (los 17 videos con
+- [x] Copiar una porción de `auto-design` (los 17 videos con
       `resources.analysis`) —y, si el tiempo lo permite, algunos de
       `design-catalog`— a un directorio temporal, sincronizar con el modelo
       E5 real, verificar `doctor` en `ok` y digest SHA-256 del árbol fuente
@@ -216,7 +216,7 @@ contenido real de `auto-design`/`design-catalog`.
 
 ### T2. Consulta semilla nueva orientada a `analysis.json`
 
-- [ ] Sembrar al menos una consulta nueva en
+- [x] Sembrar al menos una consulta nueva en
       `evals/queries/seed-queries.json` cuyo `expected.notes` dependa
       específicamente de contenido de `topics`/`recommendations`/
       `assessment` (no alcanzable desde `rules.json`), correr `retrieve` en
