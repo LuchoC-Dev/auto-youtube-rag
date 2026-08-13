@@ -112,7 +112,7 @@ aislada, sin estar todavía cableado a la lectura de paquetes.
 
 ### R1. Lectura del recurso estructurado por `switch`
 
-- [ ] Reemplazar el `if (manifestVideo.resources.rules)` de
+- [x] Reemplazar el `if (manifestVideo.resources.rules)` de
       `filesystem-package-source-reader.ts` por un `switch` exhaustivo sobre
       `manifestVideo.resources.structuredContent`: caso `"rules"` lee
       `deliverables/rules.json` (comportamiento ya existente, sin cambios de

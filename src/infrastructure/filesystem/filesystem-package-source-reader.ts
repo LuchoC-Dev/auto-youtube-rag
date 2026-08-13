@@ -2,6 +2,7 @@ import { readFile, realpath } from "node:fs/promises";
 import { isAbsolute, join, relative } from "node:path";
 
 import type {
+  AnalysisPackageDocumentSnapshot,
   ContextPackageDocumentSnapshot,
   MetadataPackageDocumentSnapshot,
   PackageDocumentSnapshot,
@@ -13,6 +14,7 @@ import type { SourceRegistry } from "../../application/ports/source-registry.js"
 import { sha256 } from "../../domain/indexing/content-identity.js";
 import type { PackageRef } from "../../domain/indexing/identifiers.js";
 import type { SourceRoot } from "../../domain/indexing/source-root.js";
+import { parseAnalysisJson } from "./analysis-json-parser.js";
 import { parseContextMarkdown } from "./context-markdown-parser.js";
 import { readManifest as readFilesystemManifest } from "./manifest-reader.js";
 import { selectMetadata } from "./metadata-selector.js";
@@ -199,22 +201,47 @@ export class FilesystemPackageSourceReader implements PackageSourceReader {
       documents.push(contextDocument);
     }
 
-    if (manifestVideo.resources.structuredContent === "rules") {
-      const relativePath = "deliverables/rules.json";
-      const sourcePath = join(packagePath, "deliverables", "rules.json");
-      const raw = await readDocument(sourcePath, relativePath);
-      rulesDocument = Object.freeze({
-        kind: "rules",
-        relativePath,
-        ...documentIdentity(raw),
-        parserVersion: "rules-v1",
-        content: parseRulesJson(
-          parseJson(raw, relativePath, sourcePath),
-          ref.videoId,
-          sourcePath,
-        ),
-      });
-      documents.push(rulesDocument);
+    switch (manifestVideo.resources.structuredContent) {
+      case "rules": {
+        const relativePath = "deliverables/rules.json";
+        const sourcePath = join(packagePath, "deliverables", "rules.json");
+        const raw = await readDocument(sourcePath, relativePath);
+        rulesDocument = Object.freeze({
+          kind: "rules",
+          relativePath,
+          ...documentIdentity(raw),
+          parserVersion: "rules-v1",
+          content: parseRulesJson(
+            parseJson(raw, relativePath, sourcePath),
+            ref.videoId,
+            sourcePath,
+          ),
+        });
+        documents.push(rulesDocument);
+        break;
+      }
+      case "analysis": {
+        const relativePath = "deliverables/analysis.json";
+        const sourcePath = join(packagePath, "deliverables", "analysis.json");
+        const raw = await readDocument(sourcePath, relativePath);
+        const analysisDocument: AnalysisPackageDocumentSnapshot = Object.freeze(
+          {
+            kind: "analysis",
+            relativePath,
+            ...documentIdentity(raw),
+            parserVersion: "analysis-v1",
+            content: parseAnalysisJson(
+              parseJson(raw, relativePath, sourcePath),
+              ref.videoId,
+              sourcePath,
+            ),
+          },
+        );
+        documents.push(analysisDocument);
+        break;
+      }
+      case "none":
+        break;
     }
 
     if (manifestVideo.resources.metadata) {
