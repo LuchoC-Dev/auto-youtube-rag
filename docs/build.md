@@ -8,17 +8,18 @@
 
 ---
 
-| Fase                       | N°  | Etapa                          | Estado |  %   | Descripción                                |
-| -------------------------- | --- | ------------------------------ | :----: | :--: | ------------------------------------------ |
-| **1 — Definición**         | 1.1 | Repositorio y contexto inicial |   ✅   | 100% | Git y decisiones documentadas              |
-|                            | 1.2 | Contrato de CLI y salidas      |   ✅   | 100% | Comandos, formatos y códigos definidos     |
-|                            | 1.3 | Stack y estrategia vectorial   |   ✅   | 100% | Stack y toolchain reproducible aprobados   |
-| **2 — Implementación MVP** | 2.1 | Indexación incremental         |   ✅   | 100% | Sync incremental y CLI verificadas         |
-|                            | 2.2 | Recuperación híbrida           |   ✅   | 100% | FTS5, vectores y ranking verificados       |
-|                            | 2.3 | Ensamblado de contexto         |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve` |
-|                            | 2.4 | Skill general                  |   ✅   | 100% | `skill/SKILL.md` verificada en frío        |
-| **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos       |
-|                            | 3.2 | Evaluaciones del MVP           |   ✅   | 100% | M, N y O completos; MVP cerrado            |
+| Fase                       | N°  | Etapa                                   | Estado |  %   | Descripción                                    |
+| -------------------------- | --- | --------------------------------------- | :----: | :--: | ---------------------------------------------- |
+| **1 — Definición**         | 1.1 | Repositorio y contexto inicial          |   ✅   | 100% | Git y decisiones documentadas                  |
+|                            | 1.2 | Contrato de CLI y salidas               |   ✅   | 100% | Comandos, formatos y códigos definidos         |
+|                            | 1.3 | Stack y estrategia vectorial            |   ✅   | 100% | Stack y toolchain reproducible aprobados       |
+| **2 — Implementación MVP** | 2.1 | Indexación incremental                  |   ✅   | 100% | Sync incremental y CLI verificadas             |
+|                            | 2.2 | Recuperación híbrida                    |   ✅   | 100% | FTS5, vectores y ranking verificados           |
+|                            | 2.3 | Ensamblado de contexto                  |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve`     |
+|                            | 2.4 | Skill general                           |   ✅   | 100% | `skill/SKILL.md` verificada en frío            |
+| **3 — Calidad**            | 3.1 | Pruebas funcionales                     |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos           |
+|                            | 3.2 | Evaluaciones del MVP                    |   ✅   | 100% | M, N y O completos; MVP cerrado                |
+| **4 — Posterior al MVP**   | 4.1 | Soporte de `analysis.json` (schema 2.0) |   🔵   |  0%  | Diseño aprobado (bloques P–T); sin implementar |
 
 ---
 
@@ -144,6 +145,29 @@ MVP completo: 2.1–2.4 y 3.1–3.2 están al 100%. Decisión de calibración de
 O1 y hallazgos accionables de 3.2 en
 `evals/results/2026-08-12/report.md` y `docs/decisions.md`. Trabajo
 posterior razonable (piso de similitud vectorial, MCP, interfaz web,
-paquetes de páginas web, alias de esquema `resources.analysis`) queda fuera
+paquetes de páginas web, soporte de `analysis.json`/schema 2.0) queda fuera
 de este MVP, documentado en `docs/agent-handoff.md`, no como pendiente
 urgente.
+
+### Etapa 4 — Posterior al MVP
+
+#### 4.1 Soporte de `analysis.json` (schema 2.0)
+
+Diseño propuesto y aprobado el 13 de agosto de 2026 en
+`docs/analysis-schema-design.md`, checklist fino en
+`docs/analysis-schema-tasks.md` (bloques P–T). Motivo: la skill productora
+`youtube-video-context` reemplazó `rules.json`/schema 1.0 por
+`analysis.json`/schema 2.0 el 2 de agosto de 2026; `auto-youtube-rag` nunca
+soportó el esquema nuevo, así que los 17 videos reales de `auto-design`
+generados con la skill actual —y todo video futuro— quedan fuera de la
+biblioteca. Decisiones cerradas: ambos esquemas se sostienen
+indefinidamente; `topics`/`recommendations` reutilizan las secciones fijas
+ya publicadas del bundle sin agregar una cuarta; la migración SQLite edita
+`001-initial.ts` in place (no existe base real que preservar). Detalle
+completo en `docs/decisions.md`.
+
+- [ ] P1–P3. Contratos de dominio y aplicación
+- [ ] Q1. Parser de `analysis.json`
+- [ ] R1–R2. Lectura de paquete y unidades de conocimiento
+- [ ] S1–S3. Migración SQLite, bucketing y E2E con fixtures
+- [ ] T1–T3. Validación real sobre `auto-design`/`design-catalog` y cierre
