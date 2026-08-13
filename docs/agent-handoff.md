@@ -9,33 +9,37 @@ implementada, las invariantes que no deben romperse, las validaciones realizadas
 y el siguiente bloque recomendado.
 
 Estado de referencia: **13 de agosto de 2026**, después de cerrar el punto
-3.2 — evaluaciones del MVP. El MVP completo descrito en `product-spec.md`
-(2.1–2.4 y 3.1–3.2) está terminado. El comando `retrieve` de la CLI y la
-skill portable (`skill/SKILL.md`) están implementados, probados y anunciados
-como disponibles; las evaluaciones de recuperación y ensamblado están
-corridas sobre la colección real con resultado documentado. No hay ningún
-bloque abierto en `docs/build.md`. El trabajo que sigue —si el usuario lo
-pide— es explícitamente posterior al MVP (ver "Trabajo posterior razonable,
-fuera de este MVP" más abajo), no un pendiente urgente.
+3.2 — evaluaciones del MVP — y también el punto 4.1 — soporte de
+`analysis.json` (schema 2.0), el primer trabajo posterior al MVP. El MVP
+completo descrito en `product-spec.md` (2.1–2.4 y 3.1–3.2) está terminado.
+El comando `retrieve` de la CLI y la skill portable (`skill/SKILL.md`) están
+implementados, probados y anunciados como disponibles; las evaluaciones de
+recuperación y ensamblado están corridas sobre la colección real con
+resultado documentado. Además, `auto-youtube-rag` ahora indexa y recupera
+`analysis.json` (schema 2.0) de punta a punta, validado contra los 17 videos
+reales de `auto-design` que lo usan. No hay ningún bloque abierto en
+`docs/build.md`. El trabajo que sigue —si el usuario lo pide— es
+explícitamente posterior al MVP (ver "Trabajo posterior razonable, fuera de
+este MVP" más abajo), no un pendiente urgente.
 
 ## Datos rápidos
 
-| Dato                      | Valor                                                                           |
-| ------------------------- | ------------------------------------------------------------------------------- |
-| Proyecto                  | `auto-youtube-rag`                                                              |
-| Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag`        |
-| Rama actual               | `feat/sqlite-vec-benchmark`                                                     |
-| Último commit documentado | `4b8cbcf docs(evals): resolve O1, keep RRF weights and depth budgets unchanged` |
-| Estado Git al cerrar      | Worktree limpio                                                                 |
-| Runtime                   | Node.js 24.19.0 LTS, ESM                                                        |
-| Lenguaje                  | TypeScript 6.0.3 estricto                                                       |
-| Persistencia              | SQLite mediante `node:sqlite`                                                   |
-| Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`              |
-| Dimensión                 | 384                                                                             |
-| Caché aproximada          | 129 MB en `.cache/models`                                                       |
-| Operación                 | Exclusivamente local; sin APIs externas                                         |
-| Estado del MVP            | Completo — 2.1–2.4 y 3.1–3.2 al 100% en `docs/build.md`                         |
-| Próximo punto             | Ninguno abierto; ver "Trabajo posterior razonable" al final                     |
+| Dato                      | Valor                                                                        |
+| ------------------------- | ---------------------------------------------------------------------------- |
+| Proyecto                  | `auto-youtube-rag`                                                           |
+| Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag`     |
+| Rama actual               | `feat/sqlite-vec-benchmark`                                                  |
+| Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.1 |
+| Estado Git al cerrar      | Worktree limpio                                                              |
+| Runtime                   | Node.js 24.19.0 LTS, ESM                                                     |
+| Lenguaje                  | TypeScript 6.0.3 estricto                                                    |
+| Persistencia              | SQLite mediante `node:sqlite`                                                |
+| Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`           |
+| Dimensión                 | 384                                                                          |
+| Caché aproximada          | 129 MB en `.cache/models`                                                    |
+| Operación                 | Exclusivamente local; sin APIs externas                                      |
+| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1 al 100% en `docs/build.md`                 |
+| Próximo punto             | Ninguno abierto; ver "Trabajo posterior razonable" al final                  |
 
 La rama conserva el nombre de un benchmark anterior. No asumas que el proyecto
 está trabajando actualmente en `sqlite-vec`: esa opción fue evaluada y
@@ -68,8 +72,12 @@ Antes de modificar código, leer en este orden:
 15. `evals/results/2026-08-12/report.md`: reporte final de 3.2 — resumen
     ejecutivo, métricas de Capa A, comparación Codex/Claude de Capa B,
     hallazgos accionables y la decisión de calibración (O1).
-16. Este documento: estado operativo consolidado del MVP completo y notas
-    para trabajo posterior.
+16. `docs/analysis-schema-design.md`: diseño de soporte de `analysis.json`
+    (schema 2.0), punto 4.1, ya completado.
+17. `docs/analysis-schema-tasks.md`: checklist fino completado P1–T3 para
+    4.1.
+18. Este documento: estado operativo consolidado del MVP completo, del
+    punto 4.1 y notas para trabajo posterior.
 
 `docs/development.md` sigue siendo la referencia del toolchain. Su frase que
 describe `src/main.ts` como un scaffold quedó históricamente desactualizada: la
@@ -1015,6 +1023,60 @@ motivo (registrados también en `decisions.md` y en el reporte final):
   sobre un producto ya cerrado, y la única decisión con potencial de tocar
   código (O1) concluyó en mantener los defaults.
 
+## Punto 4.1 completado — soporte de `analysis.json` (schema 2.0)
+
+Primer trabajo posterior al MVP, cerrado el 13 de agosto de 2026. Bloques
+P–T de `docs/analysis-schema-tasks.md` completos (contratos, parser,
+lectura de paquete, unidades de conocimiento, migración SQLite, bucketing,
+E2E con fixtures y validación real). Diseño completo en
+`docs/analysis-schema-design.md`, decisión de cierre en `docs/decisions.md`
+sección "Soporte de `analysis.json` (schema 2.0): implementado y
+validado".
+
+Qué cambió en `src/`:
+
+- `structuredContentKinds`/`StructuredContentKind` reemplaza los dos
+  booleanos `rules`/`analysis` de `ManifestResourceSnapshot` por un enum
+  obligatorio de tres valores; `manifest-reader.ts` colapsa los booleanos
+  crudos (cada uno opcional) y rechaza declarar ambos a la vez como
+  `MANIFEST_SCHEMA_INVALID`.
+- `analysis-json-parser.ts` (`parseAnalysisJson`) es un espejo de
+  `rules-json-parser.ts` para el schema 2.0
+  (`topics`/`recommendations`/`assessment`/`evidence_boundary`).
+- `filesystem-package-source-reader.ts` lee `deliverables/analysis.json`
+  mediante un `switch` exhaustivo sobre `structuredContent` (antes era un
+  `if` sólo para `rules`).
+- Cuatro `KnowledgeUnitType` nuevos: `analysis_document`, `analysis_section`,
+  `analysis_topic`, `analysis_recommendation`. `buildAnalysisUnits`
+  (`build-knowledge-units.ts`) construye la jerarquía: raíz →
+  cinco secciones fijas (`Summary and lens`, `Evidence boundary`,
+  `Assessment`, cabecera `Topics`, cabecera `Recommendations`) →
+  `analysis_topic`/`analysis_recommendation` searchable bajo su cabecera.
+- `source_documents.kind` en SQLite acepta `'analysis'` (edición in-place de
+  `001-initial.ts`, no una migración incremental — no había ninguna base
+  real que preservar).
+- `classifyContextSection` (`context-blocks.ts`) suma
+  `analysis_document`/`analysis_section`/`analysis_topic` a
+  `highest_relevance` y `analysis_recommendation` a `related_rules`, sin
+  agregar una tercera sección al bundle ni tocar `cli-contract.md`.
+- `rules.json`/schema 1.0 sigue funcionando exactamente igual que antes;
+  ambos esquemas se sostienen indefinidamente, seleccionados por
+  `structuredContent`, no como versiones donde una reemplaza a la otra.
+
+Validación real (bloque T, no fixtures): copia temporal de la colección
+real `auto-design` (51 videos, 17 con `analysis.json`) sincronizada con el
+modelo E5 real. Los 51 paquetes se indexaron sin ningún `issue`; `doctor`
+en `ok`; digest SHA-256 del árbol fuente idéntico antes/después. La consulta
+semilla nueva `es-analysis-neumorphism-accessibility`
+(`evals/queries/seed-queries.json`) produjo, vía `retrieve --depth
+balanced`, una cita real (`[S45]`) resuelta a una unidad `analysis_topic`
+del video real `psyw2_j_5jk`, en la sección "Highest-relevance context", con
+procedencia correcta y `context.md` legible. La copia temporal se borró al
+terminar. `design-catalog` (mencionada en diseños previos como segunda
+colección real candidata; en disco vive como `catalog-design` bajo
+`ai-transcripcion/`) no se usó para esta validación: su manifest no declara
+ningún video con `resources.analysis`.
+
 ## MVP completo — cierre y trabajo posterior
 
 Con 3.2 cerrado, `docs/build.md` marca 2.1, 2.2, 2.3, 2.4, 3.1 y 3.2 al
@@ -1031,15 +1093,6 @@ explícita del usuario:
   clara" desde 2.2; 3.2 no encontró esa evidencia).
 - Señal adicional de densidad/relevancia temática para que RRF distinga
   contenido específico de catálogo tangencial (hallazgo de 3.2, no un bug).
-- **Soporte de `analysis.json`/schema 2.0** de la skill productora
-  `youtube-video-context`, para que los 17 videos reales que ya usan ese
-  esquema (y todo video futuro) puedan indexarse. La validación tolerante
-  por video (13 de agosto) ya evita que bloqueen al resto de la fuente. A
-  diferencia de los demás ítems de esta lista, **este ya tiene diseño y
-  checklist aprobados** — `docs/analysis-schema-design.md` y
-  `docs/analysis-schema-tasks.md` (bloques P–T), registrado como punto 4.1
-  en `docs/build.md`. No es "pendiente sin plan": es trabajo listo para
-  implementar en cuanto se retome, sin necesitar una ronda de diseño nueva.
 - Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad que
   encontró N4, antes de una futura pasada de evaluación.
 - Verificación de `skill/SKILL.md` específicamente desde Codex real (2.4 se
@@ -1057,8 +1110,9 @@ frentes (u otro nuevo) es prioridad, en vez de asumir uno.
 
 1. Confirmar `git status --short` vacío y revisar los últimos commits.
 2. Ejecutar `npm.cmd run check` y `npm.cmd run build`.
-3. Leer los dieciséis documentos indicados al inicio, incluidos
-   `skill/SKILL.md` y `evals/results/2026-08-12/report.md`.
+3. Leer los dieciocho documentos indicados al inicio, incluidos
+   `skill/SKILL.md`, `evals/results/2026-08-12/report.md` y
+   `docs/analysis-schema-design.md`/`docs/analysis-schema-tasks.md`.
 4. El MVP está completo: no hay bloque abierto en `docs/build.md`.
    Preguntar al usuario qué frente de "Trabajo posterior razonable, fuera de
    este MVP" (más arriba) es prioridad, o si hay un pedido nuevo — no asumir
@@ -1075,9 +1129,10 @@ Prompt sugerido para retomar:
 > Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero el
 > estado del repositorio y las pruebas. El MVP está completo: 2.1–2.4 y
 > 3.1–3.2 al 100%, incluidos el comando `retrieve`, la skill portable
-> `skill/SKILL.md` y el reporte final de evaluaciones. No hay ningún bloque
-> abierto. Preguntame qué frente de trabajo posterior priorizar antes de
-> implementar nada.
+> `skill/SKILL.md` y el reporte final de evaluaciones. El punto 4.1 —soporte
+> de `analysis.json` (schema 2.0)— también está cerrado y validado contra la
+> colección real `auto-design`. No hay ningún bloque abierto. Preguntame qué
+> frente de trabajo posterior priorizar antes de implementar nada.
 
 ## Historial reciente relevante
 

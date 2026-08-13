@@ -2,10 +2,12 @@
 
 ## Estado
 
-Checklist propuesto y aprobado el 13 de agosto de 2026, continuando
+**Completo, cerrado el 13 de agosto de 2026.** Checklist propuesto y
+aprobado el 13 de agosto de 2026, continuando
 [analysis-schema-design.md](analysis-schema-design.md). Sigue la numeración
 de bloques ya usada por el proyecto (A–L en indexación/recuperación/contexto,
-M–O en evaluaciones); este trabajo usa **P–T**.
+M–O en evaluaciones); este trabajo usa **P–T**. Registrado como punto 4.1 en
+`docs/build.md`, validación real documentada en `docs/decisions.md`.
 
 ## Convenciones de ejecución
 
@@ -232,7 +234,7 @@ contenido real de `auto-design`/`design-catalog`.
 
 ### T3. Cierre y documentación
 
-- [ ] Actualizar `docs/product-spec.md`, `docs/indexing-design.md`,
+- [x] Actualizar `docs/product-spec.md`, `docs/indexing-design.md`,
       `docs/context-assembly-design.md`, `docs/decisions.md` (mover de
       "Pendientes de decisión" a decisión cerrada) y `docs/agent-handoff.md`
       con el resultado real de T1/T2. Actualizar `docs/build.md` con el
