@@ -102,6 +102,16 @@ export function createRuleChildKey(
   return `${createRulePatternKey(patternId)}/${normalizedKind}:${String(readNonNegativeInteger(ordinal, "ordinal"))}`;
 }
 
+export function createAnalysisTopicKey(topicId: string): string {
+  return `topic:${readStructuralSegment(topicId, "topicId")}`;
+}
+
+export function createAnalysisRecommendationKey(
+  recommendationId: string,
+): string {
+  return `recommendation:${readStructuralSegment(recommendationId, "recommendationId")}`;
+}
+
 export function createFragmentKey(
   unitId: KnowledgeUnitId,
   ordinal: number,

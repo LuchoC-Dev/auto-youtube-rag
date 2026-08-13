@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
+  createAnalysisRecommendationKey,
+  createAnalysisTopicKey,
   createFragmentKey,
   createMarkdownSectionKey,
   createRuleChildKey,
@@ -212,5 +214,20 @@ void test("builds deterministic rule and fragment structural keys", () => {
         -1,
       ),
     "ordinal",
+  );
+});
+
+void test("builds deterministic analysis structural keys", () => {
+  const topic = createAnalysisTopicKey("expressive_typography");
+  const recommendation = createAnalysisRecommendationKey(
+    "adopt_expressive_type",
+  );
+
+  assert.equal(topic, "topic:expressive_typography");
+  assert.equal(recommendation, "recommendation:adopt_expressive_type");
+  assertInvalid(() => createAnalysisTopicKey("bad/id"), "topicId");
+  assertInvalid(
+    () => createAnalysisRecommendationKey("bad/id"),
+    "recommendationId",
   );
 });

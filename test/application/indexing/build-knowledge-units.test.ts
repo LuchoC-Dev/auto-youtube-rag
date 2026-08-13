@@ -240,6 +240,138 @@ void test("builds rules sections, patterns and typed child units", () => {
   });
 });
 
+function analysisPackageSnapshot(): PackageSnapshot {
+  return {
+    kind: "video_package",
+    ref,
+    slug: "analysis-video",
+    relativePath: "videos/analysis-video",
+    manifestStage: "complete",
+    documents: [
+      {
+        kind: "analysis",
+        relativePath: "deliverables/analysis.json",
+        contentHash: "c".repeat(64),
+        byteSize: 900,
+        parserVersion: "analysis-v1",
+        content: {
+          kind: "analysis",
+          schemaVersion: "2.0",
+          analysisLens: {
+            lens: "Diseño editorial",
+            rationale: "El video cubre publicaciones editoriales.",
+            chosenBy: "agent",
+          },
+          summary: "Resumen de tendencias editoriales recientes.",
+          topics: [
+            {
+              id: "expressive_typography",
+              title: "Tipografía expresiva",
+              whatTheSourceSays: "La fuente muestra tipografía de gran escala.",
+              evidenceClass: "direct",
+              timestamps: ["00:01:12-00:02:03"],
+              visualEvidence: ["visual/frames/frame-012.jpg"],
+              analystNote: "Coincide con tendencias previas.",
+            },
+          ],
+          recommendations: [
+            {
+              id: "adopt_expressive_type",
+              recommendation:
+                "Usar tipografía expresiva como elemento dominante.",
+              rationale: "La evidencia directa respalda esta dirección.",
+              confidence: "high",
+            },
+          ],
+          assessment: {
+            strengths: ["Ejemplos visuales abundantes."],
+            weaknesses: ["No se discute accesibilidad tipográfica."],
+            verdict: "Útil como referencia de tendencias.",
+            basis: "Cobertura visual sin guía prescriptiva explícita.",
+          },
+          evidenceBoundary: {
+            transcript: "La transcripción confirma el enfoque editorial.",
+            frames: "Los frames muestran ejemplos consistentes.",
+            analystOpinion: "La clasificación de tendencia es del analista.",
+            unverified: "No se verificó la fuente original de cada pieza.",
+          },
+        },
+      },
+    ],
+  };
+}
+
+void test("builds analysis document root, fixed sections and typed children", () => {
+  const units = buildKnowledgeUnits(analysisPackageSnapshot());
+  const root = units.find((unit) => unit.unitType === "analysis_document");
+  const sections = units.filter((unit) => unit.unitType === "analysis_section");
+  const topic = units.find((unit) => unit.unitType === "analysis_topic");
+  const recommendation = units.find(
+    (unit) => unit.unitType === "analysis_recommendation",
+  );
+
+  assert.ok(root);
+  assert.equal(root.id.value, "unit:auto-design:video_123:analysis:root");
+  assert.equal(root.parentId, null);
+  assert.equal(root.depth, 0);
+  assert.equal(root.searchable, false);
+  assert.deepEqual(
+    sections.map((section) => section.title),
+    [
+      "Summary and lens",
+      "Evidence boundary",
+      "Assessment",
+      "Topics",
+      "Recommendations",
+    ],
+  );
+  assert.equal(
+    sections.every((section) => section.parentId?.equals(root.id) === true),
+    true,
+  );
+  assert.equal(
+    sections.find((section) => section.title === "Topics")?.searchable,
+    false,
+  );
+  assert.equal(
+    sections.find((section) => section.title === "Summary and lens")
+      ?.searchable,
+    true,
+  );
+
+  assert.ok(topic);
+  assert.equal(
+    topic.id.value,
+    "unit:auto-design:video_123:analysis:topic:expressive_typography",
+  );
+  assert.equal(topic.depth, 2);
+  assert.equal(topic.searchable, true);
+  assert.deepEqual(topic.timestamps, ["00:01:12-00:02:03"]);
+  assert.deepEqual(topic.visualEvidence, ["visual/frames/frame-012.jpg"]);
+  assert.equal(
+    topic.parentId?.equals(
+      sections.find((section) => section.title === "Topics")?.id ??
+        topic.parentId,
+    ),
+    true,
+  );
+
+  assert.ok(recommendation);
+  assert.equal(
+    recommendation.id.value,
+    "unit:auto-design:video_123:analysis:recommendation:adopt_expressive_type",
+  );
+  assert.equal(recommendation.depth, 2);
+  assert.equal(recommendation.searchable, true);
+  assert.equal(
+    recommendation.parentId?.equals(
+      sections.find((section) => section.title === "Recommendations")?.id ??
+        recommendation.parentId,
+    ),
+    true,
+  );
+});
+
 void test("rebuilds identically and keeps structural ids across content changes", () => {
   assert.deepEqual(serializeUnits(), serializeUnits());
 
