@@ -137,7 +137,7 @@ const manifest = {
       sourceLanguage: "en",
       contextLanguage: "es",
       stage: "complete",
-      resources: { context: true, rules: true, metadata: true },
+      resources: { context: true, structuredContent: "rules", metadata: true },
     },
   ],
   issues: [],

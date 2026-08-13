@@ -102,7 +102,7 @@ class FakeReader implements PackageSourceReader {
               stage: "complete",
               resources: Object.freeze({
                 context: true,
-                rules: false,
+                structuredContent: "none",
                 metadata: false,
               }),
             }),

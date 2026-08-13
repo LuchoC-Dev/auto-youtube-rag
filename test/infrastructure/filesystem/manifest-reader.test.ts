@@ -64,12 +64,12 @@ void test("reads videos, keeps approved resources and ignores pages", async () =
   assert.equal(firstVideo.contextLanguage, "es");
   assert.deepEqual(firstVideo.resources, {
     context: true,
-    rules: true,
+    structuredContent: "rules",
     metadata: true,
   });
   assert.deepEqual(secondVideo.resources, {
     context: true,
-    rules: false,
+    structuredContent: "none",
     metadata: true,
   });
   assert.equal("pages" in manifest, false);
@@ -170,6 +170,72 @@ void test("skips a video with an invalid resource boolean and reports it as an i
   assert.equal(invalidResourceIssue.code, "SCHEMA_INVALID");
   assert.equal(invalidResourceIssue.field, "videos[0].resources.context");
   assert.equal(invalidResourceIssue.videoId?.value, "video_one");
+});
+
+void test("collapses rules/analysis booleans into structuredContent for both schemas", () => {
+  const manifest = parseManifest(
+    {
+      videos: [
+        {
+          video_id: "video_rules",
+          slug: "video-rules",
+          resources: { context: true, rules: true, metadata: true },
+        },
+        {
+          video_id: "video_analysis",
+          slug: "video-analysis",
+          resources: { context: true, analysis: true, metadata: true },
+        },
+        {
+          video_id: "video_none",
+          slug: "video-none",
+          resources: { context: true, metadata: true },
+        },
+      ],
+    },
+    { sourceName, manifestPath: "memory://manifest", contentHash: hash },
+  );
+
+  assert.equal(manifest.issues.length, 0);
+  assert.equal(manifest.videos.length, 3);
+  const [rulesVideo, analysisVideo, noneVideo] = manifest.videos;
+  assert.equal(rulesVideo?.resources.structuredContent, "rules");
+  assert.equal(analysisVideo?.resources.structuredContent, "analysis");
+  assert.equal(noneVideo?.resources.structuredContent, "none");
+});
+
+void test("skips a video declaring both rules and analysis as an issue", () => {
+  const manifest = parseManifest(
+    {
+      videos: [
+        {
+          video_id: "video_both",
+          slug: "video-both",
+          resources: {
+            context: true,
+            rules: true,
+            analysis: true,
+            metadata: true,
+          },
+        },
+        {
+          video_id: "video_ok",
+          slug: "video-ok",
+          resources: { context: true, rules: true, metadata: true },
+        },
+      ],
+    },
+    { sourceName, manifestPath: "memory://manifest", contentHash: hash },
+  );
+
+  assert.equal(manifest.videos.length, 1);
+  assert.equal(manifest.videos[0]?.ref.videoId.value, "video_ok");
+  assert.equal(manifest.issues.length, 1);
+  const [bothIssue] = manifest.issues;
+  assert.ok(bothIssue);
+  assert.equal(bothIssue.code, "SCHEMA_INVALID");
+  assert.equal(bothIssue.field, "videos[0].resources");
+  assert.equal(bothIssue.videoId?.value, "video_both");
 });
 
 void test("skips a video whose own video_id is invalid, with a null issue videoId", () => {

@@ -199,7 +199,7 @@ export class FilesystemPackageSourceReader implements PackageSourceReader {
       documents.push(contextDocument);
     }
 
-    if (manifestVideo.resources.rules) {
+    if (manifestVideo.resources.structuredContent === "rules") {
       const relativePath = "deliverables/rules.json";
       const sourcePath = join(packagePath, "deliverables", "rules.json");
       const raw = await readDocument(sourcePath, relativePath);
