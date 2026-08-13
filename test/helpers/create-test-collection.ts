@@ -10,6 +10,8 @@ import {
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 
+import { installFakeModel } from "./install-fake-model.js";
+
 export interface TestVideo {
   readonly videoId: string;
   readonly slug: string;
@@ -52,7 +54,7 @@ export async function createTestCollection(
   await mkdir(join(collectionPath, "videos"), { recursive: true });
   await mkdir(join(root, "data"));
   await mkdir(modelCachePath);
-  await writeFile(join(modelCachePath, "model.onnx"), "test model", "utf8");
+  await installFakeModel(modelCachePath);
 
   const writeManifest = async (listed: readonly TestVideo[]) => {
     await writeFile(

@@ -10,7 +10,10 @@ import { ContextBudget } from "../../domain/context/context-budget.js";
 import { SourceName } from "../../domain/indexing/identifiers.js";
 import { RetrievalFilter } from "../../domain/retrieval/retrieval-filter.js";
 import { RetrievalQuery } from "../../domain/retrieval/retrieval-query.js";
-import { describeModelState } from "../../infrastructure/config/model-install-state.js";
+import {
+  describeModelState,
+  readModelState,
+} from "../../infrastructure/config/model-install-state.js";
 import { E5EmbeddingGenerator } from "../../infrastructure/embeddings/e5-embedding-generator.js";
 import { E5ModelInstaller } from "../../infrastructure/embeddings/e5-model-installer.js";
 import { writeContextBundle } from "../../infrastructure/filesystem/write-context-bundle.js";
@@ -20,6 +23,8 @@ import type {
   ApplicationConfig,
 } from "../../main/create-application.js";
 import { createApplication } from "../../main/create-application.js";
+import { commandRequirement } from "./command-requirements.js";
+import type { ParsedCliCommand } from "./parse-command.js";
 import { parseCommand } from "./parse-command.js";
 import { renderCliError, renderCliSuccess } from "./render-cli-output.js";
 
@@ -107,6 +112,42 @@ async function legacyLibraryWarnings(
   ];
 }
 
+/**
+ * Verifies a command's requirement exactly once, before the Application is
+ * built (Z2 of docs/install-tasks.md): a missing library or model produces
+ * one accessible error naming the command that fixes it, instead of the
+ * raw ERR_SQLITE_ERROR (missing library) or one MODEL_LOAD_FAILED issue
+ * per video (missing model) the 13 August cold run hit.
+ */
+async function preflight(
+  command: ParsedCliCommand,
+  options: RunCliOptions,
+): Promise<void> {
+  const requirement = commandRequirement(command);
+  if (requirement === "none") return;
+
+  if (!(await exists(options.config.databasePath))) {
+    throw Object.assign(
+      new Error(
+        `No library was found at ${options.config.databasePath}. Run "auto-youtube-rag init" first.`,
+      ),
+      { code: "LIBRARY_NOT_FOUND", retryable: false },
+    );
+  }
+
+  if (requirement === "library_and_model") {
+    const modelState = await readModelState(options.config.modelCachePath);
+    if (modelState !== "installed") {
+      throw Object.assign(
+        new Error(
+          `The embedding model is not installed at ${options.config.modelCachePath}. Run "auto-youtube-rag models install" first.`,
+        ),
+        { code: "MODEL_NOT_INSTALLED", retryable: false },
+      );
+    }
+  }
+}
+
 async function runModelsCommand(
   command:
     | {
@@ -177,6 +218,8 @@ export async function runCli(options: RunCliOptions): Promise<number> {
     const alreadyInitialized = await exists(options.config.databasePath);
     if (command.kind === "init") {
       await mkdir(dirname(options.config.databasePath), { recursive: true });
+    } else {
+      await preflight(command, options);
     }
     application = (options.applicationFactory ?? createApplication)(
       options.config,
