@@ -182,7 +182,7 @@ kind, ...) VALUES (..., 'analysis', ...)`; los tests de migración
 
 ### S3. E2E de indexación y recuperación con SQLite real
 
-- [ ] Cubrir con un E2E real (SQLite en disco temporal, sin fakes) un
+- [x] Cubrir con un E2E real (SQLite en disco temporal, sin fakes) un
       paquete con `analysis.json`: `sync` lo indexa, `retrieve` lo recupera
       y el bundle resultante cita correctamente una unidad `analysis_topic`
       y una `analysis_recommendation` en las secciones esperadas.

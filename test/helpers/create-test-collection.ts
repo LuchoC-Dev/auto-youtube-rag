@@ -13,6 +13,8 @@ import { join, relative } from "node:path";
 export interface TestVideo {
   readonly videoId: string;
   readonly slug: string;
+  /** Defaults to no structured content, matching the historical fixtures. */
+  readonly structuredContent?: "analysis";
 }
 
 export interface TestCollection {
@@ -23,6 +25,7 @@ export interface TestCollection {
   writeManifest(videos: readonly TestVideo[]): Promise<void>;
   writeContext(video: TestVideo, content: string): Promise<void>;
   removeContext(video: TestVideo): Promise<void>;
+  writeAnalysis(video: TestVideo, analysis: unknown): Promise<void>;
   snapshot(): Promise<Readonly<Record<string, string>>>;
   cleanup(): Promise<void>;
 }
@@ -61,7 +64,12 @@ export async function createTestCollection(
           source_language: "es",
           dossier_language: "es",
           stage: "complete",
-          resources: { context: true, rules: false, metadata: false },
+          resources: {
+            context: true,
+            rules: false,
+            analysis: video.structuredContent === "analysis",
+            metadata: false,
+          },
         })),
       }),
       "utf8",
@@ -81,6 +89,20 @@ export async function createTestCollection(
       "utf8",
     );
   };
+  const writeAnalysis = async (video: TestVideo, analysis: unknown) => {
+    const deliverables = join(
+      collectionPath,
+      "videos",
+      video.slug,
+      "deliverables",
+    );
+    await mkdir(deliverables, { recursive: true });
+    await writeFile(
+      join(deliverables, "analysis.json"),
+      JSON.stringify(analysis),
+      "utf8",
+    );
+  };
 
   await writeManifest(videos);
   await Promise.all(
@@ -96,6 +118,7 @@ export async function createTestCollection(
     modelCachePath,
     writeManifest,
     writeContext,
+    writeAnalysis,
     removeContext: (video) =>
       rm(
         join(
