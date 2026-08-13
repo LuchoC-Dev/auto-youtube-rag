@@ -11,7 +11,20 @@ import {
 } from "../../../src/interfaces/cli/render-cli-output.js";
 
 void test("parses every non-interactive administrative command", () => {
-  assert.deepEqual(parseCommand(["init"]), { kind: "init" });
+  assert.deepEqual(parseCommand(["init"]), {
+    kind: "init",
+    skipModel: false,
+    from: null,
+  });
+  assert.deepEqual(parseCommand(["init", "--skip-model"]), {
+    kind: "init",
+    skipModel: true,
+    from: null,
+  });
+  assert.deepEqual(
+    parseCommand(["init", "--from", "C:\\repo\\.cache\\models"]),
+    { kind: "init", skipModel: false, from: "C:\\repo\\.cache\\models" },
+  );
   assert.deepEqual(
     parseCommand(["source", "add", "C:\\library", "--name", "design"]),
     {

@@ -74,6 +74,39 @@ function unreachable(value: never): never {
   throw new Error(`Unsupported parsed command: ${JSON.stringify(value)}`);
 }
 
+/**
+ * Detects a pre-4.2 cwd-relative library the resolved home does not know
+ * about (Decision 6 of docs/install-design.md). Only warns when the
+ * resolved home is itself empty: a legacy file next to a home that already
+ * has a library is noise, not a signal.
+ */
+async function legacyLibraryWarnings(
+  config: ApplicationConfig,
+  homeIsEmpty: boolean,
+): Promise<readonly Record<string, unknown>[]> {
+  if (
+    !homeIsEmpty ||
+    config.legacyDatabasePath === undefined ||
+    config.legacyDatabasePath === config.databasePath ||
+    !(await exists(config.legacyDatabasePath))
+  ) {
+    return [];
+  }
+
+  return [
+    {
+      code: "LEGACY_LIBRARY_FOUND",
+      message:
+        `A library was found at ${config.legacyDatabasePath} (the pre-4.2 ` +
+        `cwd-relative default), but it is not visible from the active home ` +
+        `${config.databasePath}. Move the file under the new home, or set ` +
+        "AUTO_YOUTUBE_RAG_HOME to point at its parent directory.",
+      home_database_path: config.databasePath,
+      legacy_database_path: config.legacyDatabasePath,
+    },
+  ];
+}
+
 async function runModelsCommand(
   command:
     | {
@@ -150,14 +183,48 @@ export async function runCli(options: RunCliOptions): Promise<number> {
     );
 
     switch (command.kind) {
-      case "init":
+      case "init": {
+        let model: Record<string, unknown> | null = null;
+        if (!command.skipModel) {
+          const modelInstaller = (
+            options.modelInstallerFactory ?? (() => new E5ModelInstaller())
+          )(options.config);
+          const installed = await installModel(
+            {
+              modelInstaller,
+              embeddingGenerator: application.embeddingGenerator,
+            },
+            {
+              modelsPath: options.config.modelCachePath,
+              from: command.from,
+              force: false,
+            },
+          );
+          model = {
+            status: installed.status,
+            key: installed.model.key,
+            version: installed.model.version,
+            dimensions: installed.model.dimensions,
+            bytes: installed.bytes,
+            source: installed.source,
+            cache_path: installed.cachePath,
+          };
+        }
+
         options.stdout.write(
           renderCliSuccess({
             status: alreadyInitialized ? "already_initialized" : "initialized",
             database_path: options.config.databasePath,
+            home: dirname(options.config.databasePath),
+            model,
+            warnings: await legacyLibraryWarnings(
+              options.config,
+              !alreadyInitialized,
+            ),
           }),
         );
         return 0;
+      }
       case "source_add": {
         const source = await application.addSource({
           name: command.name,
@@ -216,7 +283,16 @@ export async function runCli(options: RunCliOptions): Promise<number> {
           new SQLiteDiagnosticsRepository(application.database),
           application.embeddingGenerator,
         );
-        options.stdout.write(renderCliSuccess({ status: "ok", ...status }));
+        options.stdout.write(
+          renderCliSuccess({
+            status: "ok",
+            ...status,
+            warnings: await legacyLibraryWarnings(
+              options.config,
+              status.counts.sources === 0,
+            ),
+          }),
+        );
         return 0;
       }
       case "doctor": {

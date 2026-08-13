@@ -3,7 +3,11 @@ import { parseArgs } from "node:util";
 import { contextDepths } from "../../domain/context/context-budget.js";
 
 export type ParsedCliCommand =
-  | { readonly kind: "init" }
+  | {
+      readonly kind: "init";
+      readonly skipModel: boolean;
+      readonly from: string | null;
+    }
   | {
       readonly kind: "source_add";
       readonly path: string;
@@ -79,9 +83,20 @@ export function parseCommand(argv: readonly string[]): ParsedCliCommand {
 
   switch (command) {
     case "init": {
-      const { positionals } = parse(rest);
-      exactPositionals(positionals, 0, "auto-youtube-rag init");
-      return { kind: "init" };
+      const { positionals, values } = parse(rest, {
+        "skip-model": { type: "boolean" },
+        from: { type: "string" },
+      });
+      exactPositionals(
+        positionals,
+        0,
+        "auto-youtube-rag init [--skip-model] [--from <path>]",
+      );
+      return {
+        kind: "init",
+        skipModel: values["skip-model"] === true,
+        from: typeof values.from === "string" ? values.from : null,
+      };
     }
     case "source": {
       const [subcommand, ...sourceArgs] = rest;

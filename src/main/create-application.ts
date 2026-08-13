@@ -45,6 +45,11 @@ import { SQLiteVectorSource } from "../infrastructure/vector/sqlite-vector-loade
 export interface ApplicationConfig {
   readonly databasePath: string;
   readonly modelCachePath: string;
+  /** The pre-4.2 cwd-relative database path (`<cwd>/.auto-youtube-rag/index.sqlite`).
+   * Used only to detect and warn about LEGACY_LIBRARY_FOUND (Decision 6 of
+   * docs/install-design.md); never read from automatically. `undefined`
+   * disables the check (e.g. in tests that do not care about it). */
+  readonly legacyDatabasePath?: string;
 }
 
 export interface ApplicationOverrides {

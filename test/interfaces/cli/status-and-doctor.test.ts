@@ -61,7 +61,7 @@ async function command(
 void test("reports status and runs read-only health checks", async () => {
   const setup = await fixture();
   try {
-    await command(["init"], setup.config);
+    await command(["init", "--skip-model"], setup.config);
     await command(
       ["source", "add", setup.collection, "--name", "design"],
       setup.config,
@@ -87,7 +87,7 @@ void test("reports status and runs read-only health checks", async () => {
 void test("doctor reports a missing local model cache", async () => {
   const setup = await fixture();
   try {
-    await command(["init"], setup.config);
+    await command(["init", "--skip-model"], setup.config);
     await rm(setup.config.modelCachePath, { recursive: true, force: true });
     const doctor = await command(["doctor"], setup.config);
     assert.equal(doctor.exitCode, 1);

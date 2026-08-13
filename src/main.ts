@@ -18,6 +18,11 @@ export async function main(
     config: {
       databasePath: paths.databasePath,
       modelCachePath: paths.modelsPath,
+      legacyDatabasePath: resolve(
+        process.cwd(),
+        ".auto-youtube-rag",
+        "index.sqlite",
+      ),
     },
     stdout: process.stdout,
     stderr: process.stderr,

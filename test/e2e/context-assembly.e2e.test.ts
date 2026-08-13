@@ -171,7 +171,7 @@ void test("assembles, budgets and cites context end to end through the retrieve 
 
   try {
     await withoutMutating(collections, async () => {
-      const init = await retrieve(["init"]);
+      const init = await retrieve(["init", "--skip-model"]);
       assert.equal(init.exitCode, 0);
       const addDesign = await retrieve([
         "source",
