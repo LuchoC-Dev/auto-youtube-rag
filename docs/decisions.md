@@ -256,24 +256,44 @@ indexarse — ahora aislados como `issue` en vez de tumbar todo el run — porqu
 tiene una forma de contenido incompatible con `rules.json` (schema 1.0), no
 es un simple alias de clave. Ver "Pendientes de decisión" abajo.
 
+## Soporte de `analysis.json` (schema 2.0): diseño aprobado
+
+La skill productora `youtube-video-context` reemplazó `rules.json`/schema
+1.0 por `analysis.json`/schema 2.0 el 2 de agosto de 2026 (commit `aecdde9`
+del repositorio de esa skill, breaking change explícito: "deja de producir
+un manual de reglas de diseño para producir un análisis general").
+`auto-youtube-rag` nunca soportó schema 2.0; la forma de `analysis.json`
+(`topics`/`recommendations`/`assessment`/`evidence_boundary`) no es análoga
+a la de `rules.json` (`patterns`/`principle`/`problem`/`rules`/`avoid`/
+`acceptanceCriteria`), así que no es viable un alias de campo en el
+manifest ni reusar `rules-json-parser.ts`.
+
+El 13 de agosto de 2026 se aprobó el diseño completo en
+[analysis-schema-design.md](analysis-schema-design.md) (checklist fino en
+`docs/analysis-schema-tasks.md`, bloques P–T), con estas decisiones:
+
+- **Ambos esquemas se sostienen indefinidamente.** `rules.json`/schema 1.0
+  no se congela ni se deprecia — los 34 videos existentes de `auto-design`
+  no se regeneran solos.
+- **Bucketing:** `topics`/`analysis_document`/`analysis_section` caen en
+  "Highest-relevance context"; `recommendations` cae en "Related rules and
+  patterns". Se reutilizan las dos secciones fijas ya publicadas en
+  `cli-contract.md` sin renombrarlas ni agregar una tercera, para no romper
+  el contrato de cable ya consumido por `skill/SKILL.md` y por agentes
+  reales.
+- **Migración SQLite:** se edita `001-initial.ts` in place para que el
+  `CHECK` de `source_documents.kind` incluya `'analysis'` desde el origen,
+  en vez de construir un migrador incremental. Confirmado con el usuario
+  que no existe ninguna base `.auto-youtube-rag/index.sqlite` real y
+  persistente que preservar — `auto-design` y `design-catalog` (esta
+  última, otra colección real generada por la misma skill, con algunos
+  videos más) son colecciones fuente en disco, no índices ya construidos.
+- **Validación E2E real (bloque T)** contra los videos reales con
+  `analysis.json` de `auto-design` va incluida en este trabajo, no
+  pospuesta.
+
+Implementación pendiente: bloques P–T de `docs/analysis-schema-tasks.md`.
+
 ## Pendientes de decisión
 
-- **Soporte de `analysis.json` (schema 2.0)**: la skill productora
-  `youtube-video-context` reemplazó `rules.json`/schema 1.0 por
-  `analysis.json`/schema 2.0 el 2 de agosto de 2026 (commit `aecdde9` del
-  repositorio de esa skill, breaking change explícito y documentado: "deja
-  de producir un manual de reglas de diseño para producir un análisis
-  general"). `auto-youtube-rag` nunca soportó schema 2.0. La forma de
-  `analysis.json` (`topics`/`recommendations`/`assessment`/
-  `evidence_boundary`) no es análoga a la de `rules.json`
-  (`patterns`/`principle`/`problem`/`rules`/`avoid`/`acceptanceCriteria`):
-  no es viable un alias de campo en el manifest ni reusar
-  `rules-json-parser.ts`. Requiere un parser nuevo, un snapshot de dominio
-  nuevo, y una decisión de producto explícita sobre cómo (o si)
-  `topics`/`recommendations`/`assessment` encajan en el bucketing fijo de
-  `assembleContext` ("Highest-relevance context" / "Related rules and
-  patterns" / "Additional relevant context"), y si `auto-youtube-rag`
-  sostiene ambos esquemas indefinidamente o trata schema 1.0 como
-  congelado. Necesita diseño propio y aprobación explícita antes de
-  implementar — no se resuelve en el mismo corte que la validación
-  tolerante.
+Ninguno.

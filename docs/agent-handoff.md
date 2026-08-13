@@ -1031,12 +1031,15 @@ explícita del usuario:
   clara" desde 2.2; 3.2 no encontró esa evidencia).
 - Señal adicional de densidad/relevancia temática para que RRF distinga
   contenido específico de catálogo tangencial (hallazgo de 3.2, no un bug).
-- Soporte de `analysis.json`/schema 2.0 de la skill productora
-  `youtube-video-context` (parser, snapshot de dominio y decisión de
-  bucketing en `assembleContext`) para que los 17 videos reales que ya usan
-  ese esquema puedan indexarse. La validación tolerante por video (13 de
-  agosto) ya evita que bloqueen al resto de la fuente; ver
-  `docs/decisions.md`.
+- **Soporte de `analysis.json`/schema 2.0** de la skill productora
+  `youtube-video-context`, para que los 17 videos reales que ya usan ese
+  esquema (y todo video futuro) puedan indexarse. La validación tolerante
+  por video (13 de agosto) ya evita que bloqueen al resto de la fuente. A
+  diferencia de los demás ítems de esta lista, **este ya tiene diseño y
+  checklist aprobados** — `docs/analysis-schema-design.md` y
+  `docs/analysis-schema-tasks.md` (bloques P–T), registrado como punto 4.1
+  en `docs/build.md`. No es "pendiente sin plan": es trabajo listo para
+  implementar en cuanto se retome, sin necesitar una ronda de diseño nueva.
 - Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad que
   encontró N4, antes de una futura pasada de evaluación.
 - Verificación de `skill/SKILL.md` específicamente desde Codex real (2.4 se
