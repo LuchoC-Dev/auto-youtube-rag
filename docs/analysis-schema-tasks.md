@@ -131,7 +131,7 @@ aislada, sin estar todavía cableado a la lectura de paquetes.
 
 ### R2. Unidades de conocimiento de `analysis.json`
 
-- [ ] Extender `build-knowledge-units.ts` con `buildAnalysisUnits`, simétrico
+- [x] Extender `build-knowledge-units.ts` con `buildAnalysisUnits`, simétrico
       a `buildRulesUnits`: raíz `analysis_document` (resumen + lens, no
       searchable) → secciones `analysis_section` fijas ("Summary and lens",
       "Evidence boundary", "Assessment", cabecera "Topics", cabecera

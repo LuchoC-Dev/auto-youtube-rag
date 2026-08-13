@@ -1,4 +1,6 @@
 import {
+  createAnalysisRecommendationKey,
+  createAnalysisTopicKey,
   createMarkdownSectionKey,
   createRuleChildKey,
   createRulePatternKey,
@@ -15,6 +17,10 @@ import {
   type KnowledgeUnitType,
 } from "../../domain/indexing/knowledge-unit.js";
 import type {
+  AnalysisDocumentSnapshot,
+  AnalysisPackageDocumentSnapshot,
+  AnalysisRecommendationSnapshot,
+  AnalysisTopicSnapshot,
   ContextDocumentSnapshot,
   ContextPackageDocumentSnapshot,
   ContextSectionSnapshot,
@@ -54,7 +60,7 @@ const timestampPattern = /(?<!\d)(?:\d{1,2}:)?\d{2}:\d{2}(?!\d)/gu;
 
 function createDocumentId(
   ref: PackageRef,
-  kind: "context" | "rules",
+  kind: "context" | "rules" | "analysis",
 ): DocumentId {
   return DocumentId.create(
     `document:${ref.sourceName.value}:${ref.videoId.value}:${kind}`,
@@ -63,7 +69,7 @@ function createDocumentId(
 
 function createUnitId(
   ref: PackageRef,
-  kind: "context" | "rules",
+  kind: "context" | "rules" | "analysis",
   structuralKey: string,
 ): KnowledgeUnitId {
   return KnowledgeUnitId.create(
@@ -401,6 +407,216 @@ function buildRulesUnits(
   return Object.freeze(units);
 }
 
+interface AnalysisSectionInput {
+  readonly key: string;
+  readonly ordinal: number;
+  readonly title: string;
+  readonly content: string;
+  readonly structuredJson: string | null;
+  readonly searchable: boolean;
+}
+
+function renderSummaryAndLens(document: AnalysisDocumentSnapshot): string {
+  return [
+    document.summary,
+    `Lens: ${document.analysisLens.lens}`,
+    `Rationale: ${document.analysisLens.rationale}`,
+    `Chosen by: ${document.analysisLens.chosenBy}`,
+  ].join("\n\n");
+}
+
+function renderEvidenceBoundary(document: AnalysisDocumentSnapshot): string {
+  const boundary = document.evidenceBoundary;
+  return [
+    `Transcript: ${boundary.transcript}`,
+    `Frames: ${boundary.frames}`,
+    `Analyst opinion: ${boundary.analystOpinion}`,
+    `Unverified: ${boundary.unverified}`,
+  ].join("\n\n");
+}
+
+function renderAssessment(document: AnalysisDocumentSnapshot): string {
+  const assessment = document.assessment;
+  const parts = [
+    `Verdict: ${assessment.verdict}`,
+    `Basis: ${assessment.basis}`,
+  ];
+
+  if (assessment.strengths.length > 0) {
+    parts.push(
+      `Strengths:\n${assessment.strengths.map((item) => `- ${item}`).join("\n")}`,
+    );
+  }
+
+  if (assessment.weaknesses.length > 0) {
+    parts.push(
+      `Weaknesses:\n${assessment.weaknesses.map((item) => `- ${item}`).join("\n")}`,
+    );
+  }
+
+  return parts.join("\n\n");
+}
+
+function renderTopic(topic: AnalysisTopicSnapshot): string {
+  const parts = [
+    topic.title,
+    `Evidence class: ${topic.evidenceClass}`,
+    `What the source says: ${topic.whatTheSourceSays}`,
+  ];
+
+  if (topic.analystNote !== null) {
+    parts.push(`Analyst note: ${topic.analystNote}`);
+  }
+
+  return parts.join("\n\n");
+}
+
+function renderRecommendation(
+  recommendation: AnalysisRecommendationSnapshot,
+): string {
+  return [
+    recommendation.recommendation,
+    `Rationale: ${recommendation.rationale}`,
+    `Confidence: ${recommendation.confidence}`,
+  ].join("\n\n");
+}
+
+function buildAnalysisUnits(
+  ref: PackageRef,
+  document: AnalysisPackageDocumentSnapshot,
+): readonly KnowledgeUnit[] {
+  const documentId = createDocumentId(ref, "analysis");
+  const rootId = createUnitId(ref, "analysis", "root");
+  const units: KnowledgeUnit[] = [
+    createUnit({
+      id: rootId,
+      documentId,
+      parentId: null,
+      unitType: "analysis_document",
+      depth: 0,
+      ordinal: 0,
+      title: "Analysis document",
+      content: document.content.summary,
+      structuredJson: json({
+        schemaVersion: document.content.schemaVersion,
+        analysisLens: document.content.analysisLens,
+      }),
+      headingPath: [],
+      timestamps: [],
+      visualEvidence: [],
+      searchable: false,
+    }),
+  ];
+
+  function addSection(input: AnalysisSectionInput): KnowledgeUnit {
+    const unit = createUnit({
+      id: createUnitId(ref, "analysis", `section:${input.key}`),
+      documentId,
+      parentId: rootId,
+      unitType: "analysis_section",
+      depth: 1,
+      ordinal: input.ordinal,
+      title: input.title,
+      content: input.content,
+      structuredJson: input.structuredJson,
+      headingPath: [input.title],
+      timestamps: [],
+      visualEvidence: [],
+      searchable: input.searchable,
+    });
+    units.push(unit);
+    return unit;
+  }
+
+  addSection({
+    key: "summary-and-lens",
+    ordinal: 0,
+    title: "Summary and lens",
+    content: renderSummaryAndLens(document.content),
+    structuredJson: json(document.content.analysisLens),
+    searchable: true,
+  });
+  addSection({
+    key: "evidence-boundary",
+    ordinal: 1,
+    title: "Evidence boundary",
+    content: renderEvidenceBoundary(document.content),
+    structuredJson: json(document.content.evidenceBoundary),
+    searchable: true,
+  });
+  addSection({
+    key: "assessment",
+    ordinal: 2,
+    title: "Assessment",
+    content: renderAssessment(document.content),
+    structuredJson: json(document.content.assessment),
+    searchable: true,
+  });
+  const topicsSection = addSection({
+    key: "topics",
+    ordinal: 3,
+    title: "Topics",
+    content: `${String(document.content.topics.length)} topics identified.`,
+    structuredJson: null,
+    searchable: false,
+  });
+
+  document.content.topics.forEach((topic, ordinal) => {
+    units.push(
+      createUnit({
+        id: createUnitId(ref, "analysis", createAnalysisTopicKey(topic.id)),
+        documentId,
+        parentId: topicsSection.id,
+        unitType: "analysis_topic",
+        depth: 2,
+        ordinal,
+        title: topic.title,
+        content: renderTopic(topic),
+        structuredJson: json(topic),
+        headingPath: ["Topics", topic.title],
+        timestamps: topic.timestamps,
+        visualEvidence: topic.visualEvidence,
+        searchable: true,
+      }),
+    );
+  });
+
+  const recommendationsSection = addSection({
+    key: "recommendations",
+    ordinal: 4,
+    title: "Recommendations",
+    content: `${String(document.content.recommendations.length)} recommendations proposed.`,
+    structuredJson: null,
+    searchable: false,
+  });
+
+  document.content.recommendations.forEach((recommendation, ordinal) => {
+    units.push(
+      createUnit({
+        id: createUnitId(
+          ref,
+          "analysis",
+          createAnalysisRecommendationKey(recommendation.id),
+        ),
+        documentId,
+        parentId: recommendationsSection.id,
+        unitType: "analysis_recommendation",
+        depth: 2,
+        ordinal,
+        title: recommendation.recommendation,
+        content: renderRecommendation(recommendation),
+        structuredJson: json(recommendation),
+        headingPath: ["Recommendations"],
+        timestamps: [],
+        visualEvidence: [],
+        searchable: true,
+      }),
+    );
+  });
+
+  return Object.freeze(units);
+}
+
 export function buildKnowledgeUnits(
   snapshot: PackageSnapshot,
 ): readonly KnowledgeUnit[] {
@@ -413,6 +629,9 @@ export function buildKnowledgeUnits(
         break;
       case "rules":
         units.push(...buildRulesUnits(snapshot.ref, document));
+        break;
+      case "analysis":
+        units.push(...buildAnalysisUnits(snapshot.ref, document));
         break;
       case "metadata":
         break;
