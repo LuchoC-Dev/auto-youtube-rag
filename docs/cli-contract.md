@@ -2,7 +2,9 @@
 
 ## Estado
 
-Contrato aprobado y completo para el MVP.
+Contrato aprobado y completo para el MVP, ampliado el 13 de agosto de 2026
+con el punto 4.2 (hogar de usuario e instalación del modelo). Diseño en
+`docs/install-design.md`, checklist fino en `docs/install-tasks.md`.
 
 ## Principios
 
@@ -18,7 +20,7 @@ Contrato aprobado y completo para el MVP.
 ## Comandos del MVP
 
 ```text
-auto-youtube-rag init
+auto-youtube-rag init [--skip-model] [--from <path>]
 auto-youtube-rag source add <path> --name <name>
 auto-youtube-rag source list
 auto-youtube-rag source remove <name>
@@ -26,22 +28,41 @@ auto-youtube-rag sync [--source <name>]
 auto-youtube-rag retrieve <query> [options]
 auto-youtube-rag status
 auto-youtube-rag doctor
+auto-youtube-rag models install [--force] [--from <path>]
+auto-youtube-rag models status
 auto-youtube-rag rebuild --confirm
 ```
 
 No existen comandos separados `index` o `search` en el MVP. `sync` cubre la
 indexación inicial e incremental; `retrieve` busca y ensambla contexto.
+`models install`/`models status` y las banderas `--skip-model`/`--from` de
+`init` son del punto 4.2.
 
 ## Administración
 
 ### `init`
 
-Inicializa configuración y SQLite. Debe ser idempotente y nunca reemplazar una
-biblioteca existente.
+Inicializa el hogar de usuario (`~/.auto-youtube-rag/`, o
+`AUTO_YOUTUBE_RAG_HOME` si está definida), crea/migra la base SQLite y deja
+el modelo de embeddings instalado. Debe ser idempotente y nunca reemplazar
+una biblioteca existente.
 
 ```text
-auto-youtube-rag init
+auto-youtube-rag init [--skip-model] [--from <path>]
 ```
+
+`--skip-model` omite la instalación del modelo (pensado para CI y entornos
+sin red). `--from <path>` copia un modelo ya presente en disco en vez de
+descargarlo — ver `models install` para el orden de resolución completo, que
+`init` reutiliza internamente.
+
+`init` deja de ser instantáneo por defecto: sin `--skip-model`, tarda lo que
+tarde bajar ~130 MB la primera vez que corre en un hogar nuevo.
+
+El recibo suma `home` (el hogar resuelto) y `model` (el mismo objeto que
+emite `models install`, o `null` si se usó `--skip-model`) al
+`database_path` que ya emitía. También puede sumar `warnings` con
+`LEGACY_LIBRARY_FOUND` — ver más abajo.
 
 ### `source add`
 
@@ -90,7 +111,10 @@ auto-youtube-rag sync --source <name>
 ### `status`
 
 Informa fuentes, videos, documentos, secciones, reglas, embeddings, errores,
-última sincronización, modelo de embeddings y versión de esquema.
+última sincronización, modelo de embeddings y versión de esquema. Suma
+`warnings` con `LEGACY_LIBRARY_FOUND` cuando el hogar resuelto está vacío
+(sin fuentes) y existe una base `.auto-youtube-rag/index.sqlite` relativa al
+`cwd` — ver Decisión 6 de `docs/install-design.md`.
 
 ```text
 auto-youtube-rag status
@@ -99,11 +123,78 @@ auto-youtube-rag status
 ### `doctor`
 
 Comprueba SQLite, FTS5, modelo local, rutas, configuración, permisos e
-integridad de esquema sin modificar datos.
+integridad de esquema sin modificar datos. El check `EMBEDDING_MODEL` lee la
+misma ruta que resuelve `models status`, y su mensaje ante un modelo
+ausente nombra `auto-youtube-rag models install`, no un comando de
+benchmarks. Es el único comando administrativo que sigue corriendo — y
+reporta el detalle — incluso si la base falla al abrirse (`SQLITE_INTEGRITY`
+en `error`), en vez de propagar el error crudo del driver.
 
 ```text
 auto-youtube-rag doctor
 ```
+
+### `models install`
+
+Instala el modelo de embeddings (E5 Small multilingüe, ~130 MB) en el hogar
+resuelto. Reutiliza el orden de resolución de la Decisión 5 de
+`docs/install-design.md`:
+
+1. si el destino ya tiene el modelo instalado (recibo y disco coinciden) →
+   `already_installed`, no hace nada, salvo `--force`;
+2. si se pasó `--from <path>` y esa ruta tiene el modelo completo → copia
+   (nunca mueve) y reporta `adopted`;
+3. si se pasó `--from` y la ruta no tiene el modelo completo → error de uso,
+   código `2`, `MODEL_SOURCE_INVALID`;
+4. en caso contrario → descarga desde Hugging Face y reporta `installed`.
+
+```text
+auto-youtube-rag models install [--force] [--from <path>]
+```
+
+No requiere que exista la base ni el hogar previamente. Toca la red salvo
+que se use `--from`; queda fuera de `npm run check` por el mismo motivo que
+el smoke de E5.
+
+Recibo:
+
+```json
+{
+  "schema_version": "1.0",
+  "status": "installed",
+  "model": { "key": "e5-small", "version": "1", "dimensions": 384 },
+  "cache_path": "C:\\Users\\lucho\\.auto-youtube-rag\\models",
+  "bytes": 135266304,
+  "source": "download"
+}
+```
+
+`status` admite `installed`, `already_installed` y `adopted`. `source`
+admite `download` y `copy` (`null` cuando `status` es `already_installed`).
+
+### `models status`
+
+Reporta el estado del modelo sin descargar ni modificar nada. Código de
+salida `0` en los tres estados: informar ausencia no es un fallo operativo.
+
+```text
+auto-youtube-rag models status
+```
+
+```json
+{
+  "schema_version": "1.0",
+  "status": "incomplete",
+  "model": { "key": "e5-small", "version": "1", "dimensions": 384 },
+  "cache_path": "C:\\Users\\lucho\\.auto-youtube-rag\\models",
+  "issues": [{ "path": "onnx/model_quantized.onnx", "reason": "missing" }]
+}
+```
+
+`status` admite `installed`, `incomplete` y `absent`. `issues` sólo aparece
+cuando `status` es `incomplete`, listando cada archivo requerido ausente
+(`reason: "missing"`) o de tamaño distinto al recibo (`reason:
+"size_mismatch"`) — nunca hashea los ~130 MB.
 
 ### `rebuild`
 
@@ -280,6 +371,24 @@ incluyen un código simbólico estable, por ejemplo `SOURCE_NOT_FOUND`,
 `PACKAGE_INVALID`, `DATABASE_BUSY`, `SCHEMA_INCOMPATIBLE`,
 `EMBEDDING_MODEL_MISSING` u `OUTPUT_WRITE_FAILED`, además de `retryable` cuando
 corresponda.
+
+Códigos del punto 4.2 (preflight de requisitos e instalación, ver
+`docs/install-design.md`):
+
+| Código                    | Tipo             | Cuándo                                                              |
+| ------------------------- | ---------------- | --------------------------------------------------------------------- |
+| `LIBRARY_NOT_FOUND`       | error            | Preflight: `sync`/`retrieve`/`status`/`source *` sin base, código `1` |
+| `MODEL_NOT_INSTALLED`     | error            | Preflight: `sync`/`retrieve` sin modelo instalado, código `1`         |
+| `MODEL_SOURCE_INVALID`    | uso (`2`)        | `--from` apunta a una ruta sin modelo completo                        |
+| `MODEL_DOWNLOAD_FAILED`   | error, retryable | La red falló durante `models install`/`init`                          |
+| `DATABASE_INTEGRITY_ERROR`| error            | La base falla al abrirse; el mensaje remite a `auto-youtube-rag doctor` |
+| `LEGACY_LIBRARY_FOUND`    | warning          | Hay una base `.auto-youtube-rag/index.sqlite` relativa al `cwd` no visible desde el hogar resuelto, y el hogar está vacío |
+
+Cada comando declara qué necesita antes de ejecutar nada: `init`, `doctor`,
+`models install` y `models status` no requieren base ni modelo; `source
+add/list/remove` y `status` requieren base; `sync` y `retrieve` requieren
+base y modelo. Un requisito ausente produce **un** error, no un fallo por
+elemento procesado.
 
 La aplicación no emite internamente `126`, `127` ni códigos de la familia
 `128 + señal`, porque están reservados para el shell o el entorno de ejecución.
