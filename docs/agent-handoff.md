@@ -8,28 +8,34 @@ exacto del repositorio, las decisiones confirmadas, la arquitectura ya
 implementada, las invariantes que no deben romperse, las validaciones realizadas
 y el siguiente bloque recomendado.
 
-Estado de referencia: **12 de agosto de 2026**, después de completar el punto
-2.4 — skill general. El comando `retrieve` de la CLI y la skill portable
-(`skill/SKILL.md`) ya están implementados, probados y anunciados como
-disponibles. Sólo queda abierto el punto 3.2 (evaluaciones del MVP).
+Estado de referencia: **13 de agosto de 2026**, después de cerrar el punto
+3.2 — evaluaciones del MVP. El MVP completo descrito en `product-spec.md`
+(2.1–2.4 y 3.1–3.2) está terminado. El comando `retrieve` de la CLI y la
+skill portable (`skill/SKILL.md`) están implementados, probados y anunciados
+como disponibles; las evaluaciones de recuperación y ensamblado están
+corridas sobre la colección real con resultado documentado. No hay ningún
+bloque abierto en `docs/build.md`. El trabajo que sigue —si el usuario lo
+pide— es explícitamente posterior al MVP (ver "Trabajo posterior razonable,
+fuera de este MVP" más abajo), no un pendiente urgente.
 
 ## Datos rápidos
 
-| Dato                      | Valor                                                                    |
-| ------------------------- | ------------------------------------------------------------------------ |
-| Proyecto                  | `auto-youtube-rag`                                                       |
-| Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag` |
-| Rama actual               | `feat/sqlite-vec-benchmark`                                              |
-| Último commit documentado | `fdb9255 test(e2e): verify context assembly end to end`                  |
-| Estado Git al cerrar      | Worktree limpio                                                          |
-| Runtime                   | Node.js 24.19.0 LTS, ESM                                                 |
-| Lenguaje                  | TypeScript 6.0.3 estricto                                                |
-| Persistencia              | SQLite mediante `node:sqlite`                                            |
-| Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`       |
-| Dimensión                 | 384                                                                      |
-| Caché aproximada          | 129 MB en `.cache/models`                                                |
-| Operación                 | Exclusivamente local; sin APIs externas                                  |
-| Próximo punto             | 3.2 — evaluaciones del MVP                                               |
+| Dato                      | Valor                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------- |
+| Proyecto                  | `auto-youtube-rag`                                                              |
+| Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag`        |
+| Rama actual               | `feat/sqlite-vec-benchmark`                                                     |
+| Último commit documentado | `4b8cbcf docs(evals): resolve O1, keep RRF weights and depth budgets unchanged` |
+| Estado Git al cerrar      | Worktree limpio                                                                 |
+| Runtime                   | Node.js 24.19.0 LTS, ESM                                                        |
+| Lenguaje                  | TypeScript 6.0.3 estricto                                                       |
+| Persistencia              | SQLite mediante `node:sqlite`                                                   |
+| Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`              |
+| Dimensión                 | 384                                                                             |
+| Caché aproximada          | 129 MB en `.cache/models`                                                       |
+| Operación                 | Exclusivamente local; sin APIs externas                                         |
+| Estado del MVP            | Completo — 2.1–2.4 y 3.1–3.2 al 100% en `docs/build.md`                         |
+| Próximo punto             | Ninguno abierto; ver "Trabajo posterior razonable" al final                     |
 
 La rama conserva el nombre de un benchmark anterior. No asumas que el proyecto
 está trabajando actualmente en `sqlite-vec`: esa opción fue evaluada y
@@ -56,7 +62,14 @@ Antes de modificar código, leer en este orden:
 11. `docs/context-assembly-tasks.md`: checklist fino completado I1–L3 para
     2.3.
 12. `skill/SKILL.md`: skill portable ya verificada, punto 2.4 completado.
-13. Este documento: estado operativo, gotchas y arranque del punto 3.2.
+13. `docs/eval-design.md`: diseño de dos capas de evaluación del punto 3.2,
+    ya completado.
+14. `docs/eval-tasks.md`: checklist fino completado M1–O2 para 3.2.
+15. `evals/results/2026-08-12/report.md`: reporte final de 3.2 — resumen
+    ejecutivo, métricas de Capa A, comparación Codex/Claude de Capa B,
+    hallazgos accionables y la decisión de calibración (O1).
+16. Este documento: estado operativo consolidado del MVP completo y notas
+    para trabajo posterior.
 
 `docs/development.md` sigue siendo la referencia del toolchain. Su frase que
 describe `src/main.ts` como un scaffold quedó históricamente desactualizada: la
@@ -213,8 +226,27 @@ Verificada con dos corridas de un subagente sin contexto previo del proyecto
 dos videos reales de `auto-design`. Detalle completo en la sección
 ["Punto 2.4 completado"](#punto-24-completado--skill-general) más abajo.
 
-`docs/build.md` marca 2.1, 2.2, 2.3 y 2.4, y las pruebas funcionales
-actuales, al 100%. Sólo 3.2 queda en `0%`.
+### Punto 3.2 — evaluaciones del MVP
+
+Completado el 13 de agosto de 2026, en dos capas independientes sin ground
+truth etiquetado a mano (diseño en `docs/eval-design.md`):
+
+- Capa A (mecánica, bloque M): 24 bundles reales generados sobre la
+  colección `auto-design` con E5 real; integridad de citas perfecta;
+  agregador de métricas.
+- Capa B (juzgada, bloque N): rúbrica común respondida por Claude y por
+  Codex sobre los mismos 24 bundles, sin verse las respuestas entre sí; 9/24
+  pares divergen, ninguno por un defecto del producto.
+- Bloque O: decisión explícita de mantener los defaults de RRF y de
+  presupuestos por profundidad sin cambios, y reporte final de cierre.
+
+Detalle completo, decisiones y hallazgos accionables en la sección
+["Punto 3.2 completado"](#punto-32-completado--evaluaciones-del-mvp) más
+abajo, en `docs/eval-design.md` / `docs/eval-tasks.md`, y en
+`evals/results/2026-08-12/report.md`.
+
+`docs/build.md` marca 2.1, 2.2, 2.3, 2.4, 3.1 y 3.2 al 100%. El MVP completo
+está cerrado; no queda ningún bloque abierto.
 
 ## Arquitectura implementada
 
@@ -875,50 +907,139 @@ file`, un código que la skill tampoco explicaba. Corregido agregando
   `docs/product-spec.md`: 2.4 fue estrictamente documentación de uso sobre
   una CLI ya cerrada.
 
-## Próximo trabajo: punto 3.2 — evaluaciones del MVP
+## Punto 3.2 completado — evaluaciones del MVP
 
-Único bloque abierto según `build.md`. Según `product-spec.md`:
+Bloques M–O están completados (Capa A mecánica, Capa B juzgada, calibración
+y cierre). Diseño en `docs/eval-design.md`, checklist fino en
+`docs/eval-tasks.md`, reporte final en `evals/results/2026-08-12/report.md`.
 
-- Recall, precisión y cobertura temática sobre consultas reales
-  (`evals/queries/seed-queries.json`, ya sembrado en 2.2).
-- Comparación de resultados entre Codex y Claude usando la skill de 2.4.
-- Calibración de los pesos RRF (`k = 60`, `wText = wVector = 1.0`, ver
-  `docs/retrieval-design.md`) y de los presupuestos por profundidad
-  (`focused` 12k / `balanced` 32k / `deep` 64k), ambos dejados
-  explícitamente diferidos por 2.2 y 2.3.
-- Probablemente la primera vez que se justifica una validación completa
-  sobre la colección real `auto-design` con el modelo E5 real (ver el
-  procedimiento ya documentado en "Última validación conocida" → notas de
-  2.2/2.3), en vez de sobre fixtures o copias parciales.
+Fue, según lo previsto, la primera validación completa sobre la colección
+real `auto-design` con el modelo E5 real (no fixtures ni copias parciales),
+usando el procedimiento ya documentado en "Última validación conocida" →
+notas de 2.2/2.3.
 
-No hay diseño ni checklist fino todavía para 3.2. Antes de implementar,
-proponer diseño (métricas concretas, formato de reporte, cómo se compara
-Codex vs. Claude) siguiendo el mismo patrón que `retrieval-design.md`/
-`context-assembly-design.md`, y esperar aprobación explícita del usuario.
+Decisiones y hallazgos cerrados durante 3.2 que no deben reabrirse sin
+motivo (registrados también en `decisions.md` y en el reporte final):
+
+- **Sin ground truth etiquetado a mano.** Mide en dos capas independientes:
+  Capa A mecánica (verificable con código, sin agente) y Capa B juzgada
+  (rúbrica corta respondida por el agente consumidor real sobre el bundle ya
+  ensamblado). El criterio de éxito del producto es cobertura amplia y
+  citada, no coincidencia puntual contra una lista de "fragmentos
+  correctos".
+- **Deriva de esquema real en `auto-design`, fuera de este repositorio.** La
+  colección creció de 34 a 51 videos; 17 usan `resources.analysis` en vez de
+  `resources.rules`, y hacen fallar el manifest completo con
+  `MANIFEST_SCHEMA_INVALID` si se sincroniza sin filtrar. `sync` se comportó
+  exactamente como diseñado (falla el run, preserva paquetes existentes). La
+  ejecución real de M4 se hizo sobre una copia filtrada a los 34 videos con
+  esquema válido. Aceptar `resources.analysis` como alias, o coordinar con
+  el pipeline productor, queda fuera de 3.2 y requiere aprobación explícita
+  antes de tocar `manifest-reader.ts`.
+- **Precisión aparente limitada por ruido de catálogo compartido, no por
+  errores de recuperación.** La mayoría de consultas semilla recupera del
+  mismo subconjunto de videos sobre catálogos de estilos/tendencias; más
+  profundidad tiende a sumar más catálogo tangencial, no más contenido
+  específico. Es una característica del corpus real; RRF no tiene hoy una
+  señal adicional (tipo de unidad, densidad temática) para distinguirlo.
+- **Decisión de calibración (O1): se mantienen los defaults sin cambios** —
+  RRF `k = 60`, `wText = wVector = 1.0`, presupuestos `focused` 12k /
+  `balanced` 32k / `deep` 64k. Ninguna señal de M3 o N4 cruzó la barra de
+  "evidencia clara" que fijaba `eval-design.md`: el agotamiento de
+  presupuesto casi universal es el comportamiento esperado de recuperar un
+  universo amplio de candidatos; la cobertura juzgada se aplana de
+  `balanced` a `deep` sin que ningún preset rinda peor que uno menor; y
+  `es-no-answer-unrelated-topic` —el único caso que nunca produce
+  `status: "no_results"`— igual obtiene `precision_aparente = 0.00` sin
+  divergencia entre jueces, así que el producto ya comunica la ausencia de
+  contenido relevante sin necesitar un piso de similitud vectorial.
+  Razonamiento completo, punto por punto, en `docs/decisions.md`, sección
+  "Decisión de calibración (O1, punto 3.2)".
+- **Las 9 discrepancias de 24 entre los jueces Codex y Claude (N4) no
+  señalan ningún defecto del producto.** Se explican por severidad de
+  criterio en `precision_aparente` (2 casos) o por ambigüedad real en
+  `evals/rubric-template.md` sobre "cobertura suficiente" y "cruce
+  multilingüe demostrado" (7 casos) — ningún juez leyó mal un bundle ni
+  inventó contenido. Afinar la rúbrica queda anotado para una futura pasada
+  de evaluación, no como pendiente de 3.2.
+- No se modificó ningún archivo de `src/`: 3.2 fue estrictamente medición
+  sobre un producto ya cerrado, y la única decisión con potencial de tocar
+  código (O1) concluyó en mantener los defaults.
+
+## MVP completo — cierre y trabajo posterior
+
+Con 3.2 cerrado, `docs/build.md` marca 2.1, 2.2, 2.3, 2.4, 3.1 y 3.2 al
+100%. El MVP descrito en `docs/product-spec.md` está completo: indexación
+incremental, recuperación híbrida, ensamblado de contexto citado, comando
+`retrieve`, skill portable para agentes, pruebas funcionales y evaluación en
+dos capas sobre la colección real.
+
+Trabajo posterior razonable, explícitamente **fuera de este MVP** — ninguno
+es un pendiente urgente, y ninguno se implementa sin pedido y aprobación
+explícita del usuario:
+
+- Piso mínimo de similitud vectorial (dejado abierto "salvo evidencia
+  clara" desde 2.2; 3.2 no encontró esa evidencia).
+- Señal adicional de densidad/relevancia temática para que RRF distinga
+  contenido específico de catálogo tangencial (hallazgo de 3.2, no un bug).
+- Alias o corrección de esquema para `resources.analysis` en el manifest
+  real, o coordinación con el pipeline productor (hallazgo de 3.2, no un
+  bug de este repositorio).
+- Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad que
+  encontró N4, antes de una futura pasada de evaluación.
+- Verificación de `skill/SKILL.md` específicamente desde Codex real (2.4 se
+  cerró sólo con verificación en Claude, por decisión explícita del
+  usuario).
+- Comando `rebuild --confirm` (contrato ya aprobado en `cli-contract.md`,
+  nunca implementado porque no lo pidió el producto).
+- MCP, interfaz web y soporte de paquetes de páginas web (fuera de alcance
+  desde `product-spec.md` original).
+
+Si el usuario pide continuar el proyecto, preguntar primero cuál de estos
+frentes (u otro nuevo) es prioridad, en vez de asumir uno.
 
 ## Primer turno recomendado para el próximo agente
 
 1. Confirmar `git status --short` vacío y revisar los últimos commits.
 2. Ejecutar `npm.cmd run check` y `npm.cmd run build`.
-3. Leer los trece documentos indicados al inicio, incluido `skill/SKILL.md`.
-4. Preguntar al usuario si corresponde arrancar 3.2 ahora o si hay trabajo
-   previo (por ejemplo, verificar la skill desde Codex real). No empezar
-   código directamente: proponer diseño y checklist fino de evaluaciones
-   primero.
-5. Implementar en cortes de máximo cinco archivos por tarea, conservando
+3. Leer los dieciséis documentos indicados al inicio, incluidos
+   `skill/SKILL.md` y `evals/results/2026-08-12/report.md`.
+4. El MVP está completo: no hay bloque abierto en `docs/build.md`.
+   Preguntar al usuario qué frente de "Trabajo posterior razonable, fuera de
+   este MVP" (más arriba) es prioridad, o si hay un pedido nuevo — no asumir
+   ninguno por defecto.
+5. Si el usuario aprueba avanzar en un frente nuevo o en trabajo posterior,
+   proponer diseño y checklist fino primero, siguiendo el mismo patrón que
+   `retrieval-design.md`/`context-assembly-design.md`/`eval-design.md`, y
+   esperar aprobación explícita antes de implementar.
+6. Implementar en cortes de máximo cinco archivos por tarea, conservando
    arquitectura y commits convencionales.
 
 Prompt sugerido para retomar:
 
 > Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero el
-> estado del repositorio y las pruebas. Los puntos 2.2, 2.3 y 2.4 están
-> terminados, incluidos el comando `retrieve` y la skill portable
-> `skill/SKILL.md`. Sólo queda 3.2 —evaluaciones del MVP— abierto. No
-> implementes hasta presentar y aprobar el diseño y checklist detallado.
+> estado del repositorio y las pruebas. El MVP está completo: 2.1–2.4 y
+> 3.1–3.2 al 100%, incluidos el comando `retrieve`, la skill portable
+> `skill/SKILL.md` y el reporte final de evaluaciones. No hay ningún bloque
+> abierto. Preguntame qué frente de trabajo posterior priorizar antes de
+> implementar nada.
 
 ## Historial reciente relevante
 
 ```text
+4b8cbcf docs(evals): resolve O1, keep RRF weights and depth budgets unchanged
+e6103ed docs(evals): run N4, compare Codex and Claude Layer B judgments
+972dfad docs(evals): record N3, Codex's independent Layer B judgment
+8789ad0 docs(evals): run N2, Claude's cold-start Layer B judgment
+8f719c8 docs(evals): write the Layer B judgment rubric template
+38495f5 docs(evals): run M4, the real auto-design validation pass
+37d2718 feat(evals): aggregate layer A mechanical metrics into a report table
+2b28277 feat(evals): orchestrate seed queries across depth presets
+d1cb11e feat(evals): verify citation integrity between bundle markdown and result
+a5ba23c docs(evals): propose and approve the 3.2 evaluation plan
+27823c5 docs(progress): close point 2.4 and hand off to 3.2
+31e767a feat(skill): add the portable general skill
+350709e docs(progress): close point 2.3 and hand off to 2.4 or 3.2
 fdb9255 test(e2e): verify context assembly end to end
 af19db2 test(main): verify assembleContext is exposed on the application
 99a7399 feat(cli): add the retrieve command
@@ -980,17 +1101,25 @@ código:
 5. cómo se mantienen alineados SQLite, FTS5 y embeddings;
 6. por qué la búsqueda vectorial inicial será exacta y reemplazable;
 7. qué entregó cada punto — 2.1 indexación, 2.2 recuperación, 2.3 ensamblado y
-   `retrieve`, 2.4 la skill portable — y qué queda para 3.2 (evaluaciones);
-8. por qué RRF ponderado es el baseline de fusión y qué queda pendiente de
-   calibrar en 3.2;
-9. por qué la búsqueda vectorial no tiene piso de similitud y qué implica eso
-   tanto para `status: "no_results"` en 2.2 como para el mismo estado en el
-   bundle de 2.3;
+   `retrieve`, 2.4 la skill portable, 3.2 la evaluación en dos capas — y por
+   qué el MVP completo ya está cerrado, no en curso;
+8. por qué RRF ponderado es el baseline de fusión, y por qué 3.2 decidió
+   mantener `k`/`wText`/`wVector` sin cambios en vez de calibrarlos;
+9. por qué la búsqueda vectorial no tiene piso de similitud, qué implica eso
+   tanto para `status: "no_results"` en 2.2 y en el bundle de 2.3, y por qué
+   3.2 concluyó que ese hueco no bloquea al agente consumidor (Capa B lo
+   compensa) ni justifica agregar un umbral todavía;
 10. por qué los identificadores de fragmento y documento son derivados en vez
     de persistidos, y qué adaptadores dependen de esa reconstrucción;
 11. por qué `assembleContext` necesita `getUnits` además de `getAncestors`
     (`KnowledgeUnit` no transporta metadata de video/documento, y hay que
     conocer el `parentId` de cada candidato antes de poder caminarlo);
-12. por qué un bloque de ancestro siempre cae en "Additional relevant
+12. por qué 3.2 mide en dos capas independientes sin ground truth etiquetado
+    (Capa A mecánica, Capa B juzgada por Codex y Claude sobre el mismo
+    bundle), y por qué ninguna de las 9 discrepancias entre jueces señala un
+    defecto del producto — son ambigüedad de la rúbrica, no de lectura;
+13. qué frentes quedan como trabajo posterior razonable, explícitamente
+    fuera de este MVP, y por qué ninguno es un pendiente urgente;
+14. por qué un bloque de ancestro siempre cae en "Additional relevant
     context" aunque sea en sí una regla relevante, y por qué un presupuesto
     nunca corta un bloque a la mitad.

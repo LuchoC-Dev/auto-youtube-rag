@@ -18,7 +18,7 @@
 |                            | 2.3 | Ensamblado de contexto         |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve` |
 |                            | 2.4 | Skill general                  |   ✅   | 100% | `skill/SKILL.md` verificada en frío        |
 | **3 — Calidad**            | 3.1 | Pruebas funcionales            |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos       |
-|                            | 3.2 | Evaluaciones del MVP           |   🔵   | 94%  | M, N y O1 completos; O2 pendiente          |
+|                            | 3.2 | Evaluaciones del MVP           |   ✅   | 100% | M, N y O completos; MVP cerrado            |
 
 ---
 
@@ -137,4 +137,13 @@ bundle). Checklist fino en `docs/eval-tasks.md`, bloques M–O.
 - [x] O1. Decisión sobre pesos RRF y presupuestos (defaults mantenidos sin
       cambios; evidencia y razonamiento en `docs/decisions.md`, sección
       "Decisión de calibración (O1, punto 3.2)")
-- [ ] O2. Reporte final y cierre de 3.2
+- [x] O2. Reporte final y cierre de 3.2
+      (`evals/results/2026-08-12/report.md`)
+
+MVP completo: 2.1–2.4 y 3.1–3.2 están al 100%. Decisión de calibración de
+O1 y hallazgos accionables de 3.2 en
+`evals/results/2026-08-12/report.md` y `docs/decisions.md`. Trabajo
+posterior razonable (piso de similitud vectorial, MCP, interfaz web,
+paquetes de páginas web, alias de esquema `resources.analysis`) queda fuera
+de este MVP, documentado en `docs/agent-handoff.md`, no como pendiente
+urgente.
