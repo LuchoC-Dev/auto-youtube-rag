@@ -21,7 +21,13 @@ export type ParsedCliCommand =
       readonly maxTokens: number | null;
       readonly sources: readonly string[];
       readonly out: string | null;
-    };
+    }
+  | {
+      readonly kind: "models_install";
+      readonly force: boolean;
+      readonly from: string | null;
+    }
+  | { readonly kind: "models_status" };
 
 export class CliUsageError extends Error {
   public readonly code = "INVALID_ARGUMENTS";
@@ -175,6 +181,31 @@ export function parseCommand(argv: readonly string[]): ParsedCliCommand {
             : [],
         out: typeof values.out === "string" ? values.out : null,
       };
+    }
+    case "models": {
+      const [subcommand, ...modelArgs] = rest;
+      if (subcommand === "install") {
+        const { positionals, values } = parse(modelArgs, {
+          force: { type: "boolean" },
+          from: { type: "string" },
+        });
+        exactPositionals(
+          positionals,
+          0,
+          "auto-youtube-rag models install [--force] [--from <path>]",
+        );
+        return {
+          kind: "models_install",
+          force: values.force === true,
+          from: typeof values.from === "string" ? values.from : null,
+        };
+      }
+      if (subcommand === "status") {
+        const { positionals } = parse(modelArgs);
+        exactPositionals(positionals, 0, "auto-youtube-rag models status");
+        return { kind: "models_status" };
+      }
+      return usage("Usage: auto-youtube-rag models <install|status> ...");
     }
     default:
       return usage(`Unknown command: ${command}`);

@@ -106,6 +106,7 @@ export class E5ModelInstaller implements ModelInstaller {
       throw new ModelInstallerError(
         "MODEL_SOURCE_INVALID",
         `--from ${from} does not contain a complete model under ${modelDirectory}.`,
+        false,
       );
     }
 
@@ -118,6 +119,7 @@ export class E5ModelInstaller implements ModelInstaller {
       throw new ModelInstallerError(
         "MODEL_SOURCE_INVALID",
         `Copy from ${from} to ${modelsPath} did not produce a complete model.`,
+        false,
       );
     }
 
@@ -144,6 +146,7 @@ export class E5ModelInstaller implements ModelInstaller {
       throw new ModelInstallerError(
         "MODEL_DOWNLOAD_FAILED",
         `Could not download ${modelRepository} to ${modelsPath}.`,
+        true,
         { cause },
       );
     }
@@ -153,6 +156,7 @@ export class E5ModelInstaller implements ModelInstaller {
       throw new ModelInstallerError(
         "MODEL_DOWNLOAD_FAILED",
         `Download to ${modelsPath} did not produce a complete model.`,
+        true,
       );
     }
 

@@ -143,32 +143,70 @@ export async function readSourceState(path: string): Promise<SourceState> {
   return measured === null ? "absent" : "complete";
 }
 
+export interface ModelStateIssue {
+  readonly path: string;
+  readonly reason: "missing" | "size_mismatch";
+}
+
+export interface ModelStateDescription {
+  readonly state: ModelState;
+  readonly issues: readonly ModelStateIssue[];
+}
+
 /**
  * Compares the receipt against the files actually on disk, by size only
  * (never by hash, so this never reads the ~130 MB model). A directory with
  * files but no receipt is `incomplete`, not `installed`: it is the "someone
  * copied the model by hand" case, meant to be normalized by
- * `models install --force`.
+ * `models install --force`. When `incomplete`, `issues` lists every
+ * required file that is missing or whose size does not match the receipt
+ * (used by `models status`).
  */
-export async function readModelState(modelsPath: string): Promise<ModelState> {
+export async function describeModelState(
+  modelsPath: string,
+): Promise<ModelStateDescription> {
   const receipt = await readInstallReceipt(modelsPath);
   const measured = await measureRequiredFiles(modelsPath);
-  const anyFilePresent = measured.some((file) => file !== null);
-
-  if (receipt === null) {
-    return anyFilePresent ? "incomplete" : "absent";
-  }
-
   const actualByPath = new Map(
     measured
       .filter((file): file is InstallReceiptFile => file !== null)
       .map((file) => [file.path, file.bytes]),
   );
 
-  const matches =
-    receipt.files.length === requiredModelFiles.length &&
-    receipt.files.every((file) => actualByPath.get(file.path) === file.bytes) &&
-    actualByPath.size === receipt.files.length;
+  let state: ModelState;
+  if (receipt === null) {
+    state = actualByPath.size > 0 ? "incomplete" : "absent";
+  } else {
+    const matches =
+      receipt.files.length === requiredModelFiles.length &&
+      receipt.files.every(
+        (file) => actualByPath.get(file.path) === file.bytes,
+      ) &&
+      actualByPath.size === receipt.files.length;
+    state = matches ? "installed" : "incomplete";
+  }
 
-  return matches ? "installed" : "incomplete";
+  if (state !== "incomplete") return { state, issues: [] };
+
+  const expectedByPath = new Map(
+    receipt?.files.map((file) => [file.path, file.bytes]) ?? [],
+  );
+  const issues: ModelStateIssue[] = [];
+  for (const relativePath of requiredModelFiles) {
+    const actualBytes = actualByPath.get(relativePath);
+    if (actualBytes === undefined) {
+      issues.push({ path: relativePath, reason: "missing" });
+      continue;
+    }
+    const expectedBytes = expectedByPath.get(relativePath);
+    if (expectedBytes !== undefined && expectedBytes !== actualBytes) {
+      issues.push({ path: relativePath, reason: "size_mismatch" });
+    }
+  }
+
+  return { state, issues };
+}
+
+export async function readModelState(modelsPath: string): Promise<ModelState> {
+  return (await describeModelState(modelsPath)).state;
 }
