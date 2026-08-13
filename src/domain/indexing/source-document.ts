@@ -1,7 +1,12 @@
 import { DomainValidationError } from "./domain-error.js";
 import { DocumentId, PackageRef } from "./identifiers.js";
 
-export const sourceDocumentKinds = ["context", "rules", "metadata"] as const;
+export const sourceDocumentKinds = [
+  "context",
+  "rules",
+  "analysis",
+  "metadata",
+] as const;
 export type SourceDocumentKind = (typeof sourceDocumentKinds)[number];
 
 export interface SourceDocumentInput {
@@ -27,7 +32,7 @@ function readKind(input: unknown): SourceDocumentKind {
     typeof input !== "string" ||
     !sourceDocumentKinds.some((kind) => kind === input)
   ) {
-    invalid("kind", "must be context, rules or metadata");
+    invalid("kind", "must be context, rules, analysis or metadata");
   }
 
   return input as SourceDocumentKind;

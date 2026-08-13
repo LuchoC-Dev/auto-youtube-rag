@@ -27,7 +27,7 @@ Las mismas de bloques anteriores:
 
 ### P1. Snapshots de `analysis.json`
 
-- [ ] Declarar `AnalysisTopicSnapshot`, `AnalysisRecommendationSnapshot`,
+- [x] Declarar `AnalysisTopicSnapshot`, `AnalysisRecommendationSnapshot`,
       `AnalysisAssessmentSnapshot`, `AnalysisEvidenceBoundarySnapshot`,
       `AnalysisLensSnapshot`, `AnalysisDocumentSnapshot`,
       `AnalysisPackageDocumentSnapshot`, y sumar `"analysis"` al union
@@ -42,7 +42,7 @@ Las mismas de bloques anteriores:
 
 ### P2. `structuredContent` como enum obligatorio en `ManifestResourceSnapshot`
 
-- [ ] Declarar `structuredContentKinds = ["rules", "analysis", "none"]` y
+- [x] Declarar `structuredContentKinds = ["rules", "analysis", "none"]` y
       `StructuredContentKind`. Reemplazar los campos `rules`/`analysis` de
       `ManifestResourceSnapshot` por un único campo nuevo,
       `structuredContent`, tipado `StructuredContentKind` y siempre
@@ -69,7 +69,7 @@ Las mismas de bloques anteriores:
 
 ### P3. Tipos de unidad y de documento nuevos
 
-- [ ] Sumar `"analysis_document"`, `"analysis_section"`, `"analysis_topic"`,
+- [x] Sumar `"analysis_document"`, `"analysis_section"`, `"analysis_topic"`,
       `"analysis_recommendation"` a `knowledgeUnitTypes`
       (`documentUnitTypes` incluye `"analysis_document"`). Sumar
       `"analysis"` a `sourceDocumentKinds`.

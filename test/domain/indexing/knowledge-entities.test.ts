@@ -149,6 +149,77 @@ void test("requires document roots to be depth zero without a parent", () => {
   );
 });
 
+void test("accepts the four analysis unit types under the same document/child rules", () => {
+  const analysisRoot = KnowledgeUnit.create({
+    id: rootUnitId,
+    documentId,
+    parentId: null,
+    unitType: "analysis_document",
+    depth: 0,
+    ordinal: 0,
+    title: "Analysis",
+    content: "Complete analysis document.",
+    structuredJson: null,
+    headingPath: [],
+    timestamps: [],
+    visualEvidence: [],
+    estimatedTokens: 8,
+    contentHash: hash,
+    searchable: false,
+  });
+
+  assert.equal(analysisRoot.unitType, "analysis_document");
+  assert.equal(analysisRoot.parentId, null);
+  assertInvalid(
+    () =>
+      KnowledgeUnit.create({
+        id: rootUnitId,
+        documentId,
+        parentId: null,
+        unitType: "analysis_document",
+        depth: 1,
+        ordinal: 0,
+        title: "Analysis",
+        content: "Complete analysis document.",
+        structuredJson: null,
+        headingPath: [],
+        timestamps: [],
+        visualEvidence: [],
+        estimatedTokens: 8,
+        contentHash: hash,
+        searchable: false,
+      }),
+    "depth",
+  );
+
+  for (const unitType of [
+    "analysis_section",
+    "analysis_topic",
+    "analysis_recommendation",
+  ] as const) {
+    const child = KnowledgeUnit.create({
+      id: childUnitId,
+      documentId,
+      parentId: analysisRoot.id,
+      unitType,
+      depth: 1,
+      ordinal: 0,
+      title: "Topics",
+      content: "Analysis child content.",
+      structuredJson: null,
+      headingPath: ["Topics"],
+      timestamps: [],
+      visualEvidence: [],
+      estimatedTokens: 6,
+      contentHash: hash,
+      searchable: true,
+    });
+
+    assert.equal(child.unitType, unitType);
+    assert.equal(child.parentId?.equals(analysisRoot.id), true);
+  }
+});
+
 void test("creates search fragments with copied heading paths", () => {
   const headingPath = ["Design principles", "Hierarchy"];
   const fragment = SearchFragment.create({
