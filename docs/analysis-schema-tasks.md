@@ -40,21 +40,32 @@ Las mismas de bloques anteriores:
   - Verificar: `npm run typecheck`.
   - Archivos: `src/application/indexing/package-snapshots.ts`.
 
-### P2. `ManifestResourceSnapshot.analysis` y lectura opcional de recursos
+### P2. `structuredContent` como enum obligatorio en `ManifestResourceSnapshot`
 
-- [ ] Sumar `analysis: boolean` a `ManifestResourceSnapshot`. Cambiar
-      `readResource`/`readResources` en `manifest-reader.ts` para tratar una
-      clave ausente como `false` en vez de exigir su presencia, manteniendo
-      el rechazo cuando la clave existe pero no es booleana.
+- [ ] Declarar `structuredContentKinds = ["rules", "analysis", "none"]` y
+      `StructuredContentKind`. Reemplazar los campos `rules`/`analysis` de
+      `ManifestResourceSnapshot` por un único campo nuevo,
+      `structuredContent`, tipado `StructuredContentKind` y siempre
+      presente. En `manifest-reader.ts`, seguir leyendo
+      `resources.rules`/`resources.analysis` como booleanos opcionales del
+      JSON crudo (clave ausente → `false`, presente pero no booleana →
+      error como hoy), y colapsarlos a `structuredContent` antes de
+      construir el snapshot: `rules` true y `analysis` false da `"rules"`;
+      `rules` false y `analysis` true da `"analysis"`; ambos false da
+      `"none"`; **ambos true da `MANIFEST_SCHEMA_INVALID`** en el campo
+      `resources` ("must not declare both rules and analysis").
   - Depende de: ninguno.
-  - Aceptación: un manifest schema 1.0 sin `resources.analysis` parsea con
-    `resources.analysis === false`; un manifest schema 2.0 sin
-    `resources.rules` parsea con `resources.rules === false`; un
-    `resources.context: "yes"` explícito sigue rechazándose como antes.
+  - Aceptación: los tres casos válidos producen el `structuredContent`
+    correcto; el caso `rules=true,analysis=true` se descarta como
+    `ManifestVideoIssue` (no aborta el manifest completo, gracias a la
+    tolerancia por video ya implementada) en vez de indexarse o crashear;
+    un manifest schema 1.0 sin `resources.analysis` y uno schema 2.0 sin
+    `resources.rules` parsean ambos sin error.
   - Verificar: `node --import tsx --test test/infrastructure/filesystem/manifest-reader.test.ts`.
   - Archivos: `src/application/indexing/package-snapshots.ts`,
     `src/infrastructure/filesystem/manifest-reader.ts`,
-    `test/infrastructure/filesystem/manifest-reader.test.ts`.
+    `test/infrastructure/filesystem/manifest-reader.test.ts` (actualizar las
+    aserciones existentes sobre la forma vieja de `resources`).
 
 ### P3. Tipos de unidad y de documento nuevos
 
@@ -99,17 +110,21 @@ aislada, sin estar todavía cableado a la lectura de paquetes.
 
 ## Bloque R — Lectura de paquete y unidades de conocimiento
 
-### R1. Lectura del recurso `analysis` en el paquete
+### R1. Lectura del recurso estructurado por `switch`
 
-- [ ] Extender `filesystem-package-source-reader.ts` con un bloque paralelo
-      al de `resources.rules`: si `manifestVideo.resources.analysis`, leer
-      `deliverables/analysis.json` y parsearlo con `parseAnalysisJson`.
+- [ ] Reemplazar el `if (manifestVideo.resources.rules)` de
+      `filesystem-package-source-reader.ts` por un `switch` exhaustivo sobre
+      `manifestVideo.resources.structuredContent`: caso `"rules"` lee
+      `deliverables/rules.json` (comportamiento ya existente, sin cambios de
+      resultado), caso `"analysis"` lee `deliverables/analysis.json` y
+      parsea con `parseAnalysisJson`, caso `"none"` no agrega documento.
   - Depende de: Q1, P2.
-  - Aceptación: un paquete real con `resources: { context: true, analysis:
-true, metadata: true }` (sin `rules`) produce un `PackageSnapshot` con
-    tres documentos (`context`, `analysis`, `metadata`); un paquete con
-    ambos `rules` y `analysis` en `true` (caso no observado en la realidad,
-    pero no debe romper) produce los cuatro documentos sin conflicto.
+  - Aceptación: un paquete real con `structuredContent: "analysis"` produce
+    un `PackageSnapshot` con tres documentos (`context`, `analysis`,
+    `metadata`); un paquete con `structuredContent: "rules"` sigue
+    produciendo exactamente lo mismo que antes de este bloque (regresión
+    cero sobre los 34 videos existentes); el `switch` no compila si falta
+    manejar algún miembro de `StructuredContentKind`.
   - Verificar: `node --import tsx --test test/infrastructure/filesystem/package-source-reader.test.ts`.
   - Archivos: `src/infrastructure/filesystem/filesystem-package-source-reader.ts`,
     `test/infrastructure/filesystem/package-source-reader.test.ts`.

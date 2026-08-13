@@ -46,25 +46,57 @@ documento estructurado independientes, seleccionados por cuál trae cada
 paquete real (`resources.rules` / `resources.analysis`), no como versiones
 de un mismo esquema donde una reemplaza a la otra.
 
-## Hallazgo de diseño: los booleanos de `resources` deben volverse opcionales
+## Decisión: `structuredContent` como enum obligatorio, no dos booleanos independientes
 
-`ManifestResourceSnapshot` hoy exige `context`, `rules` y `metadata` como
-booleanos **presentes** en cada entrada del manifest; su ausencia ya produce
-`MANIFEST_SCHEMA_INVALID` (tolerado por video desde el 13 de agosto, pero
-sigue sin indexar ese video). El manifest real de schema 2.0 **no declara
-`resources.rules` en absoluto** — trae `resources.analysis` en su lugar. Si
-agrego `analysis` como booleano igualmente obligatorio, cada paquete que siga
-en schema 1.0 (sin esa clave) volvería a fallar validación, y viceversa: es
-el mismo bug que se acaba de corregir, reintroducido de forma sistemática
-para el esquema que falte en cada paquete.
+El borrador original de este documento proponía sumar `analysis: boolean`
+junto a `rules: boolean`, ambos opcionales en la lectura cruda (clave
+ausente → `false`). Funciona, pero dos flags independientes permiten
+estados que no tienen sentido de negocio: `{ rules: true, analysis: true }`
+no debería ocurrir nunca (un paquete real trae un tipo de conocimiento
+estructurado, no los dos), y cada consumidor (`filesystem-package-source-reader.ts`,
+y cualquier código futuro que dependa de "qué contenido estructurado tiene
+este video") tendría que repetir dos `if` independientes en vez de manejar
+un único valor exhaustivo.
 
-Corrección necesaria en `manifest-reader.ts`: `readResource` debe tratar una
-clave **ausente** como `false` en vez de exigir su presencia explícita, y
-seguir rechazando el caso en que la clave está presente pero no es booleana
-(sigue siendo un error real). `ManifestResourceSnapshot` se extiende con
-`analysis: boolean`, siempre presente en el snapshot ya parseado — la
-opcionalidad vive sólo en la lectura del JSON crudo, no en el contrato de
-salida.
+**Corrección adoptada:** `ManifestResourceSnapshot` reemplaza `rules` y
+`analysis` por un solo campo obligatorio y exhaustivo:
+
+```ts
+export const structuredContentKinds = ["rules", "analysis", "none"] as const;
+export type StructuredContentKind = (typeof structuredContentKinds)[number];
+
+export interface ManifestResourceSnapshot {
+  readonly context: boolean;
+  readonly structuredContent: StructuredContentKind;
+  readonly metadata: boolean;
+}
+```
+
+`manifest-reader.ts` sigue leyendo los booleanos crudos `resources.rules` y
+`resources.analysis` del JSON —cada uno opcional, clave ausente equivale a
+`false`, exactamente por la razón ya explicada: un manifest schema 1.0 no
+declara `analysis` y uno schema 2.0 no declara `rules`— pero los colapsa a
+un único `structuredContent` antes de construir el snapshot:
+
+- `rules: true`, `analysis: false` → `"rules"`.
+- `rules: false`, `analysis: true` → `"analysis"`.
+- ambos `false` → `"none"` (paquete sin contenido estructurado; ya es un
+  caso válido hoy cuando `resources.rules` es `false`, ver
+  `manifest-mixed.json`).
+- **ambos `true` → error de esquema** (`MANIFEST_SCHEMA_INVALID`, campo
+  `resources`, "must not declare both rules and analysis"). No es un caso
+  observado en la realidad; en vez de tolerarlo en silencio o indexar
+  ambos documentos, se trata como cualquier otra entrada de manifest
+  inválida — el video se descarta y se reporta como `ManifestVideoIssue`
+  gracias a la validación tolerante por video ya implementada, en vez de
+  abortar el manifest completo.
+
+Todo el código que decide qué archivo leer (`filesystem-package-source-reader.ts`)
+pasa de dos condicionales independientes a un único `switch` exhaustivo
+sobre `structuredContent`, con el mismo patrón ya usado en
+`buildKnowledgeUnits` para `document.kind`: si en el futuro aparece un
+tercer tipo de contenido estructurado, TypeScript obliga a manejarlo en vez
+de dejarlo caer silenciosamente por un `if` que nadie actualizó.
 
 ## Contrato de datos de `analysis.json` (schema 2.0)
 
@@ -189,19 +221,31 @@ Códigos de error: `ANALYSIS_SCHEMA_INVALID`, `ANALYSIS_VIDEO_ID_MISMATCH`,
 
 ## Lectura del paquete (`filesystem-package-source-reader.ts`)
 
-Bloque nuevo, paralelo al de `resources.rules`:
+El bloque que hoy es `if (manifestVideo.resources.rules) { ... }` se
+reemplaza por un único `switch` exhaustivo sobre `structuredContent`:
 
 ```ts
-if (manifestVideo.resources.analysis) {
-  const relativePath = "deliverables/analysis.json";
-  // leer, parsear con parseAnalysisJson, empujar a documents
+switch (manifestVideo.resources.structuredContent) {
+  case "rules": {
+    const relativePath = "deliverables/rules.json";
+    // leer, parsear con parseRulesJson, empujar a documents
+    break;
+  }
+  case "analysis": {
+    const relativePath = "deliverables/analysis.json";
+    // leer, parsear con parseAnalysisJson, empujar a documents
+    break;
+  }
+  case "none":
+    break;
 }
 ```
 
-Un paquete real trae `rules.json` **o** `analysis.json`, nunca ambos —pero el
-código no necesita asumirlo ni rechazar el caso contrario: si algún día un
-paquete trae los dos, ambos se indexan sin conflicto, cada uno bajo su
-propio `kind`.
+Un paquete real trae `rules.json` **o** `analysis.json`, nunca ambos; con el
+enum, ese "nunca ambos" queda garantizado por construcción (el manifest ya
+lo rechazó como error de esquema si declaraba los dos), no sólo asumido por
+convención. El `switch` es exhaustivo: si en el futuro se agrega un tercer
+`StructuredContentKind`, `tsc` obliga a manejarlo acá antes de compilar.
 
 ## Unidades de conocimiento (`build-knowledge-units.ts`)
 
