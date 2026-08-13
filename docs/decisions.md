@@ -318,6 +318,88 @@ explícitamente porque su manifest no declara ningún video con
 `resources.analysis` — no ejercita este trabajo. No es un pendiente: el
 soporte de schema 2.0 no depende de esa colección en particular.
 
+## Skill dividida en `SKILL.md` + `skill/references/`
+
+Fecha: 13 de agosto de 2026. Origen: una corrida de verificación en frío
+sobre el estilo de diseño Swiss, con un subagente sin contexto previo del
+proyecto, contra las dos colecciones reales (`auto-design`, 51 videos, y
+`catalog-design`, 12 videos) registradas por ruta directa, sin copia.
+
+La corrida cerró bien —63 paquetes indexados, 9 bundles con integridad de
+citas perfecta, fuentes byte-idénticas antes y después— pero destapó cinco
+huecos de `skill/SKILL.md`, todos de documentación y ninguno de código:
+
+1. las rutas de base y caché del modelo se resuelven relativas al `cwd`, algo
+   que la skill no mencionaba; trabajando fuera del repositorio, el primer
+   `sync` falló con 63 issues `MODEL_LOAD_FAILED`, uno por video;
+2. ese código simbólico no estaba documentado — la skill documentaba
+   `EMBEDDING_MODEL_MISSING`, que **no es sinónimo**: el primero lo emite el
+   generador de embeddings durante `sync`, el segundo es un warning de
+   degradación de la vía vectorial en `retrieve`;
+3. la afirmación "funciona sin red" convivía con la instrucción de correr
+   `npm run models:download`, que sí requiere red, sin resolver la aparente
+   contradicción;
+4. no había ninguna estimación de duración de `sync` ni estrategia de espera,
+   lo que llevó al agente a lanzar cuatro syncs, dos de ellos concurrentes;
+5. la skill describía los paquetes sólo con `rules.json` y mandaba rechazar
+   estructuras que no la tuvieran — tras el punto 4.1 eso habría hecho que un
+   agente en frío descartara una colección schema 2.0 perfectamente válida.
+
+Corregidos los cinco, `SKILL.md` había crecido a 283 líneas (~14,5 KB), que
+se cargan enteras cada vez que la skill se dispara.
+
+**Decisión: separar por frecuencia de uso, no por tema.** `SKILL.md` conserva
+lo que hace falta en cada corrida (cuándo usar, flujo, `sync`, `retrieve`,
+lectura del bundle, citas, reglas de oro) y baja a 198 líneas (~9,4 KB), un
+35% menos de carga por invocación. Lo que sólo hace falta de vez en cuando se
+muda a dos archivos:
+
+- `skill/references/setup.md`: invocación alternativa de la CLI, rutas y
+  variables de entorno, procedimiento del caché del modelo, `init`, y las dos
+  causas del error de apertura de base.
+- `skill/references/troubleshooting.md`: códigos de salida, interpretación de
+  `status`, códigos simbólicos, fallo parcial de `sync` y `doctor`.
+
+**Esto no contradice la autocontención que fijó el punto 2.4.** Aquella
+decisión prohibió que la skill dependiera de archivos _fuera_ de sí misma
+—en particular, referenciar `docs/` por ruta relativa— para poder instalarse
+o enlazarse fuera de este repositorio. El directorio `skill/` viaja completo,
+así que el bundle sigue siendo autónomo. Tener más de un archivo adentro
+nunca estuvo prohibido. Si una lectura futura interpreta la separación como
+una regresión de 2.4, está equivocada.
+
+Invariante que la separación introduce: **en `SKILL.md` se quedan los
+disparadores, se van los procedimientos.** Cada condición que exige leer una
+referencia está nombrada en `SKILL.md` por su síntoma (`ERR_SQLITE_ERROR`,
+`status` distinto de `ok`, comando ausente del PATH), más una tabla de
+referencias al inicio. La verificación de 2.4 ya había demostrado que un
+agente en frío se saltea un paso que no está a la vista; mover contenido sin
+dejar el reflejo reproduciría ese fallo.
+
+Dos cosas se mantuvieron deliberadamente en `SKILL.md` aunque por tema
+parecerían candidatas a mudarse, porque por frecuencia no lo son: la guía de
+espera de `sync` y la coexistencia `rules.json`/`analysis.json`. Ambas se
+necesitan en el momento de ejecutar, no después de fallar.
+
+La separación **todavía no se validó en frío**; queda pendiente repetir el
+mismo tipo de corrida con la skill ya dividida.
+
 ## Pendientes de decisión
 
-Ninguno.
+- **Default del caché del modelo.** `<cwd>/.cache/models` es cómodo para el
+  desarrollo dentro del repositorio, pero contradice el propósito de una
+  skill portable usada por agentes desde directorios arbitrarios: instalar la
+  CLI globalmente no lo arregla, porque la ruta se sigue resolviendo contra el
+  `cwd`. `references/setup.md` documenta el workaround
+  (`AUTO_YOUTUBE_RAG_MODEL_CACHE`), pero cambiar el default a una ubicación de
+  usuario toca código y requiere diseño previo y aprobación explícita.
+- **Guard de concurrencia en `sync`.** No existe ningún bloqueo que impida
+  dos `sync` simultáneos sobre la misma base. La corrida en frío los produjo
+  y observó conteos inconsistentes mientras corrían (`status` llegó a
+  reportar 13 videos habiendo 53); el `sync` completo posterior reconstruyó
+  el estado correcto y `doctor` nunca reportó daño, así que **no hay pérdida
+  permanente confirmada**. La hipótesis de que dos runs solapados se borran
+  paquetes entre sí —vía la lógica de eliminar los no vistos por el run
+  propio— es plausible por los timestamps observados pero **no está
+  confirmada**: haría falta reproducirla de forma aislada y deliberada antes
+  de tratarla como bug. Por ahora la skill lo advierte.
