@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { test } from "node:test";
 
 import {
+  resolveModelCachePath,
   runSeedQueries,
   type SeedQueryApplication,
 } from "../../evals/run-seed-queries.js";
 import { contextDepths } from "../../src/domain/context/context-budget.js";
+import { resolvePaths } from "../../src/infrastructure/config/resolve-paths.js";
 import type {
   ContextBundle,
   ContextResultUnit,
@@ -172,6 +174,33 @@ void test("aborts with an explicit message identifying the query and depth on a 
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+void test("--model-cache default resolves the same path as the product's resolvePaths", () => {
+  function fixtureHomedir(): string {
+    return "C:/Users/fixture-eval-user";
+  }
+
+  const withoutFlag = resolveModelCachePath(undefined, {}, fixtureHomedir);
+  assert.equal(withoutFlag, resolvePaths({}, fixtureHomedir).modelsPath);
+
+  const withEnvHome = resolveModelCachePath(
+    undefined,
+    { AUTO_YOUTUBE_RAG_HOME: "D:/custom-home" },
+    fixtureHomedir,
+  );
+  assert.equal(
+    withEnvHome,
+    resolvePaths({ AUTO_YOUTUBE_RAG_HOME: "D:/custom-home" }, fixtureHomedir)
+      .modelsPath,
+  );
+
+  const withFlag = resolveModelCachePath(
+    "E:/explicit-models",
+    {},
+    fixtureHomedir,
+  );
+  assert.equal(withFlag, resolve("E:/explicit-models"));
 });
 
 void test("never writes outside the requested output directory", async () => {
