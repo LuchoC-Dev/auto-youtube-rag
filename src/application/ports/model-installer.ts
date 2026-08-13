@@ -22,6 +22,7 @@ export class ModelInstallerError extends Error {
   public constructor(
     public readonly code: ModelInstallerErrorCode,
     message: string,
+    public readonly retryable = false,
     options?: ErrorOptions,
   ) {
     super(message, options);

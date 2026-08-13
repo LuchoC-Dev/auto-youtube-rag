@@ -4,10 +4,15 @@ import { dirname } from "node:path";
 
 import { getStatus } from "../../application/diagnostics/get-status.js";
 import { runDoctor } from "../../application/diagnostics/run-doctor.js";
+import { installModel } from "../../application/models/install-model.js";
+import type { ModelInstaller } from "../../application/ports/model-installer.js";
 import { ContextBudget } from "../../domain/context/context-budget.js";
 import { SourceName } from "../../domain/indexing/identifiers.js";
 import { RetrievalFilter } from "../../domain/retrieval/retrieval-filter.js";
 import { RetrievalQuery } from "../../domain/retrieval/retrieval-query.js";
+import { describeModelState } from "../../infrastructure/config/model-install-state.js";
+import { E5EmbeddingGenerator } from "../../infrastructure/embeddings/e5-embedding-generator.js";
+import { E5ModelInstaller } from "../../infrastructure/embeddings/e5-model-installer.js";
 import { writeContextBundle } from "../../infrastructure/filesystem/write-context-bundle.js";
 import { SQLiteDiagnosticsRepository } from "../../infrastructure/sqlite/sqlite-diagnostics.js";
 import type {
@@ -28,6 +33,14 @@ export interface RunCliOptions {
   readonly stdout: CliWriter;
   readonly stderr: CliWriter;
   readonly applicationFactory?: (config: ApplicationConfig) => Application;
+  /** `models install`/`models status` require no library (Decision 7 of
+   * docs/install-design.md), so they never call applicationFactory or open
+   * SQLite. This override exists purely for tests: it lets them avoid a
+   * real network download the same way applicationFactory lets other tests
+   * avoid a real SQLite database. */
+  readonly modelInstallerFactory?: (
+    config: ApplicationConfig,
+  ) => ModelInstaller;
 }
 
 function sourceReceipt(source: Awaited<ReturnType<Application["addSource"]>>) {
@@ -61,10 +74,73 @@ function unreachable(value: never): never {
   throw new Error(`Unsupported parsed command: ${JSON.stringify(value)}`);
 }
 
+async function runModelsCommand(
+  command:
+    | {
+        readonly kind: "models_install";
+        readonly force: boolean;
+        readonly from: string | null;
+      }
+    | { readonly kind: "models_status" },
+  options: RunCliOptions,
+): Promise<number> {
+  const embeddingGenerator = new E5EmbeddingGenerator({
+    cacheDir: options.config.modelCachePath,
+  });
+  const modelInstaller = (
+    options.modelInstallerFactory ?? (() => new E5ModelInstaller())
+  )(options.config);
+
+  if (command.kind === "models_status") {
+    const [model, description] = await Promise.all([
+      embeddingGenerator.describe(),
+      describeModelState(options.config.modelCachePath),
+    ]);
+    const receipt: Record<string, unknown> = {
+      status: description.state,
+      model,
+      cache_path: options.config.modelCachePath,
+    };
+    if (description.state === "incomplete") {
+      receipt.issues = description.issues;
+    }
+    options.stdout.write(renderCliSuccess(receipt));
+    return 0;
+  }
+
+  options.stderr.write("Installing the embedding model...\n");
+  const result = await installModel(
+    { modelInstaller, embeddingGenerator },
+    {
+      modelsPath: options.config.modelCachePath,
+      from: command.from,
+      force: command.force,
+    },
+  );
+  options.stdout.write(
+    renderCliSuccess({
+      status: result.status,
+      model: result.model,
+      cache_path: result.cachePath,
+      bytes: result.bytes,
+      source: result.source,
+    }),
+  );
+  return 0;
+}
+
 export async function runCli(options: RunCliOptions): Promise<number> {
   let application: Application | undefined;
   try {
     const command = parseCommand(options.argv);
+
+    // models install/status require no library (Decision 7 of
+    // docs/install-design.md): they never build the Application, so a
+    // models command works even before `init` has ever run.
+    if (command.kind === "models_install" || command.kind === "models_status") {
+      return await runModelsCommand(command, options);
+    }
+
     const alreadyInitialized = await exists(options.config.databasePath);
     if (command.kind === "init") {
       await mkdir(dirname(options.config.databasePath), { recursive: true });

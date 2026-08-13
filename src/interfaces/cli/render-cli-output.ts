@@ -1,3 +1,4 @@
+import { ModelInstallerError } from "../../application/ports/model-installer.js";
 import { CliUsageError } from "./parse-command.js";
 
 export const cliSchemaVersion = "1.0";
@@ -18,7 +19,16 @@ export function renderCliSuccess(
 }
 
 export function renderCliError(error: unknown): RenderedCliError {
-  const usage = error instanceof CliUsageError;
+  // --from pointing at an incomplete model is a usage mistake (the user
+  // asked for something concrete that was not there), not an operational
+  // failure: exit code 2, per Decision 5 of docs/install-design.md. Kept
+  // as its own symbolic code (MODEL_SOURCE_INVALID) rather than wrapped in
+  // CliUsageError, which would flatten it to the generic
+  // INVALID_ARGUMENTS.
+  const usage =
+    error instanceof CliUsageError ||
+    (error instanceof ModelInstallerError &&
+      error.code === "MODEL_SOURCE_INVALID");
   const code =
     error instanceof Error && "code" in error && typeof error.code === "string"
       ? error.code

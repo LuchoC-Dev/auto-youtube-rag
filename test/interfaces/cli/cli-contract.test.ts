@@ -64,6 +64,27 @@ void test("parses every non-interactive administrative command", () => {
       out: "C:\\out",
     },
   );
+  assert.deepEqual(parseCommand(["models", "install"]), {
+    kind: "models_install",
+    force: false,
+    from: null,
+  });
+  assert.deepEqual(parseCommand(["models", "install", "--force"]), {
+    kind: "models_install",
+    force: true,
+    from: null,
+  });
+  assert.deepEqual(
+    parseCommand(["models", "install", "--from", "C:\\repo\\.cache\\models"]),
+    {
+      kind: "models_install",
+      force: false,
+      from: "C:\\repo\\.cache\\models",
+    },
+  );
+  assert.deepEqual(parseCommand(["models", "status"]), {
+    kind: "models_status",
+  });
 });
 
 void test("maps missing, unknown and mistyped arguments to usage exit code 2", () => {
@@ -79,6 +100,11 @@ void test("maps missing, unknown and mistyped arguments to usage exit code 2", (
     ["retrieve", "brutalismo", "--depth", "shallow"],
     ["retrieve", "brutalismo", "--max-tokens", "0"],
     ["retrieve", "brutalismo", "--max-tokens", "abc"],
+    ["models"],
+    ["models", "frobnicate"],
+    ["models", "install", "extra"],
+    ["models", "install", "--unknown"],
+    ["models", "status", "extra"],
   ]) {
     assert.throws(
       () => parseCommand(args),
