@@ -7,7 +7,9 @@ description: Recupera contexto amplio, citado y con procedencia desde una biblio
 
 Esta skill enseña a operar `auto-youtube-rag`, una biblioteca RAG local que
 indexa paquetes de video ya generados (uno por video, con `context.md`,
-`rules.json` y metadata) y devuelve contexto amplio, deduplicado y citado.
+metadata, y contenido estructurado en `rules.json` **o** `analysis.json`
+según la versión de esquema con que se generó el paquete) y devuelve
+contexto amplio, deduplicado y citado.
 
 **El producto no responde preguntas por sí mismo.** No contiene un LLM
 interno. Vos —el agente que ejecuta esta skill— sos el único responsable de
@@ -15,8 +17,21 @@ leer el contexto recuperado, razonar sobre él y redactar la respuesta. Nunca
 asumas que `retrieve` te da una respuesta final; te da evidencia con
 procedencia.
 
-Funciona exclusivamente en local, sin red, y nunca escribe ni modifica los
-paquetes fuente registrados.
+Funciona exclusivamente en local y nunca escribe ni modifica los paquetes
+fuente registrados.
+
+## Archivos de referencia
+
+Esta skill se lee entera cada vez. Los procedimientos que sólo hacen falta de
+vez en cuando viven en archivos aparte, junto a este:
+
+| Archivo                         | Leelo cuando                                                                                                   |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `references/setup.md`           | Es la primera vez en esta máquina, o falla la base de datos, las rutas o la carga del modelo de embeddings.    |
+| `references/troubleshooting.md` | Un comando devolvió un código distinto de `0`, o hay `warnings` o códigos simbólicos que no sabés interpretar. |
+
+Si la biblioteca ya está funcionando, no abras ninguno de los dos: todo lo
+que necesitás para operar está acá abajo.
 
 ## Cuándo usar esta skill
 
@@ -31,11 +46,8 @@ ni para tareas que no dependen de esta biblioteca.
 
 ## Antes de empezar
 
-La CLI se invoca como `auto-youtube-rag <comando>`. Si el comando no está
-disponible en el PATH, buscá el repositorio del proyecto y usá
-`node "<ruta-al-repo>/dist/main.js" <comando>` en su lugar (requiere haber
-corrido `npm run build` una vez en ese repo). El resto de esta skill asume
-que ya resolviste ese detalle y usa la forma corta.
+La CLI se invoca como `auto-youtube-rag <comando>`. Si el comando no está en
+el PATH, leé `references/setup.md` para la forma alternativa.
 
 Todos los comandos son no interactivos y seguros de ejecutar sin supervisión
 humana, salvo `rebuild`, que **todavía no está implementado** — no lo
@@ -45,34 +57,26 @@ invoques ni lo ofrezcas como disponible.
 `stderr` lleva progreso y advertencias; no forma parte del contrato de datos.
 Nunca imprimas de más pidiendo `--json` extra: ya es el formato por defecto.
 
+**Las rutas de la base y del modelo son relativas al directorio de trabajo.**
+Usá el mismo `cwd` en todas las invocaciones de la sesión. Si cambiás de
+directorio entre comandos, vas a apuntar a otra base sin ningún aviso.
+
 ## Flujo recomendado
 
-1. **Inicializar antes de cualquier otro comando.** `auto-youtube-rag status`,
-   `doctor` y `source add` necesitan que la base de datos local ya exista.
-   Si es la primera vez que usás la herramienta en esta máquina (o no estás
-   seguro), corré primero:
+1. **Inicializar antes de cualquier otro comando.** `status`, `doctor` y
+   `source add` necesitan que la base de datos local ya exista:
 
    ```text
    auto-youtube-rag init
    ```
 
-   Es idempotente — si ya está inicializada, no hace nada destructivo ni la
-   reemplaza. Si te saltás este paso, `status`/`doctor`/`source add` fallan
-   con un error de base de datos poco claro (`ERR_SQLITE_ERROR: unable to
-open database file`).
-
-   La base de datos se ubica por defecto en `<cwd>/.auto-youtube-rag/`,
-   relativa al directorio de trabajo del proceso. El mismo error también
-   aparece si invocás un comando posterior desde un `cwd` distinto al que
-   usaste para `init` — no asumas que siempre significa "falta `init`";
-   confirmá primero que estás ejecutando desde el mismo directorio de
-   trabajo en cada invocación.
+   Es idempotente. Si te lo saltás, esos comandos fallan con
+   `ERR_SQLITE_ERROR: unable to open database file` → `references/setup.md`.
 
 2. **Diagnosticar antes de asumir estado.** Corré `auto-youtube-rag status`
    para ver fuentes registradas, última sincronización y salud del modelo.
    Si algo parece roto (y ya corriste `init`), corré `auto-youtube-rag doctor`
-   para un chequeo de integridad de sólo lectura (SQLite, FTS5, modelo local,
-   esquema).
+   para un chequeo de integridad de sólo lectura.
 
 3. **Registrar una fuente si hace falta.** Si `status` no muestra la
    colección que el usuario necesita:
@@ -87,9 +91,15 @@ open database file`).
    que contiene un subdirectorio por `<slug>`), no su carpeta padre. El
    recibo puede devolver un `collection_path` un nivel arriba de esa ruta
    — es la resolución esperada de la raíz de la colección, no un error.
-   Nunca registres una ruta que no siga la estructura esperada
-   (`videos/<slug>/deliverables/context.md`, `rules.json`,
-   `source/metadata.json`) sin confirmarlo primero.
+
+   La estructura esperada es `videos/<slug>/deliverables/context.md` y
+   `source/metadata.json`, más `deliverables/rules.json` **o**
+   `deliverables/analysis.json`. Los dos formatos estructurados son
+   igualmente válidos y conviven en la misma biblioteca: `rules.json` es el
+   esquema original y `analysis.json` el de los paquetes más recientes. Una
+   colección puede mezclar ambos, e incluso tener videos sin ninguno.
+   **No trates la ausencia de `rules.json` como una colección inválida** y no
+   intentes convertir un formato al otro.
 
 4. **Sincronizar.** Antes de una consulta importante, o si `status` muestra
    una sincronización vieja:
@@ -102,6 +112,17 @@ open database file`).
    `sync` es incremental e idempotente: repetirlo sin cambios no hace nada
    destructivo. Un paquete inválido no bloquea el resto; revisá `warnings`
    en el recibo si algo falló parcialmente.
+
+   **`sync` es una operación larga.** La primera indexación tarda del orden
+   de **10 a 15 segundos por video** — una colección de 60 videos lleva entre
+   10 y 15 minutos. Un `sync` posterior sin cambios termina en segundos.
+   Planificá la espera antes de lanzarlo: en segundo plano si tu entorno
+   puede, o con un timeout holgado (15 minutos o más) si sólo podés en
+   primer plano.
+
+   Mientras corre: **nunca lances un segundo `sync`**, y no uses el conteo de
+   videos de `status` como señal de progreso — puede subir y bajar. La única
+   señal fiable de que terminó es el recibo JSON del propio comando.
 
 5. **Recuperar contexto.**
 
@@ -121,6 +142,11 @@ open database file`).
    - Sin `--out`, el bundle queda en un directorio temporal cuya ruta te
      da el recibo; no necesitás elegir `--out` salvo que el usuario quiera
      conservarlo en un lugar concreto.
+
+   Para una investigación amplia, varias consultas `focused` o `balanced`
+   desde ángulos distintos suelen rendir más que una sola `deep`: una
+   colección de catálogos temáticos devuelve mucho contenido tangencial
+   cuando el presupuesto es grande.
 
 6. **Leer el bundle, no adivinar desde el recibo.** `retrieve` nunca imprime
    el contexto completo en `stdout`; imprime un recibo compacto:
@@ -146,44 +172,18 @@ open database file`).
    necesites resolver una cita a su procedencia exacta (fuente, video,
    heading, evidencia visual) o inspeccionar métricas.
 
+   Si el recibo trae un `status` distinto de `"ok"` o `warnings` no vacíos,
+   leé `references/troubleshooting.md` antes de interpretar la cobertura.
+
 7. **Citar con procedencia real.** Cuando uses contenido recuperado en tu
    respuesta, citá los IDs `[S0N]` tal como aparecen en `context.md`. Nunca
    fabriques una cita que no venga del bundle.
 
-## Interpretar `status` en el recibo
-
-- `"ok"`: hay bundle con evidencia. Un `status: "ok"` con relevancia baja es
-  un resultado válido y esperado, no un error — la búsqueda semántica no
-  tiene piso de similitud, así que consultas poco relacionadas con la
-  colección igual devuelven candidatos. Leé `Coverage and limitations` en
-  `context.md` antes de confiar ciegamente en la relevancia.
-- `"no_results"`: la biblioteca (tras aplicar `--source` u otros filtros)
-  quedó vacía de candidatos. El bundle igual se escribe, explicando la
-  ausencia de evidencia. No es un fallo del comando.
-- `"partial"`: una vía de recuperación se degradó (por ejemplo, búsqueda
-  textual o vectorial no disponible) pero igual se produjo un bundle
-  utilizable. Revisá `warnings` antes de confiar en la cobertura.
-
-## Códigos de salida
-
-| Código | Significado                                               | Qué hacer                                                 |
-| -----: | --------------------------------------------------------- | --------------------------------------------------------- |
-|    `0` | Éxito, incluidos `no_results`, `no_changes`, etc.         | Continuar normalmente.                                    |
-|    `1` | Fallo operativo o resultado parcial (`status: "partial"`) | Revisar `warnings`/`limitations`; no reintentar a ciegas. |
-|    `2` | Uso inválido de la CLI (argumento mal escrito)            | Corregir el comando, no es un bug del producto.           |
-|  `130` | Interrupción manual (Ctrl+C)                              | No aplica a uso no interactivo.                           |
-
-Cada salida JSON también incluye códigos simbólicos estables (por ejemplo
-`SOURCE_NOT_FOUND`, `PACKAGE_INVALID`, `EMBEDDING_MODEL_MISSING`) y un
-`retryable` cuando corresponde. Usalos para decidir si tiene sentido
-reintentar o si hace falta intervención humana (por ejemplo, descargar el
-modelo local con `npm run models:download` en el repositorio).
-
 ## Reglas de oro
 
-- Nunca leas los paquetes fuente (`context.md`, `rules.json` originales)
-  directamente cuando `retrieve` puede darte el mismo contenido ya
-  organizado, deduplicado y citado.
+- Nunca leas los paquetes fuente (`context.md`, `rules.json` o
+  `analysis.json` originales) directamente cuando `retrieve` puede darte el
+  mismo contenido ya organizado, deduplicado y citado.
 - Nunca modifiques ni borres archivos dentro de una fuente registrada; el
   producto tampoco lo hace.
 - Nunca fabriques una cita `[S0N]` ni contenido que no venga del bundle.
@@ -191,3 +191,8 @@ modelo local con `npm run models:download` en el repositorio).
   pero todavía no está implementado.
 - Nunca asumas que un `status: "ok"` de baja relevancia es un bug: es el
   comportamiento esperado del MVP.
+- Nunca lances un `sync` mientras otro sigue corriendo, ni uses el conteo
+  intermedio de `status` como señal de progreso.
+- Nunca reintentes un comando fallido sin haber leído antes el archivo de
+  referencia que corresponde: la mayoría de los fallos son de configuración
+  y reintentar a ciegas los repite igual.
