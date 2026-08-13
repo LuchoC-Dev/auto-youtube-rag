@@ -177,6 +177,72 @@ void test("reads a complete package through the application port without writes"
   }
 });
 
+void test("reads a package with analysis.json instead of rules.json", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "auto-youtube-rag-package-"));
+  const analysisVideoId = VideoId.create("video_456");
+  const analysisRef = PackageRef.create(sourceName, analysisVideoId);
+  const slug = "analysis-video";
+  const videosPath = join(directory, "videos");
+  const packagePath = join(videosPath, slug);
+  const deliverablesPath = join(packagePath, "deliverables");
+  const manifestPath = join(directory, "manifest.json");
+  const analysisPath = join(deliverablesPath, "analysis.json");
+  const analysisRaw = await readFixture("analysis-complete.json");
+
+  try {
+    await mkdir(deliverablesPath, { recursive: true });
+    await writeFile(analysisPath, analysisRaw, "utf8");
+    await writeFile(
+      manifestPath,
+      JSON.stringify({
+        videos: [
+          {
+            video_id: analysisVideoId.value,
+            slug,
+            source_language: "es",
+            dossier_language: "es",
+            stage: "complete",
+            resources: { context: false, analysis: true, metadata: false },
+          },
+        ],
+      }),
+      "utf8",
+    );
+
+    const source = SourceRoot.create({
+      name: sourceName,
+      collectionPath: directory,
+      manifestPath,
+      videosPath,
+      enabled: true,
+    });
+    const reader = new FilesystemPackageSourceReader(registryFor(source));
+    const snapshot = await reader.readPackage(analysisRef);
+
+    assert.deepEqual(
+      snapshot.documents.map((document) => ({
+        kind: document.kind,
+        relativePath: document.relativePath,
+        parserVersion: document.parserVersion,
+      })),
+      [
+        {
+          kind: "analysis",
+          relativePath: "deliverables/analysis.json",
+          parserVersion: "analysis-v1",
+        },
+      ],
+    );
+    const analysisDocument = snapshot.documents[0];
+    assert.ok(analysisDocument);
+    assert.equal(analysisDocument.contentHash, sha256(analysisRaw));
+    assert.equal(analysisDocument.kind, "analysis");
+    assert.equal(analysisDocument.content.topics.length, 2);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 void test("reports unknown sources and packages with stable fields", async () => {
   const missingSource = SourceName.create("missing-source");
   const reader = new FilesystemPackageSourceReader(registryFor(null));
