@@ -78,8 +78,8 @@ export async function runDoctor(
     code: "EMBEDDING_MODEL",
     status: modelPresent ? "ok" : "error",
     message: modelPresent
-      ? `${model.key}@${model.version} cache is present.`
-      : `${model.key}@${model.version} cache is missing.`,
+      ? `${model.key}@${model.version} is installed at ${modelCachePath}.`
+      : `${model.key}@${model.version} is not installed at ${modelCachePath}. Run "auto-youtube-rag models install" first.`,
   });
 
   return {

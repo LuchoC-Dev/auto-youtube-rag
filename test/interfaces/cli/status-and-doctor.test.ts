@@ -94,12 +94,14 @@ void test("doctor reports a missing local model cache", async () => {
     assert.equal(doctor.output.status, "error");
     const checks = doctor.output.checks;
     assert.ok(Array.isArray(checks));
-    assert.ok(
-      checks.some(
-        (check) =>
-          record(check).code === "EMBEDDING_MODEL" &&
-          record(check).status === "error",
-      ),
+    const modelCheck = checks
+      .map(record)
+      .find((check) => check.code === "EMBEDDING_MODEL");
+    assert.ok(modelCheck);
+    assert.equal(modelCheck.status, "error");
+    assert.match(
+      String(modelCheck.message),
+      /auto-youtube-rag models install/u,
     );
   } finally {
     await rm(setup.root, { recursive: true, force: true });
