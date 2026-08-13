@@ -142,6 +142,24 @@ void test("creates every approved table, index and FTS trigger", async () => {
       scalarNumber(database, "SELECT count(*) FROM fragment_fts"),
       0,
     );
+
+    database.exec(`
+      INSERT INTO source_documents(package_id, kind, relative_path, content_hash, byte_size, parser_version)
+      VALUES (1, 'analysis', 'deliverables/analysis.json', '${"e".repeat(64)}', 20, 'analysis-v1');
+    `);
+    assert.equal(
+      scalarNumber(
+        database,
+        "SELECT count(*) FROM source_documents WHERE kind = 'analysis'",
+      ),
+      1,
+    );
+    assert.throws(() => {
+      database.exec(`
+        INSERT INTO source_documents(package_id, kind, relative_path, content_hash, byte_size, parser_version)
+        VALUES (1, 'unknown', 'deliverables/unknown.json', '${"f".repeat(64)}', 5, 'unknown-v1');
+      `);
+    });
   } finally {
     database.close();
   }

@@ -154,7 +154,7 @@ de punta a punta salvo por la restricción del `CHECK` de SQLite (bloque S).
 
 ### S1. `CHECK` de `source_documents.kind` incluye `'analysis'`
 
-- [ ] Editar `001-initial.ts` in place (decisión confirmada: no existe base
+- [x] Editar `001-initial.ts` in place (decisión confirmada: no existe base
       real que preservar) para que el `CHECK` sea
       `CHECK (kind IN ('context', 'rules', 'analysis', 'metadata'))`.
   - Depende de: ninguno (independiente del resto del bloque S).
@@ -166,7 +166,7 @@ kind, ...) VALUES (..., 'analysis', ...)`; los tests de migración
 
 ### S2. Bucketing de `assembleContext`
 
-- [ ] Sumar `"analysis_document"`, `"analysis_section"`, `"analysis_topic"`
+- [x] Sumar `"analysis_document"`, `"analysis_section"`, `"analysis_topic"`
       a `highestRelevanceTypes` y `"analysis_recommendation"` a
       `relatedRulesTypes` en `context-blocks.ts`.
   - Depende de: P3.
