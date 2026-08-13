@@ -108,7 +108,10 @@ void test("counts passage-prefixed inputs including adapter-owned tokens", async
     texts.map((text) => Array.from(text).length + 2),
   );
   const runtime = new FakeRuntime(session);
-  const generator = new E5EmbeddingGenerator({ runtime });
+  const generator = new E5EmbeddingGenerator({
+    runtime,
+    cacheDir: "C:/models",
+  });
 
   const counts = await generator.countTokens(["  Diseño visual  ", "color"]);
 
@@ -124,7 +127,7 @@ void test("counts passage-prefixed inputs including adapter-owned tokens", async
   assert.ok(loadOptions);
   assert.equal(loadOptions.localFilesOnly, true);
   assert.equal(loadOptions.dtype, "q8");
-  assert.equal(loadOptions.cacheDir.endsWith(".cache\\models"), true);
+  assert.equal(loadOptions.cacheDir.endsWith("models"), true);
 });
 
 void test("embeds documents in batches and normalizes document and query vectors", async () => {
@@ -132,6 +135,7 @@ void test("embeds documents in batches and normalizes document and query vectors
   const generator = new E5EmbeddingGenerator({
     runtime: new FakeRuntime(session),
     batchSize: 2,
+    cacheDir: "C:/models",
   });
   const documents = ["uno", "dos", "tres", "cuatro", "cinco"];
 
@@ -159,7 +163,11 @@ void test("embeds documents in batches and normalizes document and query vectors
 void test("rejects invalid inputs, counters and vectors", async () => {
   assert.throws(
     () =>
-      new E5EmbeddingGenerator({ runtime: new FakeRuntime(), batchSize: 0 }),
+      new E5EmbeddingGenerator({
+        runtime: new FakeRuntime(),
+        batchSize: 0,
+        cacheDir: "C:/models",
+      }),
     (error: unknown) => {
       assert.ok(error instanceof E5EmbeddingError);
       assert.equal(error.code, "INVALID_BATCH_SIZE");
@@ -168,7 +176,10 @@ void test("rejects invalid inputs, counters and vectors", async () => {
   );
 
   await expectCode(
-    new E5EmbeddingGenerator({ runtime: new FakeRuntime() }).embedQuery("   "),
+    new E5EmbeddingGenerator({
+      runtime: new FakeRuntime(),
+      cacheDir: "C:/models",
+    }).embedQuery("   "),
     "INVALID_INPUT",
   );
 
@@ -176,6 +187,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
   await expectCode(
     new E5EmbeddingGenerator({
       runtime: new FakeRuntime(mismatch),
+      cacheDir: "C:/models",
     }).countTokens(["texto"]),
     "TOKEN_COUNT_MISMATCH",
   );
@@ -184,6 +196,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
   await expectCode(
     new E5EmbeddingGenerator({
       runtime: new FakeRuntime(invalidCount),
+      cacheDir: "C:/models",
     }).countTokens(["texto"]),
     "INVALID_TOKEN_COUNT",
   );
@@ -192,6 +205,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
   await expectCode(
     new E5EmbeddingGenerator({
       runtime: new FakeRuntime(tooLong),
+      cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
     "INPUT_TOO_LONG",
   );
@@ -200,6 +214,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
   await expectCode(
     new E5EmbeddingGenerator({
       runtime: new FakeRuntime(wrongCount),
+      cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
     "EMBEDDING_COUNT_MISMATCH",
   );
@@ -210,6 +225,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
   await expectCode(
     new E5EmbeddingGenerator({
       runtime: new FakeRuntime(wrongDimensions),
+      cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
     "INVALID_VECTOR_DIMENSIONS",
   );
@@ -220,6 +236,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
   await expectCode(
     new E5EmbeddingGenerator({
       runtime: new FakeRuntime(nonFinite),
+      cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
     "NON_FINITE_VECTOR",
   );
@@ -230,6 +247,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
   await expectCode(
     new E5EmbeddingGenerator({
       runtime: new FakeRuntime(zero),
+      cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
     "ZERO_NORM_VECTOR",
   );
@@ -238,7 +256,10 @@ void test("rejects invalid inputs, counters and vectors", async () => {
 void test("loads lazily, disposes once and explains a missing local model", async () => {
   const session = new FakeSession();
   const runtime = new FakeRuntime(session);
-  const generator = new E5EmbeddingGenerator({ runtime });
+  const generator = new E5EmbeddingGenerator({
+    runtime,
+    cacheDir: "C:/models",
+  });
 
   await Promise.all([
     generator.countTokens(["uno"]),
@@ -251,11 +272,12 @@ void test("loads lazily, disposes once and explains a missing local model", asyn
 
   const missing = new E5EmbeddingGenerator({
     runtime: new FakeRuntime(undefined, new Error("files absent")),
+    cacheDir: "C:/models",
   });
   await assert.rejects(missing.countTokens(["texto"]), (error: unknown) => {
     assert.ok(error instanceof E5EmbeddingError);
     assert.equal(error.code, "MODEL_LOAD_FAILED");
-    assert.match(error.message, /npm run models:download/u);
+    assert.match(error.message, /auto-youtube-rag models install/u);
     assert.equal(error.cause instanceof Error, true);
     return true;
   });
