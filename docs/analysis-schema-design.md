@@ -2,9 +2,12 @@
 
 ## Estado
 
-**Aprobado el 13 de agosto de 2026.** Las cuatro decisiones abiertas quedaron
-resueltas (ver "Decisiones confirmadas" al final). Checklist fino en
-`docs/analysis-schema-tasks.md`.
+**Aprobado el 13 de agosto de 2026, implementado y validado el mismo día.**
+Las cuatro decisiones abiertas quedaron resueltas (ver "Decisiones
+confirmadas" al final). Checklist fino en `docs/analysis-schema-tasks.md`
+(bloques P–T, completos). Validación real contra la colección `auto-design`
+en `docs/decisions.md`, sección "Soporte de `analysis.json` (schema 2.0):
+implementado y validado".
 
 ## Contexto
 

@@ -58,16 +58,17 @@ El sistema admite varias raíces registradas, inicialmente:
 Cada paquete conserva su estructura original. El indexador no agrega ni modifica
 archivos dentro de esos paquetes.
 
-| Fuente                    | Uso en el MVP                              |
-| ------------------------- | ------------------------------------------ |
-| `manifest.json`           | Inventario y estado; no corpus semántico   |
-| `deliverables/context.md` | Fuente principal de conocimiento           |
-| `deliverables/rules.json` | Patrones y reglas estructuradas            |
-| `source/metadata.json`    | Identidad, filtros y procedencia           |
-| `transcript/source.txt`   | Respaldo opcional; no indexado por defecto |
-| Archivos VTT              | No indexados                               |
-| `visual/coverage.json`    | Metadatos de evidencia                     |
-| Imágenes                  | Ruta preservada; sin embeddings en el MVP  |
+| Fuente                       | Uso en el MVP                                                                                             |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `manifest.json`              | Inventario y estado; no corpus semántico                                                                  |
+| `deliverables/context.md`    | Fuente principal de conocimiento                                                                          |
+| `deliverables/rules.json`    | Patrones y reglas estructuradas (schema 1.0)                                                              |
+| `deliverables/analysis.json` | Análisis general estructurado (schema 2.0, punto 4.1); mutuamente excluyente con `rules.json` por paquete |
+| `source/metadata.json`       | Identidad, filtros y procedencia                                                                          |
+| `transcript/source.txt`      | Respaldo opcional; no indexado por defecto                                                                |
+| Archivos VTT                 | No indexados                                                                                              |
+| `visual/coverage.json`       | Metadatos de evidencia                                                                                    |
+| Imágenes                     | Ruta preservada; sin embeddings en el MVP                                                                 |
 
 ## Alcance del MVP
 

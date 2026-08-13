@@ -52,9 +52,13 @@ observado.
 
 ### `SourceDocument`
 
-Archivo derivado de un paquete con tipo `context`, `rules` o `metadata`.
-Conserva ruta relativa, hash SHA-256, tamaño y parser versionado. Un cambio de
-hash o de versión del parser invalida únicamente sus datos derivados.
+Archivo derivado de un paquete con tipo `context`, `rules`, `analysis` o
+`metadata`. `rules` y `analysis` son mutuamente excluyentes por paquete: cada
+video real trae `rules.json` (schema 1.0) o `analysis.json` (schema 2.0),
+nunca ambos — ver "Soporte de `analysis.json` (schema 2.0)" en
+`docs/decisions.md` y `docs/analysis-schema-design.md`. Conserva ruta
+relativa, hash SHA-256, tamaño y parser versionado. Un cambio de hash o de
+versión del parser invalida únicamente sus datos derivados.
 
 ### `KnowledgeUnit`
 
@@ -63,7 +67,9 @@ Unidad amplia que puede devolverse al agente. Forma una jerarquía mediante
 
 - `context_document` y `context_section`;
 - `rules_document` y `rules_section`;
-- `rule_pattern`, `rule_item`, `avoid_item` y `acceptance_criterion`.
+- `rule_pattern`, `rule_item`, `avoid_item` y `acceptance_criterion`;
+- `analysis_document` y `analysis_section` (punto 4.1, schema 2.0);
+- `analysis_topic` y `analysis_recommendation`.
 
 Cada unidad conserva texto renderizado, representación estructurada opcional,
 ruta de encabezados, timestamps existentes, evidencia visual, estimación de
@@ -249,7 +255,7 @@ CREATE TABLE video_packages (
 CREATE TABLE source_documents (
   id INTEGER PRIMARY KEY,
   package_id INTEGER NOT NULL REFERENCES video_packages(id) ON DELETE CASCADE,
-  kind TEXT NOT NULL CHECK (kind IN ('context', 'rules', 'metadata')),
+  kind TEXT NOT NULL CHECK (kind IN ('context', 'rules', 'analysis', 'metadata')),
   relative_path TEXT NOT NULL,
   content_hash TEXT NOT NULL,
   byte_size INTEGER NOT NULL CHECK (byte_size >= 0),

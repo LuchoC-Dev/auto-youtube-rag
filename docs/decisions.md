@@ -250,13 +250,12 @@ inválido ya no aborta la lectura de todo el manifest.
   por pruebas nuevas en ambos archivos de test.
 
 Esto resuelve el efecto amplificador (un video roto bloqueaba los 51), no el
-hallazgo de fondo: los 17 videos con `resources.analysis` siguen sin
-indexarse — ahora aislados como `issue` en vez de tumbar todo el run — porque
-`analysis.json` (schema 2.0 de la skill productora `youtube-video-context`)
-tiene una forma de contenido incompatible con `rules.json` (schema 1.0), no
-es un simple alias de clave. Ver "Pendientes de decisión" abajo.
+hallazgo de fondo: los 17 videos con `resources.analysis` estuvieron
+aislados como `issue` (en vez de tumbar todo el run) hasta que se implementó
+el soporte completo de `analysis.json` — ver "Soporte de `analysis.json`
+(schema 2.0): implementado y validado" abajo.
 
-## Soporte de `analysis.json` (schema 2.0): diseño aprobado
+## Soporte de `analysis.json` (schema 2.0): implementado y validado
 
 La skill productora `youtube-video-context` reemplazó `rules.json`/schema
 1.0 por `analysis.json`/schema 2.0 el 2 de agosto de 2026 (commit `aecdde9`
@@ -289,10 +288,35 @@ El 13 de agosto de 2026 se aprobó el diseño completo en
   última, otra colección real generada por la misma skill, con algunos
   videos más) son colecciones fuente en disco, no índices ya construidos.
 - **Validación E2E real (bloque T)** contra los videos reales con
-  `analysis.json` de `auto-design` va incluida en este trabajo, no
+  `analysis.json` de `auto-design` fue incluida en este trabajo, no
   pospuesta.
 
-Implementación pendiente: bloques P–T de `docs/analysis-schema-tasks.md`.
+**Implementado y cerrado el 13 de agosto de 2026** — bloques P–T de
+`docs/analysis-schema-tasks.md` completos. Validación real (bloque T)
+ejecutada contra una copia temporal de la colección real `auto-design`
+(51 videos, incluidos los 17 con `analysis.json`) con el modelo E5 real:
+
+- los 51 paquetes se indexaron sin ningún `issue` (`packagesIndexed: 51`,
+  `packagesFailed: 0`) — los 17 videos con `analysis.json` que antes
+  quedaban aislados como issue ahora se indexan como ciudadanos de primera
+  clase;
+- `doctor` reportó los cinco checks en `ok`;
+- el digest SHA-256 del árbol fuente copiado fue idéntico antes y después de
+  `sync`, confirmando que la fuente nunca se escribe;
+- una consulta semilla nueva (`es-analysis-neumorphism-accessibility` en
+  `evals/queries/seed-queries.json`), orientada específicamente a contenido
+  no alcanzable desde `rules.json`, produjo un bundle real vía `retrieve
+--depth balanced` donde la cita `[S45]` resolvió a una unidad
+  `analysis_topic` real (`psyw2_j_5jk`, "Neumorphism as a middle ground, and
+  its accessibility defense") en la sección "Highest-relevance context", con
+  procedencia correcta y `context.md` legible;
+- la copia temporal se descartó al terminar; la colección real
+  `auto-design` no se modificó.
+
+`design-catalog` (la segunda colección real mencionada arriba) no se validó
+explícitamente porque su manifest no declara ningún video con
+`resources.analysis` — no ejercita este trabajo. No es un pendiente: el
+soporte de schema 2.0 no depende de esa colección en particular.
 
 ## Pendientes de decisión
 

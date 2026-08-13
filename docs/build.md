@@ -8,18 +8,18 @@
 
 ---
 
-| Fase                       | N°  | Etapa                                   | Estado |  %   | Descripción                                    |
-| -------------------------- | --- | --------------------------------------- | :----: | :--: | ---------------------------------------------- |
-| **1 — Definición**         | 1.1 | Repositorio y contexto inicial          |   ✅   | 100% | Git y decisiones documentadas                  |
-|                            | 1.2 | Contrato de CLI y salidas               |   ✅   | 100% | Comandos, formatos y códigos definidos         |
-|                            | 1.3 | Stack y estrategia vectorial            |   ✅   | 100% | Stack y toolchain reproducible aprobados       |
-| **2 — Implementación MVP** | 2.1 | Indexación incremental                  |   ✅   | 100% | Sync incremental y CLI verificadas             |
-|                            | 2.2 | Recuperación híbrida                    |   ✅   | 100% | FTS5, vectores y ranking verificados           |
-|                            | 2.3 | Ensamblado de contexto                  |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve`     |
-|                            | 2.4 | Skill general                           |   ✅   | 100% | `skill/SKILL.md` verificada en frío            |
-| **3 — Calidad**            | 3.1 | Pruebas funcionales                     |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos           |
-|                            | 3.2 | Evaluaciones del MVP                    |   ✅   | 100% | M, N y O completos; MVP cerrado                |
-| **4 — Posterior al MVP**   | 4.1 | Soporte de `analysis.json` (schema 2.0) |   🔵   |  0%  | Diseño aprobado (bloques P–T); sin implementar |
+| Fase                       | N°  | Etapa                                   | Estado |  %   | Descripción                                               |
+| -------------------------- | --- | --------------------------------------- | :----: | :--: | --------------------------------------------------------- |
+| **1 — Definición**         | 1.1 | Repositorio y contexto inicial          |   ✅   | 100% | Git y decisiones documentadas                             |
+|                            | 1.2 | Contrato de CLI y salidas               |   ✅   | 100% | Comandos, formatos y códigos definidos                    |
+|                            | 1.3 | Stack y estrategia vectorial            |   ✅   | 100% | Stack y toolchain reproducible aprobados                  |
+| **2 — Implementación MVP** | 2.1 | Indexación incremental                  |   ✅   | 100% | Sync incremental y CLI verificadas                        |
+|                            | 2.2 | Recuperación híbrida                    |   ✅   | 100% | FTS5, vectores y ranking verificados                      |
+|                            | 2.3 | Ensamblado de contexto                  |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve`                |
+|                            | 2.4 | Skill general                           |   ✅   | 100% | `skill/SKILL.md` verificada en frío                       |
+| **3 — Calidad**            | 3.1 | Pruebas funcionales                     |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos                      |
+|                            | 3.2 | Evaluaciones del MVP                    |   ✅   | 100% | M, N y O completos; MVP cerrado                           |
+| **4 — Posterior al MVP**   | 4.1 | Soporte de `analysis.json` (schema 2.0) |   ✅   | 100% | Bloques P–T completos; validado contra `auto-design` real |
 
 ---
 
@@ -145,9 +145,10 @@ MVP completo: 2.1–2.4 y 3.1–3.2 están al 100%. Decisión de calibración de
 O1 y hallazgos accionables de 3.2 en
 `evals/results/2026-08-12/report.md` y `docs/decisions.md`. Trabajo
 posterior razonable (piso de similitud vectorial, MCP, interfaz web,
-paquetes de páginas web, soporte de `analysis.json`/schema 2.0) queda fuera
-de este MVP, documentado en `docs/agent-handoff.md`, no como pendiente
-urgente.
+paquetes de páginas web) queda fuera de este MVP, documentado en
+`docs/agent-handoff.md`, no como pendiente urgente. El soporte de
+`analysis.json`/schema 2.0, el primer frente de trabajo posterior, ya se
+implementó y validó — ver 4.1 abajo.
 
 ### Etapa 4 — Posterior al MVP
 
@@ -166,8 +167,21 @@ ya publicadas del bundle sin agregar una cuarta; la migración SQLite edita
 `001-initial.ts` in place (no existe base real que preservar). Detalle
 completo en `docs/decisions.md`.
 
-- [ ] P1–P3. Contratos de dominio y aplicación
-- [ ] Q1. Parser de `analysis.json`
-- [ ] R1–R2. Lectura de paquete y unidades de conocimiento
-- [ ] S1–S3. Migración SQLite, bucketing y E2E con fixtures
-- [ ] T1–T3. Validación real sobre `auto-design`/`design-catalog` y cierre
+- [x] P1–P3. Contratos de dominio y aplicación
+- [x] Q1. Parser de `analysis.json`
+- [x] R1–R2. Lectura de paquete y unidades de conocimiento
+- [x] S1–S3. Migración SQLite, bucketing y E2E con fixtures
+- [x] T1–T3. Validación real sobre `auto-design` y cierre
+
+Cerrado el 13 de agosto de 2026. Validación real (bloque T) contra una
+copia temporal de la colección real `auto-design` (51 videos, incluidos
+los 17 con `analysis.json`) con el modelo E5 real: los 51 paquetes se
+indexaron sin ningún `issue`, `doctor` reportó los cinco checks en `ok`, y
+el digest SHA-256 del árbol fuente fue idéntico antes/después de `sync`.
+Una consulta semilla nueva (`es-analysis-neumorphism-accessibility`)
+orientada específicamente a contenido de `analysis.json` produjo un bundle
+real donde una cita resolvió a una unidad `analysis_topic` con procedencia
+correcta. `design-catalog` no se validó explícitamente: su manifest no
+declara ningún video con `resources.analysis`, así que no ejercita este
+trabajo. Detalle completo en `docs/decisions.md`, sección "Soporte de
+`analysis.json` (schema 2.0): implementado y validado".
