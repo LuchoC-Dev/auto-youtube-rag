@@ -5,11 +5,11 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { test } from "node:test";
 
-import {
-  describeModelState,
-  requiredModelFiles,
-} from "../../src/infrastructure/config/model-install-state.js";
+import { describeModelState } from "../../src/infrastructure/config/model-install-state.js";
 import { E5ModelInstaller } from "../../src/infrastructure/embeddings/e5-model-installer.js";
+import { activeModelProfile } from "../../src/infrastructure/embeddings/model-profile.js";
+
+const requiredModelFiles = activeModelProfile.requiredFiles;
 
 const projectRoot = resolve(import.meta.dirname, "../..");
 const repositoryCache = join(projectRoot, ".cache", "models");

@@ -10,10 +10,10 @@ import {
   type E5DownloadOptions,
   type E5DownloadRuntime,
 } from "../../../src/infrastructure/embeddings/e5-model-installer.js";
-import {
-  readInstallReceipt,
-  requiredModelFiles,
-} from "../../../src/infrastructure/config/model-install-state.js";
+import { readInstallReceipt } from "../../../src/infrastructure/config/model-install-state.js";
+import { activeModelProfile } from "../../../src/infrastructure/embeddings/model-profile.js";
+
+const requiredModelFiles = activeModelProfile.requiredFiles;
 
 const modelDirectory = join("Xenova", "multilingual-e5-small");
 

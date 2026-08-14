@@ -9,11 +9,15 @@ import {
   readInstallReceipt,
   readModelState,
   readSourceState,
-  requiredModelFiles,
   writeInstallReceipt,
   type InstallReceipt,
 } from "../../../src/infrastructure/config/model-install-state.js";
+import {
+  activeModelProfile,
+  type EmbeddingModelProfile,
+} from "../../../src/infrastructure/embeddings/model-profile.js";
 
+const requiredModelFiles = activeModelProfile.requiredFiles;
 const modelDirectory = join("Xenova", "multilingual-e5-small");
 
 async function writeAllRequiredFiles(
@@ -136,6 +140,47 @@ void test("readSourceState reports absent when only some files exist", async () 
     await writeFile(target, "partial", "utf8");
 
     assert.equal(await readSourceState(root), "absent");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+void test("a profile with a different repository and required files is measured under its own directory, not E5's", async () => {
+  const root = await tempDir();
+  try {
+    const otherProfile: EmbeddingModelProfile = Object.freeze({
+      key: "other-model",
+      repository: "Acme/other-model",
+      revision: "main",
+      dtype: "q8",
+      dimensions: 128,
+      maxInputTokens: 256,
+      inputPrefixes: null,
+      requiredFiles: Object.freeze(["config.json", "weights.bin"]),
+    });
+    const otherDirectory = join("Acme", "other-model");
+
+    // Writing E5's required files (under E5's directory) should not satisfy
+    // the other profile's state: different directory, different files.
+    await writeAllRequiredFiles(root);
+    assert.equal(await readModelState(root, otherProfile), "absent");
+    assert.equal(await readSourceState(root, otherProfile), "absent");
+
+    for (const relativePath of otherProfile.requiredFiles) {
+      const target = join(root, otherDirectory, relativePath);
+      await mkdir(join(target, ".."), { recursive: true });
+      await writeFile(target, "other-content", "utf8");
+    }
+
+    assert.equal(await readSourceState(root, otherProfile), "complete");
+    const measured = await measureModelFiles(root, otherProfile);
+    assert.ok(measured !== null);
+    assert.equal(measured.length, otherProfile.requiredFiles.length);
+
+    // The E5 files under the default directory are still untouched and still
+    // measurable under the default (active) profile.
+    const measuredDefault = await measureModelFiles(root);
+    assert.ok(measuredDefault !== null);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

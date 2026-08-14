@@ -1,18 +1,11 @@
 import { readFile, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-/**
- * The four files the runtime needs to load the model locally. Paths are
- * relative to `<modelsPath>/Xenova/multilingual-e5-small/`.
- */
-export const requiredModelFiles: readonly string[] = Object.freeze([
-  "config.json",
-  "tokenizer.json",
-  "tokenizer_config.json",
-  "onnx/model_quantized.onnx",
-]);
+import {
+  activeModelProfile,
+  type EmbeddingModelProfile,
+} from "../embeddings/model-profile.js";
 
-const modelDirectory = "Xenova/multilingual-e5-small";
 const receiptFileName = ".install.json";
 
 export interface InstallReceiptModel {
@@ -111,35 +104,43 @@ async function fileBytes(path: string): Promise<number | null> {
   }
 }
 
-/** Byte size of each required file under `<path>/Xenova/multilingual-e5-small/`,
+/** Byte size of each required file under `<path>/<profile.repository>/`,
  * or `null` for a file that does not exist (or is not a regular file). */
 async function measureRequiredFiles(
   path: string,
+  profile: EmbeddingModelProfile,
 ): Promise<readonly (InstallReceiptFile | null)[]> {
   return Promise.all(
-    requiredModelFiles.map(async (relativePath) => {
-      const bytes = await fileBytes(join(path, modelDirectory, relativePath));
+    profile.requiredFiles.map(async (relativePath) => {
+      const bytes = await fileBytes(
+        join(path, profile.repository, relativePath),
+      );
       return bytes === null ? null : { path: relativePath, bytes };
     }),
   );
 }
 
-/** Measures the four required files under `path`. Returns `null` if any of
- * them is missing; otherwise the byte size of each, in `requiredModelFiles`
- * order. Used to build a fresh receipt after a download or a copy. */
+/** Measures the profile's required files under `path`. Returns `null` if any
+ * of them is missing; otherwise the byte size of each, in
+ * `profile.requiredFiles` order. Used to build a fresh receipt after a
+ * download or a copy. */
 export async function measureModelFiles(
   path: string,
+  profile: EmbeddingModelProfile = activeModelProfile,
 ): Promise<readonly InstallReceiptFile[] | null> {
-  const measured = await measureRequiredFiles(path);
+  const measured = await measureRequiredFiles(path, profile);
   return measured.every((file): file is InstallReceiptFile => file !== null)
     ? measured
     : null;
 }
 
 /** `--from` origins never carry a receipt, so completeness is judged purely
- * by the presence of the four required files. */
-export async function readSourceState(path: string): Promise<SourceState> {
-  const measured = await measureModelFiles(path);
+ * by the presence of the profile's required files. */
+export async function readSourceState(
+  path: string,
+  profile: EmbeddingModelProfile = activeModelProfile,
+): Promise<SourceState> {
+  const measured = await measureModelFiles(path, profile);
   return measured === null ? "absent" : "complete";
 }
 
@@ -164,9 +165,10 @@ export interface ModelStateDescription {
  */
 export async function describeModelState(
   modelsPath: string,
+  profile: EmbeddingModelProfile = activeModelProfile,
 ): Promise<ModelStateDescription> {
   const receipt = await readInstallReceipt(modelsPath);
-  const measured = await measureRequiredFiles(modelsPath);
+  const measured = await measureRequiredFiles(modelsPath, profile);
   const actualByPath = new Map(
     measured
       .filter((file): file is InstallReceiptFile => file !== null)
@@ -178,7 +180,7 @@ export async function describeModelState(
     state = actualByPath.size > 0 ? "incomplete" : "absent";
   } else {
     const matches =
-      receipt.files.length === requiredModelFiles.length &&
+      receipt.files.length === profile.requiredFiles.length &&
       receipt.files.every(
         (file) => actualByPath.get(file.path) === file.bytes,
       ) &&
@@ -192,7 +194,7 @@ export async function describeModelState(
     receipt?.files.map((file) => [file.path, file.bytes]) ?? [],
   );
   const issues: ModelStateIssue[] = [];
-  for (const relativePath of requiredModelFiles) {
+  for (const relativePath of profile.requiredFiles) {
     const actualBytes = actualByPath.get(relativePath);
     if (actualBytes === undefined) {
       issues.push({ path: relativePath, reason: "missing" });
@@ -207,6 +209,9 @@ export async function describeModelState(
   return { state, issues };
 }
 
-export async function readModelState(modelsPath: string): Promise<ModelState> {
-  return (await describeModelState(modelsPath)).state;
+export async function readModelState(
+  modelsPath: string,
+  profile: EmbeddingModelProfile = activeModelProfile,
+): Promise<ModelState> {
+  return (await describeModelState(modelsPath, profile)).state;
 }
