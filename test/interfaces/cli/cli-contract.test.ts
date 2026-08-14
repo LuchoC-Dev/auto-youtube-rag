@@ -38,10 +38,20 @@ void test("parses every non-interactive administrative command", () => {
     kind: "source_remove",
     name: "design",
   });
-  assert.deepEqual(parseCommand(["sync"]), { kind: "sync", source: null });
+  assert.deepEqual(parseCommand(["sync"]), {
+    kind: "sync",
+    source: null,
+    force: false,
+  });
   assert.deepEqual(parseCommand(["sync", "--source", "design"]), {
     kind: "sync",
     source: "design",
+    force: false,
+  });
+  assert.deepEqual(parseCommand(["sync", "--force"]), {
+    kind: "sync",
+    source: null,
+    force: true,
   });
   assert.deepEqual(parseCommand(["status"]), { kind: "status" });
   assert.deepEqual(parseCommand(["doctor"]), { kind: "doctor" });

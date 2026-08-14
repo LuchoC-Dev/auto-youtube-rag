@@ -7,6 +7,7 @@ import { EmbeddingRecord } from "../../domain/indexing/embedding-record.js";
 import {
   DocumentId,
   PackageRef,
+  type SourceName,
   SyncId,
 } from "../../domain/indexing/identifiers.js";
 import { SourceDocument } from "../../domain/indexing/source-document.js";
@@ -150,6 +151,38 @@ function issueFrom(
     message,
     retryable: false,
   });
+}
+
+/**
+ * `sync --force`'s escape hatch for a ghost run left behind by a killed
+ * process (Ctrl+C, closed terminal, power cut): marks the source's active
+ * `running` run `failed` and records a `RUN_SUPERSEDED` issue on it before
+ * `syncSource` starts a new run, so `recordRun`'s one-running-run-per-source
+ * guard does not block the new sync. A no-op when the source has no active
+ * run — `--force` on a healthy source just runs `sync` normally.
+ */
+export async function supersedeActiveRun(
+  store: IndexStore,
+  source: SourceName,
+  now: () => Date = () => new Date(),
+): Promise<void> {
+  const supersededId = await store.supersedeActiveRun(
+    source,
+    now().toISOString(),
+  );
+  if (supersededId === null) return;
+  await store.recordIssue(
+    SyncIssue.create({
+      syncId: supersededId,
+      videoId: null,
+      relativePath: null,
+      code: "RUN_SUPERSEDED",
+      message:
+        `Sync run ${supersededId.value} for source ${source.value} was ` +
+        "superseded by --force: marked failed instead of completing.",
+      retryable: false,
+    }),
+  );
 }
 
 export async function syncSource(

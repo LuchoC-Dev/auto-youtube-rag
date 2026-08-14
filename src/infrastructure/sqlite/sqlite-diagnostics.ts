@@ -1,6 +1,7 @@
 import type { DatabaseSync } from "node:sqlite";
 
 import type {
+  ActiveSyncRunSnapshot,
   DatabaseHealthSnapshot,
   DiagnosticsRepository,
   LibraryStatusSnapshot,
@@ -74,6 +75,29 @@ export class SQLiteDiagnosticsRepository implements DiagnosticsRepository {
           }
         : null,
     });
+  }
+
+  public listActiveSyncRuns(): Promise<readonly ActiveSyncRunSnapshot[]> {
+    const rows = this.database
+      .prepare(
+        `SELECT r.id, s.name AS source_name, r.started_at
+         FROM sync_runs r
+         LEFT JOIN sources s ON s.id = r.source_id
+         WHERE r.status = 'running'
+         ORDER BY r.started_at ASC, r.id ASC`,
+      )
+      .all() as unknown as {
+      readonly id: string;
+      readonly source_name: string | null;
+      readonly started_at: string;
+    }[];
+    return Promise.resolve(
+      rows.map((row) => ({
+        id: row.id,
+        sourceName: row.source_name,
+        startedAt: row.started_at,
+      })),
+    );
   }
 
   public checkHealth(): Promise<DatabaseHealthSnapshot> {

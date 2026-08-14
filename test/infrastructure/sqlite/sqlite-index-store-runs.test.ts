@@ -155,6 +155,80 @@ void test("reopens persisted package state and model summaries", async () => {
   }
 });
 
+void test("supersedeActiveRun marks the running run failed and unblocks recordRun", async () => {
+  const database = openDatabase(await databasePath());
+  try {
+    await new SQLiteSourceRegistry(database).add(source);
+    const store = new SQLiteIndexStore(database);
+
+    const running = SyncRun.start({
+      id: SyncId.create("sync:ghost"),
+      sourceName,
+      startedAt: "2026-08-11T00:00:00.000Z",
+    });
+    await store.recordRun(running);
+
+    // recordRun already refuses a second running run while the ghost is
+    // still marked running.
+    await assert.rejects(
+      store.recordRun(
+        SyncRun.start({
+          id: SyncId.create("sync:blocked"),
+          sourceName,
+          startedAt: "2026-08-11T00:05:00.000Z",
+        }),
+      ),
+      (error: unknown) => {
+        assert.ok(error instanceof SQLiteIndexStoreError);
+        assert.equal(error.code, "SYNC_ALREADY_RUNNING");
+        return true;
+      },
+    );
+
+    const supersededId = await store.supersedeActiveRun(
+      sourceName,
+      "2026-08-11T00:10:00.000Z",
+    );
+    assert.equal(supersededId?.value, "sync:ghost");
+
+    const row = database
+      .prepare("SELECT status, finished_at FROM sync_runs WHERE id = ?")
+      .get("sync:ghost");
+    assert.ok(row);
+    assert.equal(row.status, "failed");
+    assert.equal(row.finished_at, "2026-08-11T00:10:00.000Z");
+
+    // Now a new running run for the source is accepted.
+    const afterForce = SyncRun.start({
+      id: SyncId.create("sync:after-force"),
+      sourceName,
+      startedAt: "2026-08-11T00:10:01.000Z",
+    });
+    await store.recordRun(afterForce);
+    await store.recordRun(
+      afterForce.finish({
+        status: "ok",
+        finishedAt: "2026-08-11T00:11:00.000Z",
+        counters: {
+          packagesSeen: 0,
+          packagesUnchanged: 0,
+          packagesIndexed: 0,
+          packagesFailed: 0,
+          packagesDeleted: 0,
+        },
+      }),
+    );
+
+    // Nothing left to supersede once no run is running.
+    assert.equal(
+      await store.supersedeActiveRun(sourceName, "2026-08-11T00:20:00.000Z"),
+      null,
+    );
+  } finally {
+    database.close();
+  }
+});
+
 void test("rejects runs for unknown sources and issues for unknown runs", async () => {
   const database = openDatabase(await databasePath());
   try {

@@ -6,7 +6,10 @@ import type {
   ManifestVideoIssue,
   PackageSnapshot,
 } from "../../../src/application/indexing/package-snapshots.js";
-import { syncSource } from "../../../src/application/indexing/sync-source.js";
+import {
+  supersedeActiveRun,
+  syncSource,
+} from "../../../src/application/indexing/sync-source.js";
 import type { PackageSourceReader } from "../../../src/application/ports/package-source-reader.js";
 import type {
   VectorIndexChange,
@@ -19,6 +22,7 @@ import {
   VideoId,
 } from "../../../src/domain/indexing/identifiers.js";
 import { SourceRoot } from "../../../src/domain/indexing/source-root.js";
+import { SyncRun } from "../../../src/domain/indexing/sync-run.js";
 import { FakeEmbeddingGenerator } from "../../fakes/fake-embedding-generator.js";
 import { InMemoryIndexStore } from "../../fakes/in-memory-index-store.js";
 
@@ -303,4 +307,42 @@ void test("fails an unreadable manifest without deleting the previous index", as
   assert.equal(result.status, "failed");
   assert.ok(await setup.store.getPackageState(packageRef));
   assert.equal(result.counters.packagesDeleted, 0);
+});
+
+void test("supersedeActiveRun marks a ghost run failed with a RUN_SUPERSEDED issue", async () => {
+  const store = new InMemoryIndexStore();
+  // A run that started but never finished, as a killed process would leave
+  // it (Ctrl+C, closed terminal, power cut).
+  const ghost = SyncRun.start({
+    id: SyncId.create("sync:ghost"),
+    sourceName,
+    startedAt: "2026-08-11T00:00:00.000Z",
+  });
+  await store.recordRun(ghost);
+
+  await supersedeActiveRun(
+    store,
+    sourceName,
+    () => new Date("2026-08-11T00:05:00.000Z"),
+  );
+
+  const superseded = store.runs.get("sync:ghost");
+  assert.ok(superseded);
+  assert.equal(superseded.status, "failed");
+  assert.equal(superseded.finishedAt, "2026-08-11T00:05:00.000Z");
+  const issue = store.issues.find((entry) => entry.code === "RUN_SUPERSEDED");
+  assert.ok(issue);
+  assert.equal(issue.syncId.value, "sync:ghost");
+  assert.equal(issue.retryable, false);
+
+  // A source with nothing running is left untouched.
+  await supersedeActiveRun(
+    store,
+    sourceName,
+    () => new Date("2026-08-11T00:06:00.000Z"),
+  );
+  assert.equal(
+    store.issues.filter((entry) => entry.code === "RUN_SUPERSEDED").length,
+    1,
+  );
 });

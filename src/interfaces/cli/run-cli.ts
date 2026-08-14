@@ -364,7 +364,9 @@ export async function runCli(options: RunCliOptions): Promise<number> {
           }
         }
         options.stderr.write("Synchronizing registered sources...\n");
-        const results = await application.sync(command.source ?? undefined);
+        const results = await application.sync(command.source ?? undefined, {
+          force: command.force,
+        });
         const partial = results.some(
           (result) => result.status === "partial" || result.status === "failed",
         );

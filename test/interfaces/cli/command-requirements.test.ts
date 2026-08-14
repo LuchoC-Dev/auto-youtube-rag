@@ -18,7 +18,7 @@ const oneOfEachKind: readonly ParsedCliCommand[] = [
   { kind: "source_add", path: "C:\\videos", name: "design" },
   { kind: "source_list" },
   { kind: "source_remove", name: "design" },
-  { kind: "sync", source: null },
+  { kind: "sync", source: null, force: false },
   { kind: "status" },
   { kind: "doctor" },
   {

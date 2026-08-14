@@ -33,9 +33,20 @@ export interface DatabaseHealthSnapshot {
   readonly fullTextSearch: boolean;
 }
 
+/** A `running` sync run, as read by `doctor`'s `STALE_SYNC_RUN` check. Every
+ * run this lists is either genuinely in progress or a ghost left behind by
+ * a killed process (Ctrl+C, closed terminal, power cut) — `doctor` cannot
+ * tell which, so it only reports, never guesses or supersedes. */
+export interface ActiveSyncRunSnapshot {
+  readonly id: string;
+  readonly sourceName: string | null;
+  readonly startedAt: string;
+}
+
 export interface DiagnosticsRepository {
   readStatus(): Promise<LibraryStatusSnapshot>;
   checkHealth(): Promise<DatabaseHealthSnapshot>;
+  listActiveSyncRuns(): Promise<readonly ActiveSyncRunSnapshot[]>;
 }
 
 export interface ApplicationStatus extends LibraryStatusSnapshot {
