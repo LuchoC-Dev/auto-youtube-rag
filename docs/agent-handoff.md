@@ -1362,6 +1362,18 @@ defecto de 4.4 llegando por un camino nuevo. `rebuildIndex` ahora publica un
 `remove_packages` después del commit de la purga. **Si tocás la purga, mantené
 esa publicación.**
 
+**Validado contra el binario real**, no sólo con tests: copia temporal de 3
+videos reales de `auto-design` (dos con `rules.json`, uno con
+`analysis.json`), modelo E5 real. `rebuild --confirm` dejó los digests
+SHA-256 de unidades, fragmentos **y vectores** idénticos bit a bit a los de
+antes —con lote 1 el embedding es determinista también sobre datos reales—,
+preservó el historial de runs, y `doctor` quedó en `ok` con `retrieve` sin
+ningún warning. Con un run `running` inyectado, el guard rechazó el comando
+sin borrar nada. Corrompiendo un fragmento derivado a mano: `sync` respondió
+`no_changes` y lo dejó intacto, `rebuild` lo reparó. Digest del árbol fuente
+idéntico antes y después; la copia y la base temporales se borraron al
+terminar. Detalle en `docs/build.md`.
+
 Estado final: **342 tests, 0 fallos**, `npm run check` y `npm run build` en
 verde.
 

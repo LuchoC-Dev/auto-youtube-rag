@@ -356,6 +356,32 @@ embeddings—, exactamente el defecto que 4.4 había corregido, reapareciendo po
 un camino nuevo. Corregido publicando un `remove_packages` después del commit
 de la purga.
 
+**Validación contra el binario real**, no sólo con tests, sobre una copia
+temporal de 3 videos reales de `auto-design` (dos con `rules.json`, uno con
+`analysis.json`, para ejercitar ambos esquemas) y el modelo E5 real adoptado
+desde `.cache/models`:
+
+- `sync` inicial: 3 paquetes, 252 unidades, 254 fragmentos y embeddings;
+- `rebuild` sin `--confirm` → código `2`; con `--force` → código `2`
+  (`--force` no existe para este comando);
+- `rebuild --confirm`: `status: "ok"`, 3 borrados, 3 reindexados, 24 s. Los
+  digests SHA-256 de unidades, fragmentos **y vectores** quedaron idénticos
+  bit a bit a los de antes — confirmación en datos reales de que con lote 1 el
+  embedding es determinista. `sync_runs` pasó de 1 a 2: el historial se
+  preservó y se sumó el run del rebuild;
+- `doctor`: los seis checks en `ok`; `retrieve --depth focused`: `ok`, 3
+  fuentes, **sin `VECTORS_STALE` ni ningún otro warning**;
+- con un run `running` inyectado a mano, `rebuild` fue rechazado con
+  `SYNC_ALREADY_RUNNING` y código `1` **sin borrar nada** (3 paquetes y 254
+  embeddings intactos), nombrando `sync --source design --force` como salida;
+- reparación real: corrompido un fragmento derivado, `sync` respondió
+  `no_changes` y lo dejó intacto —la brecha, reproducida con el binario—,
+  y `rebuild --confirm` lo eliminó devolviendo los tres digests a su valor
+  original.
+
+El digest del árbol fuente fue idéntico antes y después de todo el
+procedimiento. La copia y la base temporales se borraron al terminar.
+
 **El punto 1 del orden de prioridad —ordenar fragmentos por longitud antes de
 lotear— se cerró sin escribir código.** Es inerte con el `batchSize = 1` que
 adoptó 4.3: el padding que el ordenamiento ataca sólo existe dentro de un lote
