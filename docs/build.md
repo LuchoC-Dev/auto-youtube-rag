@@ -8,20 +8,21 @@
 
 ---
 
-| Fase                       | N°  | Etapa                                   | Estado |  %   | Descripción                                               |
-| -------------------------- | --- | --------------------------------------- | :----: | :--: | --------------------------------------------------------- |
-| **1 — Definición**         | 1.1 | Repositorio y contexto inicial          |   ✅   | 100% | Git y decisiones documentadas                             |
-|                            | 1.2 | Contrato de CLI y salidas               |   ✅   | 100% | Comandos, formatos y códigos definidos                    |
-|                            | 1.3 | Stack y estrategia vectorial            |   ✅   | 100% | Stack y toolchain reproducible aprobados                  |
-| **2 — Implementación MVP** | 2.1 | Indexación incremental                  |   ✅   | 100% | Sync incremental y CLI verificadas                        |
-|                            | 2.2 | Recuperación híbrida                    |   ✅   | 100% | FTS5, vectores y ranking verificados                      |
-|                            | 2.3 | Ensamblado de contexto                  |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve`                |
-|                            | 2.4 | Skill general                           |   ✅   | 100% | `skill/SKILL.md` verificada en frío                       |
-| **3 — Calidad**            | 3.1 | Pruebas funcionales                     |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos                      |
-|                            | 3.2 | Evaluaciones del MVP                    |   ✅   | 100% | M, N y O completos; MVP cerrado                           |
-| **4 — Posterior al MVP**   | 4.1 | Soporte de `analysis.json` (schema 2.0) |   ✅   | 100% | Bloques P–T completos; validado contra `auto-design` real |
-|                            | 4.2 | Instalación: hogar de usuario y `init`  |   ✅   | 100% | Bloques U–Z e Y completos; validado en frío desde cero    |
-|                            | 4.3 | Seguridad de `sync` y rendimiento       |   ✅   | 100% | Guard de concurrencia, runs fantasma y lote 1 (2,23x)     |
+| Fase                       | N°  | Etapa                                   | Estado |  %   | Descripción                                                |
+| -------------------------- | --- | --------------------------------------- | :----: | :--: | ---------------------------------------------------------- |
+| **1 — Definición**         | 1.1 | Repositorio y contexto inicial          |   ✅   | 100% | Git y decisiones documentadas                              |
+|                            | 1.2 | Contrato de CLI y salidas               |   ✅   | 100% | Comandos, formatos y códigos definidos                     |
+|                            | 1.3 | Stack y estrategia vectorial            |   ✅   | 100% | Stack y toolchain reproducible aprobados                   |
+| **2 — Implementación MVP** | 2.1 | Indexación incremental                  |   ✅   | 100% | Sync incremental y CLI verificadas                         |
+|                            | 2.2 | Recuperación híbrida                    |   ✅   | 100% | FTS5, vectores y ranking verificados                       |
+|                            | 2.3 | Ensamblado de contexto                  |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve`                 |
+|                            | 2.4 | Skill general                           |   ✅   | 100% | `skill/SKILL.md` verificada en frío                        |
+| **3 — Calidad**            | 3.1 | Pruebas funcionales                     |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos                       |
+|                            | 3.2 | Evaluaciones del MVP                    |   ✅   | 100% | M, N y O completos; MVP cerrado                            |
+| **4 — Posterior al MVP**   | 4.1 | Soporte de `analysis.json` (schema 2.0) |   ✅   | 100% | Bloques P–T completos; validado contra `auto-design` real  |
+|                            | 4.2 | Instalación: hogar de usuario y `init`  |   ✅   | 100% | Bloques U–Z e Y completos; validado en frío desde cero     |
+|                            | 4.3 | Seguridad de `sync` y rendimiento       |   ✅   | 100% | Guard de concurrencia, runs fantasma y lote 1 (2,23x)      |
+|                            | 4.4 | Aviso de vectores obsoletos             |   ✅   | 100% | `VECTORS_STALE` y recarga del índice por versión de modelo |
 
 ---
 
@@ -256,3 +257,24 @@ más largo, así que uno corto costaba como uno de 511.
 
 **Paralelizar no servía**, y se midió antes de descartarlo: concurrencia 2 →
 0,99x, concurrencia 4 → 1,00x. ONNX ya satura los núcleos internamente.
+
+#### 4.4 Aviso de vectores obsoletos
+
+- [x] `VECTORS_STALE` cuando la biblioteca tiene contenido y ningún vector
+      para el modelo activo
+- [x] `VectorSearchIndex.load()` devuelve el conteo de vectores cargados
+- [x] El índice recarga al cambiar `version` o `dimensions`, no sólo `key`
+
+Cerrado el 14 de agosto de 2026. Detalle en `docs/decisions.md`, sección
+"Degradación silenciosa de la vía vectorial".
+
+Cerró el hueco anotado al investigar el soporte de otros modelos:
+`retrieve` devolvía `status: "ok"` armado sólo con búsqueda textual, sin
+aviso, cuando los vectores no correspondían al modelo activo.
+
+**Un segundo defecto tapaba al primero.** El camino rápido del índice
+comparaba sólo `model.key` —que es `e5-small` y nunca cambia— en vez de
+`version`, que codifica revisión y cuantización. Reutilizar el snapshot
+devuelve un conteo mayor que cero, así que el warning nuevo jamás habría
+disparado. Lo detectó el agente que implementaba `VECTORS_STALE` y lo
+reportó en lugar de corregirlo en silencio.

@@ -467,13 +467,10 @@ source_documents`, y la cascada `source_documents → knowledge_units →
 search_fragments → embeddings` borra los vectores de todos los modelos del
   paquete. Cada `sync` deja exactamente un modelo. Comparar dos modelos sobre
   el mismo corpus requeriría un camino de código que hoy no existe.
-- **Hueco de degradación silenciosa.** Entre cambiar el modelo y correr
-  `sync`, el loader filtra por el modelo activo y no encuentra vectores, así
-  que el índice queda vacío. Falla seguro —nunca mezcla vectores de dos
-  modelos— pero `retrieve` devuelve `status: "ok"` con sólo la vía textual y
-  sin ningún aviso. Debería emitir un warning (`EMBEDDING_MODEL_MISSING` ya
-  existe, o uno propio tipo `VECTORS_STALE`) indicando que hay que
-  reindexar.
+- ~~**Hueco de degradación silenciosa.**~~ **Corregido el 14 de agosto de 2026.** Entre cambiar el modelo y correr `sync`, el loader filtraba por el
+  modelo activo, no encontraba vectores y `retrieve` devolvía `status: "ok"`
+  con sólo la vía textual, sin aviso. Ahora emite `VECTORS_STALE`. Detalle en
+  `docs/decisions.md`, sección "Degradación silenciosa de la vía vectorial".
 
 Un LLM generativo queda descartado por definición del producto: el sistema
 necesita un vector de tamaño fijo por texto, y la decisión fundacional es que

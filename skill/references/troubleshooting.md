@@ -55,12 +55,31 @@ cambiar nada vuelve a fallar igual.
 
 Aparte, en los `warnings` de `retrieve`:
 
-| Código                    | Qué significa                                                                  |
-| ------------------------- | ------------------------------------------------------------------------------ |
-| `EMBEDDING_MODEL_MISSING` | La vía vectorial se degradó; el bundle igual se produce, sólo con vía textual. |
+| Código                      | Qué significa                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| `EMBEDDING_MODEL_MISSING`   | La vía vectorial se degradó; el bundle igual se produce, sólo con vía textual. |
+| `VECTOR_SEARCH_UNAVAILABLE` | La vía vectorial falló con error; el bundle se armó sólo con búsqueda textual. |
+| `TEXT_SEARCH_UNAVAILABLE`   | La vía textual falló; el bundle se armó sólo con búsqueda semántica.           |
+| `VECTORS_STALE`             | La biblioteca tiene contenido pero **ningún vector** para el modelo activo.    |
 
-El bundle sirve, pero se armó sólo con búsqueda textual. Decilo si vas a
-apoyarte en esa evidencia.
+En los tres primeros el bundle sirve, pero se armó con una sola vía. Decilo
+si vas a apoyarte en esa evidencia.
+
+**`VECTORS_STALE` merece atención aparte.** Significa que la búsqueda
+semántica no participó en absoluto: los resultados salieron sólo de
+coincidencia léxica, así que la cobertura es bastante peor de lo normal. Pasa
+cuando los vectores no corresponden al modelo activo, típicamente porque la
+biblioteca se indexó con otro modelo y todavía no se regeneró.
+
+Se resuelve reindexando:
+
+```text
+auto-youtube-rag sync
+```
+
+Hasta entonces podés usar el bundle, pero **avisá en tu respuesta que la
+búsqueda semántica no participó**: puede faltar contenido relevante que la
+coincidencia léxica no alcanza a encontrar.
 
 ## `sync` falló parcialmente
 
@@ -75,7 +94,7 @@ No intentes reparar nada a mano.
 ## `sync` parece colgado
 
 Antes de asumir que falló, leé la sección de `sync` en `SKILL.md`: la primera
-indexación de una colección grande tarda entre 10 y 15 minutos, y eso es
+indexación de una colección grande tarda entre 5 y 10 minutos, y eso es
 normal.
 
 No uses el conteo de videos de `status` como señal de progreso: mientras un
