@@ -78,14 +78,32 @@ Antes de asumir que falló, leé la sección de `sync` en `SKILL.md`: la primera
 indexación de una colección grande tarda entre 10 y 15 minutos, y eso es
 normal.
 
-Dos cosas que **no** debés hacer mientras haya un `sync` corriendo:
+No uses el conteo de videos de `status` como señal de progreso: mientras un
+`sync` está en curso puede subir y bajar. La única señal fiable de que
+terminó es el recibo JSON del propio comando.
 
-- lanzar un segundo `sync` — no hay ningún bloqueo que te lo impida, y dos
-  procesos sobre la misma base producen conteos inconsistentes;
-- usar el conteo de videos de `status` como señal de progreso — mientras un
-  `sync` está en curso puede subir y bajar.
+Un segundo `sync` simultáneo ya no es posible: el producto lo rechaza con
+`SYNC_ALREADY_RUNNING`.
 
-La única señal fiable de que terminó es el recibo JSON del propio comando.
+## `SYNC_ALREADY_RUNNING`
+
+Hay un run activo para esa fuente. Dos casos:
+
+1. **Un `sync` sigue trabajando de verdad.** Esperá su recibo JSON. No
+   fuerces nada.
+2. **Un `sync` anterior murió** (Ctrl+C, terminal cerrada, corte) y dejó su
+   registro marcado como activo. `doctor` lo reporta como `STALE_SYNC_RUN`
+   con su antigüedad. Para destrabarlo:
+
+   ```text
+   auto-youtube-rag sync --force
+   ```
+
+   Marca el run abandonado como fallido —dejando un issue `RUN_SUPERSEDED`
+   como constancia— y arranca uno nuevo.
+
+La antigüedad que informa `doctor` es la señal para distinguir los dos casos:
+un run de minutos probablemente siga vivo; uno de horas, no.
 
 ## Verificar integridad
 
