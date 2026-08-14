@@ -23,6 +23,7 @@
 |                            | 4.2 | Instalación: hogar de usuario y `init`  |   ✅   | 100% | Bloques U–Z e Y completos; validado en frío desde cero     |
 |                            | 4.3 | Seguridad de `sync` y rendimiento       |   ✅   | 100% | Guard de concurrencia, runs fantasma y lote 1 (2,23x)      |
 |                            | 4.4 | Aviso de vectores obsoletos             |   ✅   | 100% | `VECTORS_STALE` y recarga del índice por versión de modelo |
+|                            | 4.5 | Perfil de modelo de embeddings          |   ✅   | 100% | Bloques AA–AD completos; validado sin reindexar            |
 
 ---
 
@@ -280,3 +281,44 @@ comparaba sólo `model.key` —que es `e5-small` y nunca cambia— en vez de
 devuelve un conteo mayor que cero, así que el warning nuevo jamás habría
 disparado. Lo detectó el agente que implementaba `VECTORS_STALE` y lo
 reportó en lugar de corregirlo en silencio.
+
+#### 4.5 Perfil de modelo de embeddings
+
+Diseño en `docs/model-profile-design.md`, checklist fino en
+`docs/model-profile-tasks.md` (bloques AA–AD). Origen: los prefijos
+`passage: `/`query: ` de la familia E5 se aplicaban siempre, sin excepción,
+en `e5-embedding-generator.ts`; con otro modelo (MiniLM, BGE, Jina) degradan
+la calidad **sin ningún error**, el hueco que quedó anotado al investigar el
+punto 4.2 y que el usuario fijó como frente número 1 el 14 de agosto de 2026.
+
+- [x] AA. `model-profile.ts`: `EmbeddingModelProfile`, `activeModelProfile`
+      congelado, `modelVersion` y `modelDescriptorOf`
+- [x] AB. El generador aplica prefijos según el perfil inyectado;
+      `countTokens` y `embedDocuments` comparten la misma política de
+      prefijado
+- [x] AC. `model-install-state.ts` y el instalador consumen el perfil; mueren
+      los duplicados de `modelDirectory` y `requiredModelFiles`
+- [x] AD. Rename del adaptador y del instalador, validación real sin
+      reindexar, cierre de documentación
+
+Cerrado el 14 de agosto de 2026.
+
+`"Xenova/multilingual-e5-small"` pasó de estar escrito tres veces en `src/` a
+aparecer una sola vez, en `model-profile.ts`. `E5EmbeddingGenerator` y
+`E5ModelInstaller` se renombraron a `TransformersEmbeddingGenerator` y
+`TransformersModelInstaller` —ya no son específicos de E5—, sin cambiar los
+valores de ningún código de error público.
+
+**La decisión con más riesgo era no reindexar nada.** `modelVersion(profile)`
+pliega la política de prefijos en el `version` persistido (sufijo
+`+noprefix` sin prefijos), pero con el perfil activo produce, carácter por
+carácter, el mismo literal que ya existía:
+`"Xenova/multilingual-e5-small@main:q8"`. Un test de regresión fija ese
+literal. Validado además contra el binario real (AD3): sobre una copia
+temporal de 3 videos reales de `auto-design` ya sincronizados con el código
+anterior, `sync` con el código de 4.5 devolvió `status: "no_changes"`,
+`packagesIndexed: 0`; `retrieve` no mostró `VECTORS_STALE` ni ningún otro
+warning, confirmando que los vectores viejos siguen siendo válidos; `doctor`
+reportó los seis checks en `ok`; y el digest SHA-256 del árbol fuente fue
+idéntico antes y después. Detalle completo en `docs/decisions.md`, sección
+"Perfil de modelo y política de prefijos".

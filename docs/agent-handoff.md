@@ -10,8 +10,8 @@ y el siguiente bloque recomendado.
 
 Estado de referencia: **14 de agosto de 2026**, después de cerrar los puntos
 4.2 —instalación: hogar de usuario, `init` instalador y preflight—, 4.3
-—seguridad de `sync` y rendimiento de indexación— y 4.4 —aviso de vectores
-obsoletos.
+—seguridad de `sync` y rendimiento de indexación—, 4.4 —aviso de vectores
+obsoletos— y 4.5 —perfil de modelo de embeddings y política de prefijos.
 
 **Lo que más probablemente contradiga tu memoria de sesiones viejas**, en
 orden de impacto:
@@ -39,30 +39,34 @@ implementados, probados y anunciados como disponibles; las evaluaciones de
 recuperación y ensamblado están corridas sobre la colección real con
 resultado documentado. Además, `auto-youtube-rag` ahora indexa y recupera
 `analysis.json` (schema 2.0) de punta a punta, validado contra los 17 videos
-reales de `auto-design` que lo usan. No hay ningún bloque abierto en
-`docs/build.md`. El trabajo que sigue —si el usuario lo pide— es
-explícitamente posterior al MVP (ver "Trabajo posterior razonable, fuera de
-este MVP" más abajo), no un pendiente urgente.
+reales de `auto-design` que lo usan. La identidad del modelo de embeddings y
+su política de prefijos ya son un dato explícito e inyectable
+(`EmbeddingModelProfile`), en vez de constantes hardcodeadas específicas de
+E5 — el frente número 1 del orden de prioridad que el usuario fijó el 14 de
+agosto ya está cerrado. No hay ningún bloque abierto en `docs/build.md`. El
+trabajo que sigue —si el usuario lo pide— es explícitamente posterior al MVP
+(ver "Trabajo posterior razonable, fuera de este MVP" más abajo), no un
+pendiente urgente.
 
 ## Datos rápidos
 
-| Dato                      | Valor                                                                        |
-| ------------------------- | ---------------------------------------------------------------------------- |
-| Proyecto                  | `auto-youtube-rag`                                                           |
-| Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag`     |
-| Rama actual               | `main`                                                                       |
-| Remoto                    | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (privado)                |
-| Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.3 |
-| Estado Git al cerrar      | Worktree limpio                                                              |
-| Runtime                   | Node.js 24.19.0 LTS, ESM                                                     |
-| Lenguaje                  | TypeScript 6.0.3 estricto                                                    |
-| Persistencia              | SQLite mediante `node:sqlite`                                                |
-| Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`           |
-| Dimensión                 | 384                                                                          |
-| Instalación               | `auto-youtube-rag init` → `~/.auto-youtube-rag/` (base + modelo, ~130 MB)    |
-| Operación                 | Exclusivamente local; sin APIs externas                                      |
-| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1–4.3 al 100% en `docs/build.md`             |
-| Próximo punto             | Ninguno abierto; ver "Trabajo posterior razonable" al final                  |
+| Dato                      | Valor                                                                                                      |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Proyecto                  | `auto-youtube-rag`                                                                                         |
+| Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag`                                   |
+| Rama actual               | `main`                                                                                                     |
+| Remoto                    | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (privado)                                              |
+| Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.5                               |
+| Estado Git al cerrar      | Worktree limpio                                                                                            |
+| Runtime                   | Node.js 24.19.0 LTS, ESM                                                                                   |
+| Lenguaje                  | TypeScript 6.0.3 estricto                                                                                  |
+| Persistencia              | SQLite mediante `node:sqlite`                                                                              |
+| Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`                                         |
+| Dimensión                 | 384                                                                                                        |
+| Instalación               | `auto-youtube-rag init` → `~/.auto-youtube-rag/` (base + modelo, ~130 MB)                                  |
+| Operación                 | Exclusivamente local; sin APIs externas                                                                    |
+| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1–4.5 al 100% en `docs/build.md`                                           |
+| Próximo punto             | Ninguno abierto; siguiente frente sugerido: lotear ordenando por longitud (ver "Orden de prioridad" abajo) |
 
 **Cambió el 14 de agosto de 2026.** Hasta entonces todo el proyecto vivía en
 una rama llamada `feat/sqlite-vec-benchmark` —nombre heredado de un benchmark
@@ -414,17 +418,32 @@ Filesystem (`src/infrastructure/filesystem/`):
   explícito si el directorio del `request_id` ya existe en vez de mezclar
   archivos.
 
-Embeddings (`src/infrastructure/embeddings/e5-embedding-generator.ts`):
+Embeddings (`src/infrastructure/embeddings/`, renombrado en el punto 4.5):
 
-- `E5EmbeddingGenerator` carga perezosamente;
-- prefijos E5: `passage:` y `query:` (el prefijo `query:` lo aplica el
-  adaptador dentro de `embedQuery`; el caso de uso de recuperación pasa el
-  texto crudo);
-- límite declarado: 512 tokens;
-- lotes configurables;
-- vectores normalizados y validados;
-- runtime forzado a local mediante `env.allowRemoteModels = false` y
-  `env.cacheDir` antes de crear el pipeline.
+- `model-profile.ts` (nuevo en 4.5): `EmbeddingModelProfile`,
+  `EmbeddingInputPrefixes`, el perfil activo congelado `activeModelProfile`,
+  `modelVersion(profile)` y `modelDescriptorOf(profile)`. No importa nada:
+  ni Transformers.js, ni `node:fs`, ni otro módulo del proyecto. Es la única
+  fuente de la identidad del modelo (repositorio, revisión, `dtype`,
+  dimensiones, `maxInputTokens`, `requiredFiles`) y de su política de
+  prefijos. `"Xenova/multilingual-e5-small"` aparece una sola vez en todo
+  `src/`, acá.
+- `transformers-embedding-generator.ts` (antes `e5-embedding-generator.ts`):
+  `TransformersEmbeddingGenerator` carga perezosamente y recibe
+  `profile?: EmbeddingModelProfile` con default `activeModelProfile`; los
+  prefijos se aplican según `profile.inputPrefixes` (`null` = sin prefijo,
+  texto crudo), y `countTokens`/`embedDocuments` comparten la misma función
+  de prefijado; límite declarado: `profile.maxInputTokens` (512 con el
+  perfil activo); lotes configurables; vectores normalizados y validados;
+  runtime forzado a local mediante `env.allowRemoteModels = false` y
+  `env.cacheDir` antes de crear el pipeline. Tipos renombrados:
+  `EmbeddingAdapterError`/`...ErrorCode`, `EmbeddingSession`,
+  `EmbeddingRuntime`, `EmbeddingRuntimeLoadOptions` (antes con prefijo `E5`).
+  Los **valores** de los códigos de error no cambiaron.
+- `transformers-model-installer.ts` (antes `e5-model-installer.ts`):
+  `TransformersModelInstaller` recibe el perfil igual que el generador;
+  tipos renombrados `ModelDownloadRuntime`/`ModelDownloadOptions` (antes
+  `E5DownloadRuntime`/`E5DownloadOptions`).
 
 SQLite (`src/infrastructure/sqlite/`):
 
@@ -1167,6 +1186,52 @@ colección real candidata; en disco vive como `catalog-design` bajo
 `ai-transcripcion/`) no se usó para esta validación: su manifest no declara
 ningún video con `resources.analysis`.
 
+## Punto 4.5 completado — perfil de modelo de embeddings
+
+Cerrado el 14 de agosto de 2026. Diseño en `docs/model-profile-design.md`,
+checklist fino en `docs/model-profile-tasks.md` (bloques AA–AD). Origen: los
+prefijos `passage:`/`query:` de E5 se aplicaban siempre, sin excepción, y
+degradaban en silencio cualquier otro modelo — hueco anotado al investigar
+4.2, fijado como frente número 1 el 14 de agosto.
+
+Qué cambió en `src/` (ver también la sección de inventario más arriba):
+
+- Nace `model-profile.ts`: `EmbeddingModelProfile`, `activeModelProfile`
+  congelado, `modelVersion(profile)` y `modelDescriptorOf(profile)`. No
+  importa nada de fuera. `"Xenova/multilingual-e5-small"` pasó de tres
+  copias en `src/` a una sola.
+- El generador y el instalador reciben el perfil por inyección, con
+  `activeModelProfile` como default; ningún llamador de producto
+  (`create-application.ts`, `run-cli.ts`) pasa perfil explícito.
+  `countTokens` y `embedDocuments` comparten la misma función de prefijado.
+- `model-install-state.ts` recibe el perfil (o `repository`/`requiredFiles`)
+  en vez de leer constantes de módulo propias.
+- Rename: `E5EmbeddingGenerator` → `TransformersEmbeddingGenerator`,
+  `E5ModelInstaller` → `TransformersModelInstaller`, con sus archivos y
+  tipos. Los valores de los códigos de error públicos no cambiaron.
+
+**La decisión de mayor riesgo:** la política de prefijos participa de
+`modelVersion`, así que apagar los prefijos algún día invalida y reindexa
+automáticamente por diseño, pero con el perfil activo el literal de
+`version` no se movió un carácter
+(`"Xenova/multilingual-e5-small@main:q8"`), fijado con un test de regresión.
+Validado contra el binario real (no sólo tests): sobre una copia temporal de
+3 videos reales de `auto-design` ya sincronizados con el código anterior a
+4.5, `sync` con el código nuevo devolvió `status: "no_changes"`,
+`packagesIndexed: 0`; `retrieve` no mostró `VECTORS_STALE` ni ningún otro
+warning; `doctor` reportó los seis checks en `ok`; el digest SHA-256 del
+árbol fuente fue idéntico antes y después. La copia y la base temporal se
+borraron al terminar.
+
+Hallazgo colateral, anotado en `docs/decisions.md`, no un pendiente:
+`parseManifest` rechaza un `manifest.json` con BOM UTF-8
+(`MANIFEST_JSON_INVALID`) — apareció por cómo PowerShell escribió el
+manifest de prueba, no afecta a los manifests reales de la skill productora.
+
+`skill/SKILL.md` no se tocó: nada observable cambió para un agente
+consumidor. Estado final: **325 tests, 0 fallos**, `npm run check` y
+`npm run build` en verde, smoke real del modelo en verde.
+
 ## MVP completo — cierre y trabajo posterior
 
 Con 3.2 cerrado, `docs/build.md` marca 2.1, 2.2, 2.3, 2.4, 3.1 y 3.2 al
@@ -1175,27 +1240,31 @@ incremental, recuperación híbrida, ensamblado de contexto citado, comando
 `retrieve`, skill portable para agentes, pruebas funcionales y evaluación en
 dos capas sobre la colección real.
 
-Después del MVP se cerraron cuatro puntos más, todos originados en corridas
-de verificación en frío: 4.1 (`analysis.json`), 4.2 (instalación), 4.3
-(seguridad de `sync` y rendimiento) y 4.4 (aviso de vectores obsoletos).
+Después del MVP se cerraron cinco puntos más, todos originados en corridas de
+verificación en frío o en investigación de sus hallazgos: 4.1
+(`analysis.json`), 4.2 (instalación), 4.3 (seguridad de `sync` y
+rendimiento), 4.4 (aviso de vectores obsoletos) y 4.5 (perfil de modelo de
+embeddings y política de prefijos).
 
 ### Orden de prioridad fijado por el usuario el 14 de agosto de 2026
 
 Este orden ya está decidido. **No vuelvas a preguntarlo**; si el usuario
 cambia de idea lo dirá.
 
-1. **Prefijos E5 hardcodeados.** `passage:` y `query:` se aplican siempre en
-   `e5-embedding-generator.ts`. Son específicos de la familia E5: con MiniLM,
-   Jina o BGE degradan la calidad **sin ningún error**. El arnés de
-   benchmarks ya lo contempla con un flag `e5Prefixes` en su
-   `ModelDefinition`; el producto no. Mover los prefijos al descriptor del
-   modelo es el trabajo real de "modelo configurable" — la dimensión y la
-   reindexación automática ya funcionan. Detalle en `docs/install-design.md`
-   → "Nota: qué haría falta para soportar otro modelo".
-2. **Ordenar fragmentos por longitud antes de lotear.** Medido en 1,93x,
+~~1. **Prefijos E5 hardcodeados.**~~ **Cerrado el 14 de agosto de 2026 como
+punto 4.5.** `passage:` y `query:` ya no se aplican incondicionalmente:
+`EmbeddingModelProfile.inputPrefixes` los hace un dato explícito
+(`null` = sin prefijo), inyectable en el generador y en el instalador con el
+perfil activo como default. La política de prefijos participa de
+`modelVersion`, así que un cambio futuro de política dispara reindexación
+automática; con el perfil activo hoy no cambió nada y no se reindexó
+(validado contra el binario real). Detalle en `docs/decisions.md`, sección
+"Perfil de modelo y política de prefijos", y en `docs/model-profile-design.md`.
+
+1. **Ordenar fragmentos por longitud antes de lotear.** Medido en 1,93x,
    menos que el lote 1 que ya se adoptó, y más complejo. Sólo tiene sentido
    si aparece un motivo para volver a lotear. Ver `docs/sync-safety-design.md`.
-3. **Comando `rebuild --confirm`**, cuyo contrato ya está aprobado en
+2. **Comando `rebuild --confirm`**, cuyo contrato ya está aprobado en
    `cli-contract.md` y nunca se implementó; luego **MCP, interfaz web y
    soporte de paquetes de páginas web**, fuera de alcance desde
    `product-spec.md` original.
@@ -1227,13 +1296,14 @@ están en el orden de arriba:
    La rama es `main` y tiene remoto privado: **no pushees sin pedido
    explícito**.
 2. Ejecutar `npm.cmd run check` y `npm.cmd run build`. La referencia al
-   cerrar el 14 de agosto: **315 tests, 0 fallos**.
-3. Leer los documentos del orden de lectura, incluidos los tres diseños
-   posteriores al MVP: `install-design.md`, `install-tasks.md` y
-   `sync-safety-design.md`.
-4. **El siguiente frente ya está decidido**: los prefijos E5 hardcodeados,
-   punto 1 del orden de prioridad de arriba. No preguntes qué priorizar; el
-   usuario lo fijó el 14 de agosto.
+   cerrar el punto 4.5, el 14 de agosto: **325 tests, 0 fallos**.
+3. Leer los documentos del orden de lectura, incluidos los cuatro diseños
+   posteriores al MVP: `install-design.md`, `install-tasks.md`,
+   `sync-safety-design.md` y `model-profile-design.md`.
+4. **El siguiente frente ya está decidido**: ordenar fragmentos por longitud
+   antes de lotear (punto 1 del orden de prioridad de arriba, antes punto 2 —
+   el punto 1 anterior, los prefijos E5 hardcodeados, se cerró como 4.5). No
+   preguntes qué priorizar; el usuario lo fijó el 14 de agosto.
 5. Proponer diseño y checklist fino **antes** de implementar, siguiendo el
    patrón de `retrieval-design.md` / `install-design.md` /
    `sync-safety-design.md`, y esperar aprobación explícita.
@@ -1269,17 +1339,27 @@ Prompt sugerido para retomar:
 
 > Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero
 > el estado del repositorio y las pruebas. El MVP está completo, y también
-> los puntos 4.1 a 4.4: soporte de `analysis.json`, instalación con hogar de
-> usuario, seguridad de `sync` con guard de concurrencia, y aviso de vectores
-> obsoletos. No hay pendientes de decisión. El siguiente frente ya está
-> decidido: los prefijos E5 hardcodeados. Propone diseño y checklist antes de
-> implementar nada.
+> los puntos 4.1 a 4.5: soporte de `analysis.json`, instalación con hogar de
+> usuario, seguridad de `sync` con guard de concurrencia, aviso de vectores
+> obsoletos y perfil de modelo de embeddings (prefijos ya no hardcodeados).
+> No hay pendientes de decisión. El siguiente frente ya está decidido:
+> ordenar fragmentos por longitud antes de lotear. Propone diseño y
+> checklist antes de implementar nada.
 
 ## Historial reciente relevante
 
-Los veinticuatro commits más recientes; el historial completo tiene 136.
+Los commits más recientes.
 
 ```text
+eb12309 fix(embeddings): name the loaded model from the profile, not a literal
+53545b8 refactor(embeddings): rename E5ModelInstaller to TransformersModelInstaller
+faa04fb refactor(embeddings): rename E5EmbeddingGenerator to TransformersEmbeddingGenerator
+a0ce77f refactor(embeddings): installer consumes the profile, duplicates die
+dc2e580 refactor(install): model-install-state accepts the embedding profile
+e3b7d5d feat(embeddings): apply prefix policy from the injected model profile
+8738de5 docs(embeddings): design the model profile and its task checklist
+4291bbf feat(embeddings): add model profile as single source of truth
+be4ebff docs(handoff): hand over with the priority order and what the session taught
 73b59aa fix(sync): close the cross-process race by locking before the check
 fb2b02c docs(retrieval): close point 4.4 and teach the skill VECTORS_STALE
 d7b5df0 fix(vector-search): reload the snapshot when the model version changes

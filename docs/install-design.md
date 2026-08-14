@@ -452,15 +452,30 @@ dejó claro y conviene no volver a investigarlo desde cero.
 
 **Lo que falta:**
 
-- La identidad del modelo son constantes de módulo en
+- ~~La identidad del modelo son constantes de módulo en
   `e5-embedding-generator.ts` (`modelRepository`, `modelRevision`,
-  `modelDtype`, `modelDescriptor`). Cambiar de modelo es cambiar código.
-- **Los prefijos E5 (`passage: ` / `query: `) están hardcodeados** y se
+  `modelDtype`, `modelDescriptor`). Cambiar de modelo es cambiar código.~~
+  **Corregido el 14 de agosto de 2026.** Nace
+  `src/infrastructure/embeddings/model-profile.ts` con
+  `EmbeddingModelProfile` y el perfil activo congelado `activeModelProfile`;
+  el generador (renombrado `TransformersEmbeddingGenerator`) y el instalador
+  (renombrado `TransformersModelInstaller`) lo reciben por inyección, con
+  ese perfil como default. `"Xenova/multilingual-e5-small"` aparece ahora una
+  sola vez en todo `src/`. Detalle en `docs/decisions.md`, sección "Perfil de
+  modelo y política de prefijos".
+- ~~**Los prefijos E5 (`passage: ` / `query: `) están hardcodeados** y se
   aplican siempre. Son específicos de la familia E5: con MiniLM, Jina o BGE
   degradan la calidad **sin ningún error**. El arnés de benchmarks ya
   contempla esto con un flag `e5Prefixes` en su `ModelDefinition`; el
   producto no. Mover los prefijos al descriptor del modelo es el trabajo real
-  de "modelo configurable", no la dimensión.
+  de "modelo configurable", no la dimensión.~~ **Corregido el 14 de agosto de 2026.** `EmbeddingModelProfile.inputPrefixes` es `EmbeddingInputPrefixes |
+null` — `null` es explícito ("este modelo no lleva prefijos"), no un
+  default olvidado. `countTokens` y `embedDocuments` comparten la misma
+  política de prefijado. La política participa de `modelVersion(profile)`
+  (sufijo `+noprefix` sin prefijos), así que un perfil futuro sin prefijos
+  invalida y reindexa automáticamente; con el perfil activo el literal de
+  `version` no cambió, así que nada se reindexó al implementar esto (validado
+  en AD3 de `docs/model-profile-tasks.md`). Detalle en `docs/decisions.md`.
 - **Dos modelos no conviven en la práctica**, aunque el esquema lo permita
   (`PRIMARY KEY (fragment_id, model_key)`). `applyPackage` hace `DELETE FROM
 source_documents`, y la cascada `source_documents → knowledge_units →
