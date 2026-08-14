@@ -338,7 +338,7 @@ export class TransformersEmbeddingGenerator implements EmbeddingGenerator {
         this.sessionPromise = undefined;
         throw new EmbeddingAdapterError(
           "MODEL_LOAD_FAILED",
-          `E5 Small could not be loaded from ${this.cacheDir}. Run "auto-youtube-rag models install" first.`,
+          `${this.profile.repository} could not be loaded from ${this.cacheDir}. Run "auto-youtube-rag models install" first.`,
           { cause },
         );
       });
