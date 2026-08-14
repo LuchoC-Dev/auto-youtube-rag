@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { afterEach, test } from "node:test";
 
 import {
@@ -261,6 +262,58 @@ void test("rejects runs for unknown sources and issues for unknown runs", async 
       },
     );
   } finally {
+    database.close();
+  }
+});
+
+void test("recordRun takes the write lock before checking for an active run", async () => {
+  // The check and the insert must be one atomic step. Without it, two
+  // operating-system processes both read "no active run" before either
+  // writes, both start syncing, and two overlapping runs empty the source.
+  // Two connections to the same file reproduce that: while one holds the
+  // write lock, the other must be refused rather than proceed to insert.
+  const path = await databasePath();
+  const database = openDatabase(path);
+  const contender = new DatabaseSync(path, { timeout: 200 });
+  try {
+    await new SQLiteSourceRegistry(database).add(source);
+    const store = new SQLiteIndexStore(contender);
+
+    database.exec("BEGIN IMMEDIATE");
+    try {
+      await assert.rejects(
+        store.recordRun(
+          SyncRun.start({
+            id: SyncId.create("sync:contended"),
+            sourceName,
+            startedAt: "2026-08-11T00:00:00.000Z",
+          }),
+        ),
+        "a blocked writer must fail, never fall through to the insert",
+      );
+    } finally {
+      database.exec("ROLLBACK");
+    }
+
+    // The refusal must leave no transaction open on the losing connection,
+    // or every later write on it would fail too.
+    await store.recordRun(
+      SyncRun.start({
+        id: SyncId.create("sync:after-contention"),
+        sourceName,
+        startedAt: "2026-08-11T00:01:00.000Z",
+      }),
+    );
+    const rows = contender
+      .prepare("SELECT id FROM sync_runs ORDER BY id")
+      .all() as unknown as readonly { readonly id: string }[];
+    assert.deepEqual(
+      rows.map((row) => row.id),
+      ["sync:after-contention"],
+      "the contended run must not have been written",
+    );
+  } finally {
+    contender.close();
     database.close();
   }
 });

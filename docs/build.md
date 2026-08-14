@@ -236,6 +236,8 @@ corrida en frío del 13 de agosto.
 - [x] AA. Guard de concurrencia en el store y regresión del borrado cruzado
 - [x] AB. `sync --force`, `RUN_SUPERSEDED` y `doctor` con `STALE_SYNC_RUN`
 - [x] AC. `defaultBatchSize` de 16 a 1
+- [x] AD. Cierre de la carrera entre procesos: `recordRun` bajo
+      `BEGIN IMMEDIATE` (14 de agosto, posterior al cierre inicial de 4.3)
 
 Cerrado el 14 de agosto de 2026.
 

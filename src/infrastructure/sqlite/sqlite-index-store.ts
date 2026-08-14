@@ -537,17 +537,35 @@ export class SQLiteIndexStore implements IndexStore {
     }
   }
 
+  /**
+   * The one-running-run-per-source check and the write that follows it run
+   * inside a single `BEGIN IMMEDIATE`.
+   *
+   * Checking and then inserting without it leaves a window where two
+   * operating-system processes both read "no active run" before either
+   * writes, so both start syncing — and two overlapping runs empty the
+   * source, since each deletes the packages it did not claim itself.
+   * `BEGIN IMMEDIATE` takes the write lock before the read, so the second
+   * process waits (up to the 5 s `busy_timeout` set in `open-database.ts`),
+   * then sees the first run and is rejected. The guard stops being advisory
+   * and becomes an actual guarantee.
+   */
   public recordRun(run: SyncRun): Promise<void> {
+    let started = false;
+    let committed = false;
     try {
+      // Inside the try: acquiring the lock can fail (another process holds
+      // it past `busy_timeout`), and that must reject the returned promise
+      // rather than throw synchronously out of a method typed Promise<void>.
+      this.database.exec("BEGIN IMMEDIATE");
+      started = true;
       const source = this.database
         .prepare("SELECT id FROM sources WHERE name = ?")
         .get(run.sourceName.value) as { readonly id: number } | undefined;
       if (source === undefined) {
-        return rejected(
-          new SQLiteIndexStoreError(
-            "UNKNOWN_SOURCE",
-            `Source ${run.sourceName.value} is not registered.`,
-          ),
+        throw new SQLiteIndexStoreError(
+          "UNKNOWN_SOURCE",
+          `Source ${run.sourceName.value} is not registered.`,
         );
       }
 
@@ -563,13 +581,11 @@ export class SQLiteIndexStore implements IndexStore {
           )
           .get(source.id, run.id.value) as ActiveRunRow | undefined;
         if (active !== undefined) {
-          return rejected(
-            new SQLiteIndexStoreError(
-              "SYNC_ALREADY_RUNNING",
-              `Sync run ${active.id} for source ${run.sourceName.value} is ` +
-                `already running (started at ${active.started_at}). Run ` +
-                `"auto-youtube-rag sync --force" to supersede it.`,
-            ),
+          throw new SQLiteIndexStoreError(
+            "SYNC_ALREADY_RUNNING",
+            `Sync run ${active.id} for source ${run.sourceName.value} is ` +
+              `already running (started at ${active.started_at}). Run ` +
+              `"auto-youtube-rag sync --force" to supersede it.`,
           );
         }
       }
@@ -594,9 +610,13 @@ export class SQLiteIndexStore implements IndexStore {
           run.finishedAt,
           JSON.stringify(run.counters),
         );
+      this.database.exec("COMMIT");
+      committed = true;
       return Promise.resolve();
     } catch (error: unknown) {
       return rejected(error);
+    } finally {
+      if (started && !committed) this.database.exec("ROLLBACK");
     }
   }
 

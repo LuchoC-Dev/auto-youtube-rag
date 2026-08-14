@@ -76,12 +76,12 @@ tiene que sostenerse aunque mañana otro camino inicie un sync.
 `recordRun` rechaza registrar un run `running` para una fuente que ya tiene
 otro `running`, con `SQLiteIndexStoreError` de código `SYNC_ALREADY_RUNNING`.
 
-Esto **no** elimina la carrera real entre dos procesos del sistema operativo
-—dos `recordRun` simultáneos podrían pasar ambos—, pero `sync_runs` está en
-la misma base y `node:sqlite` serializa las escrituras, así que la ventana es
-de microsegundos y el caso que importa (un usuario o agente lanzando un
-segundo sync mientras ve correr el primero) queda cubierto. Un lock real de
-base de datos queda fuera de alcance y se registra como tal.
+**Actualización del 14 de agosto de 2026:** la versión original comprobaba y
+después insertaba sin atomicidad, así que no eliminaba la carrera entre dos
+procesos del sistema operativo. Se cerró envolviendo el chequeo y la
+escritura en un único `BEGIN IMMEDIATE`, que toma el lock antes de leer. Ver
+`docs/decisions.md`, sección "Cierre de la carrera entre procesos en
+`recordRun`".
 
 ## Parte 2 — Tamaño de lote de embeddings
 

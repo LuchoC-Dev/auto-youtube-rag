@@ -547,11 +547,11 @@ Decisiones cerradas:
 
 Limitaciones declaradas, no ocultas:
 
-- El guard **no** elimina la carrera entre dos procesos del sistema
-  operativo: dos `recordRun` simultáneos podrían pasar los dos. `node:sqlite`
-  serializa las escrituras, así que la ventana es de microsegundos y el caso
-  real —alguien lanzando un segundo sync mientras ve correr el primero—
-  queda cubierto. Un lock de base entre procesos queda fuera de alcance.
+- ~~El guard no elimina la carrera entre dos procesos del sistema
+  operativo.~~ **Cerrado el 14 de agosto de 2026**, ver "Cierre de la carrera
+  entre procesos" más abajo. La versión original comprobaba y después
+  insertaba sin atomicidad, así que dos procesos podían leer "no hay run
+  activo" antes de que ninguno escribiera.
 - `supersedeActiveRun` hace un `UPDATE` directo en vez de reconstruir un
   `SyncRun` y pasarlo por `recordRun`, así que no atraviesa la máquina de
   estados del dominio. Fija `status` y `finished_at` juntos, de modo que la
@@ -627,6 +627,46 @@ Fue detectado por el agente que implementaba `VECTORS_STALE`, que lo
 Ese reporte es lo que evitó cerrar el punto con un warning que no podía
 dispararse.
 
+## Cierre de la carrera entre procesos en `recordRun`
+
+Corregido el 14 de agosto de 2026. Cierra la limitación que 4.3 había
+declarado explícitamente como no resuelta.
+
+**El problema.** El guard comprobaba con un `SELECT` y después insertaba, sin
+atomicidad. Dos procesos del sistema operativo podían leer "no hay run
+activo" antes de que ninguno escribiera, y arrancar los dos — que es
+exactamente el escenario cuyo daño 4.3 confirmó: dos runs solapados dejan la
+fuente vacía.
+
+**La corrección.** El chequeo y la escritura ocurren dentro de un único
+`BEGIN IMMEDIATE`. Ese modo toma el lock de escritura **antes** de leer, así
+que el segundo proceso espera (hasta los 5 s de `busy_timeout` que
+`open-database.ts` ya configuraba) y luego ve el run del primero y es
+rechazado. El guard deja de ser indicativo y pasa a ser una garantía.
+
+**Se descartó un índice único parcial** (`CREATE UNIQUE INDEX ... WHERE
+status = 'running'`), que también resolvería el problema. Motivos: exige
+cambiar el esquema, y `open-database.ts` no tiene camino de migración
+incremental —compara la versión y rechaza cualquier diferencia—, así que
+habría obligado a construir ese mecanismo o a invalidar bibliotecas
+existentes. Además fallaría al crearse si una base ya tuviera dos runs
+`running`, un estado posible antes de 4.3. `BEGIN IMMEDIATE` da la misma
+garantía sin tocar el esquema y reutiliza un patrón que el propio
+`migrateEmptyDatabase` ya usaba.
+
+**Un bug propio, encontrado por el test.** La primera versión dejaba el
+`BEGIN IMMEDIATE` fuera del `try`, de modo que no poder tomar el lock lanzaba
+de forma **síncrona** en un método tipado `Promise<void>`: un llamador con
+`.catch()` no lo habría visto. El test de contención lo detectó de inmediato.
+Ahora la apertura de la transacción está dentro del `try`, y el `ROLLBACK`
+sólo corre si la transacción llegó a abrirse.
+
+**Cómo se prueba.** Dos conexiones al mismo archivo, que es el caso real de
+dos procesos: mientras una mantiene el lock, la otra debe ser rechazada en
+vez de caer al `INSERT`, no debe dejar transacción abierta —una escritura
+posterior sobre esa misma conexión tiene que funcionar— y el run en disputa
+no debe haberse escrito.
+
 ## Pendientes de decisión
 
 Ninguno.
@@ -636,8 +676,6 @@ Ninguno.
 - **Ordenar fragmentos por longitud antes de lotear.** Medido en 1,93x, menos
   que el lote 1 que ya se adoptó, y más complejo. Sólo tendría sentido si
   aparece un motivo para volver a lotear.
-- **Lock de base entre procesos del sistema operativo**, para cerrar la
-  ventana de microsegundos que el guard actual no cubre.
 - **Verificar `skill/SKILL.md` desde Codex real.** El punto 2.4 se cerró sólo
   con verificación en Claude, por decisión explícita del usuario.
 
