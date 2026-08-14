@@ -485,3 +485,72 @@ void test("marks an unchanged package seen without replacing derivatives", async
     database.close();
   }
 });
+
+void test("two concurrent runs over one source delete each other's packages", async () => {
+  // Deliberate reproduction of the hypothesis left open on 13 August, after
+  // a cold run launched four syncs (two overlapping) and `status` reported
+  // 13 videos where there were 53. The mechanism is `deletePackagesNotSeen`,
+  // which removes every package whose `last_seen_sync_id` is not the run
+  // asking: whatever a concurrent run has already claimed looks unseen.
+  const path = await databasePath();
+  const database = openDatabase(path);
+  const sourceRoot = source("auto-design");
+  try {
+    const registry = new SQLiteSourceRegistry(database);
+    await registry.add(sourceRoot);
+    const store = new SQLiteIndexStore(database);
+
+    const seed = await startRun(store, sourceRoot.name, "sync:seed");
+    for (const videoId of ["video_1", "video_2", "video_3"]) {
+      await store.applyPackage(
+        packageChange({
+          sourceName: sourceRoot.name,
+          videoId,
+          syncId: seed.id,
+          hashCharacter: "a",
+          searchTerm: "alpha",
+          vectorValue: 0.25,
+        }),
+      );
+    }
+
+    const runA = await startRun(store, sourceRoot.name, "sync:concurrent-a");
+    const runB = await startRun(store, sourceRoot.name, "sync:concurrent-b");
+
+    // Nothing rejects a second active run over the same source.
+    const refs = await store.listPackageRefs(sourceRoot.name);
+    assert.equal(refs.length, 3);
+
+    // A claims two packages, B claims the third — the interleaving two
+    // overlapping syncs produce, reproduced deterministically.
+    await store.markPackageSeen(
+      PackageRef.create(sourceRoot.name, VideoId.create("video_1")),
+      runA.id,
+    );
+    await store.markPackageSeen(
+      PackageRef.create(sourceRoot.name, VideoId.create("video_2")),
+      runA.id,
+    );
+    await store.markPackageSeen(
+      PackageRef.create(sourceRoot.name, VideoId.create("video_3")),
+      runB.id,
+    );
+
+    // A finishes first and drops what B had claimed.
+    assert.equal(
+      await store.deletePackagesNotSeen(sourceRoot.name, runA.id),
+      1,
+    );
+    // B finishes and drops what A had kept.
+    assert.equal(
+      await store.deletePackagesNotSeen(sourceRoot.name, runB.id),
+      2,
+    );
+
+    // Every package is gone even though both runs succeeded and each video
+    // was seen by one of them.
+    assert.deepEqual(await store.listPackageRefs(sourceRoot.name), []);
+  } finally {
+    database.close();
+  }
+});
