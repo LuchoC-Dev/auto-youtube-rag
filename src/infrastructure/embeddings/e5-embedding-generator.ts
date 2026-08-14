@@ -21,7 +21,12 @@ export const modelDescriptor: EmbeddingModelDescriptor = Object.freeze({
 export const modelRepository = "Xenova/multilingual-e5-small";
 export const modelRevision = "main";
 export const modelDtype = "q8";
-const defaultBatchSize = 16;
+// Batch 1, not 16: within a batch every text pads to the longest one, and
+// this library's fragments range from 13 to 511 tokens. Measured with real
+// fragments, batch 1 ran 2.27x faster than batch 16 because padding, not
+// throughput, dominated the cost (see docs/sync-safety-design.md). Still
+// overridable via `batchSize` for anyone who wants to trade it back.
+const defaultBatchSize = 1;
 
 export type E5EmbeddingErrorCode =
   | "INVALID_INPUT"
