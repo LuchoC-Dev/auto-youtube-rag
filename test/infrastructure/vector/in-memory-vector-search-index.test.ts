@@ -345,6 +345,8 @@ void test("reloads when the model version changes, not just its key", async () =
       "no vectors exist for the new version, which is what VECTORS_STALE reports",
     );
   } finally {
-    library.database.close();
+    // `library.close()`, not `library.database.close()`: the latter closes
+    // SQLite but leaves the temporary directory behind, one per run.
+    await library.close();
   }
 });
