@@ -315,3 +315,36 @@ void test("reports an empty library instead of failing", async () => {
     await library.close();
   }
 });
+
+void test("reloads when the model version changes, not just its key", async () => {
+  // `key` stays `e5-small` across revisions and quantizations; `version`
+  // carries them (`Xenova/multilingual-e5-small@main:q8`). Comparing only the
+  // key would keep serving vectors built by a different model, and would also
+  // hide the staleness VECTORS_STALE reports: a reused snapshot has a
+  // non-zero count, so the warning never fires.
+  const library = await createTestLibrary(seeds);
+  const source = new CountingVectorSource(
+    new SQLiteVectorSource(library.database),
+  );
+
+  try {
+    const index = new InMemoryVectorSearchIndex(source);
+
+    await index.load(model);
+    assert.equal(source.loads, 1);
+
+    await index.load(model);
+    assert.equal(source.loads, 1, "the same model must reuse the snapshot");
+
+    const otherRevision = { ...model, version: `${model.version}-next` };
+    const loaded = await index.load(otherRevision);
+    assert.equal(source.loads, 2, "a different version must reload");
+    assert.equal(
+      loaded,
+      0,
+      "no vectors exist for the new version, which is what VECTORS_STALE reports",
+    );
+  } finally {
+    library.database.close();
+  }
+});
