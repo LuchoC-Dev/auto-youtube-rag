@@ -77,6 +77,14 @@ Se resuelve reindexando:
 auto-youtube-rag sync
 ```
 
+Si `sync` responde `no_changes` y el warning **sigue apareciendo**, los
+paquetes no cambiaron y el modelo tampoco, así que la indexación incremental no
+tiene nada que recalcular. Ahí hace falta forzar la regeneración completa:
+
+```text
+auto-youtube-rag rebuild --confirm
+```
+
 Hasta entonces podés usar el bundle, pero **avisá en tu respuesta que la
 búsqueda semántica no participó**: puede faltar contenido relevante que la
 coincidencia léxica no alcanza a encontrar.
@@ -123,6 +131,28 @@ Hay un run activo para esa fuente. Dos casos:
 
 La antigüedad que informa `doctor` es la señal para distinguir los dos casos:
 un run de minutos probablemente siga vivo; uno de horas, no.
+
+`rebuild` emite el mismo código, con una diferencia: abarca **todas** las
+fuentes, así que un run activo en cualquiera de ellas lo bloquea, y **no acepta
+`--force`**. Destrabá primero con `sync --source <nombre> --force` y después
+corré el rebuild.
+
+## `rebuild` terminó en `partial` o `failed`
+
+`partial` significa que alguna fuente se degradó mientras se regeneraba, y las
+demás se reconstruyeron bien; `failed`, que ninguna pudo reconstruirse. En los
+dos casos el código de salida es `1` y los `issues` del recibo dicen qué video
+falló y por qué — se leen igual que los de `sync`.
+
+**La biblioteca no queda corrupta.** Si el proceso se interrumpe a la mitad
+(Ctrl+C, corte, terminal cerrada) queda parcialmente reconstruida, que no es un
+estado dañado ni requiere reparación manual: volvé a correr
+`rebuild --confirm`, que deja siempre el mismo resultado. Mientras tanto
+`retrieve` puede devolver menos contexto del esperado.
+
+Lo que `rebuild` **no** arregla: un `sync` que falló por un paquete inválido.
+Eso se resuelve leyendo los `issues` del recibo de `sync`, no borrando y
+regenerando la biblioteca entera.
 
 ## Verificar integridad
 
