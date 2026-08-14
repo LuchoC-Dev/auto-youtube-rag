@@ -50,8 +50,9 @@ La CLI se invoca como `auto-youtube-rag <comando>`. Si el comando no está en
 el PATH, leé `references/setup.md` para la forma alternativa.
 
 Todos los comandos son no interactivos y seguros de ejecutar sin supervisión
-humana, salvo `rebuild`, que **todavía no está implementado** — no lo
-invoques ni lo ofrezcas como disponible.
+humana, salvo `rebuild`, que borra y regenera la biblioteca entera: exige
+`--confirm` y no conviene lanzarlo por iniciativa propia (ver "Reconstruir la
+biblioteca" más abajo).
 
 `stdout` siempre imprime JSON compacto (recibos o resultados estructurados).
 `stderr` lleva progreso y advertencias; no forma parte del contrato de datos.
@@ -232,6 +233,48 @@ cualquier carpeta y siempre vas a hablar con la misma biblioteca.
    respuesta, citá los IDs `[S0N]` tal como aparecen en `context.md`. Nunca
    fabriques una cita que no venga del bundle.
 
+## Reconstruir la biblioteca
+
+`rebuild` borra todo el índice derivado y lo regenera desde los paquetes que
+siguen en disco. Conserva las fuentes registradas y el historial; los paquetes
+fuente nunca se tocan.
+
+```text
+auto-youtube-rag rebuild --confirm
+```
+
+Sirve para lo que un `sync` normal **no puede** detectar: `sync` es
+incremental y compara el hash del paquete contra el indexado, así que si el
+paquete no cambió no recalcula nada, aunque el modo de indexar sí haya
+cambiado. Casos típicos: el producto se actualizó y cambió cómo genera
+embeddings o cómo parsea los archivos.
+
+Cuándo **no** usarlo:
+
+- para arreglar un `sync` que falló: eso se resuelve leyendo los `issues` del
+  recibo, no borrando la biblioteca;
+- para "refrescar" contenido nuevo: para eso está `sync`, que es incremental
+  y mucho más rápido;
+- mientras haya un `sync` corriendo: el comando falla con
+  `SYNC_ALREADY_RUNNING` sin borrar nada.
+
+Qué esperar al correrlo:
+
+- **tarda minutos**, porque vuelve a generar los embeddings de la biblioteca
+  entera. No lo confundas con un comando colgado;
+- `--confirm` es obligatorio; sin esa bandera termina con código `2`;
+- no acepta `--force`. Si hay un run fantasma bloqueando, primero
+  `sync --source <nombre> --force` y después `rebuild`;
+- **si el proceso se interrumpe a mitad, la biblioteca queda parcialmente
+  reconstruida.** No es un estado corrupto y no requiere ninguna reparación
+  especial: volvé a correr `rebuild --confirm`, que deja siempre el mismo
+  resultado. Hasta que termine, `retrieve` puede devolver menos contexto del
+  esperado.
+
+El recibo trae `status` (`ok`, `partial` o `failed`), `packages_deleted`,
+`packages_indexed`, `packages_failed`, el detalle por fuente e `issues`.
+`partial` y `failed` salen con código `1`.
+
 ## Reglas de oro
 
 - Nunca leas los paquetes fuente (`context.md`, `rules.json` o
@@ -240,8 +283,9 @@ cualquier carpeta y siempre vas a hablar con la misma biblioteca.
 - Nunca modifiques ni borres archivos dentro de una fuente registrada; el
   producto tampoco lo hace.
 - Nunca fabriques una cita `[S0N]` ni contenido que no venga del bundle.
-- Nunca ofrezcas `rebuild` como comando disponible: el contrato lo aprueba
-  pero todavía no está implementado.
+- Nunca lances `rebuild` por tu cuenta para "arreglar" un `sync` que falló:
+  no es su función y tarda minutos. Sugerilo sólo ante los casos de la
+  sección "Reconstruir la biblioteca", y dejá que el usuario decida.
 - Nunca asumas que un `status: "ok"` de baja relevancia es un bug: es el
   comportamiento esperado del MVP.
 - Nunca lances un `sync` mientras otro sigue corriendo, ni uses el conteo

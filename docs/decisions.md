@@ -782,15 +782,85 @@ de los recibos JSON; `models/.install.json`; el puerto `EmbeddingGenerator` y
 `cli-contract.md` (ningún comando ni flag nuevo); `skill/SKILL.md` (nada
 observable cambió para un agente consumidor).
 
+## `rebuild` regenera en vez de sólo purgar (punto 4.6)
+
+Decidido e implementado el 14 de agosto de 2026. Diseño completo en
+`docs/rebuild-design.md`.
+
+El contrato aprobado desde el MVP decía apenas dos frases: "regenera el índice
+derivado y exige confirmación explícita". Las decisiones que hubo que tomar
+para implementarlo:
+
+- **Purga y re-sincroniza, no sólo purga.** El contrato dice "regenera". Una
+  purga seca dejaría la biblioteca vacía y silenciosamente inservible hasta
+  que alguien se acuerde de correr `sync`: el peor estado posible para un
+  comando cuyo propósito es reparar.
+- **Preserva `sources`, `schema_meta`, `sync_runs` y `sync_issues`.** Sólo
+  `video_packages` y su cascada son derivados. Preservar el historial no es
+  una preferencia nueva: `source remove` ya deja historial desprendido y
+  `sync_runs.source_id` es `ON DELETE SET NULL` justamente para permitirlo.
+  Un rebuild que borrara el historial destruiría la única evidencia de por
+  qué alguien tuvo que reconstruir.
+- **El guard de `sync` activo vive dentro de la transacción de la purga**, no
+  en el caso de uso. Comprobar en la aplicación y borrar después reabre la
+  misma ventana que 4.3 cerró en `recordRun`. Un rebuild abarca todas las
+  fuentes, así que un run activo en cualquiera lo bloquea.
+- **No acepta `--force`.** Destrabar un run fantasma y reconstruir la
+  biblioteca entera son dos decisiones distintas.
+- **Sólo la purga es transaccional.** Envolver también la re-sincronización
+  dejaría un `BEGIN IMMEDIATE` abierto durante el embedding de la biblioteca
+  entera. Se acepta que un proceso muerto a mitad deje la biblioteca
+  parcialmente reconstruida; el remedio es repetir el comando, que es
+  idempotente, y tanto `cli-contract.md` como `SKILL.md` lo declaran.
+- **Recorre las fuentes secuencialmente**, a diferencia del `Promise.all` de
+  `sync`: un rebuild es el caso de máxima carga y 4.3 midió que paralelizar la
+  indexación rinde 1,00x porque ONNX ya satura los núcleos.
+
+### El defecto que encontró el test del índice vectorial
+
+El diseño afirmaba que no hacía falta ningún mecanismo nuevo para el índice en
+memoria, porque ya invalida su snapshot en `apply`. **Era falso.** La purga
+borra filas por SQL, y SQL no publica nada; un rebuild que termina sin ningún
+paquete no publica ni un cambio, así que el snapshot sobrevive entero. Medido:
+2 vectores servidos sobre una biblioteca con cero embeddings.
+
+Es el mismo defecto que 4.4 corrigió —snapshot obsoleto tapando
+`VECTORS_STALE`— llegando por un camino nuevo. `rebuildIndex` ahora publica un
+`remove_packages` con los `PackageRef` que había, después de que la purga
+commitea y nunca antes, respetando el invariante de no publicar vectores antes
+del commit SQLite.
+
+## Ordenar fragmentos por longitud: medido y descartado
+
+Cerrado el 14 de agosto de 2026 **sin escribir código**, tras verificarlo
+contra el código y no contra el documento. Era el punto 1 del orden de
+prioridad del usuario.
+
+El ordenamiento por longitud amortiza el padding dentro de un lote: todos los
+textos de un lote se rellenan hasta el más largo. Con `batchSize = 1` —el
+default que adoptó 4.3— cada llamada recibe un solo texto y no hay padding
+posible, así que ordenar la entrada no cambia una sola operación del runtime.
+
+- `defaultBatchSize` es `1` y ningún llamador de producto lo sobrescribe.
+- `embedDocuments` se invoca **por paquete**, dentro del bucle de videos de
+  `syncSource`, así que el universo ordenable serían los fragmentos de un
+  video, no el corpus con el que se midió el 1,93x.
+- La medición de 4.3 ya lo decía: lote 16 ordenado rinde 1,93x contra 2,27x
+  del lote 1. No era una mejora sobre el lote 1; era la alternativa que el
+  lote 1 le ganó.
+- Reintroducirlo costaría el determinismo que 4.3 celebró: el vector de un
+  fragmento pasaría a depender de qué otros fragmentos del mismo video tienen
+  longitud parecida.
+
+Sólo reabrir si aparece un motivo independiente para volver a un lote mayor
+que 1.
+
 ## Pendientes de decisión
 
 Ninguno.
 
 ## Trabajo posterior anotado, sin decisión pendiente
 
-- **Ordenar fragmentos por longitud antes de lotear.** Medido en 1,93x, menos
-  que el lote 1 que ya se adoptó, y más complejo. Sólo tendría sentido si
-  aparece un motivo para volver a lotear.
 - **Verificar `skill/SKILL.md` desde Codex real.** El punto 2.4 se cerró sólo
   con verificación en Claude, por decisión explícita del usuario.
 

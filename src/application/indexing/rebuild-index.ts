@@ -1,5 +1,7 @@
 import type { IndexStore } from "../ports/index-store.js";
 import type { SourceRegistry } from "../ports/source-registry.js";
+import type { VectorIndexSink } from "../ports/vector-index-sink.js";
+import type { PackageRef } from "../../domain/indexing/identifiers.js";
 import type { SourceRoot } from "../../domain/indexing/source-root.js";
 import type { SyncIssue } from "../../domain/indexing/sync-run.js";
 import type { SyncSourceResult } from "./sync-source.js";
@@ -7,6 +9,13 @@ import type { SyncSourceResult } from "./sync-source.js";
 export interface RebuildIndexDependencies {
   readonly store: IndexStore;
   readonly registry: SourceRegistry;
+  /**
+   * The purge deletes rows through SQL, which publishes nothing, so the
+   * in-memory index would keep serving a snapshot of vectors whose fragments
+   * no longer exist. `sync` only invalidates it by publishing changes, and a
+   * rebuild that regenerates nothing publishes none.
+   */
+  readonly vectorIndex: VectorIndexSink;
   /**
    * Injected rather than called directly so a rebuild reuses the exact
    * wiring a plain `sync` uses. Reimplementing the loop here would let the
@@ -74,7 +83,23 @@ export async function rebuildIndex(
   dependencies: RebuildIndexDependencies,
 ): Promise<RebuildIndexResult> {
   const sources = await dependencies.registry.list();
+
+  // Collected before the purge, while the rows still exist, so the removal
+  // published below names the packages that actually went.
+  const purged: PackageRef[] = [];
+  for (const source of sources) {
+    purged.push(...(await dependencies.store.listPackageRefs(source.name)));
+  }
+
   const packagesDeleted = await dependencies.store.purgeDerivedIndex();
+
+  // After the delete commits, never before — the same ordering `sync`
+  // obeys: SQLite is the source of truth and vectors are published only
+  // once the transaction that removed them succeeded.
+  await dependencies.vectorIndex.apply({
+    kind: "remove_packages",
+    packageRefs: purged,
+  });
 
   // Sequential, unlike `sync`'s Promise.all over sources. A rebuild reindexes
   // everything, so it is the maximum-load case, and 4.3 measured that

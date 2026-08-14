@@ -226,6 +226,52 @@ raíces registradas.
 auto-youtube-rag rebuild --confirm
 ```
 
+Implementado en el punto 4.6. Borra todos los paquetes indexados y todo lo
+derivado de ellos —documentos, unidades, fragmentos, FTS5 y embeddings— y
+después re-sincroniza cada fuente registrada. **Preserva** el registro de
+fuentes, la versión de esquema y el historial de runs e issues.
+
+Sirve para los cambios que `sync` no puede detectar, porque `unchanged()` sólo
+compara el hash del paquete y la identidad del modelo: un tamaño de lote de
+embeddings distinto (ver `sync-safety-design.md`), un `parser_version` nuevo o
+un cambio de fragmentación. No es el remedio de un `sync` fallido.
+
+`--confirm` es obligatorio; sin él el comando termina con código `2`.
+`rebuild` **no acepta `--force`**: destrabar un run fantasma es una decisión
+aparte (`sync --force`). Si alguna fuente tiene un `sync` en curso, `rebuild`
+falla con `SYNC_ALREADY_RUNNING` sin borrar nada.
+
+Requiere biblioteca y modelo, como `sync` y `retrieve`.
+
+```json
+{
+  "schema_version": "1.0",
+  "status": "ok",
+  "sources_rebuilt": 2,
+  "packages_deleted": 51,
+  "packages_indexed": 51,
+  "packages_failed": 0,
+  "sources": [
+    {
+      "name": "auto-design",
+      "status": "ok",
+      "packages_indexed": 34,
+      "packages_failed": 0
+    }
+  ],
+  "issues": []
+}
+```
+
+`status` agregado: `ok` si toda fuente terminó bien, `partial` si alguna
+degradó, `failed` si ninguna pudo reconstruirse. Una biblioteca sin fuentes
+registradas devuelve `ok` con `sources_rebuilt: 0`. Códigos de salida: `0`
+para `ok`, `1` para `partial` y `failed`.
+
+Sólo la purga es transaccional. Si el proceso muere entre la purga y el final
+de la re-sincronización, la biblioteca queda parcialmente reconstruida; el
+remedio es volver a correr `rebuild`, que es idempotente.
+
 ## Recuperación
 
 ### `retrieve`

@@ -4,6 +4,10 @@ import { test } from "node:test";
 import { rebuildIndex } from "../../../src/application/indexing/rebuild-index.js";
 import type { SyncSourceResult } from "../../../src/application/indexing/sync-source.js";
 import type { SourceRegistry } from "../../../src/application/ports/source-registry.js";
+import type {
+  VectorIndexChange,
+  VectorIndexSink,
+} from "../../../src/application/ports/vector-index-sink.js";
 import {
   SourceName,
   SyncId,
@@ -12,6 +16,14 @@ import {
 import { SourceRoot } from "../../../src/domain/indexing/source-root.js";
 import { SyncIssue, SyncRun } from "../../../src/domain/indexing/sync-run.js";
 import { InMemoryIndexStore } from "../../fakes/in-memory-index-store.js";
+
+class RecordingVectorSink implements VectorIndexSink {
+  public readonly changes: VectorIndexChange[] = [];
+  public apply(change: VectorIndexChange): Promise<void> {
+    this.changes.push(change);
+    return Promise.resolve();
+  }
+}
 
 function source(name: string): SourceRoot {
   return SourceRoot.create({
@@ -63,8 +75,10 @@ void test("purges once and rebuilds every registered source", async () => {
   const second = source("catalog-design");
   const synced: string[] = [];
 
+  const vectorIndex = new RecordingVectorSink();
   const result = await rebuildIndex({
     store,
+    vectorIndex,
     registry: registryOf([first, second]),
     sync: (target) => {
       // The purge must already have happened by the time any source syncs:
@@ -113,8 +127,10 @@ void test("reports how many packages the purge deleted", async () => {
   // Seed two package states so the purge has something to count.
   store.seedPackages(target.name, ["video_1", "video_2"]);
 
+  const vectorIndex = new RecordingVectorSink();
   const result = await rebuildIndex({
     store,
+    vectorIndex,
     registry: registryOf([target]),
     sync: (synced) =>
       Promise.resolve(
@@ -128,6 +144,17 @@ void test("reports how many packages the purge deleted", async () => {
 
   assert.equal(result.packagesDeleted, 2);
   assert.equal(result.packagesIndexed, 2);
+
+  // The purge deletes rows through SQL, which publishes nothing, so the
+  // removal has to be published explicitly or the in-memory index keeps
+  // serving vectors whose fragments are gone.
+  assert.equal(vectorIndex.changes.length, 1);
+  const [published] = vectorIndex.changes;
+  assert.ok(published?.kind === "remove_packages");
+  assert.deepEqual(
+    published.packageRefs.map((ref) => ref.videoId.value),
+    ["video_1", "video_2"],
+  );
 });
 
 void test("a source that degrades leaves the rebuild partial without stopping the others", async () => {
@@ -143,8 +170,10 @@ void test("a source that degrades leaves the rebuild partial without stopping th
     retryable: false,
   });
 
+  const vectorIndex = new RecordingVectorSink();
   const result = await rebuildIndex({
     store,
+    vectorIndex,
     registry: registryOf([first, second]),
     sync: (target) =>
       Promise.resolve(
@@ -174,8 +203,10 @@ void test("a source that degrades leaves the rebuild partial without stopping th
 void test("every source failing is reported as failed, not partial", async () => {
   const store = new InMemoryIndexStore();
 
+  const vectorIndex = new RecordingVectorSink();
   const result = await rebuildIndex({
     store,
+    vectorIndex,
     registry: registryOf([source("auto-design"), source("catalog-design")]),
     sync: (target) =>
       Promise.resolve(
@@ -194,8 +225,10 @@ void test("every source failing is reported as failed, not partial", async () =>
 void test("a library with no registered sources rebuilds successfully into nothing", async () => {
   const store = new InMemoryIndexStore();
 
+  const vectorIndex = new RecordingVectorSink();
   const result = await rebuildIndex({
     store,
+    vectorIndex,
     registry: registryOf([]),
     sync: () => Promise.reject(new Error("no source should be synchronized")),
   });
@@ -221,9 +254,11 @@ void test("a running sync stops the rebuild before anything is purged or synced"
     }),
   );
 
+  const vectorIndex = new RecordingVectorSink();
   await assert.rejects(
     rebuildIndex({
       store,
+      vectorIndex,
       registry: registryOf([target]),
       sync: () =>
         Promise.reject(new Error("no source may sync under a running run")),
@@ -233,4 +268,9 @@ void test("a running sync stops the rebuild before anything is purged or synced"
 
   assert.equal(store.purges, 0);
   assert.equal(store.states.size, 1, "the library is untouched");
+  assert.deepEqual(
+    vectorIndex.changes,
+    [],
+    "nothing was published, because nothing was removed",
+  );
 });
