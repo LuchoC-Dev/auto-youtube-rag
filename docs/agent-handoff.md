@@ -8,8 +8,17 @@ exacto del repositorio, las decisiones confirmadas, la arquitectura ya
 implementada, las invariantes que no deben romperse, las validaciones realizadas
 y el siguiente bloque recomendado.
 
-Estado de referencia: **13 de agosto de 2026**, después de cerrar el punto
-3.2 — evaluaciones del MVP — y también el punto 4.1 — soporte de
+Estado de referencia: **14 de agosto de 2026**, después de cerrar el punto
+4.2 — instalación: hogar de usuario, `init` instalador y preflight.
+
+**Lo que más probablemente contradiga tu memoria de sesiones viejas:** la
+base y el modelo **ya no son relativos al directorio de trabajo**. Viven en
+`~/.auto-youtube-rag/`, se instalan con `auto-youtube-rag init`, y
+`AUTO_YOUTUBE_RAG_MODEL_CACHE` se renombró a `AUTO_YOUTUBE_RAG_MODELS_DIR`.
+Ver "Configuración de ejecución" más abajo antes de asumir cualquier ruta.
+
+Antes se habían cerrado el punto
+3.2 — evaluaciones del MVP — y el punto 4.1 — soporte de
 `analysis.json` (schema 2.0), el primer trabajo posterior al MVP. El MVP
 completo descrito en `product-spec.md` (2.1–2.4 y 3.1–3.2) está terminado.
 El comando `retrieve` de la CLI y la skill portable (`skill/SKILL.md`) están
@@ -36,9 +45,9 @@ este MVP" más abajo), no un pendiente urgente.
 | Persistencia              | SQLite mediante `node:sqlite`                                                |
 | Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`           |
 | Dimensión                 | 384                                                                          |
-| Caché aproximada          | 129 MB en `.cache/models`                                                    |
+| Instalación               | `auto-youtube-rag init` → `~/.auto-youtube-rag/` (base + modelo, ~130 MB)    |
 | Operación                 | Exclusivamente local; sin APIs externas                                      |
-| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1 al 100% en `docs/build.md`                 |
+| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2, 4.1 y 4.2 al 100% en `docs/build.md`            |
 | Próximo punto             | Ninguno abierto; ver "Trabajo posterior razonable" al final                  |
 
 La rama conserva el nombre de un benchmark anterior. No asumas que el proyecto
@@ -593,30 +602,53 @@ auto-youtube-rag rebuild --confirm
 
 ## Configuración de ejecución
 
-Por defecto:
+**Cambió en el punto 4.2 (14 de agosto de 2026).** Si una memoria de sesión
+vieja dice que las rutas son relativas al `cwd`, está desactualizada.
 
-- base: `<cwd>/.auto-youtube-rag/index.sqlite`;
-- modelo: `<cwd>/.cache/models`.
+Todo vive en un hogar de usuario, resuelto por
+`src/infrastructure/config/resolve-paths.ts`, la **única** función que
+calcula estas rutas:
+
+```text
+~/.auto-youtube-rag/          ← C:\Users\<usuario>\.auto-youtube-rag\
+  index.sqlite                ← la biblioteca
+  models/                     ← el modelo instalado (~130 MB)
+```
 
 Variables admitidas:
 
 ```text
-AUTO_YOUTUBE_RAG_HOME
-AUTO_YOUTUBE_RAG_MODEL_CACHE
+AUTO_YOUTUBE_RAG_HOME        ← mueve el hogar entero
+AUTO_YOUTUBE_RAG_MODELS_DIR  ← mueve sólo el modelo
 ```
 
-El modelo esperado existe bajo:
+`AUTO_YOUTUBE_RAG_MODEL_CACHE` **ya no existe**: se renombró a
+`AUTO_YOUTUBE_RAG_MODELS_DIR` porque el modelo es estado instalado, no un
+caché que se regenere solo.
+
+El modelo se instala con el producto, no con npm:
 
 ```text
-.cache/models/Xenova/multilingual-e5-small/
-  config.json
-  tokenizer.json
-  tokenizer_config.json
-  onnx/model_quantized.onnx
+auto-youtube-rag init                    # crea hogar, base y modelo
+auto-youtube-rag init --from <ruta>      # copia un modelo ya presente
+auto-youtube-rag init --skip-model       # sólo la base (CI, sin red)
+auto-youtube-rag models install [--force] [--from <ruta>]
+auto-youtube-rag models status
 ```
 
-Si falta, ejecutar `npm run models:download`. El producto no debe descargar
-durante `sync`, `doctor` ni tests normales.
+`models/.install.json` es el recibo de instalación: guarda el tamaño esperado
+de cada archivo y permite distinguir `absent`, `incomplete` (descarga
+truncada) e `installed` sin hashear 130 MB.
+
+`npm run models:download` **sigue existiendo pero es sólo para benchmarks**
+(`benchmarks/embeddings/run.ts`, escribe en `<repo>/.cache/models`). No lo
+ofrezcas como remedio de producto: depende de `tsx` y de `benchmarks/`, que
+no existen fuera del repositorio clonado. El `.cache/` del repo es territorio
+exclusivo de benchmarks; el producto no lo lee nunca.
+
+El producto no debe descargar durante `sync`, `doctor` ni tests normales.
+Sólo `init` y `models install` usan la red, y sólo cuando el usuario los
+invoca por nombre.
 
 ## Comandos de desarrollo y calidad
 
@@ -915,8 +947,11 @@ file`, un código que la skill tampoco explicaba. Corregido agregando
      correctamente contra `result.json`. Encontró dos ambigüedades menores,
      ya corregidas en el texto: (a) el mismo `ERR_SQLITE_ERROR` también
      puede deberse a un `cwd` inconsistente entre invocaciones, no sólo a
-     `init` faltante — la base de datos por defecto es relativa a
-     `<cwd>/.auto-youtube-rag/`; (b) `source add` espera la ruta a la
+     `init` faltante — la base de datos por defecto era relativa a
+     `<cwd>/.auto-youtube-rag/` **cuando se escribió esto**; el punto 4.2 la
+     movió al hogar de usuario y reemplazó ese error crudo por
+     `LIBRARY_NOT_FOUND`, así que este hallazgo ya no aplica; (b) `source
+add` espera la ruta a la
      carpeta `videos/` en sí, no a su carpeta padre, y el `collection_path`
      del recibo puede quedar un nivel arriba de esa ruta sin que eso sea un
      error.
