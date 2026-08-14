@@ -823,7 +823,9 @@ recrear este mismo aislamiento.
 - Nunca persistir `.env`, cookies, headers, URLs temporales ni metadata cruda.
 - Nunca descargar el modelo implícitamente durante tests o uso normal.
 - Nunca cambiar esquema, modelo/dimensión o dependencia nativa sin aprobación.
-- Mantener commits convencionales pequeños mediante la skill `git-commit`.
+- **Commitear siempre con la skill `/git-commit`, nunca con `git commit` a
+  mano.** No es una preferencia de estilo: la skill analiza el diff real para
+  elegir tipo y alcance. Detalle en `docs/development.md` → "Cómo commitear".
 - Nunca pushear, reescribir historial ni forzar sin pedido explícito: `main`
   está publicada en un repositorio privado y el push la hace visible fuera
   de esta máquina.
