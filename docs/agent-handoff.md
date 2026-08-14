@@ -38,8 +38,9 @@ este MVP" más abajo), no un pendiente urgente.
 | ------------------------- | ---------------------------------------------------------------------------- |
 | Proyecto                  | `auto-youtube-rag`                                                           |
 | Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag`     |
-| Rama actual               | `feat/sqlite-vec-benchmark`                                                  |
-| Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.1 |
+| Rama actual               | `main`                                                                       |
+| Remoto                    | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (privado)                |
+| Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.3 |
 | Estado Git al cerrar      | Worktree limpio                                                              |
 | Runtime                   | Node.js 24.19.0 LTS, ESM                                                     |
 | Lenguaje                  | TypeScript 6.0.3 estricto                                                    |
@@ -51,10 +52,21 @@ este MVP" más abajo), no un pendiente urgente.
 | Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1–4.3 al 100% en `docs/build.md`             |
 | Próximo punto             | Ninguno abierto; ver "Trabajo posterior razonable" al final                  |
 
-La rama conserva el nombre de un benchmark anterior. No asumas que el proyecto
-está trabajando actualmente en `sqlite-vec`: esa opción fue evaluada y
-descartada para el MVP. No renombres la rama ni reescribas historial sin
-autorización explícita.
+**Cambió el 14 de agosto de 2026.** Hasta entonces todo el proyecto vivía en
+una rama llamada `feat/sqlite-vec-benchmark` —nombre heredado de un benchmark
+descartado— sin ninguna rama `main` y sin remoto. Se creó `main` sobre la
+punta de esa rama, así que contiene los 128 commits desde el primero sin
+necesidad de merge, y se publicó en un repositorio privado. Si una memoria de
+sesión vieja menciona `feat/sqlite-vec-benchmark` como rama de trabajo, está
+desactualizada.
+
+`sqlite-vec` sigue siendo una opción evaluada y **descartada** para el MVP: el
+nombre viejo de la rama no significa que se esté trabajando en eso.
+
+No reescribas historial ni fuerces pushes sin autorización explícita. La rama
+local `feat/sqlite-vec-benchmark` se conserva apuntando al mismo commit que
+`main` y puede borrarse; `docs/bootstrap-project` y `feat/embedding-benchmark`
+están contenidas en la historia y tampoco tienen commits propios.
 
 ## Orden de lectura recomendado
 
@@ -812,6 +824,9 @@ recrear este mismo aislamiento.
 - Nunca descargar el modelo implícitamente durante tests o uso normal.
 - Nunca cambiar esquema, modelo/dimensión o dependencia nativa sin aprobación.
 - Mantener commits convencionales pequeños mediante la skill `git-commit`.
+- Nunca pushear, reescribir historial ni forzar sin pedido explícito: `main`
+  está publicada en un repositorio privado y el push la hace visible fuera
+  de esta máquina.
 - Antes de cada commit ejecutar al menos el test específico, `npm run check` y
   `npm run build` según el riesgo.
 - Preservar stdout JSON y stderr para progreso.
