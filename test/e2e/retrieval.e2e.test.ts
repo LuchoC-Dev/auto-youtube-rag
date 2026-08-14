@@ -49,10 +49,15 @@ function vectorForAngle(angle: number): Float32Array {
 }
 
 class TopicEmbeddingGenerator implements EmbeddingGenerator {
+  public constructor(
+    private readonly modelKey = "fake-topic-e5",
+    private readonly modelVersion = "1",
+  ) {}
+
   public describe() {
     return Promise.resolve({
-      key: "fake-topic-e5",
-      version: "1",
+      key: this.modelKey,
+      version: this.modelVersion,
       dimensions: 3,
       maxInputTokens: 512,
     });
@@ -285,5 +290,65 @@ void test("retrieves a synced package through both paths, degrades correctly on 
     await reopened.close();
     await design.cleanup();
     await catalog.cleanup();
+  }
+});
+
+void test("warns VECTORS_STALE when the active model has no embeddings in the index", async () => {
+  const collection = await createTestCollection([rareVideo]);
+
+  await collection.writeContext(
+    rareVideo,
+    "El sistema tipográfico utiliza Helvetica como fuente principal para el cuerpo editorial.",
+  );
+
+  const config = {
+    databasePath: collection.databasePath,
+    modelCachePath: collection.modelCachePath,
+  };
+
+  // Sync while "model-a" is active: fragments get indexed and embedded
+  // under that model's key and version.
+  const syncedApplication = createApplication(config, {
+    embeddingGenerator: new TopicEmbeddingGenerator("model-a", "1"),
+  });
+
+  try {
+    await syncedApplication.addSource({
+      name: "design",
+      path: collection.collectionPath,
+    });
+    const [syncResult] = await syncedApplication.sync("design");
+
+    assert.equal(syncResult?.status, "ok");
+  } finally {
+    await syncedApplication.close();
+  }
+
+  // Reopen with "model-b" active, reusing the same database. sqlite-vector-
+  // loader.ts filters embeddings by model_key/model_version, so the index
+  // for "model-b" loads zero vectors even though search_fragments still
+  // holds text for the lexical path — reproducing the silent-degradation
+  // hole documented in docs/install-design.md.
+  const staleApplication = createApplication(config, {
+    embeddingGenerator: new TopicEmbeddingGenerator("model-b", "1"),
+  });
+
+  try {
+    const outcome = await staleApplication.retrieveCandidates(
+      RetrievalQuery.create({ text: "Helvetica" }),
+    );
+
+    const staleWarning = outcome.warnings.find(
+      (warning) => warning.code === "VECTORS_STALE",
+    );
+
+    assert.equal(outcome.status, "ok");
+    assert.ok(outcome.metrics.textHits > 0);
+    assert.equal(outcome.metrics.vectorHits, 0);
+    assert.ok(staleWarning, "expected a VECTORS_STALE warning");
+    assert.equal(staleWarning.path, "vector");
+  } finally {
+    await staleApplication.close();
+    await collection.cleanup();
   }
 });
