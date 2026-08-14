@@ -320,8 +320,22 @@ bundle con cobertura y limitaciones, sin fabricar contenido.
 
 ## Citaciones
 
-El Markdown utiliza `[S01]`, `[S02]` y equivalentes. Cada ID se resuelve en
-`result.json`:
+El Markdown utiliza `[S01]`, `[S02]` y equivalentes. **El ID abre el bloque,
+como parte de su encabezado**, y etiqueta el contenido que viene debajo:
+
+```text
+### [S01] Método completo de la fuente > Brutalismo
+
+Diez de los doce sitios usan tipografía de gran escala...
+```
+
+Un ID nunca aparece fuera de una línea de encabezado. Hasta el 14 de agosto
+de 2026 el marcador cerraba el bloque, en su propia línea, lo que lo dejaba
+visualmente pegado al encabezado siguiente: un agente consumidor atribuyó
+citas a la unidad equivocada aunque todos los IDs resolvían. Ver
+`docs/decisions.md`.
+
+Cada ID se resuelve en `result.json`:
 
 ```json
 {

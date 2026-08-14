@@ -42,16 +42,27 @@ function blockHeading(block: ContextUnitBlock): string {
   return block.title ?? "Untitled";
 }
 
+/**
+ * The citation id opens the block, inside its heading.
+ *
+ * It used to trail the content on its own line, which put it one blank line
+ * above the *next* block's heading. The cold-run agent of 14 August read it
+ * as opening what followed and attributed several citations to the wrong
+ * unit — while every id still resolved against `result.json`, so no
+ * mechanical check caught it. Reading the id as part of the heading of the
+ * text it labels removes the ambiguity by construction.
+ *
+ * `cli-contract.md` fixes the `[S01]` shape, not its position, so this stays
+ * within the approved contract.
+ */
 function renderBlock(
   block: ContextUnitBlock,
   citation: CitationRecord,
 ): string {
   return [
-    `### ${blockHeading(block)}`,
+    `### [${citation.citationId}] ${blockHeading(block)}`,
     "",
     block.content,
-    "",
-    `[${citation.citationId}]`,
   ].join("\n");
 }
 

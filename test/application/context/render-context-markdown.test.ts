@@ -113,9 +113,38 @@ void test("renders a candidate block's content with its citation marker", () => 
     block({ rawId: "a", headingPath: ["Método", "Brutalismo"] }),
   ]);
 
-  assert.match(markdown, /### Método > Brutalismo/);
+  assert.match(markdown, /### \[S01\] Método > Brutalismo/);
   assert.match(markdown, /a content/);
-  assert.match(markdown, /\[S01\]/);
+});
+
+void test("binds each citation id to the heading of the block it labels", () => {
+  // Regression for the 14 August cold run: the id used to trail its block,
+  // which left it one blank line above the *next* heading. A consuming agent
+  // read it as opening what followed and attributed citations to the wrong
+  // unit, while every id still resolved against result.json — so no
+  // mechanical check caught it.
+  const markdown = render([
+    block({ rawId: "first", headingPath: ["Primero"] }),
+    block({ rawId: "second", headingPath: ["Segundo"] }),
+  ]);
+
+  const lines = markdown.split("\n");
+  const headings = lines.filter((line) => line.startsWith("### "));
+  assert.deepEqual(headings, ["### [S01] Primero", "### [S02] Segundo"]);
+
+  // No citation id may stand alone: every one lives on a heading line.
+  for (const line of lines) {
+    if (!/\[S\d+\]/u.test(line)) continue;
+    assert.ok(
+      line.startsWith("### "),
+      `citation id found outside a heading: ${line}`,
+    );
+  }
+
+  // The second block's content must not sit between S01 and its own heading.
+  assert.ok(
+    markdown.indexOf("### [S02] Segundo") < markdown.indexOf("second content"),
+  );
 });
 
 void test("places document/section and rule blocks in their dedicated sections", () => {
