@@ -80,6 +80,28 @@ locales quedan excluidos de lint, formato y Git según corresponda.
 toolchain. No constituyen la implementación de la CLI ni autorizan decisiones
 de dominio pendientes.
 
+## Cómo commitear
+
+**Los commits se hacen con la skill `/git-commit`, no con `git commit` a
+mano.** Es la convención del proyecto y aplica a cualquier agente que trabaje
+acá, sin excepción por urgencia o por tamaño del cambio.
+
+La skill analiza el diff real para elegir tipo y alcance, en vez de confiar en
+lo que el autor cree haber cambiado, y evita las desviaciones que aparecen
+cuando cada quien redacta el mensaje a su criterio.
+
+Reglas que la acompañan:
+
+- Un cambio lógico por commit; máximo cinco archivos por tarea. Si un commit
+  necesita más, decilo explícitamente en el cuerpo y explicá por qué partirlo
+  habría sido peor.
+- Mensajes en inglés, siguiendo el historial del repositorio.
+- Nunca `Co-Authored-By`.
+- Nunca `--no-verify` ni saltear hooks.
+- **Nunca pushear ni reescribir historial sin pedido explícito del usuario**:
+  `main` está publicada en un repositorio privado y el push la hace visible
+  fuera de esta máquina.
+
 ## Criterio de aceptación
 
 Antes de integrar un cambio deben pasar:
