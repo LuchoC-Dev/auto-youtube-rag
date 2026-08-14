@@ -335,17 +335,6 @@ void test("deletes only unseen packages for the source and active run", async ()
     await registry.add(bravo);
     const store = new SQLiteIndexStore(database);
     const alphaOld = await startRun(store, alpha.name, "sync:alpha-old");
-    const alphaCurrent = await startRun(
-      store,
-      alpha.name,
-      "sync:alpha-current",
-    );
-    const bravoCurrent = await startRun(
-      store,
-      bravo.name,
-      "sync:bravo-current",
-    );
-
     await store.applyPackage(
       packageChange({
         sourceName: alpha.name,
@@ -355,6 +344,32 @@ void test("deletes only unseen packages for the source and active run", async ()
         searchTerm: "oldalpha",
         vectorValue: 0.1,
       }),
+    );
+    // alphaOld must finish before alphaCurrent can start: recordRun rejects
+    // a second running run for the same source (see the concurrency guard
+    // regression test below).
+    await store.recordRun(
+      alphaOld.finish({
+        status: "ok",
+        finishedAt: "2026-08-11T00:00:30.000Z",
+        counters: {
+          packagesSeen: 1,
+          packagesUnchanged: 0,
+          packagesIndexed: 1,
+          packagesFailed: 0,
+          packagesDeleted: 0,
+        },
+      }),
+    );
+    const alphaCurrent = await startRun(
+      store,
+      alpha.name,
+      "sync:alpha-current",
+    );
+    const bravoCurrent = await startRun(
+      store,
+      bravo.name,
+      "sync:bravo-current",
     );
     await store.applyPackage(
       packageChange({
@@ -452,7 +467,6 @@ void test("marks an unchanged package seen without replacing derivatives", async
     await new SQLiteSourceRegistry(database).add(sourceRoot);
     const store = new SQLiteIndexStore(database);
     const oldRun = await startRun(store, sourceRoot.name, "sync:old");
-    const currentRun = await startRun(store, sourceRoot.name, "sync:current");
     const change = packageChange({
       sourceName: sourceRoot.name,
       videoId: "unchanged_video",
@@ -462,6 +476,22 @@ void test("marks an unchanged package seen without replacing derivatives", async
       vectorValue: 0.4,
     });
     await store.applyPackage(change);
+    // oldRun must finish before currentRun can start: recordRun rejects a
+    // second running run for the same source.
+    await store.recordRun(
+      oldRun.finish({
+        status: "ok",
+        finishedAt: "2026-08-11T00:00:30.000Z",
+        counters: {
+          packagesSeen: 1,
+          packagesUnchanged: 0,
+          packagesIndexed: 1,
+          packagesFailed: 0,
+          packagesDeleted: 0,
+        },
+      }),
+    );
+    const currentRun = await startRun(store, sourceRoot.name, "sync:current");
     const before = database
       .prepare(
         "SELECT package_hash, (SELECT count(*) FROM embeddings) AS embeddings FROM video_packages",
@@ -486,12 +516,14 @@ void test("marks an unchanged package seen without replacing derivatives", async
   }
 });
 
-void test("two concurrent runs over one source delete each other's packages", async () => {
+void test("a second concurrent run over one source is rejected, so neither can delete the other's packages", async () => {
   // Deliberate reproduction of the hypothesis left open on 13 August, after
   // a cold run launched four syncs (two overlapping) and `status` reported
-  // 13 videos where there were 53. The mechanism is `deletePackagesNotSeen`,
+  // 13 videos where there were 53. The mechanism was `deletePackagesNotSeen`,
   // which removes every package whose `last_seen_sync_id` is not the run
-  // asking: whatever a concurrent run has already claimed looks unseen.
+  // asking: whatever a concurrent run had already claimed looked unseen.
+  // `recordRun` now rejects a second `running` run for the same source, so
+  // the second sync never gets to claim or delete anything.
   const path = await databasePath();
   const database = openDatabase(path);
   const sourceRoot = source("auto-design");
@@ -513,16 +545,37 @@ void test("two concurrent runs over one source delete each other's packages", as
         }),
       );
     }
+    await store.recordRun(
+      seed.finish({
+        status: "ok",
+        finishedAt: "2026-08-11T00:01:00.000Z",
+        counters: {
+          packagesSeen: 3,
+          packagesUnchanged: 0,
+          packagesIndexed: 3,
+          packagesFailed: 0,
+          packagesDeleted: 0,
+        },
+      }),
+    );
 
     const runA = await startRun(store, sourceRoot.name, "sync:concurrent-a");
-    const runB = await startRun(store, sourceRoot.name, "sync:concurrent-b");
 
-    // Nothing rejects a second active run over the same source.
-    const refs = await store.listPackageRefs(sourceRoot.name);
-    assert.equal(refs.length, 3);
+    // The interleaving two overlapping syncs produce: a second `sync`
+    // launched while the first is still running must be rejected outright,
+    // not allowed to start and race `deletePackagesNotSeen` against it.
+    await assert.rejects(
+      startRun(store, sourceRoot.name, "sync:concurrent-b"),
+      (error: unknown) => {
+        assert.ok(error instanceof SQLiteIndexStoreError);
+        assert.equal(error.code, "SYNC_ALREADY_RUNNING");
+        assert.match(error.message, /sync:concurrent-a/);
+        assert.match(error.message, /2026-08-11T00:00:00\.000Z/);
+        return true;
+      },
+    );
 
-    // A claims two packages, B claims the third — the interleaving two
-    // overlapping syncs produce, reproduced deterministically.
+    // A can still claim and finish normally.
     await store.markPackageSeen(
       PackageRef.create(sourceRoot.name, VideoId.create("video_1")),
       runA.id,
@@ -533,23 +586,15 @@ void test("two concurrent runs over one source delete each other's packages", as
     );
     await store.markPackageSeen(
       PackageRef.create(sourceRoot.name, VideoId.create("video_3")),
-      runB.id,
+      runA.id,
     );
-
-    // A finishes first and drops what B had claimed.
     assert.equal(
       await store.deletePackagesNotSeen(sourceRoot.name, runA.id),
-      1,
-    );
-    // B finishes and drops what A had kept.
-    assert.equal(
-      await store.deletePackagesNotSeen(sourceRoot.name, runB.id),
-      2,
+      0,
     );
 
-    // Every package is gone even though both runs succeeded and each video
-    // was seen by one of them.
-    assert.deepEqual(await store.listPackageRefs(sourceRoot.name), []);
+    // Every package survives: the second run never got to exist.
+    assert.equal((await store.listPackageRefs(sourceRoot.name)).length, 3);
   } finally {
     database.close();
   }

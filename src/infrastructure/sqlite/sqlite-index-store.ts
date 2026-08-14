@@ -19,6 +19,7 @@ import type { SyncIssue, SyncRun } from "../../domain/indexing/sync-run.js";
 export type SQLiteIndexStoreErrorCode =
   | "INVALID_DELETE_RUN"
   | "INVALID_PACKAGE_CHANGE"
+  | "SYNC_ALREADY_RUNNING"
   | "UNKNOWN_SOURCE"
   | "UNKNOWN_SYNC_RUN";
 
@@ -74,6 +75,11 @@ interface SourceIdRow {
 interface SyncRunRow {
   readonly source_id: number | null;
   readonly status: string;
+}
+
+interface ActiveRunRow {
+  readonly id: string;
+  readonly started_at: string;
 }
 
 function insertedId(row: unknown): number {
@@ -543,6 +549,29 @@ export class SQLiteIndexStore implements IndexStore {
             `Source ${run.sourceName.value} is not registered.`,
           ),
         );
+      }
+
+      // Only registering a *new* running run is guarded here; closing an
+      // existing one (transition to ok/partial/failed, or a repeated write
+      // of the same running run) must never be blocked by its own row, so
+      // active runs are matched excluding this run's id.
+      if (run.status === "running") {
+        const active = this.database
+          .prepare(
+            `SELECT id, started_at FROM sync_runs
+             WHERE source_id = ? AND status = 'running' AND id <> ?`,
+          )
+          .get(source.id, run.id.value) as ActiveRunRow | undefined;
+        if (active !== undefined) {
+          return rejected(
+            new SQLiteIndexStoreError(
+              "SYNC_ALREADY_RUNNING",
+              `Sync run ${active.id} for source ${run.sourceName.value} is ` +
+                `already running (started at ${active.started_at}). Run ` +
+                `"auto-youtube-rag sync --force" to supersede it.`,
+            ),
+          );
+        }
       }
 
       this.database
