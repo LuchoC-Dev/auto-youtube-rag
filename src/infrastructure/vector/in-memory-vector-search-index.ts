@@ -80,9 +80,9 @@ export class InMemoryVectorSearchIndex implements VectorSearchIndex {
 
   public constructor(private readonly source: VectorSource) {}
 
-  public load(model: EmbeddingModelDescriptor): Promise<void> {
+  public load(model: EmbeddingModelDescriptor): Promise<number> {
     if (this.loaded !== null && this.loaded.model.key === model.key) {
-      return Promise.resolve();
+      return Promise.resolve(this.loaded.entries.length);
     }
 
     try {
@@ -94,7 +94,7 @@ export class InMemoryVectorSearchIndex implements VectorSearchIndex {
       }
 
       this.loaded = { model, matrix, entries };
-      return Promise.resolve();
+      return Promise.resolve(entries.length);
     } catch (error: unknown) {
       this.loaded = null;
       return Promise.reject(

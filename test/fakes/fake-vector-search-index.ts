@@ -15,10 +15,14 @@ export class FakeVectorSearchIndex implements VectorSearchIndex {
   }[] = [];
   public hits: readonly RankedHit[] = [];
   public failure: Error | null = null;
+  /** Vectors available for the loaded model. Defaults to `hits.length` so
+   * tests that only care about search results need not set this
+   * separately; tests exercising `VECTORS_STALE` set it explicitly. */
+  public vectorCount: number | null = null;
 
-  public load(model: EmbeddingModelDescriptor): Promise<void> {
+  public load(model: EmbeddingModelDescriptor): Promise<number> {
     this.loads.push(model);
-    return Promise.resolve();
+    return Promise.resolve(this.vectorCount ?? this.hits.length);
   }
 
   public apply(change: VectorIndexChange): Promise<void> {
