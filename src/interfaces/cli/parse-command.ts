@@ -20,6 +20,7 @@ export type ParsedCliCommand =
       readonly source: string | null;
       readonly force: boolean;
     }
+  | { readonly kind: "rebuild" }
   | { readonly kind: "status" }
   | { readonly kind: "doctor" }
   | {
@@ -155,6 +156,23 @@ export function parseCommand(argv: readonly string[]): ParsedCliCommand {
         source: typeof values.source === "string" ? values.source : null,
         force: values.force === true,
       };
+    }
+    case "rebuild": {
+      const usageText = "auto-youtube-rag rebuild --confirm";
+      // `strict` parsing already rejects any other flag — `--force` included,
+      // which rebuild deliberately does not accept: superseding a ghost run
+      // and rebuilding the whole library are two separate decisions.
+      const { positionals, values } = parse(rest, {
+        confirm: { type: "boolean" },
+      });
+      exactPositionals(positionals, 0, usageText);
+      if (values.confirm !== true) {
+        return usage(
+          "rebuild deletes and regenerates the whole derived index, so it " +
+            `requires explicit confirmation. Usage: ${usageText}`,
+        );
+      }
+      return { kind: "rebuild" };
     }
     case "status":
     case "doctor": {

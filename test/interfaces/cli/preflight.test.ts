@@ -115,6 +115,37 @@ void test("sync with a library but no model: MODEL_NOT_INSTALLED, code 1, names 
   }
 });
 
+void test("rebuild without a library: LIBRARY_NOT_FOUND, not a purge attempt", async () => {
+  const { root, config } = await tempConfig();
+  try {
+    const result = await command(["rebuild", "--confirm"], config);
+    assert.equal(result.exitCode, 1);
+    const error = record(result.output.error);
+    assert.equal(error.code, "LIBRARY_NOT_FOUND");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+void test("rebuild with a library but no model: MODEL_NOT_INSTALLED before anything is deleted", async () => {
+  const { root, config } = await tempConfig();
+  try {
+    await mkdir(dirname(config.databasePath), { recursive: true });
+    await writeFile(config.databasePath, "", "utf8");
+
+    // The point of the preflight here is not just the message: a rebuild that
+    // purged first and only then discovered the missing model would leave an
+    // empty library it cannot regenerate.
+    const result = await command(["rebuild", "--confirm"], config);
+    assert.equal(result.exitCode, 1);
+    const error = record(result.output.error);
+    assert.equal(error.code, "MODEL_NOT_INSTALLED");
+    assert.match(String(error.message), /auto-youtube-rag models install/u);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 void test("retrieve with library and model both present: preflight passes and reaches the Application", async () => {
   const { root, config } = await tempConfig();
   try {

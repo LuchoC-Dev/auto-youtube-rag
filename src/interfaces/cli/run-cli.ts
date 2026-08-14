@@ -382,6 +382,36 @@ export async function runCli(options: RunCliOptions): Promise<number> {
         );
         return partial ? 1 : 0;
       }
+      case "rebuild": {
+        options.stderr.write(
+          "Rebuilding the derived index from scratch. This re-embeds every " +
+            "fragment and takes minutes; if it is interrupted, run it again.\n",
+        );
+        const result = await application.rebuildIndex();
+        options.stdout.write(
+          renderCliSuccess({
+            status: result.status,
+            sources_rebuilt: result.sourcesRebuilt,
+            packages_deleted: result.packagesDeleted,
+            packages_indexed: result.packagesIndexed,
+            packages_failed: result.packagesFailed,
+            sources: result.sources.map((source) => ({
+              name: source.name,
+              status: source.status,
+              packages_indexed: source.packagesIndexed,
+              packages_failed: source.packagesFailed,
+            })),
+            issues: result.issues.map((issue) => ({
+              video_id: issue.videoId?.value ?? null,
+              relative_path: issue.relativePath,
+              code: issue.code,
+              message: issue.message,
+              retryable: issue.retryable,
+            })),
+          }),
+        );
+        return result.status === "ok" ? 0 : 1;
+      }
       case "status": {
         const status = await getStatus(
           new SQLiteDiagnosticsRepository(application.database),

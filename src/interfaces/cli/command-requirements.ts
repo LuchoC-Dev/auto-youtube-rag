@@ -29,7 +29,12 @@ export function commandRequirement(
     case "status":
       return "library";
     case "sync":
+    case "rebuild":
     case "retrieve":
+      // `rebuild` re-embeds everything, so it needs the model as much as
+      // `sync` does. Leaving it at "library" would reproduce the 13 August
+      // cold run: the missing model discovered once per video instead of once
+      // before any work starts.
       return "library_and_model";
     default:
       return unreachable(command);

@@ -53,6 +53,9 @@ void test("parses every non-interactive administrative command", () => {
     source: null,
     force: true,
   });
+  assert.deepEqual(parseCommand(["rebuild", "--confirm"]), {
+    kind: "rebuild",
+  });
   assert.deepEqual(parseCommand(["status"]), { kind: "status" });
   assert.deepEqual(parseCommand(["doctor"]), { kind: "doctor" });
   assert.deepEqual(parseCommand(["retrieve", "brutalismo"]), {
@@ -119,6 +122,14 @@ void test("maps missing, unknown and mistyped arguments to usage exit code 2", (
     ["source", "remove"],
     ["sync", "--unknown"],
     ["status", "extra"],
+    // rebuild without confirmation is a usage error, never an operational
+    // one: a command that deletes the whole derived index must not run by
+    // accident.
+    ["rebuild"],
+    ["rebuild", "--confirm", "extra"],
+    // rebuild deliberately does not accept --force: superseding a ghost run
+    // and rebuilding the library are two separate decisions.
+    ["rebuild", "--confirm", "--force"],
     ["retrieve"],
     ["retrieve", "brutalismo", "--depth", "shallow"],
     ["retrieve", "brutalismo", "--max-tokens", "0"],

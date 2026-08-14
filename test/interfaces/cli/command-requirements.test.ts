@@ -19,6 +19,7 @@ const oneOfEachKind: readonly ParsedCliCommand[] = [
   { kind: "source_list" },
   { kind: "source_remove", name: "design" },
   { kind: "sync", source: null, force: false },
+  { kind: "rebuild" },
   { kind: "status" },
   { kind: "doctor" },
   {
@@ -40,6 +41,7 @@ const expected: Readonly<Record<ParsedCliCommand["kind"], CommandRequirement>> =
     source_list: "library",
     source_remove: "library",
     sync: "library_and_model",
+    rebuild: "library_and_model",
     status: "library",
     doctor: "none",
     retrieve: "library_and_model",
@@ -58,10 +60,14 @@ void test("doctor requires nothing so it can diagnose a missing library or model
   assert.equal(commandRequirement({ kind: "doctor" }), "none");
 });
 
-void test("sync and retrieve are the only commands requiring both the library and the model", () => {
+// `rebuild` joined `sync` and `retrieve` in 4.6: it re-embeds the whole
+// library, so discovering a missing model per video instead of once up front
+// would reproduce exactly what the preflight of 4.2 was built to prevent.
+void test("sync, rebuild and retrieve are the only commands requiring both the library and the model", () => {
   for (const [kind, requirement] of Object.entries(expected)) {
     const needsBoth = requirement === "library_and_model";
-    const isSyncOrRetrieve = kind === "sync" || kind === "retrieve";
-    assert.equal(needsBoth, isSyncOrRetrieve, kind);
+    const embedsOrQueries =
+      kind === "sync" || kind === "rebuild" || kind === "retrieve";
+    assert.equal(needsBoth, embedsOrQueries, kind);
   }
 });
