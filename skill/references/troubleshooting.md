@@ -39,18 +39,28 @@ Cada salida JSON incluye códigos simbólicos estables (por ejemplo
 Usalos para decidir si tiene sentido reintentar o si hace falta intervención
 humana.
 
-Dos códigos se refieren al modelo de embeddings y **no son sinónimos**:
+Códigos de estado de instalación, todos resueltos en `setup.md`:
 
-| Código                    | Dónde aparece                   | Qué significa                                                                  |
-| ------------------------- | ------------------------------- | ------------------------------------------------------------------------------ |
-| `MODEL_LOAD_FAILED`       | Issues de `sync`, uno por video | El modelo no está en la ruta de caché que la herramienta consultó.             |
-| `EMBEDDING_MODEL_MISSING` | `warnings` de `retrieve`        | La vía vectorial se degradó; el bundle igual se produce, sólo con vía textual. |
+| Código                     | Qué significa                                                    |
+| -------------------------- | ---------------------------------------------------------------- |
+| `LIBRARY_NOT_FOUND`        | Falta la base. Corré `init`.                                     |
+| `MODEL_NOT_INSTALLED`      | Falta el modelo o está dañado. Corré `models install`.           |
+| `MODEL_SOURCE_INVALID`     | `--from` apunta a una ruta sin el modelo completo. Error de uso. |
+| `MODEL_DOWNLOAD_FAILED`    | La red falló durante la descarga. Es retryable.                  |
+| `DATABASE_INTEGRITY_ERROR` | La base está dañada. Corré `doctor` para el detalle.             |
+| `LEGACY_LIBRARY_FOUND`     | Advertencia: hay una base vieja relativa al directorio actual.   |
 
-Ante `MODEL_LOAD_FAILED` no reintentes `sync` sin cambiar nada: es
-configuración, no un fallo transitorio. Leé `setup.md`.
+Ninguno de los tres primeros es transitorio: reintentar el mismo comando sin
+cambiar nada vuelve a fallar igual.
 
-Ante `EMBEDDING_MODEL_MISSING` el bundle sirve, pero se armó sólo con
-búsqueda textual. Decilo si vas a apoyarte en esa evidencia.
+Aparte, en los `warnings` de `retrieve`:
+
+| Código                    | Qué significa                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------ |
+| `EMBEDDING_MODEL_MISSING` | La vía vectorial se degradó; el bundle igual se produce, sólo con vía textual. |
+
+El bundle sirve, pero se armó sólo con búsqueda textual. Decilo si vas a
+apoyarte en esa evidencia.
 
 ## `sync` falló parcialmente
 

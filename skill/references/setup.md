@@ -3,87 +3,118 @@
 Leé este archivo **sólo** cuando se cumpla alguna de estas condiciones:
 
 - es la primera vez que usás la herramienta en esta máquina;
-- `sync` devolvió issues `MODEL_LOAD_FAILED`;
-- un comando falló con `ERR_SQLITE_ERROR: unable to open database file`;
-- `status` reporta una biblioteca vacía que esperabas que tuviera contenido.
+- un comando falló con `LIBRARY_NOT_FOUND` o `MODEL_NOT_INSTALLED`;
+- `models status` devolvió `incomplete`;
+- querés mover la biblioteca a otra ubicación.
 
-Si la biblioteca ya funciona y los comandos responden con normalidad, no
-necesitás nada de acá.
+Si la biblioteca ya funciona, no necesitás nada de acá.
 
 ## Cómo invocar la CLI
 
-La forma canónica es `auto-youtube-rag <comando>`. Si el comando no está
-disponible en el PATH, buscá el repositorio del proyecto y usá
-`node "<ruta-al-repo>/dist/main.js" <comando>` en su lugar; requiere haber
-corrido `npm run build` una vez en ese repositorio.
+La forma canónica es `auto-youtube-rag <comando>`. Si el comando no está en el
+`PATH`, buscá el repositorio del proyecto y usá
+`node "<ruta-al-repo>/dist/main.js" <comando>`; requiere haber corrido
+`npm run build` una vez en ese repositorio.
 
-## Ubicación de la base y del modelo
+## Dónde vive todo
 
-Ambas rutas se resuelven **relativas al directorio de trabajo del proceso**,
-no a la ubicación del repositorio ni del binario. Esta es la causa más común
-de fallos de arranque.
-
-| Qué              | Default                    | Variable de entorno            |
-| ---------------- | -------------------------- | ------------------------------ |
-| Base de datos    | `<cwd>/.auto-youtube-rag/` | `AUTO_YOUTUBE_RAG_HOME`        |
-| Caché del modelo | `<cwd>/.cache/models/`     | `AUTO_YOUTUBE_RAG_MODEL_CACHE` |
-
-Consecuencia práctica: si trabajás desde un directorio distinto al
-repositorio —que es el caso normal— el modelo de embeddings **no va a estar
-donde la herramienta lo busca**, aunque ya esté descargado en el repo.
-
-## El modelo de embeddings no carga
-
-Síntoma: `sync` termina con `status: "partial"` y un issue
-`MODEL_LOAD_FAILED` **por cada video**, con este mensaje:
+Un único directorio, en el hogar del usuario:
 
 ```text
-E5 Small could not be loaded from the local cache at <cwd>/.cache/models.
-Run npm run models:download first.
+~/.auto-youtube-rag/
+  index.sqlite       ← la biblioteca
+  models/            ← el modelo de embeddings (130 MB)
 ```
 
-No es un fallo transitorio y reintentar sin cambiar nada vuelve a fallar
-igual. Es configuración.
+En Windows es `C:\Users\<usuario>\.auto-youtube-rag\`.
 
-**La solución correcta es apuntar la variable a un caché que ya exista**, en
-vez de descargar el modelo de nuevo:
+**No depende del directorio desde el que ejecutás.** Podés invocar la CLI
+parado en cualquier carpeta y siempre vas a hablar con la misma biblioteca.
 
-```text
-AUTO_YOUTUBE_RAG_MODEL_CACHE=<ruta-al-repo>/.cache/models
-```
+Dos variables de entorno lo mueven, y sólo hacen falta en casos especiales
+—aislar una biblioteca de prueba, o compartir el modelo entre varios hogares:
 
-Definila en el entorno antes de invocar la CLI y usá exactamente el mismo
-valor en todas las invocaciones de la sesión.
+| Variable                      | Qué mueve                     |
+| ----------------------------- | ----------------------------- |
+| `AUTO_YOUTUBE_RAG_HOME`       | El hogar entero               |
+| `AUTO_YOUTUBE_RAG_MODELS_DIR` | Sólo el directorio del modelo |
 
-Sólo si no existe ningún caché en ninguna parte corré `npm run
-models:download` dentro del repositorio. Ese comando sí requiere red y
-descarga alrededor de 130 MB — es la única operación de toda la herramienta
-que usa la red, y ocurre una sola vez por máquina.
+Si definís alguna, usá **el mismo valor en todas las invocaciones** de la
+sesión.
 
-## Inicializar la base
-
-`status`, `doctor` y `source add` necesitan que la base de datos local ya
-exista. Si es la primera vez en esta máquina, o no estás seguro:
+## Instalar por primera vez
 
 ```text
 auto-youtube-rag init
 ```
 
-Es idempotente: si ya está inicializada, no hace nada destructivo ni la
-reemplaza.
+Crea el hogar, prepara la base y deja el modelo instalado. Es idempotente.
 
-## La base no aparece donde esperabas
+**Tarda.** Sin banderas descarga unos 130 MB, y es la única operación de toda
+la herramienta que usa la red. Dale un timeout holgado o corrélo en segundo
+plano.
 
-Síntoma: `ERR_SQLITE_ERROR: unable to open database file`, o un `status` que
-reporta una biblioteca vacía que sabés que tiene contenido.
+Dos banderas cambian ese comportamiento:
 
-Tiene dos causas posibles y conviene descartarlas en este orden:
+- **`--from <ruta>`**: copia un modelo que ya existe en disco en vez de
+  descargarlo. Tarda segundos. La ruta debe contener
+  `Xenova/multilingual-e5-small/` con sus cuatro archivos. Si no los tiene,
+  falla con `MODEL_SOURCE_INVALID` (código `2`) en vez de descargar en
+  silencio.
+- **`--skip-model`**: prepara sólo la base. Para CI o entornos sin red.
+  `sync` y `retrieve` no van a funcionar hasta que instales el modelo.
 
-1. **Falta `init`.** Corrí `auto-youtube-rag init` y reintentá.
-2. **Cambiaste de directorio de trabajo entre comandos.** La base es
-   relativa al `cwd`, así que invocar desde otra carpeta apunta a una base
-   distinta —vacía o inexistente— sin ningún aviso.
+## `LIBRARY_NOT_FOUND`
 
-Para evitar la segunda: invocá siempre desde el mismo `cwd` durante toda la
-sesión, o fijá `AUTO_YOUTUBE_RAG_HOME` a una ruta absoluta y usá ese mismo
-valor en cada invocación.
+Falta la base. El mensaje incluye la ruta exacta donde la buscó.
+
+Causas, en orden de probabilidad:
+
+1. **Nunca corriste `init`.** Corrélo.
+2. **Definiste `AUTO_YOUTUBE_RAG_HOME` con un valor distinto** al que usaste
+   antes, o lo definiste en una invocación y no en otra. Verificá que sea el
+   mismo valor en todas.
+
+## `MODEL_NOT_INSTALLED`
+
+La base existe pero falta el modelo, o está dañado. `sync` y `retrieve` lo
+necesitan; `status`, `doctor` y `source` no.
+
+```text
+auto-youtube-rag models install
+auto-youtube-rag models install --from <ruta-a-un-modelo-existente>
+auto-youtube-rag models install --force
+```
+
+**No es un fallo transitorio.** Reintentar `sync` sin instalar el modelo
+vuelve a fallar igual.
+
+## `models status` devuelve `incomplete`
+
+La instalación está a medias o dañada: típicamente una descarga cortada, que
+deja los archivos en su lugar con el tamaño equivocado. También aparece si
+alguien copió el modelo a mano, sin pasar por la herramienta.
+
+El recibo `models/.install.json` guarda el tamaño esperado de cada archivo, y
+`models status` lista en `issues` cuáles no coinciden.
+
+Se repara reinstalando encima:
+
+```text
+auto-youtube-rag models install --force
+```
+
+## Mover la biblioteca
+
+No hay comando de mudanza. Movés el directorio a mano y definís
+`AUTO_YOUTUBE_RAG_HOME` apuntando al lugar nuevo, en todas las invocaciones.
+
+## `LEGACY_LIBRARY_FOUND`
+
+Advertencia, no error. Hay una base vieja en `<directorio-actual>/.auto-youtube-rag/`,
+de cuando la herramienta guardaba la biblioteca junto al directorio de
+trabajo. Ya no se lee.
+
+Si esa base tenía contenido que te importa, movela al hogar nuevo o apuntá
+`AUTO_YOUTUBE_RAG_HOME` hacia ella. La herramienta no la migra sola: mover
+datos del usuario sin pedirlo no es su trabajo.
