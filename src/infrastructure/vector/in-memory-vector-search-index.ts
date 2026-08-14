@@ -33,6 +33,17 @@ interface LoadedIndex {
   readonly entries: readonly VectorEntry[];
 }
 
+function sameModel(
+  left: EmbeddingModelDescriptor,
+  right: EmbeddingModelDescriptor,
+): boolean {
+  return (
+    left.key === right.key &&
+    left.version === right.version &&
+    left.dimensions === right.dimensions
+  );
+}
+
 function matches(entry: VectorEntry, filter: RetrievalFilter): boolean {
   if (
     filter.sources.length > 0 &&
@@ -81,7 +92,13 @@ export class InMemoryVectorSearchIndex implements VectorSearchIndex {
   public constructor(private readonly source: VectorSource) {}
 
   public load(model: EmbeddingModelDescriptor): Promise<number> {
-    if (this.loaded !== null && this.loaded.model.key === model.key) {
+    // The snapshot is reused only for the exact same model. Comparing `key`
+    // alone would keep serving vectors built by a different revision or
+    // quantization, since `version` is what carries them
+    // (`Xenova/multilingual-e5-small@main:q8`) while `key` stays `e5-small`.
+    // That would also hide the staleness `VECTORS_STALE` exists to report:
+    // a reused snapshot has a non-zero count, so the warning never fires.
+    if (this.loaded !== null && sameModel(this.loaded.model, model)) {
       return Promise.resolve(this.loaded.entries.length);
     }
 
