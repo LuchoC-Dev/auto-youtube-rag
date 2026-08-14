@@ -1,0 +1,13 @@
+# Prettier is configured for LF, so the working copy must be LF too. Without
+# this, core.autocrlf=true on Windows checks every file out with CRLF and
+# `npm run check` fails on format:check after any checkout or fresh clone,
+# with no actual content change (git normalizes line endings when comparing).
+* text=auto eol=lf
+
+# Keep binary fixtures and the model files byte-identical.
+*.onnx binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.mp4 binary
+*.webm binary
