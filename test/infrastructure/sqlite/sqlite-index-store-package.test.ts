@@ -19,7 +19,7 @@ import { KnowledgeUnit } from "../../../src/domain/indexing/knowledge-unit.js";
 import { SearchFragment } from "../../../src/domain/indexing/search-fragment.js";
 import { SourceDocument } from "../../../src/domain/indexing/source-document.js";
 import { SourceRoot } from "../../../src/domain/indexing/source-root.js";
-import { SyncRun } from "../../../src/domain/indexing/sync-run.js";
+import { SyncIssue, SyncRun } from "../../../src/domain/indexing/sync-run.js";
 import { VideoPackage } from "../../../src/domain/indexing/video-package.js";
 import { openDatabase } from "../../../src/infrastructure/sqlite/open-database.js";
 import {
@@ -595,6 +595,242 @@ void test("a second concurrent run over one source is rejected, so neither can d
 
     // Every package survives: the second run never got to exist.
     assert.equal((await store.listPackageRefs(sourceRoot.name)).length, 3);
+  } finally {
+    database.close();
+  }
+});
+
+void test("purgeDerivedIndex deletes every derivative and preserves configuration and history", async () => {
+  const path = await databasePath();
+  const database = openDatabase(path);
+  const first = source("auto-design");
+  const second = source("catalog-design");
+  try {
+    const registry = new SQLiteSourceRegistry(database);
+    await registry.add(first);
+    await registry.add(second);
+    const store = new SQLiteIndexStore(database);
+
+    // Two sources, two packages each, so the purge cannot pass by only
+    // clearing the source it happens to visit first.
+    for (const sourceRoot of [first, second]) {
+      const run = await startRun(
+        store,
+        sourceRoot.name,
+        `sync:seed-${sourceRoot.name.value}`,
+      );
+      for (const videoId of ["video_1", "video_2"]) {
+        await store.applyPackage(
+          packageChange({
+            sourceName: sourceRoot.name,
+            videoId,
+            syncId: run.id,
+            hashCharacter: "a",
+            searchTerm: "alpha",
+            vectorValue: 0.25,
+          }),
+        );
+      }
+      await store.recordIssue(
+        SyncIssue.create({
+          syncId: run.id,
+          videoId: VideoId.create("video_1"),
+          relativePath: "videos/video-1/context.md",
+          code: "INVALID_CONTEXT",
+          message: "Recorded before the rebuild, and it must outlive it.",
+          retryable: false,
+        }),
+      );
+      await store.recordRun(
+        run.finish({
+          status: "ok",
+          finishedAt: "2026-08-11T00:01:00.000Z",
+          counters: {
+            packagesSeen: 2,
+            packagesUnchanged: 0,
+            packagesIndexed: 2,
+            packagesFailed: 0,
+            packagesDeleted: 0,
+          },
+        }),
+      );
+    }
+
+    assert.equal(await store.purgeDerivedIndex(), 4);
+
+    // Everything derived from the sources is gone, including the FTS index,
+    // which no statement touches directly: the delete triggers keep it aligned.
+    for (const table of [
+      "video_packages",
+      "source_documents",
+      "knowledge_units",
+      "search_fragments",
+      "fragment_fts",
+      "embeddings",
+    ]) {
+      assert.equal(
+        database.prepare(`SELECT count(*) AS count FROM ${table}`).get()?.count,
+        0,
+        table,
+      );
+    }
+
+    // What is not derived survives: user configuration, the schema version and
+    // the run history that explains why someone had to rebuild.
+    assert.equal(
+      database.prepare("SELECT count(*) AS count FROM sources").get()?.count,
+      2,
+    );
+    assert.equal(
+      database.prepare("SELECT count(*) AS count FROM sync_runs").get()?.count,
+      2,
+    );
+    assert.equal(
+      database.prepare("SELECT count(*) AS count FROM sync_issues").get()
+        ?.count,
+      2,
+    );
+    assert.equal(
+      database
+        .prepare("SELECT value FROM schema_meta WHERE key = 'schema_version'")
+        .get()?.value,
+      "1",
+    );
+    assert.deepEqual(await registry.list(), [first, second]);
+  } finally {
+    database.close();
+  }
+});
+
+void test("purgeDerivedIndex leaves a library a later sync can index into again", async () => {
+  const path = await databasePath();
+  const database = openDatabase(path);
+  const sourceRoot = source("auto-design");
+  try {
+    await new SQLiteSourceRegistry(database).add(sourceRoot);
+    const store = new SQLiteIndexStore(database);
+    const seed = await startRun(store, sourceRoot.name, "sync:seed");
+    await store.applyPackage(
+      packageChange({
+        sourceName: sourceRoot.name,
+        videoId: "video_1",
+        syncId: seed.id,
+        hashCharacter: "a",
+        searchTerm: "alpha",
+        vectorValue: 0.25,
+      }),
+    );
+    await store.recordRun(
+      seed.finish({
+        status: "ok",
+        finishedAt: "2026-08-11T00:01:00.000Z",
+        counters: {
+          packagesSeen: 1,
+          packagesUnchanged: 0,
+          packagesIndexed: 1,
+          packagesFailed: 0,
+          packagesDeleted: 0,
+        },
+      }),
+    );
+
+    assert.equal(await store.purgeDerivedIndex(), 1);
+    assert.equal(await store.purgeDerivedIndex(), 0);
+
+    // The rebuild's own sync: same source, fresh run, indexing into the
+    // emptied library without reopening the database.
+    const rebuilt = await startRun(store, sourceRoot.name, "sync:rebuild");
+    await store.applyPackage(
+      packageChange({
+        sourceName: sourceRoot.name,
+        videoId: "video_1",
+        syncId: rebuilt.id,
+        hashCharacter: "b",
+        searchTerm: "beta",
+        vectorValue: 0.75,
+      }),
+    );
+
+    const state = await store.getPackageState(
+      PackageRef.create(sourceRoot.name, VideoId.create("video_1")),
+    );
+    assert.equal(state?.packageHash, "b".repeat(64));
+    assert.equal(
+      database
+        .prepare(
+          "SELECT count(*) AS count FROM fragment_fts WHERE fragment_fts MATCH 'alpha'",
+        )
+        .get()?.count,
+      0,
+    );
+    assert.equal(
+      database
+        .prepare(
+          "SELECT count(*) AS count FROM fragment_fts WHERE fragment_fts MATCH 'beta'",
+        )
+        .get()?.count,
+      1,
+    );
+  } finally {
+    database.close();
+  }
+});
+
+void test("purgeDerivedIndex refuses to empty the library under a running sync", async () => {
+  const path = await databasePath();
+  const database = openDatabase(path);
+  const first = source("auto-design");
+  const second = source("catalog-design");
+  try {
+    const registry = new SQLiteSourceRegistry(database);
+    await registry.add(first);
+    await registry.add(second);
+    const store = new SQLiteIndexStore(database);
+
+    const seed = await startRun(store, first.name, "sync:seed");
+    await store.applyPackage(
+      packageChange({
+        sourceName: first.name,
+        videoId: "video_1",
+        syncId: seed.id,
+        hashCharacter: "a",
+        searchTerm: "alpha",
+        vectorValue: 0.25,
+      }),
+    );
+    await store.recordRun(
+      seed.finish({
+        status: "ok",
+        finishedAt: "2026-08-11T00:01:00.000Z",
+        counters: {
+          packagesSeen: 1,
+          packagesUnchanged: 0,
+          packagesIndexed: 1,
+          packagesFailed: 0,
+          packagesDeleted: 0,
+        },
+      }),
+    );
+
+    // The running sync belongs to the *other* source: a rebuild spans every
+    // source, so any active run anywhere must block it.
+    await startRun(store, second.name, "sync:in-flight");
+
+    await assert.rejects(store.purgeDerivedIndex(), (error: unknown) => {
+      assert.ok(error instanceof SQLiteIndexStoreError);
+      assert.equal(error.code, "SYNC_ALREADY_RUNNING");
+      assert.match(error.message, /sync:in-flight/);
+      assert.match(error.message, /catalog-design/);
+      return true;
+    });
+
+    // Nothing was deleted: the rejection happened inside the transaction,
+    // before any row could go.
+    assert.equal((await store.listPackageRefs(first.name)).length, 1);
+    assert.equal(
+      database.prepare("SELECT count(*) AS count FROM embeddings").get()?.count,
+      1,
+    );
   } finally {
     database.close();
   }
