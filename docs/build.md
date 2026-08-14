@@ -322,3 +322,42 @@ warning, confirmando que los vectores viejos siguen siendo válidos; `doctor`
 reportó los seis checks en `ok`; y el digest SHA-256 del árbol fuente fue
 idéntico antes y después. Detalle completo en `docs/decisions.md`, sección
 "Perfil de modelo y política de prefijos".
+
+#### 4.6 Comando `rebuild --confirm`
+
+Diseño en `docs/rebuild-design.md`, checklist fino en `docs/rebuild-tasks.md`
+(bloques AE–AH). Origen: `rebuild` era el único comando con contrato público
+aprobado desde el MVP que nunca se implementó, y el punto 2 del orden de
+prioridad del 14 de agosto de 2026.
+
+- [x] AE. `purgeDerivedIndex` en el puerto y en SQLite, con el guard de
+      `sync` activo dentro de la misma transacción que el borrado
+- [x] AF. Caso de uso `rebuildIndex`: purga, publica la remoción vectorial y
+      re-sincroniza cada fuente reutilizando el cableado de `sync`
+- [x] AG. Superficie de CLI: `--confirm` obligatorio, requisito
+      `library_and_model`, recibo agregado y códigos de salida
+- [x] AH. E2E sobre SQLite real, contrato de CLI, `SKILL.md` y cierre
+
+Cerrado el 14 de agosto de 2026.
+
+`rebuild` cubre lo que `sync` no puede detectar: `unchanged()` sólo compara el
+hash del paquete y la identidad del modelo, así que un tamaño de lote nuevo
+(la reindexación que 4.3 dejó "recomendable pero no obligatoria" sin ninguna
+forma de ejercerla), un `parser_version` distinto o un cambio de
+fragmentación dejan la biblioteca inconsistente mientras `doctor` sigue
+reportando `ok`.
+
+**El bloque AH2 encontró un defecto real antes de que llegara a producción.**
+El diseño daba por sentado que el índice vectorial en memoria se invalidaría
+solo, porque ya lo hace en `apply`. Es falso: la purga borra filas por SQL, y
+SQL no publica nada, así que un rebuild que termina sin ningún paquete dejaba
+el índice sirviendo vectores fantasma —2 medidos sobre una biblioteca con cero
+embeddings—, exactamente el defecto que 4.4 había corregido, reapareciendo por
+un camino nuevo. Corregido publicando un `remove_packages` después del commit
+de la purga.
+
+**El punto 1 del orden de prioridad —ordenar fragmentos por longitud antes de
+lotear— se cerró sin escribir código.** Es inerte con el `batchSize = 1` que
+adoptó 4.3: el padding que el ordenamiento ataca sólo existe dentro de un lote
+de dos o más. Detalle en `docs/rebuild-design.md`, sección "Por qué el punto 1
+se cerró sin código".

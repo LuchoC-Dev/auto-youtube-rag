@@ -71,23 +71,28 @@ mediante la skill `/git-commit`. Antes de cada commit: el test específico,
 
 ## Bloque AH — E2E, documentación y cierre
 
-- [ ] **AH1** — E2E sobre SQLite real (no fakes) con fixture de dos fuentes:
-      sincroniza, corrompe deliberadamente un derivado o cambia el
-      `parser_version` persistido, corre `rebuild --confirm` y verifica que la
-      biblioteca queda idéntica a un `sync` desde cero.
-- [ ] **AH2** — Test del índice vectorial: un `rebuild` que termina **sin
-      ningún paquete** deja el índice en memoria vacío, no sirviendo vectores
-      fantasma desde el snapshot previo (el defecto que 4.4 encontró).
-- [ ] **AH3** — Documentar el recibo, los códigos de salida y la
+- [x] **AH1** — E2E sobre SQLite real (no fakes): sincroniza, corrompe
+      deliberadamente un fragmento derivado, comprueba que `sync` responde
+      `no_changes` y **no lo repara** —la brecha, demostrada—, corre el
+      rebuild y verifica que la corrupción desaparece, que los contadores
+      vuelven a los de un `sync` desde cero, que `sources` y el historial de
+      runs sobreviven y que el árbol fuente no cambió.
+- [x] **AH2** — Test del índice vectorial: **encontró un defecto real**. Un
+      `rebuild` que termina sin ningún paquete dejaba el índice en memoria
+      sirviendo 2 vectores fantasma, porque la purga borra por SQL y sólo
+      `apply` invalida el snapshot. Corregido publicando un `remove_packages`
+      después del commit de la purga; el test ahora fija `load() === 0`.
+- [x] **AH3** — Documentado el recibo, los códigos de salida y la
       obligatoriedad de `--confirm` en `docs/cli-contract.md`, sección
-      `rebuild`, que hoy tiene sólo dos frases.
-- [ ] **AH4** — Enseñar `rebuild` a `skill/SKILL.md`: cuándo corresponde
-      correrlo (vectores mezclados, cambio de parser), que **no** es el
-      remedio de un `sync` fallido, y la ventana de reconstrucción parcial si
-      el proceso muere a mitad.
-- [ ] **AH5** — Cerrar el punto en `docs/build.md`, registrar las decisiones
-      en `docs/decisions.md` (incluido el cierre sin código del ordenamiento
-      por longitud) y actualizar `docs/agent-handoff.md`.
+      `rebuild`, que tenía sólo dos frases.
+- [x] **AH4** — `skill/SKILL.md` tiene la sección "Reconstruir la biblioteca":
+      cuándo corresponde, los tres casos en que **no** corresponde (incluido
+      "arreglar un `sync` fallido"), que tarda minutos, y que una interrupción
+      se remedia repitiendo el comando. Se corrigieron las dos menciones que
+      lo daban por no implementado.
+- [x] **AH5** — Punto cerrado en `docs/build.md`, decisiones registradas en
+      `docs/decisions.md` (incluido el cierre sin código del ordenamiento por
+      longitud) y `docs/agent-handoff.md` actualizado.
 
 ## Riesgos anotados
 

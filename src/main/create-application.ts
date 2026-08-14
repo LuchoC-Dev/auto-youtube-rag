@@ -178,6 +178,7 @@ export function createApplication(
       rebuildIndex({
         store: indexStore,
         registry: sourceRegistry,
+        vectorIndex,
         sync: (source) =>
           syncSource(
             {

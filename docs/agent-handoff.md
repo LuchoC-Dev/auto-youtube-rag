@@ -11,7 +11,8 @@ y el siguiente bloque recomendado.
 Estado de referencia: **14 de agosto de 2026**, después de cerrar los puntos
 4.2 —instalación: hogar de usuario, `init` instalador y preflight—, 4.3
 —seguridad de `sync` y rendimiento de indexación—, 4.4 —aviso de vectores
-obsoletos— y 4.5 —perfil de modelo de embeddings y política de prefijos.
+obsoletos—, 4.5 —perfil de modelo de embeddings y política de prefijos— y
+4.6 —el comando `rebuild --confirm`.
 
 **Lo que más probablemente contradiga tu memoria de sesiones viejas**, en
 orden de impacto:
@@ -27,6 +28,9 @@ orden de impacto:
 4. **El marcador de cita abre el bloque, dentro del encabezado**
    (`### [S01] ...`), no lo cierra en una línea suelta.
 5. `init` **ya no es instantáneo**: instala el modelo salvo `--skip-model`.
+6. **`rebuild --confirm` ya está implementado.** Si una memoria vieja dice
+   que el contrato lo aprueba pero no existe, está desactualizada: se cerró
+   como punto 4.6. La CLI no tiene ningún comando pendiente de implementar.
 
 Ver "Configuración de ejecución" más abajo antes de asumir cualquier ruta.
 
@@ -50,23 +54,23 @@ pendiente urgente.
 
 ## Datos rápidos
 
-| Dato                      | Valor                                                                                                      |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Proyecto                  | `auto-youtube-rag`                                                                                         |
-| Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag`                                   |
-| Rama actual               | `main`                                                                                                     |
-| Remoto                    | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (privado)                                              |
-| Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.5                               |
-| Estado Git al cerrar      | Worktree limpio; `main` pusheada y sincronizada con `origin/main` (0 commits de diferencia)                |
-| Runtime                   | Node.js 24.19.0 LTS, ESM                                                                                   |
-| Lenguaje                  | TypeScript 6.0.3 estricto                                                                                  |
-| Persistencia              | SQLite mediante `node:sqlite`                                                                              |
-| Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`                                         |
-| Dimensión                 | 384                                                                                                        |
-| Instalación               | `auto-youtube-rag init` → `~/.auto-youtube-rag/` (base + modelo, ~130 MB)                                  |
-| Operación                 | Exclusivamente local; sin APIs externas                                                                    |
-| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1–4.5 al 100% en `docs/build.md`                                           |
-| Próximo punto             | Ninguno abierto; siguiente frente sugerido: lotear ordenando por longitud (ver "Orden de prioridad" abajo) |
+| Dato                      | Valor                                                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Proyecto                  | `auto-youtube-rag`                                                                                     |
+| Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag`                               |
+| Rama actual               | `main`                                                                                                 |
+| Remoto                    | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (privado)                                          |
+| Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.6                           |
+| Estado Git al cerrar      | Worktree limpio; `main` pusheada y sincronizada con `origin/main` (0 commits de diferencia)            |
+| Runtime                   | Node.js 24.19.0 LTS, ESM                                                                               |
+| Lenguaje                  | TypeScript 6.0.3 estricto                                                                              |
+| Persistencia              | SQLite mediante `node:sqlite`                                                                          |
+| Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`                                     |
+| Dimensión                 | 384                                                                                                    |
+| Instalación               | `auto-youtube-rag init` → `~/.auto-youtube-rag/` (base + modelo, ~130 MB)                              |
+| Operación                 | Exclusivamente local; sin APIs externas                                                                |
+| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1–4.6 al 100% en `docs/build.md`                                       |
+| Próximo punto             | Ninguno abierto; el orden de prioridad del 14 de agosto quedó agotado (ver "Orden de prioridad" abajo) |
 
 **Cambió el 14 de agosto de 2026.** Hasta entonces todo el proyecto vivía en
 una rama llamada `feat/sqlite-vec-benchmark` —nombre heredado de un benchmark
@@ -121,7 +125,10 @@ Antes de modificar código, leer en este orden:
 19. `docs/install-tasks.md`: checklist fino completado U–Z e Y para 4.2.
 20. `docs/sync-safety-design.md`: guard de concurrencia, runs fantasma y
     tamaño de lote del punto 4.3, ya completado.
-21. Este documento: estado operativo consolidado del MVP, de los puntos 4.1
+21. `docs/rebuild-design.md` y `docs/rebuild-tasks.md`: el comando
+    `rebuild --confirm` del punto 4.6, ya completado. Incluye por qué el
+    ordenamiento por longitud se cerró sin escribir código.
+22. Este documento: estado operativo consolidado del MVP, de los puntos 4.1
     a 4.4, el orden de prioridad decidido y lo que enseñó la sesión del 13 y
     14 de agosto.
 
@@ -652,13 +659,15 @@ auto-youtube-rag retrieve <query> [--depth focused|balanced|deep] \
 `--source` es repetible. `--depth` y `--max-tokens` inválidos se rechazan en
 `parse-command.ts` con código de uso `2`, antes de instanciar la aplicación.
 
-Todavía no implementado, aunque el contrato público ya está aprobado:
-
 ```text
 auto-youtube-rag rebuild --confirm
 ```
 
-`rebuild` no depende de 2.3 y queda para cuando el producto lo requiera.
+`rebuild` se implementó en el punto 4.6 (14 de agosto de 2026). **Ya no queda
+ningún comando del contrato sin implementar.** Borra el índice derivado y lo
+regenera desde los paquetes en disco; preserva `sources`, la versión de
+esquema y el historial de runs. `--confirm` es obligatorio (sin él, código
+`2`) y no acepta `--force`.
 
 ## Configuración de ejecución
 
@@ -1251,11 +1260,12 @@ incremental, recuperación híbrida, ensamblado de contexto citado, comando
 `retrieve`, skill portable para agentes, pruebas funcionales y evaluación en
 dos capas sobre la colección real.
 
-Después del MVP se cerraron cinco puntos más, todos originados en corridas de
-verificación en frío o en investigación de sus hallazgos: 4.1
-(`analysis.json`), 4.2 (instalación), 4.3 (seguridad de `sync` y
-rendimiento), 4.4 (aviso de vectores obsoletos) y 4.5 (perfil de modelo de
-embeddings y política de prefijos).
+Después del MVP se cerraron seis puntos más: 4.1 (`analysis.json`), 4.2
+(instalación), 4.3 (seguridad de `sync` y rendimiento), 4.4 (aviso de vectores
+obsoletos), 4.5 (perfil de modelo de embeddings y política de prefijos) y 4.6
+(el comando `rebuild --confirm`). Los cinco primeros se originaron en corridas
+de verificación en frío o en investigación de sus hallazgos; 4.6 vino del
+orden de prioridad que el usuario fijó el 14 de agosto.
 
 ### Orden de prioridad fijado por el usuario el 14 de agosto de 2026
 
@@ -1272,13 +1282,24 @@ automática; con el perfil activo hoy no cambió nada y no se reindexó
 (validado contra el binario real). Detalle en `docs/decisions.md`, sección
 "Perfil de modelo y política de prefijos", y en `docs/model-profile-design.md`.
 
-1. **Ordenar fragmentos por longitud antes de lotear.** Medido en 1,93x,
-   menos que el lote 1 que ya se adoptó, y más complejo. Sólo tiene sentido
-   si aparece un motivo para volver a lotear. Ver `docs/sync-safety-design.md`.
-2. **Comando `rebuild --confirm`**, cuyo contrato ya está aprobado en
-   `cli-contract.md` y nunca se implementó; luego **MCP, interfaz web y
-   soporte de paquetes de páginas web**, fuera de alcance desde
-   `product-spec.md` original.
+~~1. **Ordenar fragmentos por longitud antes de lotear.**~~ **Cerrado el 14 de
+agosto de 2026 sin escribir código.** Es inerte con el `batchSize = 1` que
+adoptó 4.3: el padding que ataca sólo existe dentro de un lote de dos o más, y
+`defaultBatchSize` es 1 sin que ningún llamador de producto lo sobrescriba.
+Además `embedDocuments` se llama por paquete, así que el universo ordenable
+serían los fragmentos de un video, no el corpus del benchmark. Y la propia
+medición de 4.3 ya lo decía: 1,93x contra 2,27x del lote 1 — no era una mejora
+sobre el lote 1, era la alternativa que el lote 1 le ganó. Detalle en
+`docs/decisions.md`, sección "Ordenar fragmentos por longitud: medido y
+descartado".
+
+~~2. **Comando `rebuild --confirm`.**~~ **Cerrado el 14 de agosto de 2026 como
+punto 4.6.** Ver `docs/rebuild-design.md`.
+
+**El orden de prioridad del 14 de agosto quedó agotado.** Lo único que sigue
+en pie de esa lista es lo que el usuario dejó explícitamente para el final
+(abajo). Después de eso: **MCP, interfaz web y soporte de paquetes de páginas
+web**, fuera de alcance desde el `product-spec.md` original.
 
 Explícitamente **para el final**, por decisión del usuario:
 
@@ -1301,23 +1322,70 @@ están en el orden de arriba:
   catálogo tangencial (hallazgo de 3.2, no un bug).
 - Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad de N4.
 
+## Punto 4.6 completado — comando `rebuild --confirm`
+
+Cerrado el 14 de agosto de 2026. Diseño en `docs/rebuild-design.md`, checklist
+fino en `docs/rebuild-tasks.md` (bloques AE–AH).
+
+Qué resuelve: `sync` es incremental y `unchanged()` sólo compara el hash del
+paquete y la identidad del modelo. Un tamaño de lote distinto —la reindexación
+que 4.3 dejó "recomendable pero no obligatoria" sin ninguna forma de
+ejercerla—, un `parser_version` nuevo o un cambio de fragmentación dejan la
+biblioteca inconsistente mientras `doctor` sigue diciendo `ok`.
+
+Qué cambió en `src/`:
+
+- `IndexStore.purgeDerivedIndex()`: borra `video_packages` y, por las cascadas
+  y triggers que ya existían, todo lo derivado. El `SELECT` de runs activos y
+  el `DELETE` comparten un `BEGIN IMMEDIATE`, igual que `recordRun`. **Sin
+  migración de esquema.**
+- `rebuild-index.ts` (`rebuildIndex`): purga, publica la remoción vectorial y
+  re-sincroniza cada fuente con la función `sync` inyectada — el mismo
+  cableado que usa `application.sync`, así que nunca puede indexar distinto.
+  Recorre las fuentes **secuencialmente**, no con `Promise.all`.
+- `Application.rebuildIndex()`, `kind: "rebuild"` en `parse-command.ts`,
+  entrada `library_and_model` en `command-requirements.ts` y la rama en
+  `run-cli.ts`.
+
+Decisiones que no conviene reabrir sin motivo: regenera en vez de sólo purgar;
+preserva `sources` y el historial de runs; el guard va dentro de la purga; no
+acepta `--force`; sólo la purga es transaccional. Razonamiento completo en
+`docs/decisions.md`, sección "`rebuild` regenera en vez de sólo purgar (punto
+4.6)".
+
+**El defecto que encontró AH2, y que vale recordar.** El diseño afirmaba que
+el índice vectorial en memoria se invalidaría solo, porque ya lo hace en
+`apply`. Es falso: la purga borra por SQL y SQL no publica nada, así que un
+rebuild que termina sin ningún paquete dejaba el índice sirviendo vectores
+fantasma — 2 medidos sobre una biblioteca con cero embeddings. Es el mismo
+defecto de 4.4 llegando por un camino nuevo. `rebuildIndex` ahora publica un
+`remove_packages` después del commit de la purga. **Si tocás la purga, mantené
+esa publicación.**
+
+Estado final: **342 tests, 0 fallos**, `npm run check` y `npm run build` en
+verde.
+
 ## Primer turno recomendado para el próximo agente
 
 1. Confirmar `git status --short` vacío y revisar los últimos commits.
    La rama es `main` y tiene remoto privado: **no pushees sin pedido
    explícito**.
 2. Ejecutar `npm.cmd run check` y `npm.cmd run build`. La referencia al
-   cerrar el punto 4.5, el 14 de agosto: **325 tests, 0 fallos**.
-3. Leer los documentos del orden de lectura, incluidos los cuatro diseños
+   cerrar el punto 4.6, el 14 de agosto: **342 tests, 0 fallos**.
+3. Leer los documentos del orden de lectura, incluidos los diseños
    posteriores al MVP: `install-design.md`, `install-tasks.md`,
-   `sync-safety-design.md` y `model-profile-design.md`.
-4. **El siguiente frente ya está decidido**: ordenar fragmentos por longitud
-   antes de lotear (punto 1 del orden de prioridad de arriba, antes punto 2 —
-   el punto 1 anterior, los prefijos E5 hardcodeados, se cerró como 4.5). No
-   preguntes qué priorizar; el usuario lo fijó el 14 de agosto.
+   `sync-safety-design.md`, `model-profile-design.md` y `rebuild-design.md`.
+4. **No hay un frente decidido esperando.** El orden de prioridad que el
+   usuario fijó el 14 de agosto se agotó: sus dos puntos se cerraron ese
+   mismo día (4.6 el segundo; el primero, sin código, por inerte). Lo que
+   queda es lo que el usuario dejó explícitamente para el final —verificar la
+   skill desde Codex real, que requiere que la corra él, e higiene del
+   repositorio— y después el trabajo fuera de alcance del `product-spec.md`
+   original. **Preguntá antes de elegir**: acá sí corresponde.
 5. Proponer diseño y checklist fino **antes** de implementar, siguiendo el
    patrón de `retrieval-design.md` / `install-design.md` /
-   `sync-safety-design.md`, y esperar aprobación explícita.
+   `sync-safety-design.md` / `rebuild-design.md`, y esperar aprobación
+   explícita.
 6. Implementar en cortes de máximo cinco archivos por tarea. **Commitear con
    la skill `/git-commit`**, nunca a mano — ver `docs/development.md` →
    "Cómo commitear".
@@ -1350,12 +1418,13 @@ Prompt sugerido para retomar:
 
 > Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero
 > el estado del repositorio y las pruebas. El MVP está completo, y también
-> los puntos 4.1 a 4.5: soporte de `analysis.json`, instalación con hogar de
+> los puntos 4.1 a 4.6: soporte de `analysis.json`, instalación con hogar de
 > usuario, seguridad de `sync` con guard de concurrencia, aviso de vectores
-> obsoletos y perfil de modelo de embeddings (prefijos ya no hardcodeados).
-> No hay pendientes de decisión. El siguiente frente ya está decidido:
-> ordenar fragmentos por longitud antes de lotear. Propone diseño y
-> checklist antes de implementar nada.
+> obsoletos, perfil de modelo de embeddings (prefijos ya no hardcodeados) y
+> el comando `rebuild --confirm`. No hay pendientes de decisión ni ningún
+> comando del contrato sin implementar, y el orden de prioridad del 14 de
+> agosto quedó agotado. Pregúntame qué priorizar antes de empezar, y propone
+> diseño y checklist antes de implementar nada.
 
 ## Historial reciente relevante
 
@@ -1442,4 +1511,9 @@ código:
 17. por qué `VECTORS_STALE` necesita tres condiciones y no una, y por qué el
     índice vectorial debe recargar al cambiar `version`, no sólo `key`;
 18. por qué paralelizar la indexación no sirve —ONNX ya satura los núcleos—
-    y por qué bajar el lote a 1 rindió 2,23x.
+    y por qué bajar el lote a 1 rindió 2,23x;
+19. qué detecta `rebuild` que `sync` no puede detectar, por qué regenera en
+    vez de sólo purgar, por qué preserva el historial de runs, y por qué su
+    guard de concurrencia vive dentro de la transacción de la purga;
+20. por qué ordenar fragmentos por longitud dejó de tener sentido en cuanto
+    el lote bajó a 1, y por qué eso se cerró sin escribir código.

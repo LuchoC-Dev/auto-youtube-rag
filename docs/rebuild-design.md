@@ -219,17 +219,27 @@ declaradas; no agrega, quita ni altera ninguna tabla, índice o trigger.
 recibe los cambios de `sync`. Después de una purga su snapshot queda
 describiendo vectores que ya no existen.
 
-No hace falta ningún mecanismo nuevo: el índice **ya invalida su snapshot
-completo en `apply`** (decisión de 2.2, tomada porque `VectorIndexChange` no
-transporta tipo de unidad ni idioma), y la re-sincronización publica cambios
-por cada paquete. La única condición a verificar con un test es que un
-`rebuild` sobre una biblioteca que termina **sin ningún paquete** —todas las
-fuentes con manifest ilegible, por ejemplo— también deje el índice vacío y no
-sirviendo vectores fantasma desde el snapshot anterior.
+El primer borrador de este diseño daba por sentado que no hacía falta ningún
+mecanismo nuevo: el índice **ya invalida su snapshot completo en `apply`**
+(decisión de 2.2) y la re-sincronización publica cambios por cada paquete.
 
-Este es precisamente el defecto que 4.4 encontró: el snapshot obsoleto tapaba
-`VECTORS_STALE`. Vale la pena fijarlo con un test antes que descubrirlo otra
-vez.
+**Era falso, y el test de AH2 lo probó.** La purga borra filas por SQL, y SQL
+no publica nada al índice: `apply` es lo único que lo invalida. Un `rebuild`
+que termina sin ningún paquete —todas las fuentes con manifest vacío o
+ilegible— no publica ni un cambio, así que el snapshot anterior sobrevive
+entero y `load()` sigue devolviendo vectores cuyos fragmentos ya no existen.
+Medido: 2 vectores servidos sobre una biblioteca con cero embeddings.
+
+Es exactamente el defecto que 4.4 encontró —el snapshot obsoleto tapando
+`VECTORS_STALE`— reapareciendo por un camino nuevo, y confirma la lección del
+13 y 14 de agosto: el sistema respondía correctamente mientras algo estaba
+roto.
+
+Corrección: `rebuildIndex` recibe el `VectorIndexSink` y publica un
+`remove_packages` con los `PackageRef` que había, **después** de que la purga
+commitea, nunca antes — el mismo orden que respeta `sync`. Los refs se
+recolectan antes de purgar, mientras las filas todavía existen, para que lo
+publicado nombre los paquetes que realmente se fueron.
 
 ## Fuera de alcance
 
