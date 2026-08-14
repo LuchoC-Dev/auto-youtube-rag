@@ -2,8 +2,13 @@
 
 ## Estado
 
-Toolchain aprobado para el MVP. Este documento define el contrato de calidad
-del repositorio; no implementa todavía el dominio ni los casos de uso.
+Toolchain aprobado y en uso. Este documento define el contrato de calidad del
+repositorio y cómo ponerse a trabajar en una máquina nueva.
+
+La frase original decía que el repositorio "no implementa todavía el dominio ni
+los casos de uso". Quedó desactualizada hace tiempo: el MVP completo (2.1–2.4,
+3.1–3.2) y los puntos 4.1–4.6 están cerrados, con la CLI administrativa,
+`retrieve` y `rebuild` implementados y probados. Ver `docs/build.md`.
 
 ## Versiones fijadas
 
@@ -18,6 +23,77 @@ TypeScript 7.0.2 no se utiliza por ahora porque typescript-eslint 8.67.0
 declara compatibilidad con TypeScript `>=4.8.4 <6.1.0`. Mantener el compilador
 en 6.0.3 evita una instalación forzada y permite lint con información de tipos.
 La actualización se reconsiderará cuando la cadena oficial sea compatible.
+
+## Arrancar en una máquina nueva
+
+Nada de lo que no está versionado es irrecuperable. Un clon limpio se pone a
+trabajar con estos pasos:
+
+```powershell
+git clone https://github.com/LuchoC-Dev/auto-youtube-rag.git
+cd auto-youtube-rag
+npm.cmd ci          # respeta package-lock.json; no uses "npm install"
+npm.cmd run check   # 342 tests, sin red y sin modelo
+npm.cmd run build
+```
+
+**Hasta acá no hace falta ni red ni modelo de embeddings.** La suite rápida
+omite los smokes por el patrón `smoke` y trabaja con
+`FakeEmbeddingGenerator`, así que typecheck, lint, tests, formato y build
+corren enteros sobre un clon recién bajado.
+
+Sólo dos cosas requieren un paso extra, y cada una tiene su comando:
+
+| Para                            | Ejecutar                      | Requiere red |
+| ------------------------------- | ----------------------------- | ------------ |
+| Los dos smokes y los benchmarks | `npm.cmd run models:download` | Sí, ~129 MB  |
+| Usar el producto de verdad      | `auto-youtube-rag init`       | Sí, ~130 MB  |
+
+Son rutas distintas a propósito: `models:download` llena el caché **del
+repositorio** (`<repo>/.cache/models`) y es herramienta de desarrollo;
+`init` instala en el **hogar del usuario** y no sabe que este repositorio
+existe. Ver la sección siguiente.
+
+Qué falta en un clon y cómo vuelve:
+
+| Ausente         | Se regenera con               |
+| --------------- | ----------------------------- |
+| `node_modules/` | `npm.cmd ci`                  |
+| `dist/`         | `npm.cmd run build`           |
+| `.cache/models` | `npm.cmd run models:download` |
+| La biblioteca   | `auto-youtube-rag init`       |
+
+`.cache/` está en `.gitignore` y **nunca viajó al remoto**: ninguna máquina lo
+recibe al clonar, y esa es la intención. Es territorio local de desarrollo,
+reconstruible en un comando.
+
+### Cuidado con la profundidad de la ruta en Windows
+
+La ruta relativa más larga del repositorio mide **95 caracteres**
+(`evals/results/2026-08-12/judgments/...`). Con el límite de 260 caracteres de
+Windows, eso deja unos **164 para el directorio donde clones**. Pasado ese
+punto el `git clone` falla a mitad del checkout con `Filename too long` y deja
+un árbol incompleto — comprobado: un clon en una ruta de 170 caracteres se cayó
+con 7 archivos sin crear, mientras que uno en `C:\tmp-clone-test` trajo los 325
+archivos sin un solo error.
+
+Clonar en una ruta corta (`C:\dev\...`) alcanza. Si hace falta una profunda:
+
+```powershell
+git config --global core.longpaths true
+```
+
+Verificado el 14 de agosto de 2026 sobre un clon limpio en `C:\tmp-clone-test`:
+`npm ci`, `npm run check` (342 tests) y `npm run build` pasaron **sin `.cache/`
+y sin red**. `test:embedding:smoke` falló con su mensaje indicando
+`npm run models:download`, y `test:install:smoke` se saltó solo, tal como está
+diseñado.
+
+Lo único que existe sólo en la máquina donde se corrió son los resultados
+sueltos de benchmark (`benchmarks/*/results/`, salvo los `baseline.*`
+versionados). Es deliberado: las **conclusiones** de cada benchmark están en
+`docs/decisions.md`, que sí se versiona; los datos crudos de cada corrida no
+se conservan.
 
 ## Comandos
 
@@ -76,9 +152,10 @@ la implementación del producto. Todo código nuevo en `src/` y `test/` utiliza
 el baseline estricto. Los directorios generados, cachés, resultados y pesos
 locales quedan excluidos de lint, formato y Git según corresponda.
 
-`src/main.ts` y `test/main.test.ts` son un smoke scaffold para validar el
-toolchain. No constituyen la implementación de la CLI ni autorizan decisiones
-de dominio pendientes.
+`src/main.ts` es el entry point real de la CLI: resuelve las rutas del hogar de
+usuario con `resolvePaths` y delega en `runCli`, que implementa todos los
+comandos del contrato. Fue un smoke scaffold al principio del proyecto y esta
+sección lo describía así; dejó de serlo al cerrarse el punto 2.1.
 
 ## Cómo commitear
 
