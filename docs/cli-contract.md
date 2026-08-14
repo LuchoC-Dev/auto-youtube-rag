@@ -418,6 +418,7 @@ Códigos del punto 4.2 (preflight de requisitos e instalación, ver
 | `MODEL_DOWNLOAD_FAILED`   | error, retryable | La red falló durante `models install`/`init`                          |
 | `DATABASE_INTEGRITY_ERROR`| error            | La base falla al abrirse; el mensaje remite a `auto-youtube-rag doctor` |
 | `LEGACY_LIBRARY_FOUND`    | warning          | Hay una base `.auto-youtube-rag/index.sqlite` relativa al `cwd` no visible desde el hogar resuelto, y el hogar está vacío |
+| `VECTORS_STALE`           | warning          | `retrieve`: la vía textual encontró resultados pero el índice vectorial cargó cero vectores para el modelo activo; los resultados provienen sólo de búsqueda textual. Aparece en `warnings` del recibo de `retrieve` y en "Coverage and limitations" de `context.md` |
 
 Códigos del punto 4.3 (guard de concurrencia, ver `docs/sync-safety-design.md`):
 
