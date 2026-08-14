@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 import { test } from "node:test";
 
 import { describeModelState } from "../../src/infrastructure/config/model-install-state.js";
-import { E5ModelInstaller } from "../../src/infrastructure/embeddings/e5-model-installer.js";
+import { TransformersModelInstaller } from "../../src/infrastructure/embeddings/transformers-model-installer.js";
 import { activeModelProfile } from "../../src/infrastructure/embeddings/model-profile.js";
 
 const requiredModelFiles = activeModelProfile.requiredFiles;
@@ -44,7 +44,7 @@ void test(
         "absent",
       );
 
-      const installer = new E5ModelInstaller();
+      const installer = new TransformersModelInstaller();
       const result = await installer.install({
         modelsPath,
         from: repositoryCache,
