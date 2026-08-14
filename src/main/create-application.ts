@@ -1,6 +1,7 @@
 import type { DatabaseSync } from "node:sqlite";
 
 import {
+  supersedeActiveRun,
   syncSource,
   type SyncSourceResult,
 } from "../application/indexing/sync-source.js";
@@ -77,7 +78,10 @@ export interface Application {
   addSource(input: AddSourceInput): Promise<SourceRoot>;
   listSources(): Promise<readonly SourceRoot[]>;
   removeSource(name: unknown): Promise<void>;
-  sync(sourceName?: unknown): Promise<readonly SyncSourceResult[]>;
+  sync(
+    sourceName?: unknown,
+    options?: { readonly force?: boolean },
+  ): Promise<readonly SyncSourceResult[]>;
   retrieveCandidates(query: RetrievalQuery): Promise<RetrievalOutcome>;
   assembleContext(request: ContextRequest): Promise<ContextBundle>;
   close(): Promise<void>;
@@ -131,13 +135,24 @@ export function createApplication(
       addSource({ registry: sourceRegistry, resolveLayout }, input),
     listSources: () => listSources(sourceRegistry),
     removeSource: (name) => removeSource(sourceRegistry, name),
-    async sync(name?: unknown): Promise<readonly SyncSourceResult[]> {
+    async sync(
+      name?: unknown,
+      options?: { readonly force?: boolean },
+    ): Promise<readonly SyncSourceResult[]> {
       const sources =
         name === undefined
           ? await sourceRegistry.list()
           : [await sourceRegistry.getByName(SourceName.create(name))].filter(
               (source): source is SourceRoot => source !== null,
             );
+      if (options?.force === true) {
+        // Supersede every targeted source's ghost run before any of them
+        // starts, so a stale run for source B cannot still block source B
+        // just because this pass happened to reach it after source A.
+        await Promise.all(
+          sources.map((source) => supersedeActiveRun(indexStore, source.name)),
+        );
+      }
       return Promise.all(
         sources.map((source) =>
           syncSource(

@@ -4,6 +4,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 
+import {
+  SourceName,
+  SyncId,
+} from "../../../src/domain/indexing/identifiers.js";
+import { SyncRun } from "../../../src/domain/indexing/sync-run.js";
+import { openDatabase } from "../../../src/infrastructure/sqlite/open-database.js";
+import { SQLiteIndexStore } from "../../../src/infrastructure/sqlite/sqlite-index-store.js";
 import { runCli, type CliWriter } from "../../../src/interfaces/cli/run-cli.js";
 import { createApplication } from "../../../src/main/create-application.js";
 import { installFakeModel } from "../../helpers/install-fake-model.js";
@@ -130,6 +137,63 @@ void test("returns 2 for usage, 1 for operations and 130 for interruption", asyn
       };
     });
     assert.equal(interrupted.exitCode, 130);
+  } finally {
+    await rm(setup.root, { recursive: true, force: true });
+  }
+});
+
+void test("sync rejects a second concurrent run, and --force supersedes the stale one", async () => {
+  const setup = await fixture();
+  try {
+    await command(["init", "--skip-model"], setup.config);
+    await command(
+      ["source", "add", setup.collection, "--name", "design"],
+      setup.config,
+    );
+
+    // Simulate a process that started `sync` and was killed before it could
+    // finish: a `running` row left behind for the source, the way Ctrl+C or
+    // a closed terminal would leave it.
+    const ghostDatabase = openDatabase(setup.config.databasePath);
+    await new SQLiteIndexStore(ghostDatabase).recordRun(
+      SyncRun.start({
+        id: SyncId.create("sync:ghost"),
+        sourceName: SourceName.create("design"),
+        startedAt: "2026-08-11T00:00:00.000Z",
+      }),
+    );
+    ghostDatabase.close();
+
+    const blocked = await command(["sync", "--source", "design"], setup.config);
+    assert.equal(blocked.exitCode, 1);
+    const blockedError = record(json(blocked.stdout).error);
+    assert.equal(blockedError.code, "SYNC_ALREADY_RUNNING");
+    assert.match(String(blockedError.message), /sync:ghost/);
+    assert.match(String(blockedError.message), /sync --force/);
+
+    const forced = await command(
+      ["sync", "--source", "design", "--force"],
+      setup.config,
+    );
+    assert.equal(forced.exitCode, 0);
+    assert.equal(json(forced.stdout).status, "no_changes");
+
+    const verifyDatabase = openDatabase(setup.config.databasePath);
+    try {
+      const ghostRow = verifyDatabase
+        .prepare("SELECT status, finished_at FROM sync_runs WHERE id = ?")
+        .get("sync:ghost");
+      assert.ok(ghostRow);
+      assert.equal(ghostRow.status, "failed");
+      assert.ok(ghostRow.finished_at);
+      const issueRow = verifyDatabase
+        .prepare("SELECT code FROM sync_issues WHERE sync_id = ?")
+        .get("sync:ghost");
+      assert.ok(issueRow);
+      assert.equal(issueRow.code, "RUN_SUPERSEDED");
+    } finally {
+      verifyDatabase.close();
+    }
   } finally {
     await rm(setup.root, { recursive: true, force: true });
   }

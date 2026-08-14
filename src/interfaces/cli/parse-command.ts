@@ -15,7 +15,11 @@ export type ParsedCliCommand =
     }
   | { readonly kind: "source_list" }
   | { readonly kind: "source_remove"; readonly name: string }
-  | { readonly kind: "sync"; readonly source: string | null }
+  | {
+      readonly kind: "sync";
+      readonly source: string | null;
+      readonly force: boolean;
+    }
   | { readonly kind: "status" }
   | { readonly kind: "doctor" }
   | {
@@ -139,15 +143,17 @@ export function parseCommand(argv: readonly string[]): ParsedCliCommand {
     case "sync": {
       const { positionals, values } = parse(rest, {
         source: { type: "string" },
+        force: { type: "boolean" },
       });
       exactPositionals(
         positionals,
         0,
-        "auto-youtube-rag sync [--source <name>]",
+        "auto-youtube-rag sync [--source <name>] [--force]",
       );
       return {
         kind: "sync",
         source: typeof values.source === "string" ? values.source : null,
+        force: values.force === true,
       };
     }
     case "status":

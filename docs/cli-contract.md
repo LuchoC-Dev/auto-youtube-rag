@@ -24,7 +24,7 @@ auto-youtube-rag init [--skip-model] [--from <path>]
 auto-youtube-rag source add <path> --name <name>
 auto-youtube-rag source list
 auto-youtube-rag source remove <name>
-auto-youtube-rag sync [--source <name>]
+auto-youtube-rag sync [--source <name>] [--force]
 auto-youtube-rag retrieve <query> [options]
 auto-youtube-rag status
 auto-youtube-rag doctor
@@ -106,7 +106,22 @@ demás; el resultado informa éxitos, omisiones y errores.
 ```text
 auto-youtube-rag sync
 auto-youtube-rag sync --source <name>
+auto-youtube-rag sync --force
 ```
+
+Sólo puede haber un run `running` por fuente a la vez: es la invariante que
+impide que dos syncs concurrentes sobre la misma fuente se borren paquetes
+entre sí (ver `docs/sync-safety-design.md`). Si ya hay uno activo, `sync`
+falla con código de salida `1` y símbolo `SYNC_ALREADY_RUNNING`, nombrando el
+id del run activo, cuándo empezó y `auto-youtube-rag sync --force` como
+salida.
+
+`--force` marca ese run activo como `failed` (registrando un `SyncIssue` con
+código `RUN_SUPERSEDED` que deja constancia de que fue abandonado, no
+completado) y arranca uno nuevo. Es la salida cuando el proceso que dejó el
+run activo murió (Ctrl+C, cierre de terminal, corte); nunca se abandona un
+run automáticamente. Sin un run activo, `--force` no hace nada distinto de
+un `sync` normal.
 
 ### `status`
 
@@ -129,6 +144,12 @@ ausente nombra `auto-youtube-rag models install`, no un comando de
 benchmarks. Es el único comando administrativo que sigue corriendo — y
 reporta el detalle — incluso si la base falla al abrirse (`SQLITE_INTEGRITY`
 en `error`), en vez de propagar el error crudo del driver.
+
+El check `STALE_SYNC_RUN` lista los runs `running` de cualquier fuente, con
+su id y antigüedad. Estado `error` sólo si existe alguno, con el mensaje
+nombrando `auto-youtube-rag sync --force`; `ok` si no hay ninguno. `doctor`
+nunca marca un run activo como fallido por sí mismo — sólo informa; el
+usuario decide si correr `sync --force`.
 
 ```text
 auto-youtube-rag doctor
@@ -397,6 +418,14 @@ Códigos del punto 4.2 (preflight de requisitos e instalación, ver
 | `MODEL_DOWNLOAD_FAILED`   | error, retryable | La red falló durante `models install`/`init`                          |
 | `DATABASE_INTEGRITY_ERROR`| error            | La base falla al abrirse; el mensaje remite a `auto-youtube-rag doctor` |
 | `LEGACY_LIBRARY_FOUND`    | warning          | Hay una base `.auto-youtube-rag/index.sqlite` relativa al `cwd` no visible desde el hogar resuelto, y el hogar está vacío |
+
+Códigos del punto 4.3 (guard de concurrencia, ver `docs/sync-safety-design.md`):
+
+| Código                    | Tipo             | Cuándo                                                              |
+| ------------------------- | ---------------- | --------------------------------------------------------------------- |
+| `SYNC_ALREADY_RUNNING`    | error            | `sync` sin `--force` con un run `running` activo para la fuente, código `1` |
+| `RUN_SUPERSEDED`          | `SyncIssue`, no de proceso | Registrado sobre el run que `sync --force` marcó `failed` en vez de completar |
+| `STALE_SYNC_RUN`          | check de `doctor`| Runs `running` listados por `doctor`, con id y antigüedad; `error` sólo si hay alguno |
 
 Cada comando declara qué necesita antes de ejecutar nada: `init`, `doctor`,
 `models install` y `models status` no requieren base ni modelo; `source

@@ -48,12 +48,20 @@ function describeIssues(
   return issues.map((issue) => `${issue.path}: ${issue.reason}`).join(", ");
 }
 
+function describeAge(startedAt: string, now: Date): string {
+  const elapsedMs = now.getTime() - new Date(startedAt).getTime();
+  const minutes = Math.max(0, Math.round(elapsedMs / 60_000));
+  if (minutes < 60) return `${String(minutes)}m`;
+  return `${String(Math.floor(minutes / 60))}h${String(minutes % 60).padStart(2, "0")}m`;
+}
+
 export async function runDoctor(
   repository: DiagnosticsRepository,
   sources: SourceRegistry,
   embeddingGenerator: EmbeddingGenerator,
   modelCachePath: string,
   modelState: DoctorModelState,
+  now: () => Date = () => new Date(),
 ): Promise<DoctorResult> {
   const checks: DoctorCheck[] = [];
   const health = await repository.checkHealth();
@@ -94,6 +102,26 @@ export async function runDoctor(
         : `Source ${source.name.value} has an unreadable required path.`,
     });
   }
+
+  const activeRuns = await repository.listActiveSyncRuns();
+  const currentTime = now();
+  checks.push({
+    code: "STALE_SYNC_RUN",
+    status: activeRuns.length === 0 ? "ok" : "error",
+    message:
+      activeRuns.length === 0
+        ? "No sync run is currently marked running."
+        : `${String(activeRuns.length)} sync run(s) still marked running: ` +
+          activeRuns
+            .map(
+              (run) =>
+                `${run.id} (source ${run.sourceName ?? "unknown"}, ` +
+                `running for ${describeAge(run.startedAt, currentTime)})`,
+            )
+            .join(", ") +
+          `. If the process behind it is gone, run "auto-youtube-rag sync ` +
+          `--force" (optionally with --source) to supersede it.`,
+  });
 
   const model = await embeddingGenerator.describe();
   const identity = `${model.key}@${model.version}`;

@@ -4,6 +4,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 
+import {
+  SourceName,
+  SyncId,
+} from "../../../src/domain/indexing/identifiers.js";
+import { SyncRun } from "../../../src/domain/indexing/sync-run.js";
+import { openDatabase } from "../../../src/infrastructure/sqlite/open-database.js";
+import { SQLiteIndexStore } from "../../../src/infrastructure/sqlite/sqlite-index-store.js";
 import { runCli, type CliWriter } from "../../../src/interfaces/cli/run-cli.js";
 import { createApplication } from "../../../src/main/create-application.js";
 import { FakeEmbeddingGenerator } from "../../fakes/fake-embedding-generator.js";
@@ -80,6 +87,49 @@ void test("reports status and runs read-only health checks", async () => {
     assert.equal(doctor.exitCode, 0);
     assert.equal(doctor.output.status, "ok");
     assert.deepEqual(after.output.counts, before.output.counts);
+    const checks = doctor.output.checks;
+    assert.ok(Array.isArray(checks));
+    const staleCheck = checks
+      .map(record)
+      .find((check) => check.code === "STALE_SYNC_RUN");
+    assert.ok(staleCheck);
+    assert.equal(staleCheck.status, "ok");
+  } finally {
+    await rm(setup.root, { recursive: true, force: true });
+  }
+});
+
+void test("doctor reports a stale running sync run as an error, naming sync --force", async () => {
+  const setup = await fixture();
+  try {
+    await command(["init", "--skip-model"], setup.config);
+    await command(
+      ["source", "add", setup.collection, "--name", "design"],
+      setup.config,
+    );
+
+    const ghostDatabase = openDatabase(setup.config.databasePath);
+    await new SQLiteIndexStore(ghostDatabase).recordRun(
+      SyncRun.start({
+        id: SyncId.create("sync:ghost"),
+        sourceName: SourceName.create("design"),
+        startedAt: "2026-08-11T00:00:00.000Z",
+      }),
+    );
+    ghostDatabase.close();
+
+    const doctor = await command(["doctor"], setup.config);
+    assert.equal(doctor.exitCode, 1);
+    assert.equal(doctor.output.status, "error");
+    const checks = doctor.output.checks;
+    assert.ok(Array.isArray(checks));
+    const staleCheck = checks
+      .map(record)
+      .find((check) => check.code === "STALE_SYNC_RUN");
+    assert.ok(staleCheck);
+    assert.equal(staleCheck.status, "error");
+    assert.match(String(staleCheck.message), /sync:ghost/);
+    assert.match(String(staleCheck.message), /sync --force/);
   } finally {
     await rm(setup.root, { recursive: true, force: true });
   }

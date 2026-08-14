@@ -36,4 +36,15 @@ export interface IndexStore {
   deletePackagesNotSeen(source: SourceName, syncId: SyncId): Promise<number>;
   recordRun(run: SyncRun): Promise<void>;
   recordIssue(issue: SyncIssue): Promise<void>;
+  /**
+   * Marks the source's active `running` run `failed` (`--force`'s escape
+   * hatch for a ghost run left behind by a killed process), so `recordRun`'s
+   * one-running-run-per-source guard stops blocking new syncs for it.
+   * Returns the superseded run's id, or `null` when the source had no
+   * active run to supersede.
+   */
+  supersedeActiveRun(
+    source: SourceName,
+    supersededAt: string,
+  ): Promise<SyncId | null>;
 }

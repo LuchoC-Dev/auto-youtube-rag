@@ -600,6 +600,38 @@ export class SQLiteIndexStore implements IndexStore {
     }
   }
 
+  public supersedeActiveRun(
+    source: SourceName,
+    supersededAt: string,
+  ): Promise<SyncId | null> {
+    try {
+      const sourceRow = this.database
+        .prepare("SELECT id FROM sources WHERE name = ?")
+        .get(source.value) as SourceIdRow | undefined;
+      if (sourceRow === undefined) {
+        return rejected(
+          new SQLiteIndexStoreError(
+            "UNKNOWN_SOURCE",
+            `Source ${source.value} is not registered.`,
+          ),
+        );
+      }
+      const superseded = this.database
+        .prepare(
+          `UPDATE sync_runs
+           SET status = 'failed', finished_at = ?
+           WHERE source_id = ? AND status = 'running'
+           RETURNING id`,
+        )
+        .get(supersededAt, sourceRow.id) as { readonly id: string } | undefined;
+      return Promise.resolve(
+        superseded === undefined ? null : SyncId.create(superseded.id),
+      );
+    } catch (error: unknown) {
+      return rejected(error);
+    }
+  }
+
   public recordIssue(issue: SyncIssue): Promise<void> {
     try {
       const run = this.database

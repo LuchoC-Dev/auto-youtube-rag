@@ -89,6 +89,25 @@ export class InMemoryIndexStore implements IndexStore {
     return Promise.resolve();
   }
 
+  public supersedeActiveRun(
+    source: SourceName,
+    supersededAt: string,
+  ): Promise<SyncId | null> {
+    const active = [...this.runs.values()].find(
+      (run) => run.sourceName.equals(source) && run.status === "running",
+    );
+    if (active === undefined) return Promise.resolve(null);
+    this.runs.set(
+      active.id.value,
+      active.finish({
+        status: "failed",
+        finishedAt: supersededAt,
+        counters: active.counters,
+      }),
+    );
+    return Promise.resolve(active.id);
+  }
+
   public recordIssue(issue: SyncIssue): Promise<void> {
     this.issues.push(issue);
     return Promise.resolve();
