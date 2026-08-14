@@ -667,6 +667,121 @@ vez de caer al `INSERT`, no debe dejar transacción abierta —una escritura
 posterior sobre esa misma conexión tiene que funcionar— y el run en disputa
 no debe haberse escrito.
 
+## Perfil de modelo y política de prefijos
+
+Implementado el 14 de agosto de 2026. Diseño en `docs/model-profile-design.md`,
+checklist fino en `docs/model-profile-tasks.md` (punto 4.5). Cierra el frente
+número 1 del orden de prioridad fijado el 14 de agosto en
+`docs/agent-handoff.md`.
+
+**El problema.** Los prefijos `passage: ` y `query: ` se aplicaban **siempre**,
+en dos funciones de módulo de lo que era `e5-embedding-generator.ts`. Son
+específicos de la familia E5: con MiniLM, BGE o Jina no son neutros, el modelo
+embebe literalmente las palabras "passage" y "query" como contenido y degrada
+la calidad **sin producir ningún error**. Nada fallaba, nada avisaba; sólo los
+resultados empeoraban. El arnés de benchmarks ya lo contemplaba con un flag
+`e5Prefixes: boolean` en su `ModelDefinition`; el producto no. Quedó anotado
+como el trabajo real de "modelo configurable" al investigar el punto 4.2, ver
+`docs/install-design.md` → "Nota: qué haría falta para soportar otro modelo".
+
+**La solución.** Nace `src/infrastructure/embeddings/model-profile.ts`, que
+no importa nada de Transformers.js, `node:fs` ni otro módulo del proyecto: es
+puro dato. Define `EmbeddingModelProfile` (repositorio, revisión, `dtype`,
+dimensiones, `maxInputTokens`, `requiredFiles` e `inputPrefixes:
+EmbeddingInputPrefixes | null`, donde `null` significa explícitamente "este
+modelo no lleva prefijos", no "todavía no se decidió") y el perfil activo
+congelado `activeModelProfile`, hoy con los mismos valores que estaban
+hardcodeados para E5 Small. El generador de embeddings y el instalador dejan
+de tener constantes propias y reciben el perfil por inyección, con
+`activeModelProfile` como default — nadie que construya con `{ cacheDir }`
+nota el cambio. `countTokens` y `embedDocuments` comparten la misma función de
+prefijado, así que el presupuesto de 512 tokens siempre mide el texto tal como
+entra al modelo, prefijo incluido.
+
+Consecuencia mecánica: `"Xenova/multilingual-e5-small"` pasó de estar escrito
+tres veces en `src/` (el generador, el instalador y el estado de instalación,
+cada uno con su propia copia de `modelDirectory`) a aparecer una sola vez, en
+`model-profile.ts`. Los otros dos módulos derivan el directorio de
+`profile.repository`.
+
+Se aprovechó para renombrar el adaptador: `E5EmbeddingGenerator` que ya no
+sabe nada de E5 —ahora es un consumidor genérico de un perfil— era un nombre
+que reintroducía la confusión que este punto vino a borrar.
+`TransformersEmbeddingGenerator` y `TransformersModelInstaller` reemplazan a
+`E5EmbeddingGenerator` y `E5ModelInstaller`, junto con sus tipos
+(`EmbeddingAdapterError`, `EmbeddingSession`, `EmbeddingRuntime`,
+`ModelDownloadRuntime`, etc.). **Los valores de los códigos de error no
+cambiaron** — `MODEL_LOAD_FAILED`, `INPUT_TOO_LONG`, `MODEL_SOURCE_INVALID` y
+el resto son contrato público documentado en `cli-contract.md` y
+`skill/SKILL.md`; sólo cambió el nombre de la clase que los lleva. De paso se
+corrigió que el mensaje de `MODEL_LOAD_FAILED` nombraba "E5 Small" a mano; hoy
+lo toma de `profile.repository`.
+
+**Por qué la política de prefijos se pliega en `version`, y por qué eso no
+reindexa hoy.** Es la decisión con más consecuencias del punto. `unchanged()`
+en `sync-source.ts` incluye `key`, `version` y `dimensions` del modelo activo
+en su criterio: cambiar cualquiera de los tres invalida todos los paquetes y
+el `sync` siguiente reindexa. Si alguien apagara los prefijos sin cambiar de
+modelo y `version` no se moviera, `unchanged()` diría "sin cambios" y la
+biblioteca serviría vectores viejos con prefijo contra consultas nuevas sin
+prefijo — silencioso, y peor que el bug original que este punto corrige.
+
+Por eso `modelVersion(profile)` deriva el string y la política de prefijos
+participa de la derivación: sin prefijos agrega el sufijo `+noprefix` al
+literal base `repository@revision:dtype`. Con el perfil activo —que sí lleva
+prefijos— esto produce, carácter por carácter, el mismo literal que existía
+antes de este punto: `"Xenova/multilingual-e5-small@main:q8"`. Ninguna base
+existente se invalida y nada se reindexa hoy; un test de regresión fija ese
+literal exacto porque si alguien lo rompe sin querer, invalida en silencio
+todas las bibliotecas instaladas. Cualquier perfil futuro con una política de
+prefijos distinta sí produce un `version` distinto y dispara la reindexación
+automática que ya existía.
+
+Se descartó agregar un campo `prefixPolicy` al `EmbeddingModelDescriptor` del
+puerto y comparar eso en `unchanged()`: obliga a cambiar el puerto de
+aplicación, la tabla `embeddings` no tiene columna donde persistirlo, y
+`version` ya es exactamente el lugar donde el proyecto decidió codificar
+"todo lo que hace incomparables dos vectores" — revisión y cuantización ya
+viven ahí.
+
+**Validación real (AD3).** Sobre una copia temporal con sólo los recursos
+indexables de 3 videos reales de `auto-design` (2,22 MB, uno con
+`analysis.json` schema 2.0), nunca la colección original:
+
+- con el código anterior a 4.5 (commit `be4ebff`), `init --from` adoptó el
+  modelo real (135.392.016 bytes, `version`
+  `Xenova/multilingual-e5-small@main:q8`) y `sync` indexó los 3 paquetes
+  (`status: "ok"`, `packagesIndexed: 3`);
+- con el código de 4.5 sobre esa misma base, `sync` devolvió `status:
+"no_changes"`, `packagesUnchanged: 3`, `packagesIndexed: 0` — nada se
+  reindexó, que es la propiedad que el punto tenía que garantizar;
+- `retrieve "neumorfismo accesibilidad contraste" --depth balanced` devolvió
+  `status: "ok"`, 19.354 tokens estimados, 3 fuentes y **sin warnings**, en
+  particular sin `VECTORS_STALE` — confirma que los vectores generados por el
+  código viejo siguen siendo válidos para el modelo activo. El bundle abre
+  con una unidad `analysis` schema 2.0 y sus 18 unidades citadas resuelven
+  1:1 contra los 18 marcadores `[S01]`–`[S18]` de `context.md`;
+- `doctor` reportó los seis checks en `ok` (`SQLITE_INTEGRITY`,
+  `SQLITE_FOREIGN_KEYS`, `SQLITE_FTS`, `SOURCE_READABLE`, `STALE_SYNC_RUN`,
+  `EMBEDDING_MODEL`);
+- el digest SHA-256 del árbol fuente fue idéntico antes y después. La copia y
+  la base temporal se borraron al terminar.
+
+**Hallazgo colateral, anotado como nota, no como pendiente abierto.**
+Durante la preparación de la copia temporal para AD3, `parseManifest` rechazó
+un `manifest.json` con BOM UTF-8 con `MANIFEST_JSON_INVALID`. Apareció porque
+PowerShell escribió el manifest de prueba con BOM por defecto. Los manifests
+reales los produce la skill `youtube-video-context` sin BOM, así que esto no
+bloquea a nadie hoy; queda anotado por si alguien edita un manifest a mano en
+Windows y se encuentra con el mismo error.
+
+**Qué no cambió:** el modelo activo, su dimensión, revisión y cuantización; el
+`version` persistido en `embeddings`; los códigos de error públicos y la forma
+de los recibos JSON; `models/.install.json`; el puerto `EmbeddingGenerator` y
+`EmbeddingModelDescriptor`; el esquema SQLite (cero migraciones);
+`cli-contract.md` (ningún comando ni flag nuevo); `skill/SKILL.md` (nada
+observable cambió para un agente consumidor).
+
 ## Pendientes de decisión
 
 Ninguno.
