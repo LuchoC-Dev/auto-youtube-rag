@@ -257,3 +257,67 @@ void test("returns usage exit code 2 for invalid arguments without touching the 
     await rm(setup.root, { recursive: true, force: true });
   }
 });
+
+void test("LOW_RELEVANCE keeps status ok and exit code 0", async () => {
+  const setup = await fixture();
+  try {
+    await command(["init", "--skip-model"], setup.config, sampleBundle());
+    const result = await command(
+      ["retrieve", "diabetes tipo 2"],
+      setup.config,
+      sampleBundle({
+        warnings: [
+          {
+            code: "LOW_RELEVANCE",
+            path: "vector",
+            message:
+              "The closest match scored 0.8206 against a 0.84 relevance floor.",
+          },
+        ],
+      }),
+    );
+
+    // Nothing degraded: every path ran and the bundle is complete. The
+    // warning is about the library not covering the topic, which is a fact
+    // about the corpus, not a failure of the command.
+    assert.equal(result.exitCode, 0);
+    const receipt = json(result.stdout);
+    assert.equal(receipt.status, "ok");
+    assert.equal(
+      (receipt.warnings as readonly { code: string }[])[0]?.code,
+      "LOW_RELEVANCE",
+    );
+  } finally {
+    await rm(setup.root, { recursive: true, force: true });
+  }
+});
+
+void test("a real degradation still outranks an informational warning", async () => {
+  const setup = await fixture();
+  try {
+    await command(["init", "--skip-model"], setup.config, sampleBundle());
+    const result = await command(
+      ["retrieve", "brutalismo"],
+      setup.config,
+      sampleBundle({
+        warnings: [
+          {
+            code: "LOW_RELEVANCE",
+            path: "vector",
+            message: "Low relevance.",
+          },
+          {
+            code: "TEXT_SEARCH_UNAVAILABLE",
+            path: "text",
+            message: "The lexical search path failed.",
+          },
+        ],
+      }),
+    );
+
+    assert.equal(result.exitCode, 1);
+    assert.equal(json(result.stdout).status, "partial");
+  } finally {
+    await rm(setup.root, { recursive: true, force: true });
+  }
+});

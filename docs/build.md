@@ -24,6 +24,8 @@
 |                            | 4.3 | Seguridad de `sync` y rendimiento       |   ✅   | 100% | Guard de concurrencia, runs fantasma y lote 1 (2,23x)      |
 |                            | 4.4 | Aviso de vectores obsoletos             |   ✅   | 100% | `VECTORS_STALE` y recarga del índice por versión de modelo |
 |                            | 4.5 | Perfil de modelo de embeddings          |   ✅   | 100% | Bloques AA–AD completos; validado sin reindexar            |
+|                            | 4.6 | Comando `rebuild --confirm`             |   ✅   | 100% | Bloques AE–AH completos; validado contra el binario real   |
+|                            | 4.7 | Aviso de baja relevancia                |   ✅   | 100% | `LOW_RELEVANCE` con umbral medido sobre 24 consultas       |
 
 ---
 
@@ -387,3 +389,40 @@ lotear— se cerró sin escribir código.** Es inerte con el `batchSize = 1` que
 adoptó 4.3: el padding que el ordenamiento ataca sólo existe dentro de un lote
 de dos o más. Detalle en `docs/rebuild-design.md`, sección "Por qué el punto 1
 se cerró sin código".
+
+#### 4.7 Aviso de baja relevancia (`LOW_RELEVANCE`)
+
+Diseño en `docs/low-relevance-design.md` (bloques AI–AJ). Origen: una prueba
+manual sobre la biblioteca real preguntó por síntomas de diabetes tipo 2 y
+recibió `status: "ok"`, 31.982 tokens de contenido sobre diseño web y
+`warnings: []`. El producto tenía la señal de que nada respondía la consulta y
+no la comunicaba.
+
+- [x] AI. Umbral medido, `LOW_RELEVANCE` y su emisión en `retrieveCandidates`
+- [x] AJ. Distinción entre advertencia informativa y degradación, contrato de
+      CLI, skill y cierre
+
+Cerrado el 14 de agosto de 2026. Cierra —en una forma distinta a la
+prevista— el frente que 2.2 dejó abierto como "piso mínimo de similitud
+vectorial, salvo evidencia clara" y que 3.2 no pudo cerrar por falta de esa
+evidencia.
+
+**La evidencia, esta vez, existe.** 24 consultas clasificadas a mano contra
+los 51 videos reales, midiendo el coseno del mejor hit vectorial: en dominio
+0,8657–0,9012; técnicas no cubiertas 0,8428–0,8600; fuera de dominio
+0,8149–0,8389. Las tres clases no se solapan, pero los márgenes son de
+milésimas y E5 comprime todo entre 0,81 y 0,90.
+
+Esa fragilidad decidió el diseño: **el aviso informa y no filtra**. Un umbral
+mal calibrado produce como mucho un aviso de más; nunca oculta evidencia ni
+vacía un bundle. Se sigue descartando un piso que descarte candidatos, igual
+que en 2.2 y 3.2.
+
+**Defecto encontrado al verificar contra el binario, no con tests.** La
+primera versión funcionaba, pero el recibo pasó a `status: "partial"` con
+código de salida `1`: `run-cli.ts` trataba cualquier advertencia como
+degradación. `LOW_RELEVANCE` no lo es —todas las vías corrieron y el bundle
+está completo—, así que se introdujo `informationalWarningCodes` para
+separar "algo falló" de "esto es un dato sobre la respuesta". Verificado
+después contra el binario: `status: "ok"`, exit `0`, y el aviso presente
+tanto en `result.json` como en la sección legible de `context.md`.

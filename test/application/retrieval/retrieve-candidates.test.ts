@@ -116,8 +116,11 @@ void test("degrades to the surviving path when one path fails", async () => {
   const seeded = seedFragment(scenario.knowledgeRepository, "only-vector");
 
   scenario.textIndex.failure = new Error("FTS5 unavailable");
+  // Above the LOW_RELEVANCE floor on purpose: this test is about surviving a
+  // failed path, and a cosine under the floor would add a second, unrelated
+  // warning and obscure what it checks.
   scenario.vectorIndex.hits = [
-    { fragmentId: seeded.fragmentId, rank: 1, rawScore: 0.8 },
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: 0.9 },
   ];
 
   const outcome = await retrieveCandidates(
@@ -279,4 +282,142 @@ void test("passes the filter and configured limits to both paths", async () => {
   assert.equal(textCall.limit, query.limits.textCandidates);
   assert.equal(vectorCall.request.limit, query.limits.vectorCandidates);
   assert.equal(textCall.filter, query.filter);
+});
+
+void test("warns LOW_RELEVANCE when the closest vector hit falls under the floor", async () => {
+  const scenario = setup();
+  const seeded = seedFragment(scenario.knowledgeRepository, "unrelated");
+
+  // 0.8206 is the real cosine measured for "síntomas de la diabetes tipo 2"
+  // against the design library: high in absolute terms, which is exactly why
+  // a raw cosine cannot be read as relevance without a calibrated floor.
+  scenario.vectorIndex.hits = [
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: 0.8206 },
+  ];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "diabetes tipo 2" }),
+  );
+
+  const warning = outcome.warnings.find(
+    (candidate) => candidate.code === "LOW_RELEVANCE",
+  );
+
+  // The bundle is still produced with every candidate: the warning informs,
+  // it never filters.
+  assert.equal(outcome.status, "ok");
+  assert.equal(outcome.candidates.length, 1);
+  assert.ok(warning);
+  assert.equal(warning.path, "vector");
+  assert.match(warning.message, /0\.8206/u);
+  assert.match(warning.message, /0\.84/u);
+});
+
+void test("does not warn LOW_RELEVANCE when the closest hit clears the floor", async () => {
+  const scenario = setup();
+  const seeded = seedFragment(scenario.knowledgeRepository, "on-topic");
+
+  // 0.8428 is the measured cosine of an adjacent-but-uncovered query, the
+  // closest case above the floor: the warning must stay silent there.
+  scenario.vectorIndex.hits = [
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: 0.8428 },
+  ];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "pipeline de CI" }),
+  );
+
+  assert.deepEqual(
+    outcome.warnings.filter((entry) => entry.code === "LOW_RELEVANCE"),
+    [],
+  );
+});
+
+void test("judges LOW_RELEVANCE by the best hit, not the worst", async () => {
+  const scenario = setup();
+  const strong = seedFragment(scenario.knowledgeRepository, "strong");
+  const weak = seedFragment(scenario.knowledgeRepository, "weak", "vid_2");
+
+  scenario.vectorIndex.hits = [
+    { fragmentId: strong.fragmentId, rank: 1, rawScore: 0.8914 },
+    { fragmentId: weak.fragmentId, rank: 2, rawScore: 0.6 },
+  ];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "jerarquía tipográfica" }),
+  );
+
+  // A long tail of weak matches is normal in an exhaustive ranking; what
+  // decides relevance is whether anything matched well at all.
+  assert.deepEqual(
+    outcome.warnings.filter((entry) => entry.code === "LOW_RELEVANCE"),
+    [],
+  );
+});
+
+void test("does not warn LOW_RELEVANCE when the vector path never ran", async () => {
+  const scenario = setup();
+  const seeded = seedFragment(scenario.knowledgeRepository, "only-text");
+
+  scenario.vectorIndex.failure = new Error("model missing");
+  scenario.textIndex.hits = [
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: -1 },
+  ];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "brutalismo" }),
+  );
+
+  // The failure already has its own warning; there is no cosine to judge, and
+  // a second warning would only add noise.
+  assert.deepEqual(
+    outcome.warnings.map((entry) => entry.code),
+    ["VECTOR_SEARCH_UNAVAILABLE"],
+  );
+});
+
+void test("does not warn LOW_RELEVANCE when the vector path returned nothing", async () => {
+  const scenario = setup();
+  const seeded = seedFragment(scenario.knowledgeRepository, "only-text");
+
+  scenario.textIndex.hits = [
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: -1 },
+  ];
+  scenario.vectorIndex.hits = [];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "brutalismo" }),
+  );
+
+  assert.deepEqual(
+    outcome.warnings.filter((entry) => entry.code === "LOW_RELEVANCE"),
+    [],
+  );
+});
+
+void test("honours an injected relevance floor over the calibrated default", async () => {
+  const scenario = setup();
+  const seeded = seedFragment(scenario.knowledgeRepository, "on-topic");
+
+  scenario.vectorIndex.hits = [
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: 0.8914 },
+  ];
+
+  const outcome = await retrieveCandidates(
+    { ...scenario.dependencies, lowRelevanceCosine: 0.95 },
+    RetrievalQuery.create({ text: "jerarquía tipográfica" }),
+  );
+
+  // The default is calibrated against one corpus; another library can raise
+  // or lower the floor without the use case changing.
+  const warning = outcome.warnings.find(
+    (entry) => entry.code === "LOW_RELEVANCE",
+  );
+  assert.ok(warning);
+  assert.match(warning.message, /0\.95/u);
 });

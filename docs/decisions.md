@@ -855,6 +855,41 @@ posible, así que ordenar la entrada no cambia una sola operación del runtime.
 Sólo reabrir si aparece un motivo independiente para volver a un lote mayor
 que 1.
 
+## Aviso de baja relevancia en vez de piso de similitud (punto 4.7)
+
+Decidido e implementado el 14 de agosto de 2026. Diseño completo en
+`docs/low-relevance-design.md`.
+
+Desde 2.2 quedaba abierto un "piso mínimo de similitud vectorial, salvo
+evidencia clara"; 3.2 buscó esa evidencia y no la encontró. Apareció el 14 de
+agosto, probando la biblioteca real: una consulta sobre síntomas de diabetes
+tipo 2 devolvió `status: "ok"` con 31.982 tokens sobre diseño web y
+`warnings: []`.
+
+- **`fusedScore` no sirve para medir relevancia.** RRF asigna `1/(k + rank)`:
+  codifica posición, no similitud, así que el primer candidato de una consulta
+  perfecta y el de una absurda reciben el mismo valor. La única señal con
+  significado absoluto es el coseno de la vía vectorial.
+- **El umbral se midió, no se eligió.** 24 consultas clasificadas a mano
+  contra los 51 videos: en dominio 0,8657–0,9012; técnicas no cubiertas
+  0,8428–0,8600; fuera de dominio 0,8149–0,8389. Sin solapamiento, pero con
+  márgenes de milésimas. `0.84` es el corte conservador.
+- **El aviso informa y no filtra**, precisamente porque el umbral es frágil:
+  demasiado alto sólo molesta, demasiado bajo calla. Ninguno de los dos
+  errores puede ocultar evidencia. Un piso que descartara candidatos tendría
+  el riesgo opuesto, y se sigue descartando igual que en 2.2 y 3.2.
+- **El umbral es inyectable y vive junto a su tabla de mediciones**
+  (`retrieval-thresholds.ts`), porque está calibrado sobre una sola colección
+  de diseño en español: otro corpus, idioma o modelo lo invalidan.
+- **Una advertencia informativa no degrada el resultado.** `run-cli.ts`
+  trataba cualquier warning como degradación, lo que convirtió una consulta
+  sana en `partial` con código `1`. `informationalWarningCodes` separa "algo
+  falló" de "esto es un dato sobre la respuesta"; `LOW_RELEVANCE` mantiene
+  `ok` y exit `0`.
+
+Lo encontró la verificación contra el binario real, no la suite: los 348 tests
+pasaban con el defecto presente.
+
 ## Pendientes de decisión
 
 Ninguno.

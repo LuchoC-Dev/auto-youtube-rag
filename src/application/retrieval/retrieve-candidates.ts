@@ -4,6 +4,7 @@ import type { TextSearchIndex } from "../ports/text-search-index.js";
 import type { VectorSearchIndex } from "../ports/vector-search-index.js";
 import type { RetrievalQuery } from "../../domain/retrieval/retrieval-query.js";
 import type { FusionStrategy } from "./fusion-strategy.js";
+import { defaultLowRelevanceCosine } from "./retrieval-thresholds.js";
 import { selectCandidates } from "./select-candidates.js";
 import type {
   CandidateProvenance,
@@ -18,6 +19,12 @@ export interface RetrieveCandidatesDependencies {
   readonly knowledgeRepository: KnowledgeRepository;
   readonly embeddingGenerator: EmbeddingGenerator;
   readonly fusionStrategy: FusionStrategy;
+  /**
+   * Cosine below which `LOW_RELEVANCE` is reported. Injectable because the
+   * default is calibrated against one specific corpus — see
+   * `retrieval-thresholds.ts`.
+   */
+  readonly lowRelevanceCosine?: number;
 }
 
 /**
@@ -105,6 +112,36 @@ export async function retrieveCandidates(
       path: "vector",
       message:
         "Semantic search did not run: the vector index has no vectors for the active embedding model, so these results come from lexical search only. Run `auto-youtube-rag sync` to regenerate embeddings.",
+    });
+  }
+
+  // Read before fusion, because RRF replaces every score with 1/(k + rank):
+  // that encodes position, not similarity, so the top candidate of a perfect
+  // query and of a nonsense one end up identical. The cosine is the only
+  // signal here with an absolute meaning.
+  //
+  // Only reported when the vector path actually ran and returned hits: a
+  // failed path, a stale index or an empty result each have their own warning,
+  // and adding this one on top would just be noise.
+  const lowRelevanceCosine =
+    dependencies.lowRelevanceCosine ?? defaultLowRelevanceCosine;
+  const bestCosine = vectorAttempt.value.hits.reduce(
+    (best, hit) => Math.max(best, hit.rawScore),
+    Number.NEGATIVE_INFINITY,
+  );
+  if (
+    vectorAttempt.warning === null &&
+    vectorAttempt.value.hits.length > 0 &&
+    bestCosine < lowRelevanceCosine
+  ) {
+    warnings.push({
+      code: "LOW_RELEVANCE",
+      path: "vector",
+      message:
+        `The closest match scored ${bestCosine.toFixed(4)} against a ${lowRelevanceCosine.toFixed(2)} relevance floor: ` +
+        "semantic search found nothing that really answers this query, so the " +
+        "content below is the library's least distant material rather than an " +
+        "answer. Treat it as probably unrelated unless reading it proves otherwise.",
     });
   }
 
