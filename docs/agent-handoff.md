@@ -9,13 +9,25 @@ implementada, las invariantes que no deben romperse, las validaciones realizadas
 y el siguiente bloque recomendado.
 
 Estado de referencia: **14 de agosto de 2026**, después de cerrar los puntos
-4.2 —instalación: hogar de usuario, `init` instalador y preflight— y 4.3
-—seguridad de `sync` y rendimiento de indexación.
+4.2 —instalación: hogar de usuario, `init` instalador y preflight—, 4.3
+—seguridad de `sync` y rendimiento de indexación— y 4.4 —aviso de vectores
+obsoletos.
 
-**Lo que más probablemente contradiga tu memoria de sesiones viejas:** la
-base y el modelo **ya no son relativos al directorio de trabajo**. Viven en
-`~/.auto-youtube-rag/`, se instalan con `auto-youtube-rag init`, y
-`AUTO_YOUTUBE_RAG_MODEL_CACHE` se renombró a `AUTO_YOUTUBE_RAG_MODELS_DIR`.
+**Lo que más probablemente contradiga tu memoria de sesiones viejas**, en
+orden de impacto:
+
+1. La base y el modelo **ya no son relativos al directorio de trabajo**.
+   Viven en `~/.auto-youtube-rag/`, se instalan con `auto-youtube-rag init`,
+   y `AUTO_YOUTUBE_RAG_MODEL_CACHE` se renombró a
+   `AUTO_YOUTUBE_RAG_MODELS_DIR`.
+2. La rama es **`main`**, con remoto privado, no `feat/sqlite-vec-benchmark`.
+3. **No podés lanzar dos `sync` a la vez** sobre una fuente: el producto los
+   rechaza con `SYNC_ALREADY_RUNNING`. `sync --force` existe para destrabar
+   un run fantasma.
+4. **El marcador de cita abre el bloque, dentro del encabezado**
+   (`### [S01] ...`), no lo cierra en una línea suelta.
+5. `init` **ya no es instantáneo**: instala el modelo salvo `--skip-model`.
+
 Ver "Configuración de ejecución" más abajo antes de asumir cualquier ruta.
 
 Antes se habían cerrado el punto
@@ -98,8 +110,16 @@ Antes de modificar código, leer en este orden:
     (schema 2.0), punto 4.1, ya completado.
 17. `docs/analysis-schema-tasks.md`: checklist fino completado P1–T3 para
     4.1.
-18. Este documento: estado operativo consolidado del MVP completo, del
-    punto 4.1 y notas para trabajo posterior.
+18. `docs/install-design.md`: diseño de instalación —hogar de usuario, `init`
+    como instalador y preflight— del punto 4.2, ya completado. Incluye la
+    nota "qué haría falta para soportar otro modelo", que es el punto de
+    partida del frente siguiente.
+19. `docs/install-tasks.md`: checklist fino completado U–Z e Y para 4.2.
+20. `docs/sync-safety-design.md`: guard de concurrencia, runs fantasma y
+    tamaño de lote del punto 4.3, ya completado.
+21. Este documento: estado operativo consolidado del MVP, de los puntos 4.1
+    a 4.4, el orden de prioridad decidido y lo que enseñó la sesión del 13 y
+    14 de agosto.
 
 `docs/development.md` sigue siendo la referencia del toolchain. Su frase que
 describe `src/main.ts` como un scaffold quedó históricamente desactualizada: la
@@ -1155,118 +1175,135 @@ incremental, recuperación híbrida, ensamblado de contexto citado, comando
 `retrieve`, skill portable para agentes, pruebas funcionales y evaluación en
 dos capas sobre la colección real.
 
-Trabajo posterior razonable, explícitamente **fuera de este MVP** — ninguno
-es un pendiente urgente, y ninguno se implementa sin pedido y aprobación
-explícita del usuario:
+Después del MVP se cerraron cuatro puntos más, todos originados en corridas
+de verificación en frío: 4.1 (`analysis.json`), 4.2 (instalación), 4.3
+(seguridad de `sync` y rendimiento) y 4.4 (aviso de vectores obsoletos).
 
-- Piso mínimo de similitud vectorial (dejado abierto "salvo evidencia
-  clara" desde 2.2; 3.2 no encontró esa evidencia).
-- Señal adicional de densidad/relevancia temática para que RRF distinga
-  contenido específico de catálogo tangencial (hallazgo de 3.2, no un bug).
-- Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad que
-  encontró N4, antes de una futura pasada de evaluación.
-- Verificación de `skill/SKILL.md` específicamente desde Codex real (2.4 se
-  cerró sólo con verificación en Claude, por decisión explícita del
-  usuario).
-- Comando `rebuild --confirm` (contrato ya aprobado en `cli-contract.md`,
-  nunca implementado porque no lo pidió el producto).
-- MCP, interfaz web y soporte de paquetes de páginas web (fuera de alcance
-  desde `product-spec.md` original).
+### Orden de prioridad fijado por el usuario el 14 de agosto de 2026
 
-Si el usuario pide continuar el proyecto, preguntar primero cuál de estos
-frentes (u otro nuevo) es prioridad, en vez de asumir uno.
+Este orden ya está decidido. **No vuelvas a preguntarlo**; si el usuario
+cambia de idea lo dirá.
+
+1. **Prefijos E5 hardcodeados.** `passage:` y `query:` se aplican siempre en
+   `e5-embedding-generator.ts`. Son específicos de la familia E5: con MiniLM,
+   Jina o BGE degradan la calidad **sin ningún error**. El arnés de
+   benchmarks ya lo contempla con un flag `e5Prefixes` en su
+   `ModelDefinition`; el producto no. Mover los prefijos al descriptor del
+   modelo es el trabajo real de "modelo configurable" — la dimensión y la
+   reindexación automática ya funcionan. Detalle en `docs/install-design.md`
+   → "Nota: qué haría falta para soportar otro modelo".
+2. **Ordenar fragmentos por longitud antes de lotear.** Medido en 1,93x,
+   menos que el lote 1 que ya se adoptó, y más complejo. Sólo tiene sentido
+   si aparece un motivo para volver a lotear. Ver `docs/sync-safety-design.md`.
+3. **Comando `rebuild --confirm`**, cuyo contrato ya está aprobado en
+   `cli-contract.md` y nunca se implementó; luego **MCP, interfaz web y
+   soporte de paquetes de páginas web**, fuera de alcance desde
+   `product-spec.md` original.
+
+Explícitamente **para el final**, por decisión del usuario:
+
+- **Verificar `skill/SKILL.md` desde Codex real.** Es la única casilla sin
+  marcar de `docs/build.md` (punto 2.4). Gana valor porque la skill cambió
+  mucho el 13 y 14 de agosto —se dividió en tres archivos, cambió el modelo
+  de instalación, sumó `models`, `--force` y códigos nuevos— y todo eso se
+  validó en frío **sólo con agentes Claude**. Requiere que lo corra el
+  usuario: un agente Claude no puede invocar Codex.
+- **Higiene del repositorio**: borrar las tres ramas locales muertas
+  (ninguna tiene commits propios) y los 2,1 GB de `.cache/`, de los cuales
+  130 MB son el modelo y el resto benchmarks cerrados.
+
+Frentes anteriores que siguen sin evidencia que los justifique, y que no
+están en el orden de arriba:
+
+- Piso mínimo de similitud vectorial (abierto "salvo evidencia clara" desde
+  2.2; 3.2 no encontró esa evidencia).
+- Señal de densidad temática para que RRF distinga contenido específico de
+  catálogo tangencial (hallazgo de 3.2, no un bug).
+- Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad de N4.
 
 ## Primer turno recomendado para el próximo agente
 
 1. Confirmar `git status --short` vacío y revisar los últimos commits.
-2. Ejecutar `npm.cmd run check` y `npm.cmd run build`.
-3. Leer los dieciocho documentos indicados al inicio, incluidos
-   `skill/SKILL.md`, `evals/results/2026-08-12/report.md` y
-   `docs/analysis-schema-design.md`/`docs/analysis-schema-tasks.md`.
-4. El MVP está completo: no hay bloque abierto en `docs/build.md`.
-   Preguntar al usuario qué frente de "Trabajo posterior razonable, fuera de
-   este MVP" (más arriba) es prioridad, o si hay un pedido nuevo — no asumir
-   ninguno por defecto.
-5. Si el usuario aprueba avanzar en un frente nuevo o en trabajo posterior,
-   proponer diseño y checklist fino primero, siguiendo el mismo patrón que
-   `retrieval-design.md`/`context-assembly-design.md`/`eval-design.md`, y
-   esperar aprobación explícita antes de implementar.
-6. Implementar en cortes de máximo cinco archivos por tarea, conservando
-   arquitectura y commits convencionales.
+   La rama es `main` y tiene remoto privado: **no pushees sin pedido
+   explícito**.
+2. Ejecutar `npm.cmd run check` y `npm.cmd run build`. La referencia al
+   cerrar el 14 de agosto: **315 tests, 0 fallos**.
+3. Leer los documentos del orden de lectura, incluidos los tres diseños
+   posteriores al MVP: `install-design.md`, `install-tasks.md` y
+   `sync-safety-design.md`.
+4. **El siguiente frente ya está decidido**: los prefijos E5 hardcodeados,
+   punto 1 del orden de prioridad de arriba. No preguntes qué priorizar; el
+   usuario lo fijó el 14 de agosto.
+5. Proponer diseño y checklist fino **antes** de implementar, siguiendo el
+   patrón de `retrieval-design.md` / `install-design.md` /
+   `sync-safety-design.md`, y esperar aprobación explícita.
+6. Implementar en cortes de máximo cinco archivos por tarea. **Commitear con
+   la skill `/git-commit`**, nunca a mano — ver `docs/development.md` →
+   "Cómo commitear".
+
+### Lo que enseñó la sesión del 13 y 14 de agosto
+
+Cinco defectos reales se corrigieron en dos días. **Cuatro de los cinco
+aparecieron verificando otra cosa**, no buscándolos. Vale la pena repetir el
+método:
+
+- **Verificá contra el binario real, no sólo con tests.** `doctor` daba un
+  parte de salud falso ante un modelo truncado y toda la suite pasaba; sólo
+  se vio corriendo el comando con un archivo dañado a propósito.
+- **Desconfiá del "todo bien".** Tres de los cinco defectos tenían la misma
+  forma: el sistema respondía correctamente mientras algo estaba roto. El
+  marcador de citas pasaba toda verificación mecánica y producía procedencia
+  falsa; `retrieve` devolvía `ok` con la búsqueda semántica muerta; `doctor`
+  decía `ok` con el modelo corrupto.
+- **Un arreglo puede estar tapado por otro.** `VECTORS_STALE` no podía
+  dispararse nunca porque el índice reutilizaba un snapshot obsoleto. Dos
+  defectos se cubrían mutuamente.
+- **Medí antes de optimizar.** El paralelismo parecía obvio y rindió 1,00x;
+  el tamaño de lote no parecía nada y rindió 2,23x. La primera medición del
+  embedding fue engañosa por usar textos cortos en vez de contenido real.
+- **Los subagentes que reportan lo que no arreglaron valen oro.** El hueco
+  del snapshot obsoleto lo encontró un subagente que decidió que estaba
+  fuera de su alcance y lo dijo, en vez de tocarlo en silencio.
 
 Prompt sugerido para retomar:
 
-> Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero el
-> estado del repositorio y las pruebas. El MVP está completo: 2.1–2.4 y
-> 3.1–3.2 al 100%, incluidos el comando `retrieve`, la skill portable
-> `skill/SKILL.md` y el reporte final de evaluaciones. El punto 4.1 —soporte
-> de `analysis.json` (schema 2.0)— también está cerrado y validado contra la
-> colección real `auto-design`. No hay ningún bloque abierto. Preguntame qué
-> frente de trabajo posterior priorizar antes de implementar nada.
+> Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero
+> el estado del repositorio y las pruebas. El MVP está completo, y también
+> los puntos 4.1 a 4.4: soporte de `analysis.json`, instalación con hogar de
+> usuario, seguridad de `sync` con guard de concurrencia, y aviso de vectores
+> obsoletos. No hay pendientes de decisión. El siguiente frente ya está
+> decidido: los prefijos E5 hardcodeados. Propone diseño y checklist antes de
+> implementar nada.
 
 ## Historial reciente relevante
 
+Los veinticuatro commits más recientes; el historial completo tiene 136.
+
 ```text
-4b8cbcf docs(evals): resolve O1, keep RRF weights and depth budgets unchanged
-e6103ed docs(evals): run N4, compare Codex and Claude Layer B judgments
-972dfad docs(evals): record N3, Codex's independent Layer B judgment
-8789ad0 docs(evals): run N2, Claude's cold-start Layer B judgment
-8f719c8 docs(evals): write the Layer B judgment rubric template
-38495f5 docs(evals): run M4, the real auto-design validation pass
-37d2718 feat(evals): aggregate layer A mechanical metrics into a report table
-2b28277 feat(evals): orchestrate seed queries across depth presets
-d1cb11e feat(evals): verify citation integrity between bundle markdown and result
-a5ba23c docs(evals): propose and approve the 3.2 evaluation plan
-27823c5 docs(progress): close point 2.4 and hand off to 3.2
-31e767a feat(skill): add the portable general skill
-350709e docs(progress): close point 2.3 and hand off to 2.4 or 3.2
-fdb9255 test(e2e): verify context assembly end to end
-af19db2 test(main): verify assembleContext is exposed on the application
-99a7399 feat(cli): add the retrieve command
-b5846fd feat(context): write the context bundle to disk
-92a5b98 feat(context): orchestrate context assembly end to end
-ccf4475 feat(context): render the result.json bundle
-934c960 feat(context): render the context.md bundle
-c8b9c4f feat(context): assign sequential citations to included blocks
-f7f3037 feat(context): allocate the token budget across ordered blocks
-b0da4fb feat(context): deduplicate blocks by content hash
-98a1300 feat(context): expand candidates to their parent units
-0fdf539 feat(context): declare context assembly types
-faa84c2 feat(context): resolve token budgets per depth preset
-cbc6e65 docs(context): propose and approve 2.3 context assembly plan
-a7e4098 docs(handoff): detail cold-start state and defer real-collection validation
-9a1e68f docs(retrieval): close point 2.2 and seed evaluation queries
-8fa0fa7 test(e2e): verify hybrid retrieval end to end
-9f77192 feat(main): compose retrieval adapters into the application
-639fa56 feat(retrieval): orchestrate candidate selection and retrieval
-bb88f27 feat(retrieval): read provenance and unit hierarchy
-709a3c5 feat(retrieval): search vectors with an exact in-memory index
-aa517bc feat(retrieval): search fragments through FTS5
-59f5090 feat(retrieval): sanitize queries for the FTS5 grammar
-faed06f feat(retrieval): fuse ranked hits with weighted RRF
-2495cc9 feat(retrieval): declare hybrid retrieval ports
-3d85c3a feat(retrieval): validate retrieval queries and filters
-ba132e9 docs(retrieval): propose hybrid retrieval design
-ed89878 docs(progress): complete synchronization phase
-35ef5d1 fix(domain): accept canonical unicode slugs
-b902d0c fix(embeddings): enforce offline model loading
-705a444 test(e2e): verify incremental indexing workflow
-7a498fb feat(diagnostics): add status and doctor commands
-d82092c feat(cli): add administrative executable
-193a067 feat(cli): parse administrative commands
-e467252 feat(main): compose indexing application
-b0e5c0b feat(indexing): orchestrate incremental source sync
-6f0fb10 fix(indexing): preserve unchanged packages during sync
-be34690 feat(sources): add source management use cases
-2fb1510 docs(progress): complete persistence block
-8c629c1 feat(sqlite): apply package updates atomically
-f5ed973 feat(sqlite): persist sync runs and package state
-7f33d19 feat(sqlite): persist source registry
-2cdc17a feat(sqlite): add initial database migration
-2213542 test(embeddings): add offline E5 smoke test
-96fa2dc feat(embeddings): add local E5 generator
-160c415 feat(application): fragment knowledge units by tokens
-f862982 feat(application): build hierarchical knowledge units
+73b59aa fix(sync): close the cross-process race by locking before the check
+fb2b02c docs(retrieval): close point 4.4 and teach the skill VECTORS_STALE
+d7b5df0 fix(vector-search): reload the snapshot when the model version changes
+09e5175 test(e2e): reproduce VECTORS_STALE with real SQLite and document the code
+1f64f4b feat(retrieval): warn VECTORS_STALE when the active model has no vectors
+fb56413 refactor(vector-search): return the loaded vector count from load()
+ca4829d docs(development): require /git-commit for every commit
+e5061fa docs(handoff): record the move to main and the private remote
+700f938 docs(sync): close point 4.3 and teach the skill sync --force
+def5de1 feat(cli): add sync --force and doctor STALE_SYNC_RUN
+fb98d58 perf(embeddings): default embedding batch size to 1
+5bc1538 fix(sync): reject a second concurrent running sync per source
+c2e8a7a docs(sync): confirm the cross-deletion bug and design the guard
+3969d2b fix(context): open each block with its citation id in the heading
+d304054 docs(install): close point 4.2 and record the cold-run findings
+4bb6de3 test(install): smoke the real --from adoption against the repo cache
+116801a docs(skill): describe the user home, init installer and models commands
+033d746 fix(doctor): detect an incomplete model instead of trusting the directory
+0235184 docs(cli-contract): document models install/status, init flags and 4.2 codes
+8c633b6 feat(cli): translate raw SQLite integrity failures for sync and retrieve
+70ad16c test(cli): pin the sync-never-discovers-63-missing-models regression
+ef06e93 feat(cli): preflight requirements once, before building the Application
+9598b67 feat(cli): add the command requirements table
+c9b4ee4 fix(doctor): point the missing-model check at models install
 ```
 
 ## Definición de éxito del relevo
@@ -1298,8 +1335,18 @@ código:
     (Capa A mecánica, Capa B juzgada por Codex y Claude sobre el mismo
     bundle), y por qué ninguna de las 9 discrepancias entre jueces señala un
     defecto del producto — son ambigüedad de la rúbrica, no de lectura;
-13. qué frentes quedan como trabajo posterior razonable, explícitamente
-    fuera de este MVP, y por qué ninguno es un pendiente urgente;
+13. qué frentes quedan como trabajo posterior, en qué orden los priorizó el
+    usuario el 14 de agosto, y cuáles quedaron explícitamente para el final;
 14. por qué un bloque de ancestro siempre cae en "Additional relevant
     context" aunque sea en sí una regla relevante, y por qué un presupuesto
-    nunca corta un bloque a la mitad.
+    nunca corta un bloque a la mitad;
+15. por qué la biblioteca y el modelo viven en el hogar del usuario y no en
+    el directorio de trabajo, y por qué el modelo es estado instalado y no
+    un caché;
+16. por qué dos `sync` concurrentes sobre una fuente la dejaban vacía, por
+    qué el guard va en `recordRun` bajo `BEGIN IMMEDIATE` en vez de un
+    índice único, y por qué no se abandona ningún run automáticamente;
+17. por qué `VECTORS_STALE` necesita tres condiciones y no una, y por qué el
+    índice vectorial debe recargar al cambiar `version`, no sólo `key`;
+18. por qué paralelizar la indexación no sirve —ONNX ya satura los núcleos—
+    y por qué bajar el lote a 1 rindió 2,23x.
