@@ -136,9 +136,14 @@ Antes de modificar código, leer en este orden:
     a 4.4, el orden de prioridad decidido y lo que enseñó la sesión del 13 y
     14 de agosto.
 
-`docs/development.md` sigue siendo la referencia del toolchain. Su frase que
-describe `src/main.ts` como un scaffold quedó históricamente desactualizada: la
-CLI administrativa ya está implementada y probada.
+`docs/development.md` sigue siendo la referencia del toolchain, y desde el 14
+de agosto de 2026 también la de **cómo arrancar en una máquina nueva** (sección
+"Arrancar en una máquina nueva"): `npm ci` + `npm run check` + `npm run build`
+funcionan sobre un clon limpio **sin red y sin modelo**, porque la suite rápida
+omite los smokes y usa fakes. Sólo los smokes y los benchmarks necesitan
+`npm run models:download`, y sólo usar el producto necesita
+`auto-youtube-rag init`. Su frase que describía el repositorio como un scaffold
+sin dominio ya se corrigió.
 
 ## Objetivo del producto
 
@@ -1313,13 +1318,18 @@ Explícitamente **para el final**, por decisión del usuario:
   de instalación, sumó `models`, `--force` y códigos nuevos— y todo eso se
   validó en frío **sólo con agentes Claude**. Requiere que lo corra el
   usuario: un agente Claude no puede invocar Codex.
-- **Higiene del repositorio**: las tres ramas locales muertas ya se borraron
-  el 14 de agosto de 2026. Queda pendiente `.cache/`, 2,1 GB de los cuales
-  ~130 MB son el modelo de los benchmarks y el resto, benchmarks cerrados.
-  **Antes de borrarlo, tener en cuenta** que `.cache/models` es la única copia
-  local del modelo E5 fuera del hogar del usuario, y que es de donde se
-  adopta con `models install --from` para validar contra el binario real sin
-  descargar 130 MB de red.
+- ~~**Higiene del repositorio.**~~ **Hecha el 14 de agosto de 2026.** Se
+  borraron las tres ramas locales muertas y se limpió `.cache/` de 2110 MB a
+  **129 MB**: se fueron `sqlite-client-benchmark` (995 MB),
+  `vector-benchmark` (418 MB) y los tres modelos que el benchmark descartó
+  (`multilingual-e5-base`, `jina-embeddings-v2-base-es`,
+  `paraphrase-multilingual-MiniLM-L12-v2`, 568 MB juntos). **Se conservó
+  deliberadamente `Xenova/multilingual-e5-small`**: es la única copia local
+  del modelo activo, la que exige `test:embedding:smoke` y la que
+  `test:install:smoke` y `models install --from` adoptan para validar contra
+  el binario real sin bajar 129 MB de red. Ambos smokes se verificaron en
+  verde después de limpiar. Si algún día falta, `npm run models:download` lo
+  repone.
 
 Frentes anteriores que siguen sin evidencia que los justifique, y que no
 están en el orden de arriba:
