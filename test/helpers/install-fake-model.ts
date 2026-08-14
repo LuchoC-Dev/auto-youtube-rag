@@ -3,10 +3,11 @@ import { join } from "node:path";
 
 import {
   measureModelFiles,
-  requiredModelFiles,
   writeInstallReceipt,
 } from "../../src/infrastructure/config/model-install-state.js";
+import { activeModelProfile } from "../../src/infrastructure/embeddings/model-profile.js";
 
+const requiredModelFiles = activeModelProfile.requiredFiles;
 const modelDirectory = join("Xenova", "multilingual-e5-small");
 
 /**
