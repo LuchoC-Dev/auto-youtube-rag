@@ -492,6 +492,14 @@ desincronizado del motor de recuperación.
 7. Devolver `RetrievalOutcome` con `status` (`"ok"` o `"no_results"`),
    `candidates`, `metrics` y `warnings`.
 
+`vectorIndex.load()` devuelve la cantidad de vectores disponibles para el
+modelo activo (cambiado el 14 de agosto de 2026; antes era `Promise<void>`).
+Si la carga no falló, ese conteo es cero y la vía textual **sí** encontró
+hits, se emite el warning `VECTORS_STALE`: la biblioteca tiene contenido pero
+ningún vector para el modelo activo. Las tres condiciones juntas importan —
+ver `docs/decisions.md`, sección "Degradación silenciosa de la vía
+vectorial".
+
 **Gotcha que sigue vigente:** la búsqueda vectorial no tiene piso de similitud
 (ver la sección de decisiones de 2.2 más abajo). `status: "ok"` con candidatos
 de relevancia real baja es un resultado válido y esperado, no un bug. 2.3 lo
@@ -819,6 +827,11 @@ recrear este mismo aislamiento.
   paquetes que no reclamó él, así que dos solapados dejan la fuente vacía.
   Confirmado con reproducción determinista el 14 de agosto; el guard vive en
   `recordRun` y no debe debilitarse.
+- Nunca dejar que una vía de recuperación desaparezca en silencio. Si la
+  búsqueda semántica no participa —porque no hay vectores para el modelo
+  activo— tiene que emitirse `VECTORS_STALE`. El índice vectorial además debe
+  recargar cuando cambia `version` o `dimensions`, no sólo `key`: reutilizar
+  el snapshot devuelve un conteo mayor que cero y anula ese warning.
 - Nunca acoplar dominio o aplicación a SQLite, Transformers.js o Node paths.
 - Nunca persistir `.env`, cookies, headers, URLs temporales ni metadata cruda.
 - Nunca descargar el modelo implícitamente durante tests o uso normal.

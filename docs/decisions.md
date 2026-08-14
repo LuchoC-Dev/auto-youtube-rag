@@ -568,6 +568,65 @@ Limitaciones declaradas, no ocultas:
   obligatorio**; no se agregó el lote a la identidad del modelo porque haría
   que cualquier ajuste de rendimiento invalidara la biblioteca entera.
 
+## Degradación silenciosa de la vía vectorial
+
+Corregido el 14 de agosto de 2026. Cierra el hueco que había quedado anotado
+en `docs/install-design.md` al investigar el soporte de otros modelos.
+
+**El defecto.** `sqlite-vector-loader.ts` consulta
+`WHERE model_key = ? AND model_version = ?`. Si el modelo activo cambió y
+todavía no se reindexó, esa consulta no devuelve filas, el índice queda vacío
+y `retrieve` respondía `status: "ok"` armado **sólo con búsqueda textual, sin
+ningún aviso**. La mitad semántica del producto desaparecía en silencio.
+
+`VECTOR_SEARCH_UNAVAILABLE` no lo cubría: sólo se emite cuando la vía
+vectorial lanza una excepción. Un índice vacío no lanza, devuelve cero
+resultados, que es indistinguible de "no hubo coincidencias".
+
+**La corrección.** `VectorSearchIndex.load()` pasa de `Promise<void>` a
+devolver la cantidad de vectores disponibles para el modelo activo — dato que
+el loader ya tenía. `retrieveCandidates` emite el warning nuevo
+`VECTORS_STALE` cuando se cumplen tres condiciones a la vez:
+
+1. la carga **no** falló (si lanzó, ya hay `VECTOR_SEARCH_UNAVAILABLE` con
+   causa desconocida y no corresponde reportar además obsolescencia);
+2. cargó **cero** vectores;
+3. la vía textual **sí** devolvió hits.
+
+La tercera es la que evita falsos positivos. Sola, la segunda dispararía en
+una biblioteca vacía o recién creada, o cuando un filtro `--source` deja el
+universo sin candidatos; en esos casos el texto tampoco devuelve nada y
+`no_results` ya lo explica. Que el texto encuentre contenido y los vectores
+no es la señal inequívoca de obsolescencia.
+
+El mensaje **no afirma la causa**: dice que la búsqueda semántica no
+participó, que los resultados vienen sólo de la vía léxica, y que `sync`
+regenera los vectores. Que el modelo haya cambiado es una hipótesis que el
+código no puede verificar.
+
+El warning ya llegaba al bundle sin cableado extra: `outcome.warnings` fluye
+a `renderContextResult` y a "Coverage and limitations" de `context.md`, y
+`run-cli` degrada el estado a `partial` con salida `1` ante cualquier warning.
+
+**Un segundo defecto que tapaba al primero.** El camino rápido de
+`InMemoryVectorSearchIndex.load()` comparaba sólo `model.key`, que es
+`e5-small` y no cambia nunca; lo que cambia es `version`, que codifica
+repositorio, revisión y cuantización
+(`Xenova/multilingual-e5-small@main:q8`). Un cambio de revisión reutilizaba
+la matriz cacheada en vez de recargar, y **una matriz reutilizada tiene
+conteo mayor que cero, así que `VECTORS_STALE` nunca habría disparado**. Los
+dos defectos se cubrían mutuamente: corregir sólo el warning no alcanzaba.
+
+Ahora compara clave, versión y dimensión. En la práctica el CLI corre un
+comando por proceso, así que el snapshot obsoleto sólo afecta a una
+aplicación de vida larga —los tests hoy, un servidor o un host MCP más
+adelante—, pero la corrección vale igual.
+
+Fue detectado por el agente que implementaba `VECTORS_STALE`, que lo
+**reportó en vez de arreglarlo en silencio** por estar fuera de su alcance.
+Ese reporte es lo que evitó cerrar el punto con un warning que no podía
+dispararse.
+
 ## Pendientes de decisión
 
 Ninguno.
