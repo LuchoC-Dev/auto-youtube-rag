@@ -57,7 +57,7 @@ pendiente urgente.
 | Rama actual               | `main`                                                                                                     |
 | Remoto                    | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (privado)                                              |
 | Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.5                               |
-| Estado Git al cerrar      | Worktree limpio                                                                                            |
+| Estado Git al cerrar      | Worktree limpio; `main` pusheada y sincronizada con `origin/main` (0 commits de diferencia)                |
 | Runtime                   | Node.js 24.19.0 LTS, ESM                                                                                   |
 | Lenguaje                  | TypeScript 6.0.3 estricto                                                                                  |
 | Persistencia              | SQLite mediante `node:sqlite`                                                                              |
@@ -731,6 +731,17 @@ puede bloquear `npm.ps1`.
 `npm run check` omite la inferencia real mediante el patrón `smoke`. El smoke de
 E5 se ejecuta explícitamente y nunca debe depender de red.
 
+**No borres `.gitattributes`.** Fija `* text=auto eol=lf` y existe desde el
+14 de agosto de 2026 (commit `7ee0a9b`). Sin él, `core.autocrlf=true` en
+Windows materializa CRLF en cada `checkout` y en cada clon nuevo, y
+`format:check` —parte de `npm run check`— falla sobre archivos que nadie
+editó. Es una trampa desconcertante porque `git diff` no muestra **nada**:
+git normaliza los finales de línea al comparar, así que sólo difiere la
+representación en disco. Si algún día `format:check` falla sobre archivos
+ajenos a tu cambio, verificá que `.gitattributes` siga existiendo antes de
+tocar cualquier otra cosa; el remedio inmediato es `npx prettier --write .`,
+que no produce ningún commit.
+
 ## Última validación conocida
 
 ### Puerta final de 2.1 (11 de agosto de 2026)
@@ -1351,6 +1362,8 @@ Prompt sugerido para retomar:
 Los commits más recientes.
 
 ```text
+7ee0a9b build(repo): check every file out with LF so format:check survives a checkout
+9107f02 docs(model-profile): close point 4.5 documentation
 eb12309 fix(embeddings): name the loaded model from the profile, not a literal
 53545b8 refactor(embeddings): rename E5ModelInstaller to TransformersModelInstaller
 faa04fb refactor(embeddings): rename E5EmbeddingGenerator to TransformersEmbeddingGenerator
