@@ -21,6 +21,7 @@
 |                            | 3.2 | Evaluaciones del MVP                    |   ✅   | 100% | M, N y O completos; MVP cerrado                           |
 | **4 — Posterior al MVP**   | 4.1 | Soporte de `analysis.json` (schema 2.0) |   ✅   | 100% | Bloques P–T completos; validado contra `auto-design` real |
 |                            | 4.2 | Instalación: hogar de usuario y `init`  |   ✅   | 100% | Bloques U–Z e Y completos; validado en frío desde cero    |
+|                            | 4.3 | Seguridad de `sync` y rendimiento       |   ✅   | 100% | Guard de concurrencia, runs fantasma y lote 1 (2,23x)     |
 
 ---
 
@@ -225,3 +226,33 @@ Dos hallazgos de la corrida:
    huérfanas. Reprodujo dos veces, incluso leyendo el bundle entero de una
    sola vez. Queda registrado como pendiente de decisión: cambiarlo toca el
    contrato de `cli-contract.md`.
+
+#### 4.3 Seguridad de `sync` y rendimiento de indexación
+
+Diseño en `docs/sync-safety-design.md`. Dos trabajos con el mismo origen: la
+corrida en frío del 13 de agosto.
+
+- [x] AA. Guard de concurrencia en el store y regresión del borrado cruzado
+- [x] AB. `sync --force`, `RUN_SUPERSEDED` y `doctor` con `STALE_SYNC_RUN`
+- [x] AC. `defaultBatchSize` de 16 a 1
+
+Cerrado el 14 de agosto de 2026.
+
+**El borrado cruzado estaba confirmado, no supuesto.** La reproducción
+determinista mostró que dos runs solapados sobre una fuente la dejan
+completamente vacía: cada uno borra lo que no reclamó él, así que lo que el
+otro ya reclamó parece no visto. Ambos terminan sin error. Explica el
+`status` que reportó 13 videos habiendo 53.
+
+Verificado contra el binario real: con un run activo, `sync` rechaza con
+`SYNC_ALREADY_RUNNING` nombrando el run y su inicio; `doctor` lo reporta como
+`STALE_SYNC_RUN` con su antigüedad; `sync --force` lo marca fallido, deja un
+issue `RUN_SUPERSEDED` y arranca uno nuevo **conservando los 12 paquetes**.
+
+**Rendimiento: 2,23x medido de punta a punta.** La misma colección de 12
+videos pasó de 3 min 54 s a 1 min 45 s. La causa era el relleno dentro del
+lote: los fragmentos van de 13 a 511 tokens y todos se rellenaban hasta el
+más largo, así que uno corto costaba como uno de 511.
+
+**Paralelizar no servía**, y se midió antes de descartarlo: concurrencia 2 →
+0,99x, concurrencia 4 → 1,00x. ONNX ya satura los núcleos internamente.

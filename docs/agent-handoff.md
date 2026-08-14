@@ -8,8 +8,9 @@ exacto del repositorio, las decisiones confirmadas, la arquitectura ya
 implementada, las invariantes que no deben romperse, las validaciones realizadas
 y el siguiente bloque recomendado.
 
-Estado de referencia: **14 de agosto de 2026**, después de cerrar el punto
-4.2 — instalación: hogar de usuario, `init` instalador y preflight.
+Estado de referencia: **14 de agosto de 2026**, después de cerrar los puntos
+4.2 —instalación: hogar de usuario, `init` instalador y preflight— y 4.3
+—seguridad de `sync` y rendimiento de indexación.
 
 **Lo que más probablemente contradiga tu memoria de sesiones viejas:** la
 base y el modelo **ya no son relativos al directorio de trabajo**. Viven en
@@ -47,7 +48,7 @@ este MVP" más abajo), no un pendiente urgente.
 | Dimensión                 | 384                                                                          |
 | Instalación               | `auto-youtube-rag init` → `~/.auto-youtube-rag/` (base + modelo, ~130 MB)    |
 | Operación                 | Exclusivamente local; sin APIs externas                                      |
-| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2, 4.1 y 4.2 al 100% en `docs/build.md`            |
+| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1–4.3 al 100% en `docs/build.md`             |
 | Próximo punto             | Ninguno abierto; ver "Trabajo posterior razonable" al final                  |
 
 La rama conserva el nombre de un benchmark anterior. No asumas que el proyecto
@@ -802,6 +803,10 @@ recrear este mismo aislamiento.
 - Nunca interpretar un manifest ilegible como eliminación masiva.
 - Nunca publicar cambios vectoriales antes del commit SQLite.
 - Nunca perder la última versión válida por un fallo parcial.
+- Nunca permitir dos runs `running` sobre la misma fuente: cada run borra los
+  paquetes que no reclamó él, así que dos solapados dejan la fuente vacía.
+  Confirmado con reproducción determinista el 14 de agosto; el guard vive en
+  `recordRun` y no debe debilitarse.
 - Nunca acoplar dominio o aplicación a SQLite, Transformers.js o Node paths.
 - Nunca persistir `.env`, cookies, headers, URLs temporales ni metadata cruda.
 - Nunca descargar el modelo implícitamente durante tests o uso normal.

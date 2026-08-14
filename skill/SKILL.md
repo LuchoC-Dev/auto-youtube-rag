@@ -139,15 +139,29 @@ cualquier carpeta y siempre vas a hablar con la misma biblioteca.
    en el recibo si algo falló parcialmente.
 
    **`sync` es una operación larga.** La primera indexación tarda del orden
-   de **10 a 15 segundos por video** — una colección de 60 videos lleva entre
-   10 y 15 minutos. Un `sync` posterior sin cambios termina en segundos.
+   de **5 a 10 segundos por video** — una colección de 60 videos lleva entre
+   5 y 10 minutos. Un `sync` posterior sin cambios termina en segundos.
    Planificá la espera antes de lanzarlo: en segundo plano si tu entorno
    puede, o con un timeout holgado (15 minutos o más) si sólo podés en
    primer plano.
 
-   Mientras corre: **nunca lances un segundo `sync`**, y no uses el conteo de
-   videos de `status` como señal de progreso — puede subir y bajar. La única
-   señal fiable de que terminó es el recibo JSON del propio comando.
+   **No lances un segundo `sync` mientras haya uno corriendo.** Desde el
+   punto 4.3 el producto lo rechaza con `SYNC_ALREADY_RUNNING` en vez de
+   dejarte corromper la biblioteca, pero igual estarías perdiendo el tiempo.
+   La única señal fiable de que terminó es el recibo JSON del propio comando;
+   el conteo de videos de `status` no sirve como señal de progreso.
+
+   Si un `sync` anterior murió (Ctrl+C, terminal cerrada, corte), su registro
+   queda marcado como activo para siempre y bloquea los siguientes. `doctor`
+   lo reporta como `STALE_SYNC_RUN`. Para destrabarlo:
+
+   ```text
+   auto-youtube-rag sync --force
+   ```
+
+   Marca el run abandonado como fallido y arranca uno nuevo. **Usalo sólo si
+   estás seguro de que el proceso anterior ya no existe**, no para saltear un
+   sync que sigue trabajando.
 
 5. **Recuperar contexto.**
 
@@ -232,6 +246,8 @@ cualquier carpeta y siempre vas a hablar con la misma biblioteca.
   comportamiento esperado del MVP.
 - Nunca lances un `sync` mientras otro sigue corriendo, ni uses el conteo
   intermedio de `status` como señal de progreso.
+- Nunca uses `sync --force` para saltear un `sync` en curso: es sólo para
+  destrabar uno que murió.
 - Nunca reintentes un comando fallido sin haber leído antes el archivo de
   referencia que corresponde: la mayoría de los fallos son de configuración
   y reintentar a ciegas los repite igual.

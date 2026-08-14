@@ -508,9 +508,83 @@ posición. Tampoco rompió nada mecánico — el verificador de integridad usa
 bundle real: 34 unidades, 34 marcadores, cero huérfanas, y los 34 con
 encabezado propio.
 
+## Seguridad de `sync` y tamaño de lote (punto 4.3)
+
+Implementado el 14 de agosto de 2026. Diseño en `docs/sync-safety-design.md`.
+Cierra el pendiente "Guard de concurrencia en `sync`".
+
+**El borrado cruzado quedó confirmado, no supuesto.** La reproducción
+determinista muestra que dos runs solapados sobre una fuente la dejan
+completamente vacía: cada run borra los paquetes que no reclamó él
+(`DELETE ... WHERE last_seen_sync_id <> ?`), así que lo que el otro ya
+reclamó parece no visto. Los dos terminan sin error y cada video fue visto
+por alguno. Explica lo observado el 13 de agosto, cuando `status` reportó 13
+videos habiendo 53.
+
+Decisiones cerradas:
+
+- **El guard vive en el store, no en el caso de uso.** Es invariante de
+  persistencia: `recordRun` rechaza registrar un run `running` para una
+  fuente que ya tiene otro. Sólo aplica al alta, nunca al cierre de un run.
+- **Sin heurística de antigüedad.** Se descartó "un run de más de N minutos
+  está muerto": no hay N defendible cuando un sync de 60 videos tarda
+  minutos y uno de 500 tardaría más de una hora. Cualquier umbral mata syncs
+  vivos o deja pasar fantasmas.
+- **Dos salidas explícitas para los runs fantasma**: `sync --force`, que
+  marca el run activo como `failed` y deja un `SyncIssue` `RUN_SUPERSEDED`
+  como constancia de que fue abandonado y no completado; y un check
+  `STALE_SYNC_RUN` en `doctor` que los lista con su antigüedad. **Nada se
+  abandona solo**: marcar como fallido el trabajo de otro proceso sin que
+  nadie lo pida es la clase de decisión que el resto del producto evita.
+- **`defaultBatchSize` de 16 a 1.** El relleno dentro del lote dominaba el
+  costo: los fragmentos van de 13 a 511 tokens y todos se rellenaban hasta el
+  más largo. Medido de punta a punta: 12 videos pasaron de 3 min 54 s a
+  1 min 45 s, **2,23x**, muy cerca del 2,27x que predecía el micro-benchmark.
+- **Paralelizar se descartó con medición, no por intuición.** Concurrencia 2
+  → 0,99x, concurrencia 4 → 1,00x sobre contenido real: ONNX ya satura los
+  ocho núcleos internamente, así que repartir videos entre tareas competiría
+  por la misma CPU.
+
+Limitaciones declaradas, no ocultas:
+
+- El guard **no** elimina la carrera entre dos procesos del sistema
+  operativo: dos `recordRun` simultáneos podrían pasar los dos. `node:sqlite`
+  serializa las escrituras, así que la ventana es de microsegundos y el caso
+  real —alguien lanzando un segundo sync mientras ve correr el primero—
+  queda cubierto. Un lock de base entre procesos queda fuera de alcance.
+- `supersedeActiveRun` hace un `UPDATE` directo en vez de reconstruir un
+  `SyncRun` y pasarlo por `recordRun`, así que no atraviesa la máquina de
+  estados del dominio. Fija `status` y `finished_at` juntos, de modo que la
+  invariante `finishedAt >= startedAt` se sostiene igual. Es una operación de
+  reparación acotada y deliberada; si en el futuro las invariantes de
+  `SyncRun` se vuelven críticas en más caminos, conviene revisarlo.
+- **Los vectores cambian levemente con el tamaño de lote** (desviación de
+  coseno 4,8×10⁻³ entre lote 1 y lote 16 para el mismo texto): el modelo no
+  enmascara el relleno de forma perfecta. Está muy por debajo de lo que
+  separa dos fragmentos distintos, así que no debería mover rankings.
+  `unchanged()` no lo detecta, porque el tamaño de lote no forma parte de la
+  identidad del modelo, así que una biblioteca existente conserva sus
+  vectores viejos y queda mezclada. **Reindexar es recomendable, no
+  obligatorio**; no se agregó el lote a la identidad del modelo porque haría
+  que cualquier ajuste de rendimiento invalidara la biblioteca entera.
+
 ## Pendientes de decisión
 
-- **Guard de concurrencia en `sync`.** No existe ningún bloqueo que impida
+Ninguno.
+
+## Trabajo posterior anotado, sin decisión pendiente
+
+- **Ordenar fragmentos por longitud antes de lotear.** Medido en 1,93x, menos
+  que el lote 1 que ya se adoptó, y más complejo. Sólo tendría sentido si
+  aparece un motivo para volver a lotear.
+- **Lock de base entre procesos del sistema operativo**, para cerrar la
+  ventana de microsegundos que el guard actual no cubre.
+- **Verificar `skill/SKILL.md` desde Codex real.** El punto 2.4 se cerró sólo
+  con verificación en Claude, por decisión explícita del usuario.
+
+Descripción histórica del pendiente que 4.3 cerró:
+
+- **Guard de concurrencia en `sync`.** No existía ningún bloqueo que impidiera
   dos `sync` simultáneos sobre la misma base. La corrida en frío los produjo
   y observó conteos inconsistentes mientras corrían (`status` llegó a
   reportar 13 videos habiendo 53); el `sync` completo posterior reconstruyó
@@ -520,3 +594,8 @@ encabezado propio.
   propio— es plausible por los timestamps observados pero **no está
   confirmada**: haría falta reproducirla de forma aislada y deliberada antes
   de tratarla como bug. Por ahora la skill lo advierte.
+
+Se reprodujo el 14 de agosto y resultó cierta, y peor de lo descrito: no
+sólo corrompe conteos, deja la fuente vacía. La cautela de no tratarla como
+bug hasta reproducirla fue correcta —la conclusión podría haber sido la
+opuesta— pero la duda ya está resuelta.
