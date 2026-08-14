@@ -28,24 +28,27 @@ mediante la skill `/git-commit`. Antes de cada commit: el test específico,
 
 ## Bloque AF — caso de uso `rebuildIndex`
 
-- [ ] **AF1** — Crear `src/application/indexing/rebuild-index.ts` con
-      `rebuildIndex`: lista las fuentes, verifica que ninguna tenga un run
-      `running` **antes de purgar**, purga, y re-sincroniza cada fuente con
-      `syncSource`.
-- [ ] **AF2** — Recibo agregado: `sources_rebuilt`, `packages_deleted`,
-      `packages_indexed`, `packages_failed`, detalle por fuente e `issues`.
+- [x] **AF1** — Crear `src/application/indexing/rebuild-index.ts` con
+      `rebuildIndex`: lista las fuentes, purga (el guard de runs activos vive
+      dentro de la purga, ver AE2) y re-sincroniza cada fuente con la función
+      `sync` inyectada. Es **secuencial**, no `Promise.all` como `sync`: un
+      rebuild es el caso de máxima carga y 4.3 midió que paralelizar la
+      indexación rinde 1,00x porque ONNX ya satura los núcleos.
+- [x] **AF2** — Recibo agregado: `sourcesRebuilt`, `packagesDeleted`,
+      `packagesIndexed`, `packagesFailed`, detalle por fuente e `issues`.
       `status` agregado según la regla del diseño (`ok`/`partial`/`failed`).
-- [ ] **AF3** — Tests de aplicación con fakes (sin SQLite ni modelo real):
+- [x] **AF3** — Tests de aplicación con fakes (sin SQLite ni modelo real):
   - reconstruye dos fuentes y agrega sus contadores;
-  - **no purga nada** si una fuente tiene un run activo, y falla con
-    `SYNC_ALREADY_RUNNING`;
+  - **no purga nada** si una fuente tiene un run activo, y ninguna fuente
+    llega a sincronizar;
+  - la purga ya ocurrió cuando la primera fuente sincroniza, nunca al revés;
   - una fuente que falla deja `partial` sin impedir que las otras se
-    reconstruyan;
-  - biblioteca sin fuentes registradas → `ok`, `sources_rebuilt: 0`;
+    reconstruyan; todas fallando da `failed`, no `partial`;
+  - biblioteca sin fuentes registradas → `ok`, `sourcesRebuilt: 0`;
   - llama `purgeDerivedIndex` exactamente una vez, no una por fuente.
-- [ ] **AF4** — Exponer `rebuildIndex` en `Application`
-      (`create-application.ts`) como propiedad reemplazable, con su test de
-      cableado.
+- [x] **AF4** — Exponer `rebuildIndex` en `Application`
+      (`create-application.ts`) reutilizando el mismo cableado de `syncSource`
+      que usa `sync`, con su test contra una biblioteca real vacía.
 
 ## Bloque AG — superficie de CLI
 

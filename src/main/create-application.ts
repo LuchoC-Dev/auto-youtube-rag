@@ -1,6 +1,10 @@
 import type { DatabaseSync } from "node:sqlite";
 
 import {
+  rebuildIndex,
+  type RebuildIndexResult,
+} from "../application/indexing/rebuild-index.js";
+import {
   supersedeActiveRun,
   syncSource,
   type SyncSourceResult,
@@ -82,6 +86,7 @@ export interface Application {
     sourceName?: unknown,
     options?: { readonly force?: boolean },
   ): Promise<readonly SyncSourceResult[]>;
+  rebuildIndex(): Promise<RebuildIndexResult>;
   retrieveCandidates(query: RetrievalQuery): Promise<RetrievalOutcome>;
   assembleContext(request: ContextRequest): Promise<ContextBundle>;
   close(): Promise<void>;
@@ -167,6 +172,23 @@ export function createApplication(
         ),
       );
     },
+    // Reuses `syncSource` with exactly the wiring `sync` above builds, so the
+    // rebuild can never index differently from a plain sync.
+    rebuildIndex: () =>
+      rebuildIndex({
+        store: indexStore,
+        registry: sourceRegistry,
+        sync: (source) =>
+          syncSource(
+            {
+              reader: packageReader,
+              store: indexStore,
+              embeddingGenerator,
+              vectorIndex,
+            },
+            source,
+          ),
+      }),
     retrieveCandidates: (query) =>
       retrieveCandidates(retrievalDependencies, query),
     assembleContext: (request) =>
