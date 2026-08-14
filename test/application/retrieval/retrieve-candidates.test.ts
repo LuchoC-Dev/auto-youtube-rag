@@ -158,6 +158,63 @@ void test("degrades when the vector path fails", async () => {
   assert.equal(warning.path, "vector");
 });
 
+void test("warns VECTORS_STALE when the vector index has no vectors but text found hits", async () => {
+  const scenario = setup();
+  const seeded = seedFragment(scenario.knowledgeRepository, "text-only");
+
+  scenario.textIndex.hits = [
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: -1 },
+  ];
+  scenario.vectorIndex.vectorCount = 0;
+  scenario.vectorIndex.hits = [];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "brutalismo" }),
+  );
+
+  const staleWarning = outcome.warnings.find(
+    (warning) => warning.code === "VECTORS_STALE",
+  );
+
+  assert.equal(outcome.status, "ok");
+  assert.ok(staleWarning);
+  assert.equal(staleWarning.path, "vector");
+});
+
+void test("does not warn VECTORS_STALE when the vector index is empty and text found nothing either", async () => {
+  const scenario = setup();
+
+  scenario.vectorIndex.vectorCount = 0;
+  scenario.vectorIndex.hits = [];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "brutalismo" }),
+  );
+
+  assert.equal(outcome.status, "no_results");
+  assert.deepEqual(outcome.warnings, []);
+});
+
+void test("does not warn VECTORS_STALE when the vector index holds vectors", async () => {
+  const scenario = setup();
+  const seeded = seedFragment(scenario.knowledgeRepository, "both-paths");
+
+  scenario.textIndex.hits = [
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: -1 },
+  ];
+  scenario.vectorIndex.vectorCount = 5;
+  scenario.vectorIndex.hits = [];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "brutalismo" }),
+  );
+
+  assert.deepEqual(outcome.warnings, []);
+});
+
 void test("returns no_results with empty candidates and no fabricated content", async () => {
   const scenario = setup();
 

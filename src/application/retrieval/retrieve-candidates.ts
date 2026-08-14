@@ -64,17 +64,19 @@ export async function retrieveCandidates(
   const vectorAttempt = await attempt(
     async () => {
       const model = await dependencies.embeddingGenerator.describe();
-      const [vector] = await Promise.all([
+      const [vector, loadedVectorCount] = await Promise.all([
         dependencies.embeddingGenerator.embedQuery(query.text),
         dependencies.vectorIndex.load(model),
       ]);
 
-      return dependencies.vectorIndex.search(vector, {
+      const hits = await dependencies.vectorIndex.search(vector, {
         filter: query.filter,
         limit: query.limits.vectorCandidates,
       });
+
+      return { hits, loadedVectorCount };
     },
-    [],
+    { hits: [], loadedVectorCount: 0 },
     {
       code: "VECTOR_SEARCH_UNAVAILABLE",
       path: "vector",
@@ -85,9 +87,30 @@ export async function retrieveCandidates(
   if (textAttempt.warning) warnings.push(textAttempt.warning);
   if (vectorAttempt.warning) warnings.push(vectorAttempt.warning);
 
+  // A vector path that loaded zero vectors for the active model is
+  // indistinguishable from one that simply found no matches — unless the
+  // text path did find something. Text hits with an empty vector index is
+  // the one unambiguous signal that the vectors are missing or stale for the
+  // active model, not that the library (or a --source filter) is genuinely
+  // empty. `vectorAttempt.warning === null` excludes the case where the
+  // vector path threw: that already has its own warning and an unknown
+  // cause, so it must not also be reported as staleness.
+  if (
+    vectorAttempt.warning === null &&
+    vectorAttempt.value.loadedVectorCount === 0 &&
+    textAttempt.value.length > 0
+  ) {
+    warnings.push({
+      code: "VECTORS_STALE",
+      path: "vector",
+      message:
+        "Semantic search did not run: the vector index has no vectors for the active embedding model, so these results come from lexical search only. Run `auto-youtube-rag sync` to regenerate embeddings.",
+    });
+  }
+
   const fused = dependencies.fusionStrategy.fuse({
     textHits: textAttempt.value,
-    vectorHits: vectorAttempt.value,
+    vectorHits: vectorAttempt.value.hits,
   });
 
   // Provenance is hydrated for the whole fused set, ahead of selection,
@@ -137,7 +160,7 @@ export async function retrieveCandidates(
     candidates,
     metrics: {
       textHits: textAttempt.value.length,
-      vectorHits: vectorAttempt.value.length,
+      vectorHits: vectorAttempt.value.hits.length,
       fusedHits: fused.length,
       returnedCandidates: candidates.length,
       videosCovered: new Set(

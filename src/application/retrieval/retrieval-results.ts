@@ -74,6 +74,7 @@ export interface RetrievalMetrics {
 export type RetrievalWarningCode =
   | "TEXT_SEARCH_UNAVAILABLE"
   | "VECTOR_SEARCH_UNAVAILABLE"
+  | "VECTORS_STALE"
   | "EMBEDDING_MODEL_MISSING"
   | "QUERY_HAS_NO_SEARCHABLE_TERMS";
 
