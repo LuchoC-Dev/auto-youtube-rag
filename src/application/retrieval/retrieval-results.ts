@@ -76,13 +76,28 @@ export type RetrievalWarningCode =
   | "VECTOR_SEARCH_UNAVAILABLE"
   | "VECTORS_STALE"
   | "EMBEDDING_MODEL_MISSING"
-  | "QUERY_HAS_NO_SEARCHABLE_TERMS";
+  | "QUERY_HAS_NO_SEARCHABLE_TERMS"
+  | "LOW_RELEVANCE";
 
 export interface RetrievalWarning {
   readonly code: RetrievalWarningCode;
   readonly path: RetrievalPath | null;
   readonly message: string;
 }
+
+/**
+ * Warnings that report something about the *answer* rather than a failure in
+ * the machinery, and therefore must not degrade a result to `partial` or turn
+ * a successful command into a non-zero exit.
+ *
+ * `LOW_RELEVANCE` is the case that forced the distinction: every path ran, the
+ * fusion worked and the bundle is complete and correctly cited. What it says
+ * is that the library holds nothing on topic — a fact about the corpus, not a
+ * malfunction. Reporting it as degradation would make a perfectly healthy
+ * query look like a broken one.
+ */
+export const informationalWarningCodes: ReadonlySet<RetrievalWarningCode> =
+  new Set<RetrievalWarningCode>(["LOW_RELEVANCE"]);
 
 /**
  * `no_results` is a valid terminal state, not a failure: the library simply

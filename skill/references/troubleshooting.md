@@ -20,11 +20,15 @@ comando en vez de investigar el producto.
 
 ## `status` en el recibo de `retrieve`
 
-- `"ok"`: hay bundle con evidencia. Un `status: "ok"` con relevancia baja es
-  un resultado válido y esperado, no un error — la búsqueda semántica no
-  tiene piso de similitud, así que consultas poco relacionadas con la
-  colección igual devuelven candidatos. Leé `Coverage and limitations` en
-  `context.md` antes de confiar ciegamente en la relevancia.
+- `"ok"`: hay bundle con evidencia. Un `status: "ok"` con relevancia baja
+  sigue siendo un resultado válido y esperado, no un error — la búsqueda
+  semántica no descarta nada por similitud, así que consultas poco
+  relacionadas con la colección igual devuelven candidatos. **Desde el punto
+  4.7 eso ya no es silencioso**: cuando el mejor puntaje queda bajo el piso
+  calibrado aparece `LOW_RELEVANCE` en `warnings` (ver más abajo). Igual
+  conviene leer `Coverage and limitations` en `context.md` antes de confiar
+  ciegamente en la relevancia: el aviso puede no dispararse y el contenido
+  ser tangencial.
 - `"no_results"`: la biblioteca (tras aplicar `--source` u otros filtros)
   quedó vacía de candidatos. El bundle igual se escribe, explicando la
   ausencia de evidencia. No es un fallo del comando.
@@ -61,6 +65,7 @@ Aparte, en los `warnings` de `retrieve`:
 | `VECTOR_SEARCH_UNAVAILABLE` | La vía vectorial falló con error; el bundle se armó sólo con búsqueda textual. |
 | `TEXT_SEARCH_UNAVAILABLE`   | La vía textual falló; el bundle se armó sólo con búsqueda semántica.           |
 | `VECTORS_STALE`             | La biblioteca tiene contenido pero **ningún vector** para el modelo activo.    |
+| `LOW_RELEVANCE`             | Nada de la biblioteca responde de verdad la consulta. Ver abajo.               |
 
 En los tres primeros el bundle sirve, pero se armó con una sola vía. Decilo
 si vas a apoyarte en esa evidencia.
@@ -88,6 +93,31 @@ auto-youtube-rag rebuild --confirm
 Hasta entonces podés usar el bundle, pero **avisá en tu respuesta que la
 búsqueda semántica no participó**: puede faltar contenido relevante que la
 coincidencia léxica no alcanza a encontrar.
+
+## `LOW_RELEVANCE`
+
+**No es una degradación**: todas las vías funcionaron, el bundle está completo
+y bien citado. Lo que dice es que la biblioteca **no tiene contenido sobre el
+tema consultado**, y por eso `status` sigue siendo `"ok"` con código de salida
+`0`.
+
+Aparece porque la búsqueda vectorial es un ranking exhaustivo sin piso: toda
+consulta sobre una biblioteca no vacía devuelve algo, aunque sea el material
+menos lejano en vez de una respuesta. El mensaje incluye el puntaje real y el
+umbral, por ejemplo `0.8206 against a 0.84 relevance floor`.
+
+Qué hacer cuando aparece:
+
+- **Decilo en tu respuesta.** No presentes ese contenido como si respondiera
+  la pregunta; lo más probable es que no tenga relación.
+- **Leé igual el bundle antes de descartarlo.** El umbral está calibrado sobre
+  una colección concreta y puede equivocarse: si el contenido resulta
+  pertinente, usalo y aclará el matiz.
+- **No reintentes el mismo comando**: va a dar exactamente lo mismo. Si creés
+  que la biblioteca sí cubre el tema, reformulá la consulta con los términos
+  que usaría el video.
+- **Si esperabas cobertura y no la hay**, puede faltar sincronizar una fuente
+  (`sync`) o directamente registrarla (`source add`).
 
 ## `sync` falló parcialmente
 

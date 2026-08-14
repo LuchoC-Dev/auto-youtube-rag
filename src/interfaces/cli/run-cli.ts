@@ -6,6 +6,7 @@ import { getStatus } from "../../application/diagnostics/get-status.js";
 import { runDoctor } from "../../application/diagnostics/run-doctor.js";
 import { installModel } from "../../application/models/install-model.js";
 import type { ModelInstaller } from "../../application/ports/model-installer.js";
+import { informationalWarningCodes } from "../../application/retrieval/retrieval-results.js";
 import { ContextBudget } from "../../domain/context/context-budget.js";
 import { SourceName } from "../../domain/indexing/identifiers.js";
 import { RetrievalFilter } from "../../domain/retrieval/retrieval-filter.js";
@@ -461,7 +462,12 @@ export async function runCli(options: RunCliOptions): Promise<number> {
           command.out ?? tmpdir(),
         );
 
-        const degraded = bundle.result.warnings.length > 0;
+        // Not every warning is a degradation: an informational one reports
+        // something about the answer, not a failure of retrieval, and must
+        // not turn a healthy query into exit code 1.
+        const degraded = bundle.result.warnings.some(
+          (warning) => !informationalWarningCodes.has(warning.code),
+        );
         options.stdout.write(
           renderCliSuccess({
             status: degraded ? "partial" : bundle.result.status,

@@ -217,6 +217,17 @@ cuando `status` es `incomplete`, listando cada archivo requerido ausente
 (`reason: "missing"`) o de tamaño distinto al recibo (`reason:
 "size_mismatch"`) — nunca hashea los ~130 MB.
 
+#### Advertencia `LOW_RELEVANCE`
+
+`retrieve` la emite cuando el mejor puntaje de similitud de la vía vectorial
+queda por debajo del piso calibrado (`0.84` por defecto, ver
+`docs/low-relevance-design.md`). Significa que la biblioteca no tiene contenido
+sobre el tema, no que algo haya fallado.
+
+**No degrada el resultado**: `status` sigue `"ok"` y el código de salida es
+`0`, a diferencia de las advertencias que reportan una vía caída. Tampoco
+filtra candidatos: el bundle se arma igual, con las mismas citas.
+
 ### `rebuild`
 
 Regenera el índice derivado y exige confirmación explícita. Nunca modifica las

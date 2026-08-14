@@ -11,8 +11,8 @@ y el siguiente bloque recomendado.
 Estado de referencia: **14 de agosto de 2026**, después de cerrar los puntos
 4.2 —instalación: hogar de usuario, `init` instalador y preflight—, 4.3
 —seguridad de `sync` y rendimiento de indexación—, 4.4 —aviso de vectores
-obsoletos—, 4.5 —perfil de modelo de embeddings y política de prefijos— y
-4.6 —el comando `rebuild --confirm`.
+obsoletos—, 4.5 —perfil de modelo de embeddings y política de prefijos—, 4.6
+—el comando `rebuild --confirm`— y 4.7 —el aviso `LOW_RELEVANCE`.
 
 **Lo que más probablemente contradiga tu memoria de sesiones viejas**, en
 orden de impacto:
@@ -1334,8 +1334,13 @@ Explícitamente **para el final**, por decisión del usuario:
 Frentes anteriores que siguen sin evidencia que los justifique, y que no
 están en el orden de arriba:
 
-- Piso mínimo de similitud vectorial (abierto "salvo evidencia clara" desde
-  2.2; 3.2 no encontró esa evidencia).
+~~- Piso mínimo de similitud vectorial.~~ **Resuelto el 14 de agosto de 2026
+como punto 4.7, en una forma distinta a la prevista.** La evidencia apareció
+probando la biblioteca real; se midió el coseno sobre 24 consultas y se
+emite `LOW_RELEVANCE` bajo `0.84`. **El aviso informa, no filtra**: un piso
+que descarte candidatos se sigue descartando, igual que en 2.2 y 3.2. Ver
+`docs/low-relevance-design.md`.
+
 - Señal de densidad temática para que RRF distinga contenido específico de
   catálogo tangencial (hallazgo de 3.2, no un bug).
 - Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad de N4.
