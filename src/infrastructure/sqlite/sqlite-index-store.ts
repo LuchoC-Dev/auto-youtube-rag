@@ -652,6 +652,62 @@ export class SQLiteIndexStore implements IndexStore {
     }
   }
 
+  /**
+   * The active-run check and the delete share one `BEGIN IMMEDIATE`, exactly
+   * as in `recordRun` and for the same reason: checking first and deleting
+   * after leaves a window where a sync starts in between and indexes into a
+   * library that is about to be emptied underneath it.
+   *
+   * Only `video_packages` is deleted explicitly. Documents, units, fragments
+   * and embeddings follow through the `ON DELETE CASCADE` chain declared in
+   * the initial migration, and `fragment_fts` stays aligned through the
+   * `fragment_fts_delete` trigger — the same mechanics `deletePackagesNotSeen`
+   * already relies on.
+   */
+  public purgeDerivedIndex(): Promise<number> {
+    let started = false;
+    let committed = false;
+    try {
+      this.database.exec("BEGIN IMMEDIATE");
+      started = true;
+      const active = this.database
+        .prepare(
+          `SELECT r.id, r.started_at, s.name
+           FROM sync_runs r
+           JOIN sources s ON s.id = r.source_id
+           WHERE r.status = 'running'
+           ORDER BY r.started_at COLLATE BINARY
+           LIMIT 1`,
+        )
+        .get() as
+        | {
+            readonly id: string;
+            readonly started_at: string;
+            readonly name: string;
+          }
+        | undefined;
+      if (active !== undefined) {
+        throw new SQLiteIndexStoreError(
+          "SYNC_ALREADY_RUNNING",
+          `Sync run ${active.id} for source ${active.name} is already ` +
+            `running (started at ${active.started_at}). Rebuilding now would ` +
+            `empty the library underneath it. Wait for it to finish, or run ` +
+            `"auto-youtube-rag sync --source ${active.name} --force" if it is a ` +
+            `ghost run, before rebuilding.`,
+        );
+      }
+
+      const result = this.database.prepare("DELETE FROM video_packages").run();
+      this.database.exec("COMMIT");
+      committed = true;
+      return Promise.resolve(Number(result.changes));
+    } catch (error: unknown) {
+      return rejected(error);
+    } finally {
+      if (started && !committed) this.database.exec("ROLLBACK");
+    }
+  }
+
   public recordIssue(issue: SyncIssue): Promise<void> {
     try {
       const run = this.database

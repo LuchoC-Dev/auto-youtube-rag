@@ -15,6 +15,7 @@ export class InMemoryIndexStore implements IndexStore {
   public readonly changes: IndexedPackageChange[] = [];
   public readonly runs = new Map<string, SyncRun>();
   public readonly issues: SyncIssue[] = [];
+  public purges = 0;
 
   public constructor(private readonly events: string[] = []) {}
 
@@ -106,6 +107,24 @@ export class InMemoryIndexStore implements IndexStore {
       }),
     );
     return Promise.resolve(active.id);
+  }
+
+  public purgeDerivedIndex(): Promise<number> {
+    const active = [...this.runs.values()].find(
+      (run) => run.status === "running",
+    );
+    if (active !== undefined) {
+      return Promise.reject(
+        new Error(
+          `Sync run ${active.id.value} for source ${active.sourceName.value} is already running.`,
+        ),
+      );
+    }
+    const deleted = this.states.size;
+    this.states.clear();
+    this.purges += 1;
+    this.events.push("purge");
+    return Promise.resolve(deleted);
   }
 
   public recordIssue(issue: SyncIssue): Promise<void> {
