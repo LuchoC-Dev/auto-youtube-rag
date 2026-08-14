@@ -57,26 +57,51 @@ invoques ni lo ofrezcas como disponible.
 `stderr` lleva progreso y advertencias; no forma parte del contrato de datos.
 Nunca imprimas de más pidiendo `--json` extra: ya es el formato por defecto.
 
-**Las rutas de la base y del modelo son relativas al directorio de trabajo.**
-Usá el mismo `cwd` en todas las invocaciones de la sesión. Si cambiás de
-directorio entre comandos, vas a apuntar a otra base sin ningún aviso.
+**La biblioteca vive en el hogar del usuario**, en `~/.auto-youtube-rag/`, no
+en el directorio desde el que ejecutás. Podés invocar la CLI parado en
+cualquier carpeta y siempre vas a hablar con la misma biblioteca.
 
 ## Flujo recomendado
 
-1. **Inicializar antes de cualquier otro comando.** `status`, `doctor` y
-   `source add` necesitan que la base de datos local ya exista:
+1. **Instalar antes de cualquier otro comando.** `init` deja el sistema
+   entero listo: crea el hogar, prepara la base y deja instalado el modelo de
+   embeddings.
 
    ```text
    auto-youtube-rag init
    ```
 
-   Es idempotente. Si te lo saltás, esos comandos fallan con
-   `ERR_SQLITE_ERROR: unable to open database file` → `references/setup.md`.
+   Es idempotente: repetirlo no destruye nada.
+
+   **`init` no es instantáneo.** Sin banderas descarga el modelo, unos 130 MB,
+   y es la única operación de toda la herramienta que usa la red. Dale un
+   timeout holgado o corrélo en segundo plano. Dos banderas lo cambian:
+
+   - `--from <ruta>` copia un modelo que ya está en disco en vez de
+     descargarlo, y tarda segundos;
+   - `--skip-model` prepara sólo la base, sin modelo. Sirve para CI o sin
+     red, pero `sync` y `retrieve` **no van a funcionar** hasta que instales
+     el modelo.
+
+   Si te lo saltás, los demás comandos fallan con `LIBRARY_NOT_FOUND` y te
+   dicen exactamente qué correr.
 
 2. **Diagnosticar antes de asumir estado.** Corré `auto-youtube-rag status`
    para ver fuentes registradas, última sincronización y salud del modelo.
    Si algo parece roto (y ya corriste `init`), corré `auto-youtube-rag doctor`
    para un chequeo de integridad de sólo lectura.
+
+   Para el modelo específicamente:
+
+   ```text
+   auto-youtube-rag models status
+   auto-youtube-rag models install [--force] [--from <ruta>]
+   ```
+
+   `models status` devuelve `installed`, `incomplete` o `absent`, siempre con
+   código de salida `0` — informar ausencia no es un fallo. `incomplete`
+   significa instalación dañada o a medias, típicamente una descarga cortada,
+   y se repara con `models install --force`.
 
 3. **Registrar una fuente si hace falta.** Si `status` no muestra la
    colección que el usuario necesita:

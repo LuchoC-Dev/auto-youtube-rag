@@ -21,7 +21,10 @@ export interface DoctorCheck {
  */
 export interface DoctorModelState {
   readonly state: "installed" | "incomplete" | "absent";
-  readonly issues: readonly { readonly path: string; readonly reason: string }[];
+  readonly issues: readonly {
+    readonly path: string;
+    readonly reason: string;
+  }[];
 }
 
 export interface DoctorResult {
