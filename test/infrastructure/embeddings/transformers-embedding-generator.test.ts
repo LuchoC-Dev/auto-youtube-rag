@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
-  E5EmbeddingError,
-  E5EmbeddingGenerator,
-  type E5EmbeddingRuntime,
-  type E5EmbeddingSession,
-  type E5RuntimeLoadOptions,
-} from "../../../src/infrastructure/embeddings/e5-embedding-generator.js";
+  EmbeddingAdapterError,
+  TransformersEmbeddingGenerator,
+  type EmbeddingRuntime,
+  type EmbeddingSession,
+  type EmbeddingRuntimeLoadOptions,
+} from "../../../src/infrastructure/embeddings/transformers-embedding-generator.js";
 import {
   activeModelProfile,
   type EmbeddingModelProfile,
@@ -20,7 +20,7 @@ function vector(first = 3, second = 4, dimensions = 384): readonly number[] {
   return values;
 }
 
-class FakeSession implements E5EmbeddingSession {
+class FakeSession implements EmbeddingSession {
   public readonly countedInputs: string[][] = [];
   public readonly embeddedInputs: string[][] = [];
   public disposeCalls = 0;
@@ -53,15 +53,15 @@ class FakeSession implements E5EmbeddingSession {
   }
 }
 
-class FakeRuntime implements E5EmbeddingRuntime {
-  public readonly loadOptions: E5RuntimeLoadOptions[] = [];
+class FakeRuntime implements EmbeddingRuntime {
+  public readonly loadOptions: EmbeddingRuntimeLoadOptions[] = [];
 
   public constructor(
-    public readonly session: E5EmbeddingSession = new FakeSession(),
+    public readonly session: EmbeddingSession = new FakeSession(),
     private readonly loadError: Error | null = null,
   ) {}
 
-  public load(options: E5RuntimeLoadOptions): Promise<E5EmbeddingSession> {
+  public load(options: EmbeddingRuntimeLoadOptions): Promise<EmbeddingSession> {
     this.loadOptions.push(options);
     return this.loadError === null
       ? Promise.resolve(this.session)
@@ -84,7 +84,7 @@ async function expectCode(
     | "ZERO_NORM_VECTOR",
 ): Promise<void> {
   await assert.rejects(action, (error: unknown) => {
-    assert.ok(error instanceof E5EmbeddingError);
+    assert.ok(error instanceof EmbeddingAdapterError);
     assert.equal(error.code, code);
     return true;
   });
@@ -92,7 +92,7 @@ async function expectCode(
 
 void test("describes the approved E5 model without loading it", async () => {
   const runtime = new FakeRuntime();
-  const generator = new E5EmbeddingGenerator({
+  const generator = new TransformersEmbeddingGenerator({
     runtime,
     cacheDir: "C:/models",
     batchSize: 2,
@@ -112,7 +112,7 @@ void test("counts passage-prefixed inputs including adapter-owned tokens", async
     texts.map((text) => Array.from(text).length + 2),
   );
   const runtime = new FakeRuntime(session);
-  const generator = new E5EmbeddingGenerator({
+  const generator = new TransformersEmbeddingGenerator({
     runtime,
     cacheDir: "C:/models",
   });
@@ -136,7 +136,7 @@ void test("counts passage-prefixed inputs including adapter-owned tokens", async
 
 void test("embeds documents in batches and normalizes document and query vectors", async () => {
   const session = new FakeSession();
-  const generator = new E5EmbeddingGenerator({
+  const generator = new TransformersEmbeddingGenerator({
     runtime: new FakeRuntime(session),
     batchSize: 2,
     cacheDir: "C:/models",
@@ -167,20 +167,20 @@ void test("embeds documents in batches and normalizes document and query vectors
 void test("rejects invalid inputs, counters and vectors", async () => {
   assert.throws(
     () =>
-      new E5EmbeddingGenerator({
+      new TransformersEmbeddingGenerator({
         runtime: new FakeRuntime(),
         batchSize: 0,
         cacheDir: "C:/models",
       }),
     (error: unknown) => {
-      assert.ok(error instanceof E5EmbeddingError);
+      assert.ok(error instanceof EmbeddingAdapterError);
       assert.equal(error.code, "INVALID_BATCH_SIZE");
       return true;
     },
   );
 
   await expectCode(
-    new E5EmbeddingGenerator({
+    new TransformersEmbeddingGenerator({
       runtime: new FakeRuntime(),
       cacheDir: "C:/models",
     }).embedQuery("   "),
@@ -189,7 +189,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
 
   const mismatch = new FakeSession(() => []);
   await expectCode(
-    new E5EmbeddingGenerator({
+    new TransformersEmbeddingGenerator({
       runtime: new FakeRuntime(mismatch),
       cacheDir: "C:/models",
     }).countTokens(["texto"]),
@@ -198,7 +198,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
 
   const invalidCount = new FakeSession((texts) => texts.map(() => Number.NaN));
   await expectCode(
-    new E5EmbeddingGenerator({
+    new TransformersEmbeddingGenerator({
       runtime: new FakeRuntime(invalidCount),
       cacheDir: "C:/models",
     }).countTokens(["texto"]),
@@ -207,7 +207,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
 
   const tooLong = new FakeSession((texts) => texts.map(() => 513));
   await expectCode(
-    new E5EmbeddingGenerator({
+    new TransformersEmbeddingGenerator({
       runtime: new FakeRuntime(tooLong),
       cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
@@ -216,7 +216,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
 
   const wrongCount = new FakeSession(undefined, () => []);
   await expectCode(
-    new E5EmbeddingGenerator({
+    new TransformersEmbeddingGenerator({
       runtime: new FakeRuntime(wrongCount),
       cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
@@ -227,7 +227,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
     texts.map(() => vector(3, 4, 383)),
   );
   await expectCode(
-    new E5EmbeddingGenerator({
+    new TransformersEmbeddingGenerator({
       runtime: new FakeRuntime(wrongDimensions),
       cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
@@ -238,7 +238,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
     texts.map(() => vector(Number.NaN, 4)),
   );
   await expectCode(
-    new E5EmbeddingGenerator({
+    new TransformersEmbeddingGenerator({
       runtime: new FakeRuntime(nonFinite),
       cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
@@ -249,7 +249,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
     texts.map(() => vector(0, 0)),
   );
   await expectCode(
-    new E5EmbeddingGenerator({
+    new TransformersEmbeddingGenerator({
       runtime: new FakeRuntime(zero),
       cacheDir: "C:/models",
     }).embedDocuments(["texto"]),
@@ -260,7 +260,7 @@ void test("rejects invalid inputs, counters and vectors", async () => {
 void test("loads lazily, disposes once and explains a missing local model", async () => {
   const session = new FakeSession();
   const runtime = new FakeRuntime(session);
-  const generator = new E5EmbeddingGenerator({
+  const generator = new TransformersEmbeddingGenerator({
     runtime,
     cacheDir: "C:/models",
   });
@@ -274,12 +274,12 @@ void test("loads lazily, disposes once and explains a missing local model", asyn
   await generator.dispose();
   assert.equal(session.disposeCalls, 1);
 
-  const missing = new E5EmbeddingGenerator({
+  const missing = new TransformersEmbeddingGenerator({
     runtime: new FakeRuntime(undefined, new Error("files absent")),
     cacheDir: "C:/models",
   });
   await assert.rejects(missing.countTokens(["texto"]), (error: unknown) => {
-    assert.ok(error instanceof E5EmbeddingError);
+    assert.ok(error instanceof EmbeddingAdapterError);
     assert.equal(error.code, "MODEL_LOAD_FAILED");
     assert.match(error.message, /auto-youtube-rag models install/u);
     assert.equal(error.cause instanceof Error, true);
@@ -303,7 +303,7 @@ function customPrefixProfile(): EmbeddingModelProfile {
 
 void test("sends raw text to the runtime for a profile without prefixes", async () => {
   const session = new FakeSession();
-  const generator = new E5EmbeddingGenerator({
+  const generator = new TransformersEmbeddingGenerator({
     runtime: new FakeRuntime(session),
     cacheDir: "C:/models",
     profile: noPrefixProfile(),
@@ -317,7 +317,7 @@ void test("sends raw text to the runtime for a profile without prefixes", async 
 
 void test("applies a profile's own prefixes verbatim, distinct from E5's", async () => {
   const session = new FakeSession();
-  const generator = new E5EmbeddingGenerator({
+  const generator = new TransformersEmbeddingGenerator({
     runtime: new FakeRuntime(session),
     cacheDir: "C:/models",
     profile: customPrefixProfile(),
@@ -331,7 +331,7 @@ void test("applies a profile's own prefixes verbatim, distinct from E5's", async
 
 void test("counts tokens on exactly the same text embedDocuments submits", async () => {
   const noPrefixSession = new FakeSession();
-  const noPrefixGenerator = new E5EmbeddingGenerator({
+  const noPrefixGenerator = new TransformersEmbeddingGenerator({
     runtime: new FakeRuntime(noPrefixSession),
     cacheDir: "C:/models",
     profile: noPrefixProfile(),
@@ -348,7 +348,7 @@ void test("counts tokens on exactly the same text embedDocuments submits", async
   );
 
   const activeSession = new FakeSession();
-  const activeGenerator = new E5EmbeddingGenerator({
+  const activeGenerator = new TransformersEmbeddingGenerator({
     runtime: new FakeRuntime(activeSession),
     cacheDir: "C:/models",
   });

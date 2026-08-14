@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { test } from "node:test";
 
-import { E5EmbeddingGenerator } from "../../src/infrastructure/embeddings/e5-embedding-generator.js";
+import { TransformersEmbeddingGenerator } from "../../src/infrastructure/embeddings/transformers-embedding-generator.js";
 
 const projectRoot = resolve(import.meta.dirname, "../..");
 const cacheDir = join(projectRoot, ".cache", "models");
@@ -35,7 +35,10 @@ void test(
       "E5 Small is missing from .cache/models. Run `npm run models:download`; the smoke test never downloads files automatically.",
     );
 
-    const generator = new E5EmbeddingGenerator({ cacheDir, batchSize: 2 });
+    const generator = new TransformersEmbeddingGenerator({
+      cacheDir,
+      batchSize: 2,
+    });
     try {
       const documents = await generator.embedDocuments([
         "La jerarquía visual organiza títulos, subtítulos y texto mediante escala y contraste.",

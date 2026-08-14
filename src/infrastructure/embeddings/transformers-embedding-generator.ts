@@ -17,7 +17,7 @@ import {
 // overridable via `batchSize` for anyone who wants to trade it back.
 const defaultBatchSize = 1;
 
-export type E5EmbeddingErrorCode =
+export type EmbeddingAdapterErrorCode =
   | "INVALID_INPUT"
   | "INVALID_BATCH_SIZE"
   | "MODEL_LOAD_FAILED"
@@ -29,18 +29,18 @@ export type E5EmbeddingErrorCode =
   | "NON_FINITE_VECTOR"
   | "ZERO_NORM_VECTOR";
 
-export class E5EmbeddingError extends Error {
+export class EmbeddingAdapterError extends Error {
   public constructor(
-    public readonly code: E5EmbeddingErrorCode,
+    public readonly code: EmbeddingAdapterErrorCode,
     message: string,
     options?: ErrorOptions,
   ) {
     super(message, options);
-    this.name = "E5EmbeddingError";
+    this.name = "EmbeddingAdapterError";
   }
 }
 
-export interface E5RuntimeLoadOptions {
+export interface EmbeddingRuntimeLoadOptions {
   readonly repository: string;
   readonly revision: string;
   readonly dtype: "q8";
@@ -48,7 +48,7 @@ export interface E5RuntimeLoadOptions {
   readonly localFilesOnly: true;
 }
 
-export interface E5EmbeddingSession {
+export interface EmbeddingSession {
   countTokens(texts: readonly string[]): Promise<readonly number[]>;
   embed(
     texts: readonly string[],
@@ -56,12 +56,12 @@ export interface E5EmbeddingSession {
   dispose(): Promise<void>;
 }
 
-export interface E5EmbeddingRuntime {
-  load(options: E5RuntimeLoadOptions): Promise<E5EmbeddingSession>;
+export interface EmbeddingRuntime {
+  load(options: EmbeddingRuntimeLoadOptions): Promise<EmbeddingSession>;
 }
 
-export interface E5EmbeddingGeneratorOptions {
-  readonly runtime?: E5EmbeddingRuntime;
+export interface TransformersEmbeddingGeneratorOptions {
+  readonly runtime?: EmbeddingRuntime;
   readonly cacheDir: string;
   readonly batchSize?: number;
   // Injected for tests: exercising a profile without prefixes, or with a
@@ -74,7 +74,7 @@ export interface E5EmbeddingGeneratorOptions {
 
 function readBatchSize(input: unknown): number {
   if (typeof input !== "number" || !Number.isSafeInteger(input) || input <= 0) {
-    throw new E5EmbeddingError(
+    throw new EmbeddingAdapterError(
       "INVALID_BATCH_SIZE",
       "batchSize must be a positive safe integer",
     );
@@ -89,7 +89,7 @@ function readCacheDir(input: unknown): string {
     input.trim().length === 0 ||
     input.includes("\0")
   ) {
-    throw new E5EmbeddingError(
+    throw new EmbeddingAdapterError(
       "INVALID_INPUT",
       "cacheDir must be a non-empty path without null bytes",
     );
@@ -100,12 +100,12 @@ function readCacheDir(input: unknown): string {
 
 function readTexts(input: readonly string[]): readonly string[] {
   if (!Array.isArray(input)) {
-    throw new E5EmbeddingError("INVALID_INPUT", "texts must be an array");
+    throw new EmbeddingAdapterError("INVALID_INPUT", "texts must be an array");
   }
 
   const texts = input.map((text) => {
     if (typeof text !== "string" || text.includes("\0")) {
-      throw new E5EmbeddingError(
+      throw new EmbeddingAdapterError(
         "INVALID_INPUT",
         "texts must contain only non-empty strings without null bytes",
       );
@@ -113,7 +113,7 @@ function readTexts(input: readonly string[]): readonly string[] {
 
     const canonical = text.trim();
     if (canonical.length === 0) {
-      throw new E5EmbeddingError(
+      throw new EmbeddingAdapterError(
         "INVALID_INPUT",
         "texts must contain only non-empty strings without null bytes",
       );
@@ -146,7 +146,7 @@ function readTokenCounts(
   expected: number,
 ): readonly number[] {
   if (!Array.isArray(input) || input.length !== expected) {
-    throw new E5EmbeddingError(
+    throw new EmbeddingAdapterError(
       "TOKEN_COUNT_MISMATCH",
       "runtime must return exactly one token count per text",
     );
@@ -158,7 +158,7 @@ function readTokenCounts(
       !Number.isSafeInteger(count) ||
       count <= 0
     ) {
-      throw new E5EmbeddingError(
+      throw new EmbeddingAdapterError(
         "INVALID_TOKEN_COUNT",
         "runtime token counts must be positive safe integers",
       );
@@ -175,14 +175,14 @@ function normalizeVector(
 ): Float32Array {
   const values = Array.from(input);
   if (values.length !== expectedDimensions) {
-    throw new E5EmbeddingError(
+    throw new EmbeddingAdapterError(
       "INVALID_VECTOR_DIMENSIONS",
       `expected ${String(expectedDimensions)} dimensions, received ${String(values.length)}`,
     );
   }
 
   if (!values.every(Number.isFinite)) {
-    throw new E5EmbeddingError(
+    throw new EmbeddingAdapterError(
       "NON_FINITE_VECTOR",
       "embedding vectors must contain only finite values",
     );
@@ -190,7 +190,7 @@ function normalizeVector(
 
   const norm = Math.hypot(...values);
   if (norm === 0) {
-    throw new E5EmbeddingError(
+    throw new EmbeddingAdapterError(
       "ZERO_NORM_VECTOR",
       "embedding vectors must have a positive norm",
     );
@@ -198,7 +198,7 @@ function normalizeVector(
 
   const normalized = Float32Array.from(values, (value) => value / norm);
   if (!normalized.every(Number.isFinite)) {
-    throw new E5EmbeddingError(
+    throw new EmbeddingAdapterError(
       "NON_FINITE_VECTOR",
       "normalized embedding vectors must contain only finite values",
     );
@@ -224,7 +224,7 @@ function readRuntimeMatrix(input: unknown): readonly (readonly number[])[] {
   );
 }
 
-const transformersRuntime: E5EmbeddingRuntime = {
+const transformersRuntime: EmbeddingRuntime = {
   async load(options) {
     const { env, pipeline } = await import("@huggingface/transformers");
     env.allowLocalModels = true;
@@ -261,14 +261,14 @@ const transformersRuntime: E5EmbeddingRuntime = {
   },
 };
 
-export class E5EmbeddingGenerator implements EmbeddingGenerator {
-  private readonly runtime: E5EmbeddingRuntime;
+export class TransformersEmbeddingGenerator implements EmbeddingGenerator {
+  private readonly runtime: EmbeddingRuntime;
   private readonly cacheDir: string;
   private readonly batchSize: number;
   private readonly profile: EmbeddingModelProfile;
-  private sessionPromise: Promise<E5EmbeddingSession> | undefined;
+  private sessionPromise: Promise<EmbeddingSession> | undefined;
 
-  public constructor(options: E5EmbeddingGeneratorOptions) {
+  public constructor(options: TransformersEmbeddingGeneratorOptions) {
     this.runtime = options.runtime ?? transformersRuntime;
     this.cacheDir = readCacheDir(options.cacheDir);
     this.batchSize = readBatchSize(options.batchSize ?? defaultBatchSize);
@@ -306,7 +306,7 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
     ]);
     const vector = vectors[0];
     if (vector === undefined) {
-      throw new E5EmbeddingError(
+      throw new EmbeddingAdapterError(
         "EMBEDDING_COUNT_MISMATCH",
         "runtime did not return the query embedding",
       );
@@ -325,7 +325,7 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
     await session.dispose();
   }
 
-  private getSession(): Promise<E5EmbeddingSession> {
+  private getSession(): Promise<EmbeddingSession> {
     if (this.sessionPromise === undefined) {
       const loading = this.runtime.load({
         repository: this.profile.repository,
@@ -336,7 +336,7 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
       });
       this.sessionPromise = loading.catch((cause: unknown) => {
         this.sessionPromise = undefined;
-        throw new E5EmbeddingError(
+        throw new EmbeddingAdapterError(
           "MODEL_LOAD_FAILED",
           `E5 Small could not be loaded from ${this.cacheDir}. Run "auto-youtube-rag models install" first.`,
           { cause },
@@ -362,7 +362,7 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
       (count) => count > this.profile.maxInputTokens,
     );
     if (oversized >= 0) {
-      throw new E5EmbeddingError(
+      throw new EmbeddingAdapterError(
         "INPUT_TOO_LONG",
         `input ${String(oversized)} has ${String(counts[oversized])} tokens and exceeds the ${String(this.profile.maxInputTokens)} token model limit`,
       );
@@ -374,7 +374,7 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
       const batch = Object.freeze(texts.slice(offset, offset + this.batchSize));
       const raw = await session.embed(batch);
       if (!Array.isArray(raw) || raw.length !== batch.length) {
-        throw new E5EmbeddingError(
+        throw new EmbeddingAdapterError(
           "EMBEDDING_COUNT_MISMATCH",
           "runtime must return exactly one embedding per text",
         );
