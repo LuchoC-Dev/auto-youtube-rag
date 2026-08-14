@@ -61,7 +61,7 @@ pendiente urgente.
 | Rama actual               | `main`                                                                                                 |
 | Remoto                    | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (privado)                                          |
 | Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.6                           |
-| Estado Git al cerrar      | Worktree limpio; `main` pusheada y sincronizada con `origin/main` (0 commits de diferencia)            |
+| Estado Git al cerrar      | Worktree limpio; `main` pusheada y sincronizada con `origin/main` (0 de diferencia); única rama        |
 | Runtime                   | Node.js 24.19.0 LTS, ESM                                                                               |
 | Lenguaje                  | TypeScript 6.0.3 estricto                                                                              |
 | Persistencia              | SQLite mediante `node:sqlite`                                                                          |
@@ -83,10 +83,14 @@ desactualizada.
 `sqlite-vec` sigue siendo una opción evaluada y **descartada** para el MVP: el
 nombre viejo de la rama no significa que se esté trabajando en eso.
 
-No reescribas historial ni fuerces pushes sin autorización explícita. La rama
-local `feat/sqlite-vec-benchmark` se conserva apuntando al mismo commit que
-`main` y puede borrarse; `docs/bootstrap-project` y `feat/embedding-benchmark`
-están contenidas en la historia y tampoco tienen commits propios.
+No reescribas historial ni fuerces pushes sin autorización explícita.
+
+**`main` es ahora la única rama, local y remota.** Las tres ramas locales
+muertas —`feat/sqlite-vec-benchmark`, `docs/bootstrap-project` y
+`feat/embedding-benchmark`— se borraron el 14 de agosto de 2026 con
+`git branch -d`, después de confirmar que ninguna tenía un solo commit que
+`main` no contuviera ya. Nada se perdió: sus commits siguen en la historia de
+`main`.
 
 ## Orden de lectura recomendado
 
@@ -1309,9 +1313,13 @@ Explícitamente **para el final**, por decisión del usuario:
   de instalación, sumó `models`, `--force` y códigos nuevos— y todo eso se
   validó en frío **sólo con agentes Claude**. Requiere que lo corra el
   usuario: un agente Claude no puede invocar Codex.
-- **Higiene del repositorio**: borrar las tres ramas locales muertas
-  (ninguna tiene commits propios) y los 2,1 GB de `.cache/`, de los cuales
-  130 MB son el modelo y el resto benchmarks cerrados.
+- **Higiene del repositorio**: las tres ramas locales muertas ya se borraron
+  el 14 de agosto de 2026. Queda pendiente `.cache/`, 2,1 GB de los cuales
+  ~130 MB son el modelo de los benchmarks y el resto, benchmarks cerrados.
+  **Antes de borrarlo, tener en cuenta** que `.cache/models` es la única copia
+  local del modelo E5 fuera del hogar del usuario, y que es de donde se
+  adopta con `models install --from` para validar contra el binario real sin
+  descargar 130 MB de red.
 
 Frentes anteriores que siguen sin evidencia que los justifique, y que no
 están en el orden de arriba:
