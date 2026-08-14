@@ -459,44 +459,56 @@ sección "Nota: qué haría falta para soportar otro modelo": la dimensión y la
 reindexación automática ya funcionan; los prefijos E5 hardcodeados y la
 imposibilidad de que dos modelos convivan, no.
 
+## El marcador de cita abre el bloque, dentro del encabezado
+
+Corregido el 14 de agosto de 2026, el mismo día en que se descubrió durante
+la validación en frío de 4.2.
+
+**El problema.** El marcador `[S0N]` cerraba su bloque, solo en su propia
+línea, lo que lo dejaba a una línea en blanco del encabezado **siguiente**.
+El agente en frío lo interpretó como marcador de apertura y atribuyó a cada
+ID el contenido que venía después, produciendo un resumen con procedencia
+equivocada: afirmó que `S21` documentaba el estilo Suizo (era `S22`) y que
+`S18` trataba brutalismo (era contenido sobre minimalismo).
+
+**El producto no tenía un bug de datos**: `result.json` coincidía exactamente
+con la interpretación de cierre, las 54 unidades resolvían y había cero citas
+huérfanas. Era un problema de legibilidad del formato.
+
+Es el peor tipo de fallo posible: **pasaba toda verificación mecánica y aun
+así producía atribuciones falsas en la respuesta final**. La Capa A de 3.2 lo
+daba por bueno, y la Capa B no lo detectó porque sus jueces evaluaban
+bundles, no producían citas a partir de ellos. Ninguna de las dos capas
+medía al agente citando.
+
+**Se reprodujo dos veces**, con el mismo agente y dos lecturas distintas del
+mismo bundle: la primera leyendo `context.md` en dos tandas por tamaño
+(2.322 líneas), la segunda entero de una sola vez. No era un artefacto de
+paginación. El desplazamiento era de un bloque hacia atrás y **no uniforme**
+—algunas citas salían correctas (`S03`, `S09`), probablemente localizadas por
+contenido y no por posición—, lo que producía un resumen parcialmente bien
+atribuido y por lo tanto más difícil de detectar que uno corrido parejo.
+
+**La corrección.** El ID pasa a formar parte del encabezado del bloque:
+
+```text
+### [S01] Método completo de la fuente > Brutalismo
+```
+
+Un ID no puede aparecer fuera de una línea de encabezado, así que la
+asociación es estructural en vez de posicional. Se descartaron las
+alternativas de marcador doble (apertura y cierre) por duplicar ruido en un
+archivo que ya ronda las 2.300 líneas, y de dejar el formato advirtiendo en
+la skill, porque deja la trampa en pie y depende de que cada consumidor lea
+y recuerde la advertencia.
+
+**No rompe el contrato**: `cli-contract.md` fijaba la forma `[S01]`, nunca su
+posición. Tampoco rompió nada mecánico — el verificador de integridad usa
+`matchAll` con regex, independiente de la posición. Verificado sobre un
+bundle real: 34 unidades, 34 marcadores, cero huérfanas, y los 34 con
+encabezado propio.
+
 ## Pendientes de decisión
-
-- **El marcador de cita de `context.md` es de cierre y se lee mal.**
-  Descubierto el 14 de agosto durante la validación en frío de 4.2. En
-  `context.md` el marcador `[S0N]` aparece solo, en su propia línea, **después**
-  del bloque que etiqueta, con el encabezado del bloque siguiente
-  inmediatamente debajo. El agente en frío lo interpretó como marcador de
-  apertura y atribuyó a cada ID el contenido que venía después, produciendo
-  un resumen con procedencia equivocada: afirmó que `S21` documentaba el
-  estilo Suizo (es `S22`) y que `S18` trataba brutalismo (es contenido sobre
-  minimalismo).
-
-  **El producto no tiene un bug**: `result.json` coincide exactamente con la
-  interpretación de cierre, las 54 unidades resuelven y hay cero citas
-  huérfanas. Es un problema de legibilidad del formato.
-
-  **El error se reprodujo dos veces, con el mismo agente y dos lecturas
-  distintas del mismo bundle.** La primera vez leyó `context.md` en dos
-  tandas por tamaño (2.322 líneas), lo que hacía sospechar de un problema de
-  paginación; la segunda lo leyó entero de una sola vez y volvió a
-  desplazarse igual. No es un artefacto de leer por tramos: es el formato.
-
-  El desplazamiento es de un bloque hacia atrás y **no es uniforme** —algunas
-  citas salieron correctas (`S03`, `S09`), probablemente localizadas por
-  contenido y no por posición del marcador—, lo que produce un resumen
-  parcialmente bien atribuido y por lo tanto más difícil de detectar que uno
-  sistemáticamente corrido.
-
-  Es el peor tipo de fallo posible: **pasa toda verificación mecánica y aun
-  así produce atribuciones falsas en la respuesta final**. La Capa A de 3.2
-  lo daría por bueno, y la Capa B no lo detectó porque sus jueces evaluaban
-  bundles, no producían citas a partir de ellos.
-
-  Opciones, ninguna decidida: mover el marcador al encabezado
-  (`### [S18] Método completo...`), duplicarlo al abrir y cerrar, o dejar el
-  formato y advertirlo en la skill. Las dos primeras cambian el contrato ya
-  aprobado en `cli-contract.md` y necesitan aprobación explícita; la tercera
-  es barata pero deja la trampa en pie.
 
 - **Guard de concurrencia en `sync`.** No existe ningún bloqueo que impida
   dos `sync` simultáneos sobre la misma base. La corrida en frío los produjo

@@ -193,7 +193,21 @@ cualquier carpeta y siempre vas a hablar con la misma biblioteca.
    secciones fijas (`Query and scope`, `Highest-relevance context`,
    `Related rules and patterns`, `Additional relevant context`,
    `Coverage and limitations`, `Source registry`), citado con marcas
-   `[S01]`, `[S02]`, etc. Abrí `result_path` (`result.json`) sólo cuando
+   `[S01]`, `[S02]`, etc.
+
+   **Cada ID abre su bloque, dentro del encabezado**, y etiqueta el texto que
+   viene debajo:
+
+   ```text
+   ### [S01] Método completo de la fuente > Brutalismo
+
+   Diez de los doce sitios usan tipografía de gran escala...
+   ```
+
+   Un ID nunca aparece fuera de una línea de encabezado, así que no hay
+   ambigüedad sobre a qué contenido pertenece.
+
+   Abrí `result_path` (`result.json`) sólo cuando
    necesites resolver una cita a su procedencia exacta (fuente, video,
    heading, evidencia visual) o inspeccionar métricas.
 
