@@ -37,6 +37,10 @@ npm.cmd run check   # 342 tests, sin red y sin modelo
 npm.cmd run build
 ```
 
+Para dejar además el comando `auto-youtube-rag` disponible en el sistema,
+`npm.cmd run setup` (compila e instala globalmente). Ver la sección
+"Instalación global" más abajo.
+
 **Hasta acá no hace falta ni red ni modelo de embeddings.** La suite rápida
 omite los smokes por el patrón `smoke` y trabaja con
 `FakeEmbeddingGenerator`, así que typecheck, lint, tests, formato y build
@@ -66,6 +70,38 @@ Qué falta en un clon y cómo vuelve:
 `.cache/` está en `.gitignore` y **nunca viajó al remoto**: ninguna máquina lo
 recibe al clonar, y esa es la intención. Es territorio local de desarrollo,
 reconstruible en un comando.
+
+### Instalación global
+
+`npm run setup` compila y después ejecuta `scripts/install-global.mjs`, que
+empaqueta con `npm pack` e instala **el tarball**, no el directorio.
+
+La distinción no es cosmética. `npm install --global .` **ignora el campo
+`files`** y copia la carpeta entera: medido acá, 605 MB y 8549 archivos, con
+`.git`, `.cache`, `node_modules`, `src`, `test`, `docs` y `evals` adentro.
+`npm pack` sí respeta `files`, así que el tarball lleva sólo `dist` (~150 kB
+comprimidos) y npm resuelve aparte la dependencia de runtime.
+
+Lo instalado queda en **1 MB de código propio** más ~375 MB de
+`node_modules`, de los cuales 338 MB son `onnxruntime-node` y
+`onnxruntime-web`, que arrastra `@huggingface/transformers`. Ese peso es
+inherente a la dependencia, no al empaquetado.
+
+Se instala por **copia, no por enlace** (a diferencia de `npm link`), así que
+el clon queda descartable: se puede borrar sin romper el comando. Para
+desarrollar sobre el código conviene lo contrario —`npm link`, que sí enlaza
+al clon y refleja cada recompilación sin reinstalar.
+
+Desinstalación: `npm uninstall --global auto-youtube-rag`.
+
+**Este proyecto no usa `prepare`, `postinstall` ni ningún otro script de ciclo
+de vida para instalar.** No es una preferencia estilística: esta máquina tiene
+`ignore-scripts=true` en `~/.npmrc` —una precaución razonable contra paquetes
+que ejecutan código al instalarse— y con esa configuración los `pre`/`post`
+scripts **no se ejecutan y no avisan**. Un instalador que dependa de ellos
+falla en silencio. Por eso `build` encadena `npm run clean` explícitamente en
+vez de confiar en un `prebuild`, y por eso la instalación es un comando que el
+usuario escribe, no un efecto secundario de `npm install`.
 
 ### Cuidado con la profundidad de la ruta en Windows
 

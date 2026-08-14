@@ -21,25 +21,31 @@ Requiere **Node.js 24.19.0** (fijado en `.node-version`).
 git clone https://github.com/LuchoC-Dev/auto-youtube-rag.git
 cd auto-youtube-rag
 npm ci
-npm run build
+npm run setup
 ```
 
-Después, instalar la biblioteca y el modelo de embeddings:
+`npm run setup` compila y deja el comando `auto-youtube-rag` disponible
+globalmente. **A partir de acá el clon es descartable**: podés borrar la
+carpeta, porque la instalación copia lo suyo y no queda enlazada al
+repositorio.
+
+Después, preparar la biblioteca y el modelo de embeddings:
 
 ```text
 auto-youtube-rag init
 ```
 
 `init` crea `~/.auto-youtube-rag/` con la base SQLite y el modelo (~130 MB).
-**Es la única operación de toda la herramienta que usa la red**, y tarda:
-dale tiempo. Es idempotente, así que repetirlo no rompe nada.
-
-Si el binario no quedó en el `PATH`, todo funciona igual invocando
-`node "<ruta-al-repo>/dist/main.js" <comando>`.
+**Es la única operación de toda la herramienta que usa la red**, y tarda: dale
+tiempo. Es idempotente, así que repetirlo no rompe nada.
 
 Dos banderas útiles: `--from <ruta>` copia un modelo que ya tengas en disco en
 vez de descargarlo (segundos en lugar de minutos), y `--skip-model` prepara
 sólo la base, para CI o entornos sin red.
+
+Para desinstalar el comando: `npm uninstall --global auto-youtube-rag`. La
+biblioteca de `~/.auto-youtube-rag/` sobrevive; borrala a mano si querés
+empezar de cero.
 
 ## Uso
 
