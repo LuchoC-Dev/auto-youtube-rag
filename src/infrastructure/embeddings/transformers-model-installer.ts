@@ -19,21 +19,21 @@ import {
   type EmbeddingModelProfile,
 } from "./model-profile.js";
 
-export interface E5DownloadOptions {
+export interface ModelDownloadOptions {
   readonly repository: string;
   readonly revision: string;
   readonly dtype: "q8";
   readonly cacheDir: string;
 }
 
-export interface E5DownloadRuntime {
+export interface ModelDownloadRuntime {
   /** Downloads the model files to `options.cacheDir`. Only this adapter is
    * allowed to allow remote models: the embedding generator that serves
    * `sync`/`retrieve` always forces `allowRemoteModels = false`. */
-  download(options: E5DownloadOptions): Promise<void>;
+  download(options: ModelDownloadOptions): Promise<void>;
 }
 
-const transformersDownloadRuntime: E5DownloadRuntime = {
+const transformersDownloadRuntime: ModelDownloadRuntime = {
   async download(options) {
     const { env, pipeline } = await import("@huggingface/transformers");
     env.allowLocalModels = true;
@@ -49,8 +49,8 @@ const transformersDownloadRuntime: E5DownloadRuntime = {
   },
 };
 
-export interface E5ModelInstallerOptions {
-  readonly runtime?: E5DownloadRuntime;
+export interface TransformersModelInstallerOptions {
+  readonly runtime?: ModelDownloadRuntime;
   // Injected for tests: exercising a profile with a different repository
   // without touching the real model. Not a configuration knob for callers:
   // run-cli.ts always falls back to the active profile. See
@@ -70,11 +70,11 @@ function totalBytes(files: readonly { readonly bytes: number }[]): number {
  * smoke test -- is untouched); an incomplete `--from` is a usage error
  * (`MODEL_SOURCE_INVALID`); otherwise the model is downloaded.
  */
-export class E5ModelInstaller implements ModelInstaller {
-  private readonly runtime: E5DownloadRuntime;
+export class TransformersModelInstaller implements ModelInstaller {
+  private readonly runtime: ModelDownloadRuntime;
   private readonly profile: EmbeddingModelProfile;
 
-  public constructor(options: E5ModelInstallerOptions = {}) {
+  public constructor(options: TransformersModelInstallerOptions = {}) {
     this.runtime = options.runtime ?? transformersDownloadRuntime;
     this.profile = options.profile ?? activeModelProfile;
   }

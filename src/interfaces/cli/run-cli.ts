@@ -15,7 +15,7 @@ import {
   readModelState,
 } from "../../infrastructure/config/model-install-state.js";
 import { TransformersEmbeddingGenerator } from "../../infrastructure/embeddings/transformers-embedding-generator.js";
-import { E5ModelInstaller } from "../../infrastructure/embeddings/e5-model-installer.js";
+import { TransformersModelInstaller } from "../../infrastructure/embeddings/transformers-model-installer.js";
 import { writeContextBundle } from "../../infrastructure/filesystem/write-context-bundle.js";
 import { SQLiteMigrationError } from "../../infrastructure/sqlite/open-database.js";
 import { SQLiteDiagnosticsRepository } from "../../infrastructure/sqlite/sqlite-diagnostics.js";
@@ -196,7 +196,7 @@ async function runModelsCommand(
     cacheDir: options.config.modelCachePath,
   });
   const modelInstaller = (
-    options.modelInstallerFactory ?? (() => new E5ModelInstaller())
+    options.modelInstallerFactory ?? (() => new TransformersModelInstaller())
   )(options.config);
 
   if (command.kind === "models_status") {
@@ -288,7 +288,8 @@ export async function runCli(options: RunCliOptions): Promise<number> {
         let model: Record<string, unknown> | null = null;
         if (!command.skipModel) {
           const modelInstaller = (
-            options.modelInstallerFactory ?? (() => new E5ModelInstaller())
+            options.modelInstallerFactory ??
+            (() => new TransformersModelInstaller())
           )(options.config);
           const installed = await installModel(
             {

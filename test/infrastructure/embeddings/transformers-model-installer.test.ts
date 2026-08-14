@@ -7,10 +7,10 @@ import { test } from "node:test";
 
 import { ModelInstallerError } from "../../../src/application/ports/model-installer.js";
 import {
-  E5ModelInstaller,
-  type E5DownloadOptions,
-  type E5DownloadRuntime,
-} from "../../../src/infrastructure/embeddings/e5-model-installer.js";
+  TransformersModelInstaller,
+  type ModelDownloadOptions,
+  type ModelDownloadRuntime,
+} from "../../../src/infrastructure/embeddings/transformers-model-installer.js";
 import { readInstallReceipt } from "../../../src/infrastructure/config/model-install-state.js";
 import {
   activeModelProfile,
@@ -21,12 +21,12 @@ const requiredModelFiles = activeModelProfile.requiredFiles;
 
 const modelDirectory = join("Xenova", "multilingual-e5-small");
 
-class FakeDownloadRuntime implements E5DownloadRuntime {
-  public calls: E5DownloadOptions[] = [];
+class FakeDownloadRuntime implements ModelDownloadRuntime {
+  public calls: ModelDownloadOptions[] = [];
 
   public constructor(private readonly fail = false) {}
 
-  public async download(options: E5DownloadOptions): Promise<void> {
+  public async download(options: ModelDownloadOptions): Promise<void> {
     this.calls.push(options);
     if (this.fail) {
       throw new Error("network unavailable");
@@ -55,7 +55,7 @@ void test("download requests the approved repository, revision and dtype at the 
   const root = await tempDir();
   try {
     const runtime = new FakeDownloadRuntime();
-    const installer = new E5ModelInstaller({ runtime });
+    const installer = new TransformersModelInstaller({ runtime });
     const modelsPath = join(root, "models");
 
     const outcome = await installer.install({
@@ -88,7 +88,7 @@ void test("already installed: does nothing and never calls the download runtime"
   const root = await tempDir();
   try {
     const runtime = new FakeDownloadRuntime();
-    const installer = new E5ModelInstaller({ runtime });
+    const installer = new TransformersModelInstaller({ runtime });
     const modelsPath = join(root, "models");
 
     await installer.install({ modelsPath, from: null, force: false });
@@ -113,7 +113,7 @@ void test("--from with a complete model: copies, writes a receipt and never empt
     const from = join(root, "origin");
     await writeAllRequiredFiles(from);
     const modelsPath = join(root, "models");
-    const installer = new E5ModelInstaller({
+    const installer = new TransformersModelInstaller({
       runtime: new FakeDownloadRuntime(),
     });
 
@@ -161,7 +161,7 @@ void test("--from with a profile of a different repository: copies from and to t
       await writeFile(target, "origin", "utf8");
     }
     const modelsPath = join(root, "models");
-    const installer = new E5ModelInstaller({
+    const installer = new TransformersModelInstaller({
       runtime: new FakeDownloadRuntime(),
       profile: otherProfile,
     });
@@ -201,7 +201,7 @@ void test("--from with an incomplete model: rejects with MODEL_SOURCE_INVALID in
     await writeFile(partial, "partial", "utf8");
 
     const runtime = new FakeDownloadRuntime();
-    const installer = new E5ModelInstaller({ runtime });
+    const installer = new TransformersModelInstaller({ runtime });
     const modelsPath = join(root, "models");
 
     await assert.rejects(
@@ -222,7 +222,7 @@ void test("force reinstalls even when a valid model is already present", async (
   const root = await tempDir();
   try {
     const runtime = new FakeDownloadRuntime();
-    const installer = new E5ModelInstaller({ runtime });
+    const installer = new TransformersModelInstaller({ runtime });
     const modelsPath = join(root, "models");
 
     await installer.install({ modelsPath, from: null, force: false });
@@ -242,7 +242,7 @@ void test("force reinstalls even when a valid model is already present", async (
 void test("wraps a download failure in MODEL_DOWNLOAD_FAILED", async () => {
   const root = await tempDir();
   try {
-    const installer = new E5ModelInstaller({
+    const installer = new TransformersModelInstaller({
       runtime: new FakeDownloadRuntime(true),
     });
 
