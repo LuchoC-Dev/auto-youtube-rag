@@ -14,13 +14,10 @@ import {
   writeInstallReceipt,
 } from "../config/model-install-state.js";
 import {
-  modelDescriptor,
-  modelDtype,
-  modelRepository,
-  modelRevision,
-} from "./e5-embedding-generator.js";
-
-const modelDirectory = "Xenova/multilingual-e5-small";
+  activeModelProfile,
+  modelDescriptorOf,
+  type EmbeddingModelProfile,
+} from "./model-profile.js";
 
 export interface E5DownloadOptions {
   readonly repository: string;
@@ -54,6 +51,11 @@ const transformersDownloadRuntime: E5DownloadRuntime = {
 
 export interface E5ModelInstallerOptions {
   readonly runtime?: E5DownloadRuntime;
+  // Injected for tests: exercising a profile with a different repository
+  // without touching the real model. Not a configuration knob for callers:
+  // run-cli.ts always falls back to the active profile. See
+  // docs/model-profile-design.md, Decision 6.
+  readonly profile?: EmbeddingModelProfile;
 }
 
 function totalBytes(files: readonly { readonly bytes: number }[]): number {
@@ -70,18 +72,23 @@ function totalBytes(files: readonly { readonly bytes: number }[]): number {
  */
 export class E5ModelInstaller implements ModelInstaller {
   private readonly runtime: E5DownloadRuntime;
+  private readonly profile: EmbeddingModelProfile;
 
   public constructor(options: E5ModelInstallerOptions = {}) {
     this.runtime = options.runtime ?? transformersDownloadRuntime;
+    this.profile = options.profile ?? activeModelProfile;
   }
 
   public async install(
     options: ModelInstallOptions,
   ): Promise<ModelInstallOutcome> {
     if (!options.force) {
-      const state = await readModelState(options.modelsPath);
+      const state = await readModelState(options.modelsPath, this.profile);
       if (state === "installed") {
-        const measured = await measureModelFiles(options.modelsPath);
+        const measured = await measureModelFiles(
+          options.modelsPath,
+          this.profile,
+        );
         return {
           status: "already_installed",
           source: null,
@@ -101,7 +108,8 @@ export class E5ModelInstaller implements ModelInstaller {
     from: string,
     modelsPath: string,
   ): Promise<ModelInstallOutcome> {
-    const sourceState = await readSourceState(from);
+    const modelDirectory = this.profile.repository;
+    const sourceState = await readSourceState(from, this.profile);
     if (sourceState !== "complete") {
       throw new ModelInstallerError(
         "MODEL_SOURCE_INVALID",
@@ -114,7 +122,7 @@ export class E5ModelInstaller implements ModelInstaller {
       recursive: true,
     });
 
-    const measured = await measureModelFiles(modelsPath);
+    const measured = await measureModelFiles(modelsPath, this.profile);
     if (measured === null) {
       throw new ModelInstallerError(
         "MODEL_SOURCE_INVALID",
@@ -125,7 +133,7 @@ export class E5ModelInstaller implements ModelInstaller {
 
     await writeInstallReceipt(modelsPath, {
       schema_version: "1.0",
-      model: modelDescriptor,
+      model: modelDescriptorOf(this.profile),
       files: measured,
       installed_at: new Date().toISOString(),
       source: "copy",
@@ -137,21 +145,21 @@ export class E5ModelInstaller implements ModelInstaller {
   private async download(modelsPath: string): Promise<ModelInstallOutcome> {
     try {
       await this.runtime.download({
-        repository: modelRepository,
-        revision: modelRevision,
-        dtype: modelDtype,
+        repository: this.profile.repository,
+        revision: this.profile.revision,
+        dtype: this.profile.dtype,
         cacheDir: modelsPath,
       });
     } catch (cause: unknown) {
       throw new ModelInstallerError(
         "MODEL_DOWNLOAD_FAILED",
-        `Could not download ${modelRepository} to ${modelsPath}.`,
+        `Could not download ${this.profile.repository} to ${modelsPath}.`,
         true,
         { cause },
       );
     }
 
-    const measured = await measureModelFiles(modelsPath);
+    const measured = await measureModelFiles(modelsPath, this.profile);
     if (measured === null) {
       throw new ModelInstallerError(
         "MODEL_DOWNLOAD_FAILED",
@@ -162,7 +170,7 @@ export class E5ModelInstaller implements ModelInstaller {
 
     await writeInstallReceipt(modelsPath, {
       schema_version: "1.0",
-      model: modelDescriptor,
+      model: modelDescriptorOf(this.profile),
       files: measured,
       installed_at: new Date().toISOString(),
       source: "download",

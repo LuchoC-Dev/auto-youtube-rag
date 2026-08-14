@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { modelDescriptor } from "../../../src/infrastructure/embeddings/e5-embedding-generator.js";
 import {
   activeModelProfile,
   modelDescriptorOf,
@@ -57,10 +56,10 @@ void test("modelDescriptorOf(activeModelProfile) matches the port descriptor fie
   const descriptor = modelDescriptorOf(activeModelProfile);
 
   assert.deepEqual(descriptor, {
-    key: modelDescriptor.key,
-    version: modelDescriptor.version,
-    dimensions: modelDescriptor.dimensions,
-    maxInputTokens: modelDescriptor.maxInputTokens,
+    key: activeModelProfile.key,
+    version: "Xenova/multilingual-e5-small@main:q8",
+    dimensions: activeModelProfile.dimensions,
+    maxInputTokens: activeModelProfile.maxInputTokens,
   });
 });
 

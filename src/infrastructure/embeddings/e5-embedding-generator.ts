@@ -10,18 +10,6 @@ import {
   type EmbeddingModelProfile,
 } from "./model-profile.js";
 
-// Exported so the model installer adapter (W2) and the install-model use
-// case (W4) share the exact same model identity used to load embeddings
-// here, instead of duplicating it. Derived from the active profile
-// (src/infrastructure/embeddings/model-profile.ts) so there is a single
-// source of truth for model identity; removed once the installer and
-// install-state modules consume the profile directly (block AC).
-export const modelDescriptor: EmbeddingModelDescriptor =
-  modelDescriptorOf(activeModelProfile);
-
-export const modelRepository = activeModelProfile.repository;
-export const modelRevision = activeModelProfile.revision;
-export const modelDtype = activeModelProfile.dtype;
 // Batch 1, not 16: within a batch every text pads to the longest one, and
 // this library's fragments range from 13 to 511 tokens. Measured with real
 // fragments, batch 1 ran 2.27x faster than batch 16 because padding, not
