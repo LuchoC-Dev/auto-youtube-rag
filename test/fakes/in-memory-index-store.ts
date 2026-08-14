@@ -3,10 +3,11 @@ import type {
   IndexedPackageState,
   IndexStore,
 } from "../../src/application/ports/index-store.js";
-import type {
+import {
   PackageRef,
   SourceName,
   SyncId,
+  VideoId,
 } from "../../src/domain/indexing/identifiers.js";
 import type { SyncIssue, SyncRun } from "../../src/domain/indexing/sync-run.js";
 
@@ -107,6 +108,24 @@ export class InMemoryIndexStore implements IndexStore {
       }),
     );
     return Promise.resolve(active.id);
+  }
+
+  /**
+   * Seeds already-indexed packages so a test can observe what a purge or a
+   * deletion removes, without going through a full applyPackage.
+   */
+  public seedPackages(source: SourceName, videoIds: readonly string[]): void {
+    for (const videoId of videoIds) {
+      const ref = PackageRef.create(source, VideoId.create(videoId));
+      this.states.set(ref.serialize(), {
+        ref,
+        packageHash: "seed".padEnd(64, "0"),
+        documents: [],
+        embeddingModels: [],
+        lastSeenSyncId: SyncId.create("sync:seed"),
+        indexedAt: "2026-08-14T00:00:00.000Z",
+      });
+    }
   }
 
   public purgeDerivedIndex(): Promise<number> {

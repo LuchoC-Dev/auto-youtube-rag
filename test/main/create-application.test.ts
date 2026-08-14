@@ -129,3 +129,34 @@ void test("exposes assembleContext, reusing the same retrieval wiring", async ()
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+void test("exposes rebuildIndex over a real library, reusing the sync wiring", async () => {
+  const directory = await mkdtemp(
+    join(tmpdir(), "auto-youtube-rag-rebuild-index-"),
+  );
+  const application = createApplication(
+    {
+      databasePath: join(directory, "index.sqlite"),
+      modelCachePath: join(directory, "models"),
+    },
+    {
+      embeddingGenerator: new FakeEmbeddingGenerator(),
+      vectorIndex: new FakeVectorSearchIndex(),
+    },
+  );
+
+  try {
+    const result = await application.rebuildIndex();
+
+    // An empty library rebuilds into nothing without touching the model or
+    // the filesystem: nothing registered means nothing to regenerate.
+    assert.equal(result.status, "ok");
+    assert.equal(result.sourcesRebuilt, 0);
+    assert.equal(result.packagesDeleted, 0);
+    assert.deepEqual(result.sources, []);
+    assert.deepEqual(result.issues, []);
+  } finally {
+    await application.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
