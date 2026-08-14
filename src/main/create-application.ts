@@ -32,7 +32,7 @@ import { removeSource } from "../application/sources/remove-source.js";
 import { SourceName } from "../domain/indexing/identifiers.js";
 import type { RetrievalQuery } from "../domain/retrieval/retrieval-query.js";
 import type { SourceRoot } from "../domain/indexing/source-root.js";
-import { E5EmbeddingGenerator } from "../infrastructure/embeddings/e5-embedding-generator.js";
+import { TransformersEmbeddingGenerator } from "../infrastructure/embeddings/transformers-embedding-generator.js";
 import { FilesystemPackageSourceReader } from "../infrastructure/filesystem/filesystem-package-source-reader.js";
 import { resolveSourceLayout } from "../infrastructure/filesystem/source-layout-resolver.js";
 import { openDatabase } from "../infrastructure/sqlite/open-database.js";
@@ -101,7 +101,7 @@ export function createApplication(
     new FilesystemPackageSourceReader(sourceRegistry);
   const embeddingGenerator =
     overrides.embeddingGenerator ??
-    new E5EmbeddingGenerator({ cacheDir: config.modelCachePath });
+    new TransformersEmbeddingGenerator({ cacheDir: config.modelCachePath });
   // sync publishes through this same instance, and retrieval queries it: one
   // object owns the vectors, so a committed change and a served query cannot
   // disagree about which fragments exist.
@@ -179,7 +179,7 @@ export function createApplication(
         request,
       ),
     async close(): Promise<void> {
-      if (embeddingGenerator instanceof E5EmbeddingGenerator) {
+      if (embeddingGenerator instanceof TransformersEmbeddingGenerator) {
         await embeddingGenerator.dispose();
       }
       if (ownsDatabase) database.close();

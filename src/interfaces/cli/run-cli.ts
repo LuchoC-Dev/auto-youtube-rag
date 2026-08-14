@@ -14,7 +14,7 @@ import {
   describeModelState,
   readModelState,
 } from "../../infrastructure/config/model-install-state.js";
-import { E5EmbeddingGenerator } from "../../infrastructure/embeddings/e5-embedding-generator.js";
+import { TransformersEmbeddingGenerator } from "../../infrastructure/embeddings/transformers-embedding-generator.js";
 import { E5ModelInstaller } from "../../infrastructure/embeddings/e5-model-installer.js";
 import { writeContextBundle } from "../../infrastructure/filesystem/write-context-bundle.js";
 import { SQLiteMigrationError } from "../../infrastructure/sqlite/open-database.js";
@@ -192,7 +192,7 @@ async function runModelsCommand(
     | { readonly kind: "models_status" },
   options: RunCliOptions,
 ): Promise<number> {
-  const embeddingGenerator = new E5EmbeddingGenerator({
+  const embeddingGenerator = new TransformersEmbeddingGenerator({
     cacheDir: options.config.modelCachePath,
   });
   const modelInstaller = (
