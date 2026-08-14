@@ -4,23 +4,24 @@ import type {
   EmbeddingGenerator,
   EmbeddingModelDescriptor,
 } from "../../application/ports/embedding-generator.js";
+import {
+  activeModelProfile,
+  modelDescriptorOf,
+  type EmbeddingModelProfile,
+} from "./model-profile.js";
 
 // Exported so the model installer adapter (W2) and the install-model use
 // case (W4) share the exact same model identity used to load embeddings
-// here, instead of duplicating it. A future configurable model (see
-// docs/install-design.md, "Nota: qué haría falta para soportar otro
-// modelo") would replace these module constants with a descriptor;
-// changing model identity still requires approval.
-export const modelDescriptor: EmbeddingModelDescriptor = Object.freeze({
-  key: "e5-small",
-  version: "Xenova/multilingual-e5-small@main:q8",
-  dimensions: 384,
-  maxInputTokens: 512,
-});
+// here, instead of duplicating it. Derived from the active profile
+// (src/infrastructure/embeddings/model-profile.ts) so there is a single
+// source of truth for model identity; removed once the installer and
+// install-state modules consume the profile directly (block AC).
+export const modelDescriptor: EmbeddingModelDescriptor =
+  modelDescriptorOf(activeModelProfile);
 
-export const modelRepository = "Xenova/multilingual-e5-small";
-export const modelRevision = "main";
-export const modelDtype = "q8";
+export const modelRepository = activeModelProfile.repository;
+export const modelRevision = activeModelProfile.revision;
+export const modelDtype = activeModelProfile.dtype;
 // Batch 1, not 16: within a batch every text pads to the longest one, and
 // this library's fragments range from 13 to 511 tokens. Measured with real
 // fragments, batch 1 ran 2.27x faster than batch 16 because padding, not
@@ -75,6 +76,12 @@ export interface E5EmbeddingGeneratorOptions {
   readonly runtime?: E5EmbeddingRuntime;
   readonly cacheDir: string;
   readonly batchSize?: number;
+  // Injected for tests: exercising a profile without prefixes, or with a
+  // different prefix policy, without touching the real model. Not a
+  // configuration knob for callers: create-application.ts and run-cli.ts
+  // always fall back to the active profile. See
+  // docs/model-profile-design.md, Decision 6.
+  readonly profile?: EmbeddingModelProfile;
 }
 
 function readBatchSize(input: unknown): number {
@@ -130,12 +137,20 @@ function readTexts(input: readonly string[]): readonly string[] {
   return Object.freeze(texts);
 }
 
-function passageInputs(texts: readonly string[]): readonly string[] {
-  return Object.freeze(texts.map((text) => `passage: ${text}`));
+function passageInputs(
+  texts: readonly string[],
+  profile: EmbeddingModelProfile,
+): readonly string[] {
+  const { inputPrefixes } = profile;
+  if (inputPrefixes === null) {
+    return texts;
+  }
+  return Object.freeze(texts.map((text) => `${inputPrefixes.passage}${text}`));
 }
 
-function queryInput(text: string): string {
-  return `query: ${text}`;
+function queryInput(text: string, profile: EmbeddingModelProfile): string {
+  const { inputPrefixes } = profile;
+  return inputPrefixes === null ? text : `${inputPrefixes.query}${text}`;
 }
 
 function readTokenCounts(
@@ -168,12 +183,13 @@ function readTokenCounts(
 
 function normalizeVector(
   input: readonly number[] | Float32Array,
+  expectedDimensions: number,
 ): Float32Array {
   const values = Array.from(input);
-  if (values.length !== modelDescriptor.dimensions) {
+  if (values.length !== expectedDimensions) {
     throw new E5EmbeddingError(
       "INVALID_VECTOR_DIMENSIONS",
-      `expected ${String(modelDescriptor.dimensions)} dimensions, received ${String(values.length)}`,
+      `expected ${String(expectedDimensions)} dimensions, received ${String(values.length)}`,
     );
   }
 
@@ -261,16 +277,18 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
   private readonly runtime: E5EmbeddingRuntime;
   private readonly cacheDir: string;
   private readonly batchSize: number;
+  private readonly profile: EmbeddingModelProfile;
   private sessionPromise: Promise<E5EmbeddingSession> | undefined;
 
   public constructor(options: E5EmbeddingGeneratorOptions) {
     this.runtime = options.runtime ?? transformersRuntime;
     this.cacheDir = readCacheDir(options.cacheDir);
     this.batchSize = readBatchSize(options.batchSize ?? defaultBatchSize);
+    this.profile = options.profile ?? activeModelProfile;
   }
 
   public describe(): Promise<EmbeddingModelDescriptor> {
-    return Promise.resolve(modelDescriptor);
+    return Promise.resolve(modelDescriptorOf(this.profile));
   }
 
   public async countTokens(
@@ -280,7 +298,7 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
     if (canonical.length === 0) {
       return Object.freeze([]);
     }
-    return this.countPrefixed(passageInputs(canonical));
+    return this.countPrefixed(passageInputs(canonical, this.profile));
   }
 
   public async embedDocuments(
@@ -290,12 +308,14 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
     if (canonical.length === 0) {
       return Object.freeze([]);
     }
-    return this.embedPrefixed(passageInputs(canonical));
+    return this.embedPrefixed(passageInputs(canonical, this.profile));
   }
 
   public async embedQuery(query: string): Promise<Float32Array> {
     const canonical = readTexts([query]);
-    const vectors = await this.embedPrefixed([queryInput(canonical[0] ?? "")]);
+    const vectors = await this.embedPrefixed([
+      queryInput(canonical[0] ?? "", this.profile),
+    ]);
     const vector = vectors[0];
     if (vector === undefined) {
       throw new E5EmbeddingError(
@@ -320,9 +340,9 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
   private getSession(): Promise<E5EmbeddingSession> {
     if (this.sessionPromise === undefined) {
       const loading = this.runtime.load({
-        repository: modelRepository,
-        revision: modelRevision,
-        dtype: modelDtype,
+        repository: this.profile.repository,
+        revision: this.profile.revision,
+        dtype: this.profile.dtype,
         cacheDir: this.cacheDir,
         localFilesOnly: true,
       });
@@ -351,12 +371,12 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
   ): Promise<readonly Float32Array[]> {
     const counts = await this.countPrefixed(texts);
     const oversized = counts.findIndex(
-      (count) => count > modelDescriptor.maxInputTokens,
+      (count) => count > this.profile.maxInputTokens,
     );
     if (oversized >= 0) {
       throw new E5EmbeddingError(
         "INPUT_TOO_LONG",
-        `input ${String(oversized)} has ${String(counts[oversized])} tokens and exceeds the ${String(modelDescriptor.maxInputTokens)} token model limit`,
+        `input ${String(oversized)} has ${String(counts[oversized])} tokens and exceeds the ${String(this.profile.maxInputTokens)} token model limit`,
       );
     }
 
@@ -371,7 +391,12 @@ export class E5EmbeddingGenerator implements EmbeddingGenerator {
           "runtime must return exactly one embedding per text",
         );
       }
-      vectors.push(...raw.map(normalizeVector));
+      const dimensions = this.profile.dimensions;
+      vectors.push(
+        ...raw.map((vector: readonly number[] | Float32Array) =>
+          normalizeVector(vector, dimensions),
+        ),
+      );
     }
 
     return Object.freeze(vectors);

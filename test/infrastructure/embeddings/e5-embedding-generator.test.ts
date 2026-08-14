@@ -8,6 +8,10 @@ import {
   type E5EmbeddingSession,
   type E5RuntimeLoadOptions,
 } from "../../../src/infrastructure/embeddings/e5-embedding-generator.js";
+import {
+  activeModelProfile,
+  type EmbeddingModelProfile,
+} from "../../../src/infrastructure/embeddings/model-profile.js";
 
 function vector(first = 3, second = 4, dimensions = 384): readonly number[] {
   const values = new Array<number>(dimensions).fill(0);
@@ -281,4 +285,77 @@ void test("loads lazily, disposes once and explains a missing local model", asyn
     assert.equal(error.cause instanceof Error, true);
     return true;
   });
+});
+
+function noPrefixProfile(): EmbeddingModelProfile {
+  return Object.freeze({
+    ...activeModelProfile,
+    inputPrefixes: null,
+  });
+}
+
+function customPrefixProfile(): EmbeddingModelProfile {
+  return Object.freeze({
+    ...activeModelProfile,
+    inputPrefixes: Object.freeze({ passage: "doc>> ", query: "q>> " }),
+  });
+}
+
+void test("sends raw text to the runtime for a profile without prefixes", async () => {
+  const session = new FakeSession();
+  const generator = new E5EmbeddingGenerator({
+    runtime: new FakeRuntime(session),
+    cacheDir: "C:/models",
+    profile: noPrefixProfile(),
+  });
+
+  await generator.embedDocuments(["uno", "dos"]);
+  await generator.embedQuery("tres");
+
+  assert.deepEqual(session.embeddedInputs, [["uno"], ["dos"], ["tres"]]);
+});
+
+void test("applies a profile's own prefixes verbatim, distinct from E5's", async () => {
+  const session = new FakeSession();
+  const generator = new E5EmbeddingGenerator({
+    runtime: new FakeRuntime(session),
+    cacheDir: "C:/models",
+    profile: customPrefixProfile(),
+  });
+
+  await generator.embedDocuments(["uno"]);
+  await generator.embedQuery("dos");
+
+  assert.deepEqual(session.embeddedInputs, [["doc>> uno"], ["q>> dos"]]);
+});
+
+void test("counts tokens on exactly the same text embedDocuments submits", async () => {
+  const noPrefixSession = new FakeSession();
+  const noPrefixGenerator = new E5EmbeddingGenerator({
+    runtime: new FakeRuntime(noPrefixSession),
+    cacheDir: "C:/models",
+    profile: noPrefixProfile(),
+  });
+
+  await noPrefixGenerator.countTokens(["uno", "dos"]);
+  await noPrefixGenerator.embedDocuments(["uno", "dos"]);
+
+  assert.deepEqual(noPrefixSession.countedInputs[0], ["uno", "dos"]);
+  assert.deepEqual(noPrefixSession.embeddedInputs.flat(), ["uno", "dos"]);
+  assert.deepEqual(
+    noPrefixSession.countedInputs[0],
+    noPrefixSession.embeddedInputs.flat(),
+  );
+
+  const activeSession = new FakeSession();
+  const activeGenerator = new E5EmbeddingGenerator({
+    runtime: new FakeRuntime(activeSession),
+    cacheDir: "C:/models",
+  });
+
+  await activeGenerator.countTokens(["uno"]);
+  await activeGenerator.embedDocuments(["uno"]);
+
+  assert.deepEqual(activeSession.countedInputs[0], ["passage: uno"]);
+  assert.deepEqual(activeSession.embeddedInputs.flat(), ["passage: uno"]);
 });
