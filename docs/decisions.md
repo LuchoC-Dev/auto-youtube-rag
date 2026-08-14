@@ -384,15 +384,120 @@ necesitan en el momento de ejecutar, no después de fallar.
 La separación **todavía no se validó en frío**; queda pendiente repetir el
 mismo tipo de corrida con la skill ya dividida.
 
+## Instalación: hogar de usuario, `init` instalador y preflight (punto 4.2)
+
+Implementado el 13 y 14 de agosto de 2026. Diseño completo en
+`docs/install-design.md`, checklist en `docs/install-tasks.md`. Cierra el
+pendiente "Default del caché del modelo" que había abierto la corrida en frío.
+
+La investigación arrancó por un síntoma —63 issues `MODEL_LOAD_FAILED`— y
+llegó a una causa mucho más profunda: **nunca se había decidido cómo se
+instala el producto**. `package.json` declaraba `private: true` junto a un
+`bin`, ninguna especificación cubría la distribución, y el único instalador
+era `npm run models:download`, que es el arnés de benchmarks
+(`tsx benchmarks/embeddings/run.ts`) y no existe para nadie sin el
+repositorio clonado. La auditoría encontró **cuatro lugares** calculando la
+ruta del modelo, tres de ellos duplicando un default relativo al `cwd`.
+
+Decisiones cerradas, todas confirmadas por el usuario:
+
+- **Distribución como comando global tipo npm, sin `postinstall`.** Hay
+  instalaciones con scripts deshabilitados; el proyecto ya había elegido
+  `node:sqlite` sobre `better-sqlite3` en parte por eso mismo
+  (`docs/benchmarks/sqlite-client.md`), y un hook de 130 MB contradiría esa
+  decisión.
+- **Hogar único de usuario** `~/.auto-youtube-rag/`, con `index.sqlite` y
+  `models/` adentro. Reemplaza los defaults relativos al `cwd`, que rompían
+  el caso de uso principal —un agente consultando desde otro proyecto— y
+  fallaban en silencio: `status` informaba cero fuentes y aparentaba pérdida
+  de datos.
+- **El directorio se llama `models/`, no `cache/`,** y la variable pasó de
+  `AUTO_YOUTUBE_RAG_MODEL_CACHE` a `AUTO_YOUTUBE_RAG_MODELS_DIR`. Un caché es
+  dato derivado que se regenera solo; este modelo no se repone jamás por sí
+  mismo, porque el invariante prohíbe descargar implícitamente y el adaptador
+  fuerza `allowRemoteModels = false`. Es estado instalado. El nombre viejo
+  venía del vocabulario de Transformers.js, que sí descarga solo.
+- **Un solo resolutor compartido** (`resolve-paths.ts`), usado por lector y
+  escritor. Los tres defaults duplicados se eliminaron:
+  `E5EmbeddingGenerator` ahora exige `cacheDir` y `evals/run-seed-queries.ts`
+  resuelve por el mismo camino. `benchmarks/embeddings/run.ts` se conserva
+  intacto: es herramienta de investigación y trabaja legítimamente contra el
+  repositorio.
+- **`init` instala el sistema completo** (hogar, base y modelo), con
+  `--skip-model` para CI. Deja de ser instantáneo, y eso se documenta con la
+  misma prominencia que la duración de `sync`.
+- **Un modelo ya presente en disco se reutiliza sólo con `--from` explícito.**
+  Se descartó la detección automática del repositorio: le daría al producto
+  conocimiento de la estructura del repo, y el principio acordado es el
+  opuesto —el repo es código fuente, y el producto no debe poder correr desde
+  él sin haberse instalado. Se copia, nunca se mueve: vaciar el origen
+  rompería los benchmarks y el smoke de E5.
+- **Preflight de requisitos una vez por comando.** Cada comando declara qué
+  necesita y la CLI lo verifica antes de construir nada. El caso que lo
+  motivó: `sync` descubría el modelo ausente una vez por video, procesando 63
+  paquetes para llegar a una conclusión disponible en el primer milisegundo.
+  `test/interfaces/cli/` fija esa regresión.
+- **Recibo `models/.install.json`** con el tamaño esperado de cada archivo,
+  para distinguir `absent`, `incomplete` e `installed`. Detecta la descarga
+  truncada —que deja los cuatro archivos presentes con el tamaño equivocado—
+  sin leer 130 MB en cada `doctor`. Se comparan tamaños, nunca hashes.
+- **La base vieja relativa al `cwd` se avisa (`LEGACY_LIBRARY_FOUND`), no se
+  migra sola.** Mover datos del usuario sin pedirlo excede el mandato de
+  `init`.
+
+Bug encontrado y corregido durante la verificación: `doctor` seguía
+detectando el modelo con `readdir(...).length > 0` —"¿hay algo en la
+carpeta?"— aunque su mensaje ya apuntaba a `models install`. Con un modelo
+truncado, `models status` decía `incomplete` y `sync` se negaba a correr,
+pero `doctor`, que es el comando de diagnóstico, daba `ok`. `runDoctor` ahora
+recibe el estado ya resuelto en vez de inspeccionar el filesystem, lo que
+además saca un `readdir` de la capa de aplicación.
+
+El modelo por defecto y su dimensión **no cambiaron**. Lo que haría falta
+para soportar otro modelo quedó registrado en `docs/install-design.md`,
+sección "Nota: qué haría falta para soportar otro modelo": la dimensión y la
+reindexación automática ya funcionan; los prefijos E5 hardcodeados y la
+imposibilidad de que dos modelos convivan, no.
+
 ## Pendientes de decisión
 
-- **Default del caché del modelo.** `<cwd>/.cache/models` es cómodo para el
-  desarrollo dentro del repositorio, pero contradice el propósito de una
-  skill portable usada por agentes desde directorios arbitrarios: instalar la
-  CLI globalmente no lo arregla, porque la ruta se sigue resolviendo contra el
-  `cwd`. `references/setup.md` documenta el workaround
-  (`AUTO_YOUTUBE_RAG_MODEL_CACHE`), pero cambiar el default a una ubicación de
-  usuario toca código y requiere diseño previo y aprobación explícita.
+- **El marcador de cita de `context.md` es de cierre y se lee mal.**
+  Descubierto el 14 de agosto durante la validación en frío de 4.2. En
+  `context.md` el marcador `[S0N]` aparece solo, en su propia línea, **después**
+  del bloque que etiqueta, con el encabezado del bloque siguiente
+  inmediatamente debajo. El agente en frío lo interpretó como marcador de
+  apertura y atribuyó a cada ID el contenido que venía después, produciendo
+  un resumen con procedencia equivocada: afirmó que `S21` documentaba el
+  estilo Suizo (es `S22`) y que `S18` trataba brutalismo (es contenido sobre
+  minimalismo).
+
+  **El producto no tiene un bug**: `result.json` coincide exactamente con la
+  interpretación de cierre, las 54 unidades resuelven y hay cero citas
+  huérfanas. Es un problema de legibilidad del formato.
+
+  **El error se reprodujo dos veces, con el mismo agente y dos lecturas
+  distintas del mismo bundle.** La primera vez leyó `context.md` en dos
+  tandas por tamaño (2.322 líneas), lo que hacía sospechar de un problema de
+  paginación; la segunda lo leyó entero de una sola vez y volvió a
+  desplazarse igual. No es un artefacto de leer por tramos: es el formato.
+
+  El desplazamiento es de un bloque hacia atrás y **no es uniforme** —algunas
+  citas salieron correctas (`S03`, `S09`), probablemente localizadas por
+  contenido y no por posición del marcador—, lo que produce un resumen
+  parcialmente bien atribuido y por lo tanto más difícil de detectar que uno
+  sistemáticamente corrido.
+
+  Es el peor tipo de fallo posible: **pasa toda verificación mecánica y aun
+  así produce atribuciones falsas en la respuesta final**. La Capa A de 3.2
+  lo daría por bueno, y la Capa B no lo detectó porque sus jueces evaluaban
+  bundles, no producían citas a partir de ellos.
+
+  Opciones, ninguna decidida: mover el marcador al encabezado
+  (`### [S18] Método completo...`), duplicarlo al abrir y cerrar, o dejar el
+  formato y advertirlo en la skill. Las dos primeras cambian el contrato ya
+  aprobado en `cli-contract.md` y necesitan aprobación explícita; la tercera
+  es barata pero deja la trampa en pie.
+
 - **Guard de concurrencia en `sync`.** No existe ningún bloqueo que impida
   dos `sync` simultáneos sobre la misma base. La corrida en frío los produjo
   y observó conteos inconsistentes mientras corrían (`status` llegó a

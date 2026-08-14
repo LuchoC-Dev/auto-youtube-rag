@@ -20,6 +20,7 @@
 | **3 — Calidad**            | 3.1 | Pruebas funcionales                     |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos                      |
 |                            | 3.2 | Evaluaciones del MVP                    |   ✅   | 100% | M, N y O completos; MVP cerrado                           |
 | **4 — Posterior al MVP**   | 4.1 | Soporte de `analysis.json` (schema 2.0) |   ✅   | 100% | Bloques P–T completos; validado contra `auto-design` real |
+|                            | 4.2 | Instalación: hogar de usuario y `init`  |   ✅   | 100% | Bloques U–Z e Y completos; validado en frío desde cero    |
 
 ---
 
@@ -185,3 +186,42 @@ correcta. `design-catalog` no se validó explícitamente: su manifest no
 declara ningún video con `resources.analysis`, así que no ejercita este
 trabajo. Detalle completo en `docs/decisions.md`, sección "Soporte de
 `analysis.json` (schema 2.0): implementado y validado".
+
+#### 4.2 Instalación: hogar de usuario, `init` instalador y preflight
+
+Origen: la corrida de verificación en frío del 13 de agosto falló con 63
+issues `MODEL_LOAD_FAILED` y expuso que **nunca se había decidido cómo se
+instala el producto**. El único instalador era el arnés de benchmarks, que
+no existe fuera del repositorio clonado, y cuatro lugares distintos
+calculaban la ruta del modelo con reglas incompatibles.
+
+- [x] U1–U2. Resolutor de rutas compartido, recibo y estado del modelo
+- [x] V1–V3. Eliminación de los tres defaults duplicados de `cwd`
+- [x] W1–W4. Puerto, adaptador de descarga y copia desde `--from`
+- [x] X1–X5. `models` e `init` en la CLI, `main.ts` y `doctor` alineados
+- [x] Z1–Z4. Preflight de requisitos y traducción de fallos de estado
+- [x] Y1–Y3. Smoke real, validación en frío y cierre
+
+Cerrado el 14 de agosto de 2026. Diseño en `docs/install-design.md`,
+checklist en `docs/install-tasks.md`, decisiones en `docs/decisions.md`.
+
+**Validación en frío (Y2)**: un subagente sin contexto previo, con acceso
+sólo a `skill/SKILL.md` y sus referencias, partió de una máquina sin hogar
+de usuario y llegó de cero a una respuesta citada. Instaló con
+`init --from`, registró `catalog-design`, indexó los 12 videos en 3 min
+54 s sin ningún `issue` y recuperó un bundle de 54 unidades con cero citas
+huérfanas. **No copió ningún archivo a mano ni relanzó ningún `sync`** —las
+dos cosas que había hecho la corrida anterior—, y encontró la bandera
+`--from` leyendo la skill, sin ayuda.
+
+Dos hallazgos de la corrida:
+
+1. **`doctor` daba un parte falso de salud** ante un modelo truncado:
+   detectaba con `readdir(...).length > 0` aunque su mensaje ya apuntaba a
+   `models install`. Corregido; `runDoctor` recibe el estado ya resuelto.
+2. **El marcador de cita de `context.md` se lee mal.** Es de cierre y el
+   agente lo interpretó como de apertura, produciendo un resumen con
+   procedencia equivocada pese a que las 54 citas resuelven y no hay
+   huérfanas. Reprodujo dos veces, incluso leyendo el bundle entero de una
+   sola vez. Queda registrado como pendiente de decisión: cambiarlo toca el
+   contrato de `cli-contract.md`.

@@ -46,13 +46,26 @@ comando explícito ejecuta la inferencia:
 ```text
 npm run models:download
 npm run test:embedding:smoke
+npm run test:install:smoke
 ```
 
-`models:download` descarga únicamente E5 Small. El smoke exige los archivos en
-`.cache/models`, trabaja con `local_files_only` y nunca intenta acceder a la
-red. Si el modelo falta, falla indicando el comando de descarga. Para descargar
-todos los modelos del benchmark histórico se usa
-`npm run models:download:benchmarks`.
+`models:download` descarga únicamente E5 Small **al caché del repositorio**
+(`<repo>/.cache/models`). Es herramienta de desarrollo: alimenta los
+benchmarks y los dos smokes. Para descargar todos los modelos del benchmark
+histórico se usa `npm run models:download:benchmarks`.
+
+**No es la forma de instalar el producto.** Desde el punto 4.2, el usuario
+instala con `auto-youtube-rag init`, que escribe en el hogar de usuario
+(`~/.auto-youtube-rag/models/`) y no sabe que este repositorio existe.
+`models:download` depende de `tsx` y de `benchmarks/`, ninguno de los cuales
+está disponible fuera de un repositorio clonado. El `.cache/` del repositorio
+es territorio exclusivo de desarrollo.
+
+El smoke de embeddings exige los archivos en `.cache/models`, trabaja con
+`local_files_only` y nunca accede a la red. `test:install:smoke` copia ese
+mismo modelo a un hogar temporal para ejercitar la adopción real por
+`--from`; se omite si el caché no existe, en vez de fallar. Ambos quedan
+fuera de `npm run check` por el patrón `smoke`.
 
 ## Estructura y límites
 
