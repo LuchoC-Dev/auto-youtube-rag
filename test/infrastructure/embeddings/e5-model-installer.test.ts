@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -11,7 +12,10 @@ import {
   type E5DownloadRuntime,
 } from "../../../src/infrastructure/embeddings/e5-model-installer.js";
 import { readInstallReceipt } from "../../../src/infrastructure/config/model-install-state.js";
-import { activeModelProfile } from "../../../src/infrastructure/embeddings/model-profile.js";
+import {
+  activeModelProfile,
+  type EmbeddingModelProfile,
+} from "../../../src/infrastructure/embeddings/model-profile.js";
 
 const requiredModelFiles = activeModelProfile.requiredFiles;
 
@@ -130,6 +134,57 @@ void test("--from with a complete model: copies, writes a receipt and never empt
       );
       assert.equal(originContent, "origin");
     }
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+void test("--from with a profile of a different repository: copies from and to that profile's own directory, not E5's", async () => {
+  const root = await tempDir();
+  try {
+    const otherProfile: EmbeddingModelProfile = Object.freeze({
+      key: "other-model",
+      repository: "Acme/other-model",
+      revision: "main",
+      dtype: "q8",
+      dimensions: 128,
+      maxInputTokens: 256,
+      inputPrefixes: null,
+      requiredFiles: Object.freeze(["config.json", "weights.bin"]),
+    });
+    const otherDirectory = join("Acme", "other-model");
+
+    const from = join(root, "origin");
+    for (const relativePath of otherProfile.requiredFiles) {
+      const target = join(from, otherDirectory, relativePath);
+      await mkdir(join(target, ".."), { recursive: true });
+      await writeFile(target, "origin", "utf8");
+    }
+    const modelsPath = join(root, "models");
+    const installer = new E5ModelInstaller({
+      runtime: new FakeDownloadRuntime(),
+      profile: otherProfile,
+    });
+
+    const outcome = await installer.install({ modelsPath, from, force: false });
+
+    assert.equal(outcome.status, "adopted");
+    assert.equal(outcome.source, "copy");
+
+    // Landed under the other profile's own directory, not E5's.
+    for (const relativePath of otherProfile.requiredFiles) {
+      const content = await readFile(
+        join(modelsPath, otherDirectory, relativePath),
+        "utf8",
+      );
+      assert.equal(content, "origin");
+    }
+    assert.equal(existsSync(join(modelsPath, modelDirectory)), false);
+
+    const receipt = await readInstallReceipt(modelsPath);
+    assert.ok(receipt !== null);
+    assert.equal(receipt.model.key, "other-model");
+    assert.equal(receipt.model.version, "Acme/other-model@main:q8+noprefix");
   } finally {
     await rm(root, { recursive: true, force: true });
   }
