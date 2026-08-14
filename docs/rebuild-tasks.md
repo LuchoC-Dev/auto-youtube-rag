@@ -52,20 +52,22 @@ mediante la skill `/git-commit`. Antes de cada commit: el test específico,
 
 ## Bloque AG — superficie de CLI
 
-- [ ] **AG1** — `kind: "rebuild"` en `parse-command.ts`, con `--confirm`
+- [x] **AG1** — `kind: "rebuild"` en `parse-command.ts`, con `--confirm`
       obligatorio: ausente o mal escrito → código de uso `2`, sin construir la
-      `Application`. Rechazar `--force` explícitamente.
-- [ ] **AG2** — Entrada `rebuild` en `command-requirements.ts` como
-      `library_and_model`, y **actualizar** el test que hoy afirma que `sync` y
-      `retrieve` son los únicos comandos que requieren biblioteca y modelo, para
-      que contemple los tres.
-- [ ] **AG3** — Rama `rebuild` en `run-cli.ts`: invoca
-      `application.rebuildIndex`, emite el recibo y mapea `ok` → 0,
-      `partial`/`failed` → 1.
-- [ ] **AG4** — Tests de CLI: recibo bien formado, `--confirm` faltante → 2,
-      `partial` → 1, y que `rebuild` sin biblioteca reporte
-      `LIBRARY_NOT_FOUND` y sin modelo `MODEL_NOT_INSTALLED` (preflight, no
-      un error por video).
+      `Application`. `--force` lo rechaza el `strict: true` de `parseArgs` sin
+      código extra, y el test lo fija para que siga siendo así.
+- [x] **AG2** — Entrada `rebuild` en `command-requirements.ts` como
+      `library_and_model`, y test actualizado a los tres comandos. La tabla
+      exhaustiva del test hizo fallar el typecheck apenas se sumó el `kind`
+      nuevo, antes de que nadie se acordara de actualizarla.
+- [x] **AG3** — Rama `rebuild` en `run-cli.ts`: invoca
+      `application.rebuildIndex`, emite el recibo `snake_case` y mapea `ok` → 0,
+      `partial`/`failed` → 1. Avisa por stderr que tarda minutos y que una
+      interrupción se remedia repitiéndolo.
+- [x] **AG4** — Tests de CLI: recibo bien formado, `--confirm` faltante → 2,
+      `partial` → 1, biblioteca vacía → `ok` con 0 fuentes, y `rebuild` sin
+      biblioteca reportando `LIBRARY_NOT_FOUND` y sin modelo
+      `MODEL_NOT_INSTALLED` **antes** de borrar nada.
 
 ## Bloque AH — E2E, documentación y cierre
 
