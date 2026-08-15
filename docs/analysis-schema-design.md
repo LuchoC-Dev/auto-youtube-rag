@@ -1,68 +1,66 @@
-# Diseño de soporte para `analysis.json` (schema 2.0)
+# Design for `analysis.json` support (schema 2.0)
 
-## Estado
+## Status
 
-**Aprobado el 13 de agosto de 2026, implementado y validado el mismo día.**
-Las cuatro decisiones abiertas quedaron resueltas (ver "Decisiones
-confirmadas" al final). Bloques P–T, completos. Validación real contra la
-colección `auto-design`
-en `docs/decisions.md`, sección "Soporte de `analysis.json` (schema 2.0):
-implementado y validado".
+**Approved on 13 August 2026, implemented and validated the same day.**
+The four open decisions were resolved (see "Confirmed decisions" at the end).
+Blocks P–T, complete. Real validation against the `auto-design` collection
+in `docs/decisions.md`, section "`analysis.json` (schema 2.0) support:
+implemented and validated".
 
-## Contexto
+## Context
 
-El 2 de agosto de 2026 la skill productora de paquetes
-(`youtube-video-context`, repositorio separado) reemplazó
-`deliverables/rules.json` (schema 1.0) por `deliverables/analysis.json`
-(schema 2.0) en un breaking change deliberado y documentado (commit
-`aecdde9`): "deja de producir un manual de reglas de diseño para producir un
-análisis general". La forma de contenido es incompatible, no un rename de
-campo — ver `docs/decisions.md`, sección "Soporte de `analysis.json`
-(schema 2.0): diseño aprobado".
+On 2 August 2026 the package-producing skill
+(`youtube-video-context`, a separate repository) replaced
+`deliverables/rules.json` (schema 1.0) with `deliverables/analysis.json`
+(schema 2.0) in a deliberate, documented breaking change (commit
+`aecdde9`): "it stops producing a manual of design rules and starts producing
+a general analysis". The shape of the content is incompatible, not a field
+rename — see `docs/decisions.md`, section "`analysis.json` (schema 2.0)
+support: approved design".
 
-El 13 de agosto se resolvió la mitad **amplificadora** del problema
-(validación tolerante por video: un paquete con esquema no reconocido ya no
-bloquea la sincronización del resto de la fuente). Este documento diseña la
-mitad **de fondo**: que `auto-youtube-rag` pueda indexar y recuperar el
-contenido real de `analysis.json`, en vez de descartarlo como issue
-permanente. Sin este trabajo, los 17 videos reales de `auto-design` que ya
-usan schema 2.0 —y todo video futuro, porque la skill no vuelve a
-`rules.json`— quedan fuera de la biblioteca para siempre.
+On 13 August the **amplifying** half of the problem was resolved (tolerant
+per-video validation: a package with an unrecognised schema no longer blocks
+the synchronisation of the rest of the source). This document designs the
+**substantive** half: letting `auto-youtube-rag` index and retrieve the real
+content of `analysis.json` instead of discarding it as a permanent issue.
+Without this work, the 17 real `auto-design` videos that already use schema
+2.0 — and every future video, because the skill is not going back to
+`rules.json` — stay out of the library forever.
 
-## Alcance
+## Scope
 
-| Dentro de este diseño                                                                        | Fuera                                                                                                                                     |
-| -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Parsear `analysis.json` (schema 2.0) como contenido indexable de primera clase               | Migrar los 17 videos existentes de `analysis.json` a `rules.json` o viceversa                                                             |
-| Nuevo tipo de documento `"analysis"` en el dominio y la persistencia                         | Deprecar o dejar de soportar `rules.json`/schema 1.0 (sigue indexándose sin cambios)                                                      |
-| Nuevos `KnowledgeUnitType` para `topics`/`recommendations`/`assessment`/sección de evidencia | Cambiar cómo se tratan los recursos ya excluidos (`transcript`, `frames`, `source_video`, etc.)                                           |
-| Bucketing de `assembleContext` para el contenido nuevo                                       | Umbral de similitud vectorial, MCP, interfaz web (ya fuera del MVP)                                                                       |
-| Migración SQLite para el nuevo `kind` de documento                                           | Recalibrar pesos de RRF o presupuestos por profundidad a causa de este contenido nuevo (se evalúa después, con datos reales, no a priori) |
+| Inside this design                                                                        | Outside                                                                                                                   |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Parsing `analysis.json` (schema 2.0) as first-class indexable content                     | Migrating the 17 existing `analysis.json` videos to `rules.json` or the other way round                                   |
+| A new `"analysis"` document type in the domain and in persistence                         | Deprecating or dropping support for `rules.json`/schema 1.0 (it keeps being indexed unchanged)                            |
+| New `KnowledgeUnitType`s for `topics`/`recommendations`/`assessment`/the evidence section | Changing how the already excluded resources are treated (`transcript`, `frames`, `source_video`, etc.)                    |
+| `assembleContext` bucketing for the new content                                           | The vector similarity threshold, MCP, the web interface (already outside the MVP)                                         |
+| A SQLite migration for the new document `kind`                                            | Recalibrating RRF weights or per-depth budgets because of this new content (assessed later, with real data, not a priori) |
 
-## Decisión confirmada: sostener ambos esquemas indefinidamente
+## Confirmed decision: support both schemas indefinitely
 
-Los 34 videos existentes con `rules.json` no se regeneran solos —la skill
-productora declaró explícitamente que v1 "no se migra automáticamente"—, así
-que dejar de soportar schema 1.0 perdería contenido ya indexado y validado.
-`auto-youtube-rag` trata `rules.json` y `analysis.json` como dos tipos de
-documento estructurado independientes, seleccionados por cuál trae cada
-paquete real (`resources.rules` / `resources.analysis`), no como versiones
-de un mismo esquema donde una reemplaza a la otra.
+The 34 existing videos with `rules.json` do not regenerate themselves — the
+producing skill explicitly declared that v1 "is not migrated automatically" —
+so dropping schema 1.0 support would lose content that is already indexed and
+validated. `auto-youtube-rag` treats `rules.json` and `analysis.json` as two
+independent structured document types, selected by which one each real package
+carries (`resources.rules` / `resources.analysis`), not as versions of a single
+schema where one replaces the other.
 
-## Decisión: `structuredContent` como enum obligatorio, no dos booleanos independientes
+## Decision: `structuredContent` as a mandatory enum, not two independent booleans
 
-El borrador original de este documento proponía sumar `analysis: boolean`
-junto a `rules: boolean`, ambos opcionales en la lectura cruda (clave
-ausente → `false`). Funciona, pero dos flags independientes permiten
-estados que no tienen sentido de negocio: `{ rules: true, analysis: true }`
-no debería ocurrir nunca (un paquete real trae un tipo de conocimiento
-estructurado, no los dos), y cada consumidor (`filesystem-package-source-reader.ts`,
-y cualquier código futuro que dependa de "qué contenido estructurado tiene
-este video") tendría que repetir dos `if` independientes en vez de manejar
-un único valor exhaustivo.
+The original draft of this document proposed adding `analysis: boolean`
+alongside `rules: boolean`, both optional in the raw read (an absent key →
+`false`). It works, but two independent flags allow states that have no
+business meaning: `{ rules: true, analysis: true }` should never happen (a real
+package carries one kind of structured knowledge, not both), and every consumer
+(`filesystem-package-source-reader.ts`, and any future code that depends on
+"what structured content this video has") would have to repeat two independent
+`if`s instead of handling a single exhaustive value.
 
-**Corrección adoptada:** `ManifestResourceSnapshot` reemplaza `rules` y
-`analysis` por un solo campo obligatorio y exhaustivo:
+**Correction adopted:** `ManifestResourceSnapshot` replaces `rules` and
+`analysis` with a single mandatory, exhaustive field:
 
 ```ts
 export const structuredContentKinds = ["rules", "analysis", "none"] as const;
@@ -75,36 +73,37 @@ export interface ManifestResourceSnapshot {
 }
 ```
 
-`manifest-reader.ts` sigue leyendo los booleanos crudos `resources.rules` y
-`resources.analysis` del JSON —cada uno opcional, clave ausente equivale a
-`false`, exactamente por la razón ya explicada: un manifest schema 1.0 no
-declara `analysis` y uno schema 2.0 no declara `rules`— pero los colapsa a
-un único `structuredContent` antes de construir el snapshot:
+`manifest-reader.ts` still reads the raw `resources.rules` and
+`resources.analysis` booleans from the JSON — each optional, an absent key
+equalling `false`, for exactly the reason already explained: a schema 1.0
+manifest does not declare `analysis` and a schema 2.0 one does not declare
+`rules` — but it collapses them into a single `structuredContent` before
+building the snapshot:
 
 - `rules: true`, `analysis: false` → `"rules"`.
 - `rules: false`, `analysis: true` → `"analysis"`.
-- ambos `false` → `"none"` (paquete sin contenido estructurado; ya es un
-  caso válido hoy cuando `resources.rules` es `false`, ver
+- both `false` → `"none"` (a package with no structured content; that is
+  already a valid case today when `resources.rules` is `false`, see
   `manifest-mixed.json`).
-- **ambos `true` → error de esquema** (`MANIFEST_SCHEMA_INVALID`, campo
-  `resources`, "must not declare both rules and analysis"). No es un caso
-  observado en la realidad; en vez de tolerarlo en silencio o indexar
-  ambos documentos, se trata como cualquier otra entrada de manifest
-  inválida — el video se descarta y se reporta como `ManifestVideoIssue`
-  gracias a la validación tolerante por video ya implementada, en vez de
-  abortar el manifest completo.
+- **both `true` → schema error** (`MANIFEST_SCHEMA_INVALID`, field
+  `resources`, "must not declare both rules and analysis"). It is not a case
+  observed in reality; rather than tolerating it silently or indexing both
+  documents, it is treated like any other invalid manifest entry — the video
+  is discarded and reported as a `ManifestVideoIssue` thanks to the tolerant
+  per-video validation already implemented, instead of aborting the whole
+  manifest.
 
-Todo el código que decide qué archivo leer (`filesystem-package-source-reader.ts`)
-pasa de dos condicionales independientes a un único `switch` exhaustivo
-sobre `structuredContent`, con el mismo patrón ya usado en
-`buildKnowledgeUnits` para `document.kind`: si en el futuro aparece un
-tercer tipo de contenido estructurado, TypeScript obliga a manejarlo en vez
-de dejarlo caer silenciosamente por un `if` que nadie actualizó.
+All the code that decides which file to read (`filesystem-package-source-reader.ts`)
+goes from two independent conditionals to a single exhaustive `switch` over
+`structuredContent`, with the same pattern already used in
+`buildKnowledgeUnits` for `document.kind`: if a third kind of structured
+content appears in the future, TypeScript forces it to be handled instead of
+letting it fall through silently on an `if` nobody updated.
 
-## Contrato de datos de `analysis.json` (schema 2.0)
+## Data contract of `analysis.json` (schema 2.0)
 
-Confirmado contra `references/authoring.md` del repositorio real de la skill
-productora:
+Confirmed against `references/authoring.md` in the real repository of the
+producing skill:
 
 ```json
 {
@@ -128,13 +127,13 @@ productora:
 }
 ```
 
-Todo el contenido de `analysis.json` está en inglés siempre (salvo
-`source.title`/`source.creator`, verbatim), a diferencia de `context.md` que
-sigue el idioma del dossier — dato ya relevante para recuperación
-multilingüe, no requiere tratamiento especial: FTS5/E5 ya son
-idioma-agnósticos por diseño.
+All the content of `analysis.json` is always in English (except
+`source.title`/`source.creator`, verbatim), unlike `context.md`, which follows
+the language of the dossier — a fact already relevant for multilingual
+retrieval that requires no special treatment: FTS5/E5 are already
+language-agnostic by design.
 
-## Snapshots de aplicación nuevos (`package-snapshots.ts`)
+## New application snapshots (`package-snapshots.ts`)
 
 ```ts
 export const analysisEvidenceClasses = [
@@ -197,46 +196,48 @@ export interface AnalysisDocumentSnapshot {
 }
 ```
 
-`source.*` de `analysis.json` no se copia a un snapshot propio: duplica lo
-que `metadata.json` ya aporta a `SelectedMetadataSnapshot`, y ese es el que
-ya alimenta `VideoPackage`. Igual que `rules.json` hoy, `analysis.json` no es
-la fuente de metadata del paquete.
+The `source.*` of `analysis.json` is not copied into a snapshot of its own: it
+duplicates what `metadata.json` already contributes to
+`SelectedMetadataSnapshot`, and that is the one already feeding `VideoPackage`.
+Just like `rules.json` today, `analysis.json` is not the package's source of
+metadata.
 
-`PackageDocumentSnapshotBase` se extiende con `TKind` `"analysis"`, se agrega
-`AnalysisPackageDocumentSnapshot` y se suma al union `PackageDocumentSnapshot`
-— mismo patrón que `RulesPackageDocumentSnapshot`.
+`PackageDocumentSnapshotBase` is extended with the `TKind` `"analysis"`,
+`AnalysisPackageDocumentSnapshot` is added and joins the
+`PackageDocumentSnapshot` union — the same pattern as
+`RulesPackageDocumentSnapshot`.
 
-## Parser nuevo: `analysis-json-parser.ts`
+## New parser: `analysis-json-parser.ts`
 
-Espejo de `rules-json-parser.ts`: valida forma exacta, exige los seis campos
-de cada `topic` (`id`, `title`, `what_the_source_says`, `evidence_class`,
-`timestamps`, `visual_evidence`), los cuatro de cada `recommendation`, ids
-con el mismo patrón estructural que `patternId` (`readStructuralSegment`),
-detecta ids de topic/recommendation duplicados, valida los enums
-`evidence_class`/`confidence`/`chosen_by` contra listas cerradas. No repite
-la disciplina editorial completa del validador de la skill productora
-(longitud, exhaustividad de cobertura): sólo reconoce forma parseable,
-igual que `rules-json-parser.ts` no repite las reglas de autoría de
-`rules.json`.
+A mirror of `rules-json-parser.ts`: it validates the exact shape, requires the
+six fields of every `topic` (`id`, `title`, `what_the_source_says`,
+`evidence_class`, `timestamps`, `visual_evidence`), the four of every
+`recommendation`, ids with the same structural pattern as `patternId`
+(`readStructuralSegment`), detects duplicate topic/recommendation ids, and
+validates the `evidence_class`/`confidence`/`chosen_by` enums against closed
+lists. It does not repeat the full editorial discipline of the producing
+skill's validator (length, coverage exhaustiveness): it only recognises a
+parseable shape, just as `rules-json-parser.ts` does not repeat the authoring
+rules of `rules.json`.
 
-Códigos de error: `ANALYSIS_SCHEMA_INVALID`, `ANALYSIS_VIDEO_ID_MISMATCH`,
+Error codes: `ANALYSIS_SCHEMA_INVALID`, `ANALYSIS_VIDEO_ID_MISMATCH`,
 `ANALYSIS_DUPLICATE_TOPIC_ID`, `ANALYSIS_DUPLICATE_RECOMMENDATION_ID`.
 
-## Lectura del paquete (`filesystem-package-source-reader.ts`)
+## Reading the package (`filesystem-package-source-reader.ts`)
 
-El bloque que hoy es `if (manifestVideo.resources.rules) { ... }` se
-reemplaza por un único `switch` exhaustivo sobre `structuredContent`:
+The block that today is `if (manifestVideo.resources.rules) { ... }` is
+replaced by a single exhaustive `switch` over `structuredContent`:
 
 ```ts
 switch (manifestVideo.resources.structuredContent) {
   case "rules": {
     const relativePath = "deliverables/rules.json";
-    // leer, parsear con parseRulesJson, empujar a documents
+    // read, parse with parseRulesJson, push into documents
     break;
   }
   case "analysis": {
     const relativePath = "deliverables/analysis.json";
-    // leer, parsear con parseAnalysisJson, empujar a documents
+    // read, parse with parseAnalysisJson, push into documents
     break;
   }
   case "none":
@@ -244,153 +245,150 @@ switch (manifestVideo.resources.structuredContent) {
 }
 ```
 
-Un paquete real trae `rules.json` **o** `analysis.json`, nunca ambos; con el
-enum, ese "nunca ambos" queda garantizado por construcción (el manifest ya
-lo rechazó como error de esquema si declaraba los dos), no sólo asumido por
-convención. El `switch` es exhaustivo: si en el futuro se agrega un tercer
-`StructuredContentKind`, `tsc` obliga a manejarlo acá antes de compilar.
+A real package carries `rules.json` **or** `analysis.json`, never both; with
+the enum, that "never both" is guaranteed by construction (the manifest already
+rejected it as a schema error if it declared both), not merely assumed by
+convention. The `switch` is exhaustive: if a third `StructuredContentKind` is
+added in the future, `tsc` forces it to be handled here before it compiles.
 
-## Unidades de conocimiento (`build-knowledge-units.ts`)
+## Knowledge units (`build-knowledge-units.ts`)
 
-Cuatro `KnowledgeUnitType` nuevos, simétricos al patrón ya usado para
-`rules_document`/`rules_section`/`rule_pattern`/hijos:
+Four new `KnowledgeUnitType`s, symmetric to the pattern already used for
+`rules_document`/`rules_section`/`rule_pattern`/children:
 
 ```ts
-"analysis_document",    // raíz, depth 0, no searchable — resumen + lens
-"analysis_section",     // depth 1 — "Summary", "Evidence boundary", "Assessment", cabecera "Topics"/"Recommendations"
-"analysis_topic",       // depth 2, hijo de la sección "Topics"
-"analysis_recommendation", // depth 2, hijo de la sección "Recommendations"
+"analysis_document",    // root, depth 0, not searchable — summary + lens
+"analysis_section",     // depth 1 — "Summary", "Evidence boundary", "Assessment", the "Topics"/"Recommendations" header
+"analysis_topic",       // depth 2, child of the "Topics" section
+"analysis_recommendation", // depth 2, child of the "Recommendations" section
 ```
 
-`assessment` no necesita su propio `unitType`: a diferencia de `topics` y
-`recommendations` (arrays con `id` propio, uno por elemento, igual que
-`patterns[]`), `assessment` es un objeto único de cuatro campos —cabe entero
-en una sola `analysis_section` searchable, igual que `coreThesis` de
-`rules.json` hoy. `evidence_boundary` recibe el mismo tratamiento que
-`evidence` en `rules.json`: una `analysis_section` searchable propia, para
-que un agente pueda recuperar directamente "qué establece la transcripción
-vs. qué es opinión del analista" sin traer todo el documento.
+`assessment` does not need a `unitType` of its own: unlike `topics` and
+`recommendations` (arrays with their own `id`, one per element, just like
+`patterns[]`), `assessment` is a single object of four fields — it fits whole
+into one searchable `analysis_section`, just like `coreThesis` of `rules.json`
+today. `evidence_boundary` gets the same treatment as `evidence` in
+`rules.json`: a searchable `analysis_section` of its own, so that an agent can
+retrieve "what the transcript establishes vs. what is the analyst's opinion"
+directly without pulling in the whole document.
 
-No hace falta migrar `search_fragments`/embeddings de forma especial: el
-pipeline de fragmentación (`fragmentKnowledgeUnits`) ya opera sobre
-`KnowledgeUnit.content`/`estimatedTokens` sin conocer el tipo de unidad.
+There is no need to migrate `search_fragments`/embeddings in any special way:
+the fragmentation pipeline (`fragmentKnowledgeUnits`) already operates on
+`KnowledgeUnit.content`/`estimatedTokens` without knowing the unit type.
 
-## Bucketing en `assembleContext` (decisión de producto)
+## Bucketing in `assembleContext` (a product decision)
 
-`classifyContextSection` (`context-blocks.ts`) usa dos sets fijos,
-`highestRelevanceTypes` y `relatedRulesTypes`, con fallback a
-`additional_context` para cualquier tipo no listado — así que technically
-esto ya "funciona" sin tocar código (todo cae en la tercera sección). La
-pregunta es si ese fallback es la ubicación correcta.
+`classifyContextSection` (`context-blocks.ts`) uses two fixed sets,
+`highestRelevanceTypes` and `relatedRulesTypes`, with a fallback to
+`additional_context` for any type not listed — so technically this already
+"works" without touching code (everything falls into the third section). The
+question is whether that fallback is the right place.
 
-Propuesta:
+Proposal:
 
 - `analysis_document`, `analysis_section`, `analysis_topic` →
-  `highestRelevanceTypes`. Cumplen el mismo rol que `context_section`/
-  `rules_section`: son la cobertura narrativa sustantiva del video —
-  `topics[]` es, en espíritu, lo que reemplaza a las secciones temáticas.
-- `analysis_recommendation` → `relatedRulesTypes`. No es literalmente una
-  "regla" ni un "patrón", pero comparte el rol funcional: contenido
-  prescriptivo/accionable derivado del análisis, más cercano en tono a
-  `rule_item`/`acceptance_criterion` que a la cobertura narrativa pura.
+  `highestRelevanceTypes`. They play the same role as `context_section`/
+  `rules_section`: they are the substantive narrative coverage of the video —
+  `topics[]` is, in spirit, what replaces the thematic sections.
+- `analysis_recommendation` → `relatedRulesTypes`. It is not literally a
+  "rule" or a "pattern", but it shares the functional role: prescriptive,
+  actionable content derived from the analysis, closer in tone to
+  `rule_item`/`acceptance_criterion` than to pure narrative coverage.
 
-**Decisión confirmada: reutilizar las dos secciones fijas del bundle ya
-aprobadas y publicadas** en `cli-contract.md` ("Highest-relevance context",
-"Related rules and patterns"), sin renombrarlas ni agregar una tercera. La
-alternativa —una cuarta sección "Assessment and recommendations"— habría sido
-más precisa semánticamente, pero cambia el contrato de cable ya consumido por
-la skill portable (`skill/SKILL.md`) y por agentes reales en producción. El
-costo de una etiqueta "Related rules and patterns" levemente imprecisa para
-una recomendación es bajo comparado con romper un contrato ya publicado, y es
-reversible más adelante si la Capa B de una futura evaluación muestra que
-confunde a los agentes.
+**Confirmed decision: reuse the two fixed bundle sections already approved and
+published** in `cli-contract.md` ("Highest-relevance context", "Related rules
+and patterns"), without renaming them or adding a third. The alternative — a
+fourth "Assessment and recommendations" section — would have been semantically
+more precise, but it changes the wire contract already consumed by the portable
+skill (`skill/SKILL.md`) and by real agents in production. The cost of a
+slightly imprecise "Related rules and patterns" label for a recommendation is
+low compared with breaking an already published contract, and it is reversible
+later on if Layer B of a future evaluation shows that it confuses agents.
 
-## Migración SQLite: el hallazgo que más cambia el alcance
+## SQLite migration: the finding that changes the scope the most
 
-`source_documents.kind` tiene hoy `CHECK (kind IN ('context', 'rules',
-'metadata'))`. Agregar `'analysis'` requiere una migración real, y
-**`open-database.ts` hoy no soporta ninguna** — sólo sabe crear el esquema
-completo en una base vacía o rechazar cualquier base que no esté ya
-exactamente en `schema_version = '1'`. No existe todavía un mecanismo para
-llevar una base existente y poblada de v1 a v2.
+`source_documents.kind` today has `CHECK (kind IN ('context', 'rules',
+'metadata'))`. Adding `'analysis'` requires a real migration, and
+**`open-database.ts` supports none today** — it only knows how to create the
+full schema in an empty database or to reject any database that is not already
+exactly at `schema_version = '1'`. No mechanism exists yet to take an existing,
+populated v1 database to v2.
 
-Dos caminos:
+Two paths:
 
-1. **Construir el primer migrador real** (`migrations/002-analysis-kind.ts` +
-   lógica en `open-database.ts` que aplique 002 sobre una base en v1: SQLite
-   no soporta `ALTER TABLE ... DROP CONSTRAINT`, así que el patrón estándar
-   es crear `source_documents` nueva con el `CHECK` correcto, copiar filas,
-   reemplazar la tabla, actualizar `schema_meta.schema_version` a `'2'`,
-   todo en una transacción). Es la solución correcta a largo plazo —
-   destraba cualquier evolución de esquema futura, no sólo esta— pero es
-   trabajo de infraestructura nuevo, no sólo una migración más.
-2. **Editar `001-initial.ts` in place** para que el `CHECK` ya incluya
-   `'analysis'` desde el origen, sin agregar una migración 002. Mucho más
-   simple, pero sólo es seguro si **no existe todavía ninguna base SQLite
-   real y persistente** construida con el esquema actual — de lo contrario
-   reescribir una migración ya aplicada rompe cualquier instalación
-   existente en silencio (`assertCompatibleVersion` seguiría viendo
-   `schema_version = '1'` pero el `CHECK` real ya no coincidiría con lo que
-   el código espera poder escribir).
+1. **Build the first real migrator** (`migrations/002-analysis-kind.ts` plus
+   logic in `open-database.ts` that applies 002 over a v1 database: SQLite
+   does not support `ALTER TABLE ... DROP CONSTRAINT`, so the standard pattern
+   is to create a new `source_documents` with the correct `CHECK`, copy the
+   rows, replace the table, update `schema_meta.schema_version` to `'2'`,
+   all in one transaction). It is the correct long-term solution — it unblocks
+   any future schema evolution, not just this one — but it is new
+   infrastructure work, not just one more migration.
+2. **Edit `001-initial.ts` in place** so that the `CHECK` already includes
+   `'analysis'` from the origin, without adding a 002 migration. Far simpler,
+   but only safe if **no real, persistent SQLite database built with the
+   current schema exists yet** — otherwise rewriting an already applied
+   migration silently breaks any existing installation
+   (`assertCompatibleVersion` would still see `schema_version = '1'` but the
+   real `CHECK` would no longer match what the code expects to be able to
+   write).
 
-**Decisión confirmada: camino 2.** El usuario confirmó que no existe ninguna
-base `.auto-youtube-rag/index.sqlite` real y persistente fuera de este
-repositorio — sólo copias temporales ya borradas de validaciones anteriores
-(2.1, 2.2, 2.3, M4). Existen dos colecciones fuente reales generadas por la
-misma skill productora (`auto-design` y `design-catalog`, esta última con
-algunos videos más), pero ninguna tiene todavía un índice SQLite persistente
-construido a partir de ellas — son colecciones de paquetes en disco, no
-bases de `auto-youtube-rag`. `design-catalog` queda anotada como candidata
-adicional para el bloque T. Si esta lectura fuera incorrecta —si en algún
-momento se creó y se conserva un índice real fuera de este repo—, avisar
-antes de que se ejecute el bloque S: editar `001-initial.ts` sobre una base
-real ya poblada la dejaría en un estado inconsistente (`CHECK` nuevo, pero
-`schema_version` desactualizada frente a lo que el código de ese momento
-esperaba).
+**Confirmed decision: path 2.** The user confirmed that no real, persistent
+`.auto-youtube-rag/index.sqlite` database exists outside this repository —
+only already deleted temporary copies from earlier validations (2.1, 2.2, 2.3,
+M4). Two real source collections generated by the same producing skill do
+exist (`auto-design` and `design-catalog`, the latter with a few more videos),
+but neither has a persistent SQLite index built from it yet — they are
+collections of packages on disk, not `auto-youtube-rag` databases.
+`design-catalog` is noted as an additional candidate for block T. If this
+reading were incorrect — if a real index was created and is still kept outside
+this repo — say so before block S is run: editing `001-initial.ts` over a
+real, already populated database would leave it in an inconsistent state (a new
+`CHECK`, but a `schema_version` out of date with respect to what the code of
+that moment expected).
 
-## Documentos a actualizar al implementar (ver T3)
+## Documents to update when implementing (see T3)
 
-- `docs/product-spec.md`: agregar `analysis.json` a la tabla de contenido
-  indexado.
-- `docs/indexing-design.md`: documentos, unidades y algoritmo de
-  sincronización.
-- `docs/context-assembly-design.md`: bucketing extendido.
-- `docs/decisions.md`: cerrar con el resultado real de la implementación
-  (T1/T2), no sólo con la decisión de diseño ya registrada.
-- `docs/agent-handoff.md`: cerrar el pendiente ya anotado.
-- `evals/queries/seed-queries.json` y una pasada de evaluación futura
-  (fuera de este bloque): las 8 consultas semilla actuales sólo ejercitan
-  contenido de `rules.json`; en algún momento conviene sembrar consultas que
-  ejerciten específicamente contenido de `analysis.json` — no es parte de
-  este diseño, se anota para no perderlo.
+- `docs/product-spec.md`: add `analysis.json` to the indexed content table.
+- `docs/indexing-design.md`: documents, units and the synchronisation
+  algorithm.
+- `docs/context-assembly-design.md`: extended bucketing.
+- `docs/decisions.md`: close with the real result of the implementation
+  (T1/T2), not just with the design decision already recorded.
+- `docs/agent-handoff.md`: close the item already noted as pending.
+- `evals/queries/seed-queries.json` and a future evaluation pass (outside
+  this block): the current 8 seed queries only exercise `rules.json` content;
+  at some point it is worth seeding queries that specifically exercise
+  `analysis.json` content — it is not part of this design, it is noted here so
+  as not to lose it.
 
-## Plan de bloques
+## Block plan
 
-- **Bloque P** — contratos: snapshots de aplicación, `ManifestResourceSnapshot`
-  extendido, `readResource` opcional, `KnowledgeUnitType` nuevos, `sourceDocumentKinds`
-  extendido.
-- **Bloque Q** — `analysis-json-parser.ts` y sus pruebas.
-- **Bloque R** — `build-knowledge-units.ts` extendido, lectura de paquete en
-  `filesystem-package-source-reader.ts`, pruebas.
-- **Bloque S** — migración SQLite (camino 1 o 2 según la decisión), bucketing
-  en `context-blocks.ts`, pruebas.
-- **Bloque T** — E2E real: copiar la colección `auto-design` (y, si el tiempo
-  lo permite, `design-catalog`), sincronizar incluyendo los videos con
-  `analysis.json`, correr `retrieve` sobre al menos una consulta semilla
-  nueva orientada a ese contenido, inspección cualitativa, verificar digest
-  SHA-256 antes/después, borrar la copia.
+- **Block P** — contracts: application snapshots, extended
+  `ManifestResourceSnapshot`, optional `readResource`, new `KnowledgeUnitType`s,
+  extended `sourceDocumentKinds`.
+- **Block Q** — `analysis-json-parser.ts` and its tests.
+- **Block R** — extended `build-knowledge-units.ts`, package reading in
+  `filesystem-package-source-reader.ts`, tests.
+- **Block S** — SQLite migration (path 1 or 2 according to the decision),
+  bucketing in `context-blocks.ts`, tests.
+- **Block T** — real E2E: copy the `auto-design` collection (and, time
+  permitting, `design-catalog`), synchronise including the videos with
+  `analysis.json`, run `retrieve` over at least one new seed query aimed at
+  that content, qualitative inspection, verify the SHA-256 digest before and
+  after, delete the copy.
 
-## Decisiones confirmadas (13 de agosto de 2026)
+## Confirmed decisions (13 August 2026)
 
-1. **Sostener ambos esquemas indefinidamente.** `rules.json`/schema 1.0 no
-   se congela ni se deprecia.
-2. **Bucketing:** reutilizar las dos secciones fijas existentes del bundle
-   (`highest_relevance` para topics, `related_rules` para recommendations)
-   sin renombrarlas. No se toca `cli-contract.md` ni `skill/SKILL.md` por
-   este cambio.
-3. **Migración SQLite:** camino 2 — editar `001-initial.ts` in place para
-   incluir `'analysis'` en el `CHECK` de `source_documents.kind` desde el
-   origen. Confirmado que no existe una base `.auto-youtube-rag/index.sqlite`
-   real y persistente que preservar; `auto-design` y `design-catalog` son
-   colecciones fuente en disco, no índices ya construidos.
-4. **Bloque T incluido** en este trabajo, no pospuesto.
+1. **Support both schemas indefinitely.** `rules.json`/schema 1.0 is neither
+   frozen nor deprecated.
+2. **Bucketing:** reuse the two existing fixed bundle sections
+   (`highest_relevance` for topics, `related_rules` for recommendations)
+   without renaming them. Neither `cli-contract.md` nor `skill/SKILL.md` is
+   touched by this change.
+3. **SQLite migration:** path 2 — edit `001-initial.ts` in place to include
+   `'analysis'` in the `CHECK` of `source_documents.kind` from the origin.
+   Confirmed that no real, persistent `.auto-youtube-rag/index.sqlite` database
+   exists to preserve; `auto-design` and `design-catalog` are source
+   collections on disk, not indexes already built.
+4. **Block T included** in this work, not postponed.
