@@ -833,237 +833,233 @@ bundle readable? do the citations resolve? does the expansion to parents
 contribute real context or only noise?) before calibrating budgets at a later
 stage.
 
-## Bugs importantes ya corregidos
+## Important bugs already fixed
 
-### Paquetes sin cambios eliminados accidentalmente
+### Unchanged packages deleted by accident
 
-Un paquete unchanged debe actualizar `last_seen_sync_id`. Para eso existen
-`listPackageRefs` y `markPackageSeen`. No elimines esta operación ni vuelvas a
-derivar “visto” sólo desde reemplazos.
+An unchanged package must update `last_seen_sync_id`. That is what
+`listPackageRefs` and `markPackageSeen` exist for. Do not remove this operation
+and do not go back to deriving "seen" only from replacements.
 
-### Preflight de Transformers.js intentaba red
+### The Transformers.js preflight attempted network access
 
-En Transformers.js 4.2, `pipeline()` realiza inspecciones antes de propagar
-`local_files_only`. El adaptador configura el entorno global local antes de
-crear el pipeline. Mantener esta secuencia o el smoke puede intentar Hugging
-Face y producir tokenizer nulo.
+In Transformers.js 4.2, `pipeline()` performs inspections before propagating
+`local_files_only`. The adapter configures the local global environment before
+creating the pipeline. Keep this sequence, or the smoke may reach for Hugging
+Face and produce a null tokenizer.
 
-### Slugs Unicode inconsistentes
+### Inconsistent Unicode slugs
 
-Manifest y dominio deben aceptar la misma forma canónica Unicode. El paquete
-real `7-estilos-de-diseño-gráfico-que-no-conocías` es la regresión. No volver a
-un patrón ASCII.
+Manifest and domain must accept the same canonical Unicode form. The real
+package `7-estilos-de-diseño-gráfico-que-no-conocías` is the regression. Do not
+go back to an ASCII pattern.
 
-### Orden de ancestros invertido en `allocateBudget` (2.3)
+### Inverted ancestor order in `allocateBudget` (2.3)
 
-El primer borrador de `context-assembly-design.md` especificaba "depth
-ascendente (el padre inmediato antes que el abuelo)" para desempatar bloques
-de ancestro con el mismo `fusedScore`. Es una contradicción: `depth` 0 es la
-raíz del documento, así que el padre inmediato de una unidad profunda tiene
-`depth` **mayor** que su abuelo, no menor. El test de `allocate-budget.test.ts`
-lo capturó de inmediato al implementar J3. La regla correcta —ya aplicada en
-código y documentación— es `depth` **descendente**. Si alguna referencia
-vieja (memoria de sesión, comentario) dice "ascendente", está desactualizada.
+The first draft of `context-assembly-design.md` specified "ascending depth (the
+immediate parent before the grandparent)" for breaking ties between ancestor
+blocks with the same `fusedScore`. It is a contradiction: `depth` 0 is the root
+of the document, so the immediate parent of a deep unit has a **greater**
+`depth` than its grandparent, not a smaller one. The `allocate-budget.test.ts`
+test caught it immediately while implementing J3. The correct rule —already
+applied in code and documentation— is **descending** `depth`. If some old
+reference (session memory, comment) says "ascending", it is out of date.
 
-### Un solo video con esquema roto bloqueaba la sincronización de toda la fuente
+### A single video with a broken schema blocked syncing the whole source
 
-Descubierto en M4 (3.2) contra la colección real `auto-design`: `sync`
-antes procesaba `manifest.videos` con un `.map()` síncrono que tiraba
-`ManifestReadError` en la primera entrada inválida, abortando la lectura del
-manifest completo. Un solo video con un campo de esquema roto (por ejemplo,
-`resources.analysis` en vez de `resources.rules`, ver "Deriva de esquema
-real" más arriba) bloqueaba la sincronización de los otros 50 videos de la
-fuente, incluidos los válidos. Corregido el 13 de agosto: `parseManifest`
-ahora descarta la entrada inválida y la reporta como `ManifestVideoIssue`
-en vez de abortar; sólo los fallos de raíz del manifest (root no objeto,
-`videos` no array, JSON inválido, archivo no legible) siguen siendo
-fatales. Detalle en `docs/decisions.md`, sección "Validación tolerante por
-video en el manifest". No revertir a un `.map()`/`throw` síncrono sin
-recrear este mismo aislamiento.
+Discovered in M4 (3.2) against the real `auto-design` collection: `sync` used
+to process `manifest.videos` with a synchronous `.map()` that threw
+`ManifestReadError` on the first invalid entry, aborting the reading of the
+whole manifest. A single video with a broken schema field (for example,
+`resources.analysis` instead of `resources.rules`, see "Real schema drift"
+above) blocked syncing the other 50 videos of the source, including the valid
+ones. Fixed on 13 August: `parseManifest` now discards the invalid entry and
+reports it as a `ManifestVideoIssue` instead of aborting; only manifest root
+failures (root not an object, `videos` not an array, invalid JSON, unreadable
+file) remain fatal. Detail in `docs/decisions.md`, section "Per-video tolerant
+validation in the manifest". Do not revert to a synchronous `.map()`/`throw`
+without recreating this same isolation.
 
-## Invariantes y límites obligatorios
+## Mandatory invariants and limits
 
-- Nunca escribir, mover ni eliminar archivos de las fuentes registradas.
-- Nunca interpretar un manifest ilegible como eliminación masiva.
-- Nunca publicar cambios vectoriales antes del commit SQLite.
-- Nunca perder la última versión válida por un fallo parcial.
-- Nunca permitir dos runs `running` sobre la misma fuente: cada run borra los
-  paquetes que no reclamó él, así que dos solapados dejan la fuente vacía.
-  Confirmado con reproducción determinista el 14 de agosto; el guard vive en
-  `recordRun` y no debe debilitarse.
-- Nunca dejar que una vía de recuperación desaparezca en silencio. Si la
-  búsqueda semántica no participa —porque no hay vectores para el modelo
-  activo— tiene que emitirse `VECTORS_STALE`. El índice vectorial además debe
-  recargar cuando cambia `version` o `dimensions`, no sólo `key`: reutilizar
-  el snapshot devuelve un conteo mayor que cero y anula ese warning.
-- Nunca acoplar dominio o aplicación a SQLite, Transformers.js o Node paths.
-- Nunca persistir `.env`, cookies, headers, URLs temporales ni metadata cruda.
-- Nunca descargar el modelo implícitamente durante tests o uso normal.
-- Nunca cambiar esquema, modelo/dimensión o dependencia nativa sin aprobación.
-- **Commitear siempre con la skill `/git-commit`, nunca con `git commit` a
-  mano.** No es una preferencia de estilo: la skill analiza el diff real para
-  elegir tipo y alcance. Detalle en `docs/development.md` → "Cómo commitear".
-- Nunca pushear, reescribir historial ni forzar sin pedido explícito: `main`
-  está publicada en un repositorio privado y el push la hace visible fuera
-  de esta máquina.
-- Antes de cada commit ejecutar al menos el test específico, `npm run check` y
-  `npm run build` según el riesgo.
-- Preservar stdout JSON y stderr para progreso.
+- Never write, move or delete files of the registered sources.
+- Never interpret an unreadable manifest as a mass deletion.
+- Never publish vector changes before the SQLite commit.
+- Never lose the last valid version because of a partial failure.
+- Never allow two `running` runs over the same source: each run deletes the
+  packages it did not claim itself, so two overlapping ones leave the source
+  empty. Confirmed with a deterministic reproduction on 14 August; the guard
+  lives in `recordRun` and must not be weakened.
+- Never let a retrieval path disappear silently. If semantic search does not
+  take part —because there are no vectors for the active model—
+  `VECTORS_STALE` has to be emitted. The vector index must also reload when
+  `version` or `dimensions` change, not just `key`: reusing the snapshot
+  returns a count greater than zero and cancels that warning.
+- Never couple domain or application to SQLite, Transformers.js or Node paths.
+- Never persist `.env`, cookies, headers, temporary URLs or raw metadata.
+- Never download the model implicitly during tests or normal use.
+- Never change the schema, the model/dimension or a native dependency without
+  approval.
+- **Always commit with the `/git-commit` skill, never with a hand-written
+  `git commit`.** This is not a style preference: the skill analyzes the real
+  diff to choose type and scope. Detail in `docs/development.md` → "How to
+  commit".
+- Never push, rewrite history or force anything without an explicit request:
+  `main` is published in a private repository and pushing makes it visible
+  outside this machine.
+- Before each commit run at least the specific test, `npm run check` and
+  `npm run build`, according to the risk.
+- Preserve JSON on stdout and stderr for progress.
 
-Invariantes propias de recuperación (2.2):
+Invariants specific to retrieval (2.2):
 
-- Nunca comparar `rawScore` entre la vía textual y la vectorial: BM25 no tiene
-  cota y coseno vive en `0..1`. Sólo se comparan posiciones (rangos).
-- Nunca asumir que la búsqueda vectorial tiene un piso de similitud: siempre
-  devuelve algo si la biblioteca (tras filtros) no está vacía.
-- Nunca dejar que `sync` y `retrieveCandidates` usen instancias distintas del
-  índice vectorial: deben compartir la misma para que un cambio publicado y una
-  consulta nunca vean vectores diferentes.
+- Never compare `rawScore` between the text path and the vector path: BM25 has
+  no bound and cosine lives in `0..1`. Only positions (ranks) are compared.
+- Never assume vector search has a similarity floor: it always returns
+  something if the library (after filters) is not empty.
+- Never let `sync` and `retrieveCandidates` use different instances of the
+  vector index: they must share the same one so that a published change and a
+  query never see different vectors.
 
-Invariantes propias de ensamblado de contexto (2.3):
+Invariants specific to context assembly (2.3):
 
-- Nunca cortar un `ContextUnitBlock` a la mitad: se incluye completo o se
-  omite entero, para que ninguna cita `[S0N]` quede apuntando a texto
-  truncado.
-- Nunca reservar ni saltar un número de cita para un bloque omitido por
-  presupuesto: `assignCitations` sólo recorre `allocation.included`.
-- Nunca volver a tokenizar en el ensamblado: `tokenCount`/`estimatedTokens`
-  ya están persistidos desde la indexación (2.1); ni `assembleContext` ni sus
-  políticas puras abren el modelo de embeddings.
-- Nunca fabricar una causa en `limitations`/"Coverage and limitations": sólo
-  se describen señales reales (`warnings` de `RetrievalOutcome`,
-  `budgetExhausted`, `omittedCount`, filtros aplicados).
-- Nunca dejar que un ancestro pise un bloque que ya llegó como candidato:
-  `origin: "candidate"` siempre gana sobre `"ancestor"` para el mismo
-  `unitId`.
-- Nunca escribir el bundle fuera de `<outputDir>/<request_id>/`; un
-  `request_id` repetido falla explícito (`WriteContextBundleError`) en vez de
-  mezclar archivos.
-- Nunca validar `--depth`/`--max-tokens` como fallo operativo (código `1`):
-  son errores de uso (código `2`), validados en `parse-command.ts`.
+- Never cut a `ContextUnitBlock` in half: it is either included whole or
+  omitted whole, so that no `[S0N]` citation ends up pointing at truncated
+  text.
+- Never reserve or skip a citation number for a block omitted for budget
+  reasons: `assignCitations` only walks `allocation.included`.
+- Never tokenize again during assembly: `tokenCount`/`estimatedTokens` are
+  already persisted from indexing (2.1); neither `assembleContext` nor its pure
+  policies open the embedding model.
+- Never fabricate a cause in `limitations`/"Coverage and limitations": only
+  real signals are described (`warnings` from `RetrievalOutcome`,
+  `budgetExhausted`, `omittedCount`, applied filters).
+- Never let an ancestor overwrite a block that already arrived as a candidate:
+  `origin: "candidate"` always wins over `"ancestor"` for the same `unitId`.
+- Never write the bundle outside `<outputDir>/<request_id>/`; a repeated
+  `request_id` fails explicitly (`WriteContextBundleError`) instead of mixing
+  files.
+- Never validate `--depth`/`--max-tokens` as an operational failure (code `1`):
+  they are usage errors (code `2`), validated in `parse-command.ts`.
 
-## Punto 2.2 completado — recuperación híbrida
+## Point 2.2 completed — hybrid retrieval
 
-Bloques F–H están completados (contratos, adaptadores, orquestación). Detalle
-completo en `docs/retrieval-design.md`.
+Blocks F–H are completed (contracts, adapters, orchestration). Full detail in
+`docs/retrieval-design.md`.
 
-Decisiones cerradas durante 2.2 que no deben reabrirse sin motivo:
+Decisions closed during 2.2 that should not be reopened without cause:
 
-- Fusión: RRF ponderado (`k = 60`, `wText = wVector = 1.0`) detrás de
-  `FusionStrategy`, sustituible para la calibración de 3.2. Se descartó la
-  cascada porque descarta hits exclusivos de una vía sin ganar rendimiento a
-  esta escala.
-- `VectorIndexSink` fue reemplazado por `VectorSearchIndex` en `sync` y en la
-  aplicación: una sola instancia (`InMemoryVectorSearchIndex`) recibe los
-  cambios publicados y sirve las consultas, así que nunca pueden divergir.
-- Los identificadores de fragmento y documento **no se persisten**; son
-  funciones puras de columnas que sí existen (`fragment:sha256(unitId):ordinal`
-  y `document:<source>:<video>:<kind>`). Los adaptadores los reconstruyen. Ver
-  la nota en `retrieval-design.md` antes de considerar un cambio de esquema.
-- El índice vectorial invalida su snapshot completo en `apply` en vez de
-  parchear: `VectorIndexChange` no transporta tipo de unidad ni idioma, y un
-  parche dejaría entradas nuevas imposibles de filtrar.
-- La hidratación de procedencia ocurre **antes** de deduplicar y diversificar,
-  no después como sugería el primer borrador del diseño: `RankedHit` sólo lleva
-  `fragmentId`, y ni la deduplicación por `unitId` ni la diversidad por video
-  son posibles sin conocer la procedencia.
-- **La búsqueda vectorial no tiene piso de similitud.** Es un ranking
-  exhaustivo: toda consulta sobre una biblioteca no vacía (tras filtros)
-  devuelve candidatos, aunque la similitud real sea baja. `status: "no_results"`
-  sólo ocurre si el filtro deja la biblioteca vacía o si ambas vías fallan. Un
-  umbral mínimo queda pendiente de calibración en 3.2.
-- 2.2 no exponía superficie de CLI; `retrieve` se implementó recién al cerrar
-  2.3 (ver la sección siguiente).
+- Fusion: weighted RRF (`k = 60`, `wText = wVector = 1.0`) behind
+  `FusionStrategy`, replaceable for the 3.2 calibration. The cascade was
+  discarded because it drops hits exclusive to one path without gaining
+  performance at this scale.
+- `VectorIndexSink` was replaced by `VectorSearchIndex` in `sync` and in the
+  application: a single instance (`InMemoryVectorSearchIndex`) receives the
+  published changes and serves the queries, so they can never diverge.
+- The fragment and document identifiers **are not persisted**; they are pure
+  functions of columns that do exist (`fragment:sha256(unitId):ordinal` and
+  `document:<source>:<video>:<kind>`). The adapters rebuild them. See the note
+  in `retrieval-design.md` before considering a schema change.
+- The vector index invalidates its whole snapshot on `apply` instead of
+  patching it: `VectorIndexChange` carries neither unit type nor language, and
+  a patch would leave new entries impossible to filter.
+- Provenance hydration happens **before** deduplicating and diversifying, not
+  afterwards as the first draft of the design suggested: `RankedHit` only
+  carries `fragmentId`, and neither deduplication by `unitId` nor per-video
+  diversity is possible without knowing the provenance.
+- **Vector search has no similarity floor.** It is an exhaustive ranking: every
+  query over a non-empty library (after filters) returns candidates, even if
+  the real similarity is low. `status: "no_results"` only happens if the filter
+  leaves the library empty or if both paths fail. A minimum threshold remains
+  pending calibration in 3.2.
+- 2.2 exposed no CLI surface; `retrieve` was implemented only when closing 2.3
+  (see the next section).
 
-Validación completa, incluida la decisión explícita de no correr la pasada
-cualitativa sobre la colección real, en
-["Última validación conocida"](#última-validación-conocida) → "Puerta final de
-2.2".
+Complete validation, including the explicit decision not to run the qualitative
+pass over the real collection, in
+["Last known validation"](#last-known-validation) → "Final gate of 2.2".
 
-## Punto 2.3 completado — ensamblado de contexto
+## Point 2.3 completed — context assembly
 
-Bloques I–L están completados (contratos, expansión/deduplicación/presupuesto/
-citas, redacción, orquestación, CLI). Detalle completo en
-`docs/context-assembly-design.md`.
+Blocks I–L are completed (contracts,
+expansion/deduplication/budget/citations, rendering, orchestration, CLI). Full
+detail in `docs/context-assembly-design.md`.
 
-Decisiones cerradas durante 2.3 que no deben reabrirse sin motivo (registradas
-también en `decisions.md`):
+Decisions closed during 2.3 that should not be reopened without cause (also
+recorded in `decisions.md`):
 
-- Bucketing fijo por `unitType`: documento/sección siempre a "Highest-relevance
-  context", reglas/patrones siempre a "Related rules and patterns", nunca por
-  puntaje puro.
-- Los ancestros de expansión caen siempre en "Additional relevant context",
-  aunque el ancestro sea en sí una regla relevante.
-- Un bloque único que por sí solo excede el presupuesto se incluye igual —el
-  bundle nunca queda vacío habiendo evidencia real— y el presupuesto se marca
-  agotado de inmediato después.
-- Deduplicación en dos niveles desde el inicio: por `unitId` (estructural) y
-  por `contentHash` (contenido idéntico bajo unidades distintas).
-- `request_id` usa el mismo generador ad-hoc que `SyncId`, sin depender de
+- Fixed bucketing by `unitType`: document/section always to "Highest-relevance
+  context", rules/patterns always to "Related rules and patterns", never by
+  raw score.
+- Expansion ancestors always fall into "Additional relevant context", even if
+  the ancestor is itself a relevant rule.
+- A single block that alone exceeds the budget is included anyway —the bundle
+  is never empty when real evidence exists— and the budget is marked exhausted
+  immediately afterwards.
+- Deduplication at two levels from the start: by `unitId` (structural) and by
+  `contentHash` (identical content under different units).
+- `request_id` uses the same ad-hoc generator as `SyncId`, without depending on
   ULID.
-- `result.json` usa `snake_case` porque es el contrato de cable ya aprobado;
-  `CitationRecord`/`ContextUnitBlock` internos siguen en `camelCase`.
-  `renderContextResult` es el único punto de traducción entre ambos.
-- Presupuestos por profundidad (`focused` 12k / `balanced` 32k / `deep` 64k)
-  confirmados sin recalibrar en este punto; la calibración queda para 3.2.
+- `result.json` uses `snake_case` because it is the already approved wire
+  contract; the internal `CitationRecord`/`ContextUnitBlock` stay in
+  `camelCase`. `renderContextResult` is the only translation point between the
+  two.
+- Budgets by depth (`focused` 12k / `balanced` 32k / `deep` 64k) confirmed
+  without recalibrating at this point; calibration is left for 3.2.
 
-Presupuestos de contexto por profundidad ya no aparece como pendiente de
-decisión en `decisions.md`: quedó confirmado el 12 de agosto de 2026.
+Context budgets by depth no longer appear as a pending decision in
+`decisions.md`: they were confirmed on 12 August 2026.
 
-## Punto 2.4 completado — skill general
+## Point 2.4 completed — general skill
 
-`skill/SKILL.md` invoca la CLI ya completa (`init`, `source add/list/remove`,
-`sync`, `retrieve`, `status`, `doctor`) sin lógica específica de proveedor.
-`rebuild` se documenta explícitamente como no disponible todavía.
+`skill/SKILL.md` invokes the already complete CLI (`init`,
+`source add/list/remove`, `sync`, `retrieve`, `status`, `doctor`) with no
+provider-specific logic. `rebuild` is explicitly documented as not yet
+available.
 
-Decisiones cerradas durante 2.4 que no deben reabrirse sin motivo:
+Decisions closed during 2.4 that should not be reopened without cause:
 
-- Ubicación: `skill/SKILL.md` en la raíz del repo, tal como ya aprobaba el
-  árbol conceptual de `product-spec.md` (`skill/` a secas, sin anidar un
-  directorio con el nombre del proyecto adentro).
-- Autocontención: el contenido esencial del contrato de CLI (comandos, flags,
-  exit codes, forma del recibo JSON, códigos simbólicos) está embebido
-  directamente en `SKILL.md`, no referenciado por ruta relativa a `docs/`,
-  porque la skill debe poder instalarse o enlazarse fuera de este
-  repositorio.
-- Invocación: la skill asume `auto-youtube-rag <comando>` como forma
-  canónica (igual que `cli-contract.md`) y documenta `node
-"<ruta-al-repo>/dist/main.js" <comando>` como respaldo, porque el binario
-  no está enlazado globalmente (`npm link`) en este entorno de desarrollo.
-- Verificación: **"en frío"**, con un subagente sin contexto previo del
-  proyecto (no leyó `docs/` ni `src/`, sólo el texto de la skill) contra una
-  copia temporal de dos videos reales de `auto-design` — nunca contra la
-  colección original. Dos corridas:
-  1. La primera corrida reveló un hueco crítico: la skill no mencionaba
-     `init` como paso previo obligatorio. Sin él, `status`/`doctor`/
-     `source add` fallan con `ERR_SQLITE_ERROR: unable to open database
-file`, un código que la skill tampoco explicaba. Corregido agregando
-     `init` como paso 1 del flujo recomendado.
-  2. La segunda corrida, con la skill corregida, completó el flujo completo
-     (`init` → `status` → `source add` → `sync` → `retrieve` → lectura de
-     `context.md`/`result.json` → cita con procedencia) sin inspeccionar
-     `src/` ni inventar sintaxis, y confirmó que las citas `[S0N]` resuelven
-     correctamente contra `result.json`. Encontró dos ambigüedades menores,
-     ya corregidas en el texto: (a) el mismo `ERR_SQLITE_ERROR` también
-     puede deberse a un `cwd` inconsistente entre invocaciones, no sólo a
-     `init` faltante — la base de datos por defecto era relativa a
-     `<cwd>/.auto-youtube-rag/` **cuando se escribió esto**; el punto 4.2 la
-     movió al hogar de usuario y reemplazó ese error crudo por
-     `LIBRARY_NOT_FOUND`, así que este hallazgo ya no aplica; (b) `source
-add` espera la ruta a la
-     carpeta `videos/` en sí, no a su carpeta padre, y el `collection_path`
-     del recibo puede quedar un nivel arriba de esa ruta sin que eso sea un
-     error.
-  3. **Verificación específica en Codex (agente externo real, no simulado)
-     no se ejecutó** — el usuario eligió explícitamente cerrar 2.4 con sólo
-     verificación en Claude Code por ahora. Si aparece un problema de
-     interpretación de la skill específico de Codex, o antes de considerar
-     el punto "verificado en dos proveedores" en un sentido estricto, correr
-     la misma skill desde Codex contra una colección de prueba y reportar
-     resultado.
-- No se modificó ningún archivo de `src/`, `docs/cli-contract.md` ni
-  `docs/product-spec.md`: 2.4 fue estrictamente documentación de uso sobre
-  una CLI ya cerrada.
+- Location: `skill/SKILL.md` at the root of the repo, exactly as the conceptual
+  tree of `product-spec.md` already approved (plain `skill/`, without nesting a
+  directory named after the project inside it).
+- Self-containment: the essential content of the CLI contract (commands, flags,
+  exit codes, shape of the JSON receipt, symbolic codes) is embedded directly
+  in `SKILL.md`, not referenced by a path relative to `docs/`, because the
+  skill must be installable or linkable outside this repository.
+- Invocation: the skill assumes `auto-youtube-rag <command>` as the canonical
+  form (same as `cli-contract.md`) and documents
+  `node "<path-to-repo>/dist/main.js" <command>` as a fallback, because the
+  binary is not globally linked (`npm link`) in this development environment.
+- Verification: **"cold"**, with a subagent with no prior context of the
+  project (it read neither `docs/` nor `src/`, only the text of the skill)
+  against a temporary copy of two real `auto-design` videos — never against the
+  original collection. Two runs:
+  1. The first run revealed a critical gap: the skill did not mention `init` as
+     a mandatory previous step. Without it, `status`/`doctor`/`source add` fail
+     with `ERR_SQLITE_ERROR: unable to open database file`, a code the skill
+     did not explain either. Fixed by adding `init` as step 1 of the
+     recommended flow.
+  2. The second run, with the corrected skill, completed the whole flow
+     (`init` → `status` → `source add` → `sync` → `retrieve` → reading
+     `context.md`/`result.json` → citation with provenance) without inspecting
+     `src/` or inventing syntax, and confirmed that the `[S0N]` citations
+     resolve correctly against `result.json`. It found two minor ambiguities,
+     already corrected in the text: (a) the same `ERR_SQLITE_ERROR` can also be
+     caused by an inconsistent `cwd` between invocations, not only by a missing
+     `init` — the default database was relative to `<cwd>/.auto-youtube-rag/`
+     **when this was written**; point 4.2 moved it to the user home and
+     replaced that raw error with `LIBRARY_NOT_FOUND`, so this finding no
+     longer applies; (b) `source add` expects the path to the `videos/` folder
+     itself, not to its parent folder, and the receipt's `collection_path` may
+     end up one level above that path without that being an error.
+  3. **Specific verification on Codex (a real external agent, not a simulated
+     one) was not run** — the user explicitly chose to close 2.4 with
+     verification on Claude Code only for now. If a Codex-specific problem of
+     skill interpretation appears, or before considering the point "verified on
+     two providers" in a strict sense, run the same skill from Codex against a
+     test collection and report the result.
+- No file of `src/`, `docs/cli-contract.md` or `docs/product-spec.md` was
+  modified: 2.4 was strictly usage documentation over an already closed CLI.
 
 ## Punto 3.2 completado — evaluaciones del MVP
 
