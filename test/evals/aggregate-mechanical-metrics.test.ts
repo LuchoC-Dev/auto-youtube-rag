@@ -29,6 +29,7 @@ function result(
       units_selected: overrides.unitsSelected ?? 3,
       sources_used: overrides.sourcesUsed ?? 2,
       estimated_tokens: overrides.estimatedTokens ?? 500,
+      top_vector_similarity: 0.88,
     },
     units: [],
     sources: [],

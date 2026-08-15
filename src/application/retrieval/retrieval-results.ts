@@ -69,6 +69,21 @@ export interface RetrievalMetrics {
   readonly returnedCandidates: number;
   readonly videosCovered: number;
   readonly sourcesCovered: number;
+  /**
+   * Cosine of the closest vector hit, or `null` when the semantic path did not
+   * run or returned nothing.
+   *
+   * Reported on every query, not only when it trips `LOW_RELEVANCE`, so the
+   * consuming agent can judge with its own criteria instead of inheriting a
+   * threshold calibrated against one collection. The product states the
+   * evidence; deciding what it means is the agent's job, which is the same
+   * division of labour the whole design rests on.
+   *
+   * It is a similarity in the embedding space, not a percentage of relevance:
+   * E5 compresses everything into roughly 0.81..0.90, so a high-looking number
+   * can still mean the library holds nothing on topic.
+   */
+  readonly topVectorSimilarity: number | null;
 }
 
 export type RetrievalWarningCode =

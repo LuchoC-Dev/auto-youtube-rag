@@ -49,6 +49,12 @@ export interface ContextResultDocument {
     readonly units_selected: number;
     readonly sources_used: number;
     readonly estimated_tokens: number;
+    /**
+     * Cosine of the closest semantic match, or `null` when the vector path did
+     * not run. Always reported, so the agent can weigh relevance itself rather
+     * than only learning about it when `LOW_RELEVANCE` fires.
+     */
+    readonly top_vector_similarity: number | null;
   };
   readonly units: readonly ContextResultUnit[];
   readonly sources: readonly ContextResultSource[];

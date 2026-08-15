@@ -97,6 +97,41 @@ cada uno de esos casos, y sumar `LOW_RELEVANCE` sólo agregaría ruido.
 | "síntomas de la diabetes tipo 2"      | 0,8206 | **sí**  |
 | "historia de la revolución francesa"  | 0,8149 | **sí**  |
 
+## El número se reporta siempre, no sólo cuando avisa
+
+`metrics.top_vector_similarity` lleva el coseno del mejor hit vectorial en
+**cada** consulta (o `null` si la vía semántica no corrió). El aviso es un
+juicio con un umbral discutible; el número es el dato.
+
+La razón es la filosofía del producto: el agente que consulta es el único
+cerebro. Decidir qué significa un 0,84 es exactamente el tipo de juicio que el
+diseño delega en él, así que darle sólo el veredicto —y no la evidencia— sería
+incoherente. Con el número puede aplicar su propio criterio, o calibrar otro
+umbral para su corpus sin tocar el producto.
+
+También corrige un riesgo que el aviso solo introduce: **falsa confianza por
+ausencia**. Un agente podría razonar "no hay `LOW_RELEVANCE`, entonces esto es
+relevante", y es falso — el umbral puede no dispararse con contenido
+tangencial. Teniendo el número, la ausencia de aviso deja de ser la única
+información disponible.
+
+Lo estrecho del margen quedó demostrado en la primera corrida real tras
+implementarlo: "síntomas de la diabetes tipo 2" midió **0,8399** contra un piso
+de 0,84. Una diezmilésima más y no habría avisado, con el contenido siendo
+igual de irrelevante.
+
+## Limitación conocida: la vía textual no participa
+
+El juicio se apoya sólo en el coseno vectorial. Si FTS5 encontrara una
+coincidencia léxica exacta —señal fuerte de relevancia— pero el coseno quedara
+bajo el piso, el aviso saltaría igual: un falso positivo.
+
+En la práctica es poco probable, porque un término presente en la colección
+suele elevar también el coseno. Y el costo está acotado por diseño: como el
+aviso informa y no filtra, un falso positivo cuesta una advertencia de más,
+nunca contenido perdido. Pero el criterio no cubre ese caso y conviene saberlo
+antes de subir el umbral.
+
 ## Fuera de alcance
 
 - **Filtrar o descartar candidatos por umbral.** Se mantiene la decisión de

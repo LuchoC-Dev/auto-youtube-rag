@@ -217,6 +217,17 @@ cuando `status` es `incomplete`, listando cada archivo requerido ausente
 (`reason: "missing"`) o de tamaño distinto al recibo (`reason:
 "size_mismatch"`) — nunca hashea los ~130 MB.
 
+#### Métrica `top_vector_similarity`
+
+`result.json` incluye en `metrics` el coseno del mejor resultado de la vía
+semántica, en **toda** consulta, o `null` si esa vía no corrió. Es el dato
+crudo detrás de `LOW_RELEVANCE`: se reporta dispare o no la advertencia, para
+que el agente juzgue la relevancia con su propio criterio en vez de heredar un
+umbral calibrado sobre una colección concreta.
+
+No es un porcentaje de relevancia: es distancia en el espacio de embeddings, y
+E5 comprime todo entre 0,81 y 0,90.
+
 #### Advertencia `LOW_RELEVANCE`
 
 `retrieve` la emite cuando el mejor puntaje de similitud de la vía vectorial

@@ -421,3 +421,45 @@ void test("honours an injected relevance floor over the calibrated default", asy
   assert.ok(warning);
   assert.match(warning.message, /0\.95/u);
 });
+
+void test("reports the top vector similarity on every query, warning or not", async () => {
+  const scenario = setup();
+  const seeded = seedFragment(scenario.knowledgeRepository, "on-topic");
+
+  scenario.vectorIndex.hits = [
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: 0.8914 },
+  ];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "jerarquía tipográfica" }),
+  );
+
+  // Reported even when nothing is wrong: the agent gets the raw number and
+  // judges relevance itself, instead of only hearing about it through a
+  // threshold calibrated on one collection.
+  assert.equal(outcome.metrics.topVectorSimilarity, 0.8914);
+  assert.deepEqual(
+    outcome.warnings.filter((entry) => entry.code === "LOW_RELEVANCE"),
+    [],
+  );
+});
+
+void test("reports a null similarity when the vector path contributed nothing", async () => {
+  const scenario = setup();
+  const seeded = seedFragment(scenario.knowledgeRepository, "only-text");
+
+  scenario.vectorIndex.failure = new Error("model missing");
+  scenario.textIndex.hits = [
+    { fragmentId: seeded.fragmentId, rank: 1, rawScore: -1 },
+  ];
+
+  const outcome = await retrieveCandidates(
+    scenario.dependencies,
+    RetrievalQuery.create({ text: "brutalismo" }),
+  );
+
+  // Null, not zero: no measurement happened, which is different from a
+  // measurement that came out low.
+  assert.equal(outcome.metrics.topVectorSimilarity, null);
+});

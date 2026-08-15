@@ -58,6 +58,7 @@ function sampleBundle(
         units_selected: overrides.status === "no_results" ? 0 : 1,
         sources_used: overrides.status === "no_results" ? 0 : 1,
         estimated_tokens: overrides.status === "no_results" ? 0 : 10,
+        top_vector_similarity: 0.88,
       },
       units: [],
       sources: [],

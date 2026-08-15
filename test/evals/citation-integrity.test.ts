@@ -49,6 +49,7 @@ function bundle(input: {
         units_selected: input.units.length,
         sources_used: 1,
         estimated_tokens: 10 * input.units.length,
+        top_vector_similarity: 0.88,
       },
       units: input.units,
       sources: [],
