@@ -276,4 +276,4 @@ CLI: elegir modelo requiere aprobación y reindexación, y no es este punto.
 
 Orden de ejecución: AA → AB → AC → AD, estrictamente secuencial. AB y AC
 dependen de AA; AD es un rename mecánico que sólo tiene sentido con el
-comportamiento ya cerrado. Detalle fino en `docs/model-profile-tasks.md`.
+comportamiento ya cerrado.
