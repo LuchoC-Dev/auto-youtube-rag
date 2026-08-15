@@ -10,8 +10,8 @@ cerebro generativo. Todo corre en tu máquina, sin APIs externas.
 
 **Estado: completo y en uso.** El MVP (indexación incremental, recuperación
 híbrida, ensamblado de contexto y skill portable) está cerrado, y también los
-siete puntos posteriores, hasta `rebuild`. No queda ningún comando del
-contrato sin implementar. Ver [`docs/build.md`](docs/build.md).
+siete puntos posteriores, hasta el aviso de baja relevancia. No queda ningún
+comando del contrato sin implementar. Ver [`docs/build.md`](docs/build.md).
 
 ## Instalación
 
