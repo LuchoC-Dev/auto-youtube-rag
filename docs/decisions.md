@@ -381,7 +381,7 @@ with the already split skill remains pending.
 ## Installation: user home, `init` as installer, and preflight (point 4.2)
 
 Implemented on 13 and 14 August 2026. Full design in `docs/install-design.md`.
-It closes the open item "Default del caché del modelo" that the cold run had
+It closes the open item "Model cache default" that the cold run had
 opened.
 
 The investigation started from a symptom — 63 `MODEL_LOAD_FAILED` issues — and
@@ -503,7 +503,7 @@ heading.
 ## `sync` safety and batch size (point 4.3)
 
 Implemented on 14 August 2026. Design in `docs/sync-safety-design.md`. It closes
-the open item "Guard de concurrencia en `sync`".
+the open item "Concurrency guard in `sync`".
 
 **Cross-deletion was confirmed, not assumed.** The deterministic reproduction
 shows that two overlapping runs over one source leave it completely empty: each
