@@ -4,9 +4,17 @@
 
 **Cerrado el 13 de agosto de 2026.** Los bloques M (Capa A mecánica), N
 (Capa B juzgada) y O (calibración y cierre) de
-[`docs/eval-tasks.md`](../../../docs/eval-tasks.md) están completos. Este
+[`docs/eval-design.md`](../../../docs/eval-design.md) están completos. Este
 documento es el reporte final del punto 3.2, el último bloque abierto del
 MVP según `docs/build.md`.
+
+**Nota sobre los bundles:** los 24 bundles generados (`context.md` y
+`result.json` por consulta y profundidad) no se versionan en este
+repositorio porque contienen texto verbatim derivado de videos de YouTube de
+terceros. Se pueden regenerar corriendo `evals/run-seed-queries.ts` sobre
+`evals/queries/seed-queries.json` contra una colección propia. Los juicios de
+Capa B (`judgments/claude/`, `judgments/codex/`) sí se conservan: son
+evidencia propia del proyecto, no contenido de terceros.
 
 ## Resumen ejecutivo
 
