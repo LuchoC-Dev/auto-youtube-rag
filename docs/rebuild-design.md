@@ -1,169 +1,164 @@
-# Diseño 4.6: el comando `rebuild --confirm`
+# Design 4.6: the `rebuild --confirm` command
 
-## Estado
+## Status
 
-**Propuesto el 14 de agosto de 2026. Pendiente de aprobación explícita.**
+**Proposed on 14 August 2026. Pending explicit approval.**
 
-Es el punto 2 del orden de prioridad fijado por el usuario el 14 de agosto. El
-punto 1 —ordenar fragmentos por longitud antes de lotear— quedó cerrado sin
-implementar: es inerte con el `batchSize = 1` que adoptó 4.3 (ver "Por qué el
-punto 1 se cerró sin código" más abajo).
+It is point 2 of the priority order set by the user on 14 August. Point 1 —
+sorting fragments by length before batching — was closed without implementation:
+it is inert with the `batchSize = 1` that 4.3 adopted (see "Why point 1 was
+closed without code" below).
 
-`rebuild` es el único comando cuyo contrato público está aprobado en
-`cli-contract.md` desde el MVP y nunca se implementó.
+`rebuild` is the only command whose public contract has been approved in
+`cli-contract.md` since the MVP and was never implemented.
 
-## El problema que resuelve
+## The problem it solves
 
-`sync` es incremental por diseño: `unchanged()` compara el hash del paquete
-en disco contra el persistido, y si coinciden marca el paquete visto sin
-recalcular nada. Eso es correcto y es lo que hace que un `sync` sobre 51
-videos sin cambios termine en segundos.
+`sync` is incremental by design: `unchanged()` compares the hash of the package
+on disk against the persisted one, and if they match it marks the package seen
+without recomputing anything. That is correct and it is what makes a `sync` over
+51 unchanged videos finish in seconds.
 
-Pero `unchanged()` sólo mira **el contenido de la fuente y la identidad del
-modelo** (`key`/`version`/`dimensions`). No mira nada más del pipeline
-derivado. Hay al menos cuatro cambios reales, ya ocurridos o previsibles, que
-invalidan el índice sin que `sync` pueda notarlo:
+But `unchanged()` only looks at **the source's content and the model's identity**
+(`key`/`version`/`dimensions`). It looks at nothing else in the derived pipeline.
+There are at least four real changes, already occurred or foreseeable, that
+invalidate the index without `sync` being able to notice:
 
-1. **Tamaño de lote de embeddings.** 4.3 bajó el default de 16 a 1 y midió
-   una desviación de coseno de 4,8×10⁻³ entre ambos. El diseño de 4.3 declaró
-   explícitamente que el lote **no** forma parte de la identidad del modelo,
-   así que una biblioteca existente conserva sus vectores viejos: quedan
-   vectores mezclados y "reindexar es recomendable pero no obligatorio". Hoy
-   no existe ninguna forma de ejercer esa recomendación salvo borrar el
-   archivo SQLite a mano.
-2. **Cambios de parser.** `source_documents.parser_version` se persiste por
-   documento precisamente porque un parser nuevo produce unidades distintas
-   del mismo byte de entrada. `unchanged()` no lo compara.
-3. **Cambios de fragmentación o de tipos de unidad.** 4.1 agregó cuatro
-   `KnowledgeUnitType` nuevos; un cambio equivalente futuro no re-fragmenta
-   paquetes ya indexados.
-4. **Cambio de perfil de modelo.** 4.5 hizo que la política de prefijos
-   participe de `modelVersion`, así que ese caso **sí** dispara reindexación
-   automática — es el único de los cuatro que ya está cubierto, y conviene
-   dejar constancia de por qué no necesita `rebuild`.
+1. **Embedding batch size.** 4.3 lowered the default from 16 to 1 and measured a
+   cosine deviation of 4.8×10⁻³ between the two. The design of 4.3 explicitly
+   declared that the batch is **not** part of the model's identity, so an
+   existing library keeps its old vectors: mixed vectors remain and "reindexing
+   is advisable but not mandatory". Today there is no way of acting on that
+   recommendation short of deleting the SQLite file by hand.
+2. **Parser changes.** `source_documents.parser_version` is persisted per
+   document precisely because a new parser produces different units from the same
+   input byte. `unchanged()` does not compare it.
+3. **Fragmentation or unit type changes.** 4.1 added four new
+   `KnowledgeUnitType`s; an equivalent future change does not re-fragment
+   already-indexed packages.
+4. **Model profile change.** 4.5 made the prefix policy take part in
+   `modelVersion`, so that case **does** trigger automatic reindexing — it is the
+   only one of the four already covered, and it is worth recording why it does
+   not need `rebuild`.
 
-En los tres primeros casos la biblioteca queda internamente inconsistente sin
-ninguna señal: `doctor` reporta `ok`, `retrieve` devuelve resultados y nadie
-se entera. Es exactamente la forma de defecto que la sesión del 13 y 14 de
-agosto identificó como la más cara: _el sistema responde correctamente
-mientras algo está roto_.
+In the first three cases the library is left internally inconsistent with no
+signal whatsoever: `doctor` reports `ok`, `retrieve` returns results and nobody
+finds out. It is exactly the form of defect that the session of 13 and 14 August
+identified as the costliest: _the system answers correctly while something is
+broken_.
 
-## Qué hace exactamente
+## What it does exactly
 
 ```text
 auto-youtube-rag rebuild --confirm
 ```
 
-Tres fases, en orden, sobre la biblioteca del hogar de usuario:
+Three phases, in order, over the user home's library:
 
-1. **Purga** todo el índice derivado.
-2. **Re-sincroniza** cada fuente registrada, en el orden en que las devuelve
-   el registro, reutilizando `syncSource` sin duplicar una línea de su
-   lógica.
-3. **Emite un recibo** agregado que suma lo que reportó cada `sync`.
+1. **Purges** the entire derived index.
+2. **Re-synchronises** each registered source, in the order the registry returns
+   them, reusing `syncSource` without duplicating a single line of its logic.
+3. **Emits an aggregate receipt** summing what each `sync` reported.
 
-### Por qué re-sincroniza en vez de sólo purgar
+### Why it re-synchronises instead of only purging
 
-El contrato dice "**regenera** el índice derivado", no "borra". Una purga
-seca dejaría la biblioteca vacía y silenciosamente inservible hasta que el
-usuario se acuerde de correr `sync` — el peor estado posible para un comando
-cuyo propósito es reparar. Un agente consumidor que ejecute `rebuild` y
-después `retrieve` obtendría `no_results` sin ninguna explicación.
+The contract says "**regenerates** the derived index", not "deletes". A dry purge
+would leave the library empty and silently useless until the user remembers to
+run `sync` — the worst possible state for a command whose purpose is to repair. A
+consuming agent that ran `rebuild` and then `retrieve` would get `no_results`
+with no explanation at all.
 
-Como `rebuild` deja el mismo estado que un `sync` completo desde cero, es
-además idempotente en el sentido que importa: correrlo dos veces seguidas
-produce la misma biblioteca.
+Since `rebuild` leaves the same state as a complete `sync` from scratch, it is
+also idempotent in the sense that matters: running it twice in a row produces the
+same library.
 
-### Qué se borra y qué sobrevive
+### What is deleted and what survives
 
-La frontera se lee directamente del esquema de `001-initial.ts`:
+The boundary is read directly from the schema of `001-initial.ts`:
 
-| Tabla                                                                   | Destino    | Por qué                                                                                     |
-| ----------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------- |
-| `video_packages`                                                        | se borra   | Derivado: se reconstruye leyendo el manifest y los paquetes                                 |
-| `source_documents`, `knowledge_units`, `search_fragments`, `embeddings` | se borran  | Cascada de `video_packages`; ningún dato propio no derivable                                |
-| `fragment_fts`                                                          | se vacía   | Los triggers `fragment_fts_delete` la mantienen alineada sola                               |
-| `sources`                                                               | **queda**  | Es configuración del usuario, no derivado. Borrarla haría a `rebuild` destructivo de verdad |
-| `schema_meta`                                                           | **queda**  | La versión de esquema no cambia; `rebuild` no es una migración                              |
-| `sync_runs`, `sync_issues`                                              | **quedan** | Historial de operaciones, no derivado del contenido                                         |
+| Table                                                                   | Fate     | Why                                                                                                 |
+| ----------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| `video_packages`                                                        | deleted  | Derived: rebuilt by reading the manifest and the packages                                           |
+| `source_documents`, `knowledge_units`, `search_fragments`, `embeddings` | deleted  | Cascade from `video_packages`; no non-derivable data of their own                                   |
+| `fragment_fts`                                                          | emptied  | The `fragment_fts_delete` triggers keep it aligned on their own                                     |
+| `sources`                                                               | **kept** | It is the user's configuration, not derived. Deleting it would make `rebuild` genuinely destructive |
+| `schema_meta`                                                           | **kept** | The schema version does not change; `rebuild` is not a migration                                    |
+| `sync_runs`, `sync_issues`                                              | **kept** | Operation history, not derived from the content                                                     |
 
-Preservar el historial de runs sigue un precedente ya establecido, no una
-preferencia nueva: `source remove` "removes catalog derivatives but preserves
-detached run history" (su propio test lo fija), y `sync_runs.source_id` es
-`ON DELETE SET NULL` justamente para permitirlo. Un `rebuild` que borrara el
-historial destruiría la única evidencia de por qué alguien tuvo que
-reconstruir.
+Preserving the run history follows an already established precedent, not a new
+preference: `source remove` "removes catalog derivatives but preserves detached
+run history" (its own test pins it), and `sync_runs.source_id` is
+`ON DELETE SET NULL` precisely to allow it. A `rebuild` that deleted the history
+would destroy the only evidence of why someone had to rebuild.
 
-Consecuencia aceptada: quedan filas en `sync_runs` sin ningún
-`video_packages` que las referencie. Es el mismo estado desprendido que ya
-produce `source remove`, y `doctor` no lo trata como error.
+Accepted consequence: rows remain in `sync_runs` with no `video_packages`
+referencing them. It is the same detached state that `source remove` already
+produces, and `doctor` does not treat it as an error.
 
-### La purga va en una sola transacción
+### The purge goes in a single transaction
 
-Un `rebuild` interrumpido a mitad de la purga no debe dejar media biblioteca.
-El borrado de `video_packages` de todas las fuentes ocurre en un único
-`BEGIN IMMEDIATE`, igual que `applyPackage`. La re-sincronización posterior
-**no** entra en esa transacción: cada `syncSource` gestiona las suyas, y un
-fallo parcial de una fuente debe comportarse exactamente como en un `sync`
-normal (issue registrado, run `partial`), no revertir la purga entera.
+A `rebuild` interrupted halfway through the purge must not leave half a library.
+The deletion of `video_packages` for every source happens in a single
+`BEGIN IMMEDIATE`, just like `applyPackage`. The subsequent re-synchronisation
+does **not** enter that transaction: each `syncSource` manages its own, and a
+partial failure of one source must behave exactly as in a normal `sync` (issue
+recorded, run `partial`), not revert the entire purge.
 
-Esto implica una ventana real: si el proceso muere entre la purga y el fin de
-la re-sincronización, la biblioteca queda parcialmente reconstruida. Es
-aceptable y no se disimula — el remedio es volver a correr `rebuild`, que es
-idempotente. Se declara en el recibo y en la skill.
+This implies a real window: if the process dies between the purge and the end of
+the re-synchronisation, the library is left partially rebuilt. That is acceptable
+and is not concealed — the remedy is to run `rebuild` again, which is idempotent.
+It is declared in the receipt and in the skill.
 
-## Interacción con el guard de concurrencia de 4.3
+## Interaction with 4.3's concurrency guard
 
-`rebuild` **respeta el guard, no lo esquiva**. Si alguna fuente tiene un run
-`running`, `rebuild` falla completo antes de borrar nada, con el mismo código
-`SYNC_ALREADY_RUNNING` que ya emite `sync`.
+`rebuild` **respects the guard, it does not bypass it**. If any source has a
+`running` run, `rebuild` fails completely before deleting anything, with the same
+`SYNC_ALREADY_RUNNING` code that `sync` already emits.
 
-La verificación ocurre **dentro de la misma transacción que la purga**, no
-antes ni por fuente durante el bucle. Al implementarlo quedó claro que
-comprobar en la aplicación y borrar después reabre exactamente la ventana que
-4.3 cerró en `recordRun`: entre la comprobación y el `DELETE` puede arrancar un
-`sync` que indexa sobre una biblioteca a punto de vaciarse. Poner el `SELECT`
-de runs activos y el `DELETE` bajo un único `BEGIN IMMEDIATE` convierte el
-guard en garantía, igual que allá. Además, un rebuild abarca **todas** las
-fuentes, así que un run activo en cualquiera lo bloquea, no sólo en la que se
-esté por tocar.
+The verification happens **inside the same transaction as the purge**, not before
+it and not per source during the loop. While implementing it, it became clear
+that checking in the application and deleting afterwards reopens exactly the
+window that 4.3 closed in `recordRun`: between the check and the `DELETE` a `sync`
+can start and index into a library about to be emptied. Putting the `SELECT` of
+active runs and the `DELETE` under a single `BEGIN IMMEDIATE` turns the guard into
+a guarantee, just as it did there. Besides, a rebuild spans **every** source, so
+an active run in any of them blocks it, not only in the one about to be touched.
 
-Consecuencia de diseño: el guard vive en `purgeDerivedIndex`, no en el caso de
-uso, y `rebuildIndex` no necesita ningún método de lectura de runs activos.
+Design consequence: the guard lives in `purgeDerivedIndex`, not in the use case,
+and `rebuildIndex` needs no method for reading active runs.
 
-**`rebuild` no acepta `--force`.** Destrabar un run fantasma y reconstruir la
-biblioteca entera son dos decisiones distintas y el usuario debe tomarlas por
-separado: primero `sync --source <name> --force`, después `rebuild`.
-Combinarlas en una bandera haría que un solo comando destrabe un run que
-quizá esté vivo y además borre todo.
+**`rebuild` does not accept `--force`.** Unblocking a ghost run and rebuilding the
+entire library are two distinct decisions and the user must take them separately:
+first `sync --source <name> --force`, then `rebuild`. Combining them in one flag
+would make a single command unblock a run that may well be alive and delete
+everything on top.
 
-## Superficie de CLI
+## CLI surface
 
-### `--confirm` es obligatorio
+### `--confirm` is mandatory
 
-Sin la bandera, `rebuild` termina con **código 2** (error de uso), validado en
-`parse-command.ts` antes de construir la `Application`, consistente con la
-regla ya fijada para `--depth` y `--max-tokens`: un argumento faltante o mal
-escrito nunca produce el código 1 de fallo operativo. No hay prompt
-interactivo: la CLI es no interactiva por contrato y su consumidor es un
-agente.
+Without the flag, `rebuild` ends with **code 2** (usage error), validated in
+`parse-command.ts` before building the `Application`, consistent with the rule
+already set for `--depth` and `--max-tokens`: a missing or misspelled argument
+never produces the operational failure code 1. There is no interactive prompt:
+the CLI is non-interactive by contract and its consumer is an agent.
 
-### Requisitos
+### Requirements
 
-`rebuild` se suma a `sync` y `retrieve` como `library_and_model` en
-`command-requirements.ts`. Necesita el modelo porque re-embebe todo: dejarlo
-en `library` reproduciría exactamente el defecto que 4.2 corrigió — descubrir
-el modelo faltante una vez por video en vez de una vez antes de empezar.
+`rebuild` joins `sync` and `retrieve` as `library_and_model` in
+`command-requirements.ts`. It needs the model because it re-embeds everything:
+leaving it as `library` would reproduce exactly the defect 4.2 corrected —
+discovering the missing model once per video instead of once before starting.
 
-Esto rompe el test `sync and retrieve are the only commands requiring both the
-library and the model`, que hay que actualizar a los tres comandos. Es una
-actualización deliberada del contrato, no una regresión.
+This breaks the test `sync and retrieve are the only commands requiring both the
+library and the model`, which has to be updated to the three commands. It is a
+deliberate contract update, not a regression.
 
-### Recibo
+### Receipt
 
-El contrato aprobado no define recibo para `rebuild` (`cli-contract.md`
-sólo declara dos frases), así que hay que definirlo y documentarlo. Propuesta,
-siguiendo la forma del recibo de `sync`:
+The approved contract defines no receipt for `rebuild` (`cli-contract.md` only
+declares two sentences), so it has to be defined and documented. Proposal,
+following the shape of `sync`'s receipt:
 
 ```json
 {
@@ -180,114 +175,111 @@ siguiendo la forma del recibo de `sync`:
 }
 ```
 
-`status` agregado: `ok` si toda fuente terminó `ok`; `partial` si alguna
-terminó `partial` o `failed`, con las demás reconstruidas; `failed` si ninguna
-pudo reconstruirse. Códigos de salida: `0` para `ok`, `1` para `partial` y
-`failed`, igual que `sync`.
+Aggregate `status`: `ok` if every source finished `ok`; `partial` if any finished
+`partial` or `failed`, with the rest rebuilt; `failed` if none could be rebuilt.
+Exit codes: `0` for `ok`, `1` for `partial` and `failed`, the same as `sync`.
 
-Una biblioteca sin ninguna fuente registrada devuelve `status: "ok"` con
-`sources_rebuilt: 0` y código `0`. No es un error: no hay nada que
-reconstruir y no hay nada roto.
+A library with no registered source returns `status: "ok"` with
+`sources_rebuilt: 0` and code `0`. It is not an error: there is nothing to
+rebuild and nothing is broken.
 
-## Dónde vive el código
+## Where the code lives
 
-`rebuild` es un caso de uso de aplicación, no lógica de CLI:
+`rebuild` is an application use case, not CLI logic:
 
-- **Dominio**: sin cambios. No aparece ningún concepto nuevo.
-- **Puerto**: `IndexStore` suma una operación —`purgeDerivedIndex(): Promise<number>`—
-  que devuelve cuántos paquetes borró. Es la única capacidad genuinamente
-  nueva; todo lo demás ya existe.
-- **Aplicación**: `src/application/indexing/rebuild-index.ts` con
-  `rebuildIndex`, que llama `purgeDerivedIndex` y después `syncSource` por cada
-  fuente. No conoce SQLite ni comprueba runs activos por su cuenta: el guard es
-  parte de la purga.
-- **Infraestructura**: `SQLiteIndexStore.purgeDerivedIndex` —el `SELECT` de
-  runs activos y un `DELETE FROM video_packages` bajo un único
-  `BEGIN IMMEDIATE`, apoyado en las cascadas y los triggers que ya existen, sin
-  tocar el esquema.
-- **Interfaz**: `kind: "rebuild"` en `parse-command.ts`, su entrada en
-  `command-requirements.ts` y su rama en `run-cli.ts`.
-- **Composition root**: `Application` expone `rebuildIndex`, reemplazable
-  igual que `retrieveCandidates` y `assembleContext`.
+- **Domain**: no changes. No new concept appears.
+- **Port**: `IndexStore` adds one operation — `purgeDerivedIndex(): Promise<number>` —
+  returning how many packages it deleted. It is the only genuinely new
+  capability; everything else already exists.
+- **Application**: `src/application/indexing/rebuild-index.ts` with
+  `rebuildIndex`, which calls `purgeDerivedIndex` and then `syncSource` for each
+  source. It knows nothing of SQLite and does not check active runs on its own:
+  the guard is part of the purge.
+- **Infrastructure**: `SQLiteIndexStore.purgeDerivedIndex` — the `SELECT` of
+  active runs and a `DELETE FROM video_packages` under a single
+  `BEGIN IMMEDIATE`, resting on the cascades and triggers that already exist,
+  without touching the schema.
+- **Interface**: `kind: "rebuild"` in `parse-command.ts`, its entry in
+  `command-requirements.ts` and its branch in `run-cli.ts`.
+- **Composition root**: `Application` exposes `rebuildIndex`, replaceable just
+  like `retrieveCandidates` and `assembleContext`.
 
-**No hay migración de esquema.** `rebuild` borra filas con las cascadas ya
-declaradas; no agrega, quita ni altera ninguna tabla, índice o trigger.
+**There is no schema migration.** `rebuild` deletes rows through the cascades
+already declared; it adds, removes and alters no table, index or trigger.
 
-## El índice vectorial en memoria
+## The in-memory vector index
 
-`InMemoryVectorSearchIndex` es la misma instancia que sirve las consultas y
-recibe los cambios de `sync`. Después de una purga su snapshot queda
-describiendo vectores que ya no existen.
+`InMemoryVectorSearchIndex` is the same instance that serves queries and receives
+`sync`'s changes. After a purge its snapshot is left describing vectors that no
+longer exist.
 
-El primer borrador de este diseño daba por sentado que no hacía falta ningún
-mecanismo nuevo: el índice **ya invalida su snapshot completo en `apply`**
-(decisión de 2.2) y la re-sincronización publica cambios por cada paquete.
+The first draft of this design took for granted that no new mechanism was needed:
+the index **already invalidates its complete snapshot on `apply`** (a decision
+from 2.2) and re-synchronisation publishes changes for each package.
 
-**Era falso, y el test de AH2 lo probó.** La purga borra filas por SQL, y SQL
-no publica nada al índice: `apply` es lo único que lo invalida. Un `rebuild`
-que termina sin ningún paquete —todas las fuentes con manifest vacío o
-ilegible— no publica ni un cambio, así que el snapshot anterior sobrevive
-entero y `load()` sigue devolviendo vectores cuyos fragmentos ya no existen.
-Medido: 2 vectores servidos sobre una biblioteca con cero embeddings.
+**That was false, and the AH2 test proved it.** The purge deletes rows through
+SQL, and SQL publishes nothing to the index: `apply` is the only thing that
+invalidates it. A `rebuild` that ends with no packages — every source with an
+empty or unreadable manifest — publishes not one change, so the previous snapshot
+survives whole and `load()` keeps returning vectors whose fragments no longer
+exist. Measured: 2 vectors served over a library with zero embeddings.
 
-Es exactamente el defecto que 4.4 encontró —el snapshot obsoleto tapando
-`VECTORS_STALE`— reapareciendo por un camino nuevo, y confirma la lección del
-13 y 14 de agosto: el sistema respondía correctamente mientras algo estaba
-roto.
+It is exactly the defect 4.4 found — the stale snapshot masking `VECTORS_STALE` —
+reappearing through a new path, and it confirms the lesson of 13 and 14 August:
+the system was answering correctly while something was broken.
 
-Corrección: `rebuildIndex` recibe el `VectorIndexSink` y publica un
-`remove_packages` con los `PackageRef` que había, **después** de que la purga
-commitea, nunca antes — el mismo orden que respeta `sync`. Los refs se
-recolectan antes de purgar, mientras las filas todavía existen, para que lo
-publicado nombre los paquetes que realmente se fueron.
+Correction: `rebuildIndex` receives the `VectorIndexSink` and publishes a
+`remove_packages` with the `PackageRef`s that were there, **after** the purge
+commits, never before — the same order `sync` respects. The refs are collected
+before purging, while the rows still exist, so that what is published names the
+packages that actually went away.
 
-## Fuera de alcance
+## Out of scope
 
-- Reindexado automático al detectar vectores de lotes mezclados. `rebuild` es
-  y sigue siendo explícito: lo corre el usuario cuando decide correrlo.
-- `rebuild --source <name>` para reconstruir una sola fuente. El contrato
-  aprobado no lo incluye y no hay evidencia de que haga falta; agregar una
-  bandera al contrato público requiere aprobación aparte.
-- Agregar el tamaño de lote a la identidad del modelo. 4.3 lo descartó con
-  causa y `rebuild` es justamente la alternativa que lo hace innecesario.
-- Backup o rollback de la biblioteca previa. Los paquetes fuente son
-  inmutables y siguen en disco: la biblioteca es reconstruible por
-  definición, que es la razón misma de que este comando pueda existir.
-- Barra de progreso. `sync` ya emite progreso por stderr y `rebuild` lo
-  hereda.
+- Automatic reindexing on detecting vectors from mixed batches. `rebuild` is and
+  remains explicit: the user runs it when they decide to run it.
+- `rebuild --source <name>` to rebuild a single source. The approved contract
+  does not include it and there is no evidence it is needed; adding a flag to the
+  public contract requires separate approval.
+- Adding the batch size to the model's identity. 4.3 discarded it with cause and
+  `rebuild` is precisely the alternative that makes it unnecessary.
+- Backup or rollback of the previous library. The source packages are immutable
+  and remain on disk: the library is rebuildable by definition, which is the very
+  reason this command can exist.
+- A progress bar. `sync` already emits progress on stderr and `rebuild` inherits
+  it.
 
-## Bloques
+## Blocks
 
-| Bloque | Contenido                                                                  |
-| ------ | -------------------------------------------------------------------------- |
-| AE     | Puerto `purgeDerivedIndex` y su implementación SQLite transaccional        |
-| AF     | Caso de uso `rebuildIndex`: guard previo, purga, re-sync y recibo agregado |
-| AG     | Superficie de CLI: `parse-command`, requisitos, `run-cli` y recibo         |
-| AH     | E2E sobre SQLite real, `cli-contract.md`, `SKILL.md` y `build.md`          |
+| Block | Content                                                                        |
+| ----- | ------------------------------------------------------------------------------ |
+| AE    | The `purgeDerivedIndex` port and its transactional SQLite implementation       |
+| AF    | The `rebuildIndex` use case: prior guard, purge, re-sync and aggregate receipt |
+| AG    | CLI surface: `parse-command`, requirements, `run-cli` and receipt              |
+| AH    | E2E over real SQLite, `cli-contract.md`, `SKILL.md` and `build.md`             |
 
-## Por qué el punto 1 se cerró sin código
+## Why point 1 was closed without code
 
-El orden de prioridad del 14 de agosto ponía "ordenar fragmentos por longitud
-antes de lotear" antes que `rebuild`. Se descartó tras verificarlo contra el
-código, no contra el documento:
+The priority order of 14 August put "sorting fragments by length before batching"
+ahead of `rebuild`. It was discarded after verifying it against the code, not
+against the document:
 
-- `defaultBatchSize` ya es `1` (`transformers-embedding-generator.ts:18`) y
-  ningún llamador de producto lo sobrescribe.
-- El loteo es un slice secuencial
-  (`transformers-embedding-generator.ts:373-375`): con lote 1 cada llamada
-  recibe un solo texto, y el padding es relativo al más largo del lote. Sin
-  lote no hay padding contra el cual ordenar; ordenar la entrada no cambia
-  una sola operación del runtime.
-- `embedDocuments` se llama **por paquete**
-  (`sync-source.ts:287-289`, dentro del bucle de videos), así que el universo
-  ordenable serían los fragmentos de un video, no el corpus con el que se
-  midió el 1,93x.
-- La medición de 4.3 ya lo decía: lote 16 ordenado por longitud rinde 1,93x,
-  contra 2,27x del lote 1 que se adoptó. No era una mejora sobre el lote 1;
-  era la alternativa que el lote 1 le ganó.
-- Reintroducirlo costaría el determinismo que 4.3 celebró: el vector de un
-  fragmento pasaría a depender de qué otros fragmentos del mismo video tienen
-  longitud parecida.
+- `defaultBatchSize` is already `1` (`transformers-embedding-generator.ts:18`) and
+  no product caller overrides it.
+- Batching is a sequential slice
+  (`transformers-embedding-generator.ts:373-375`): with batch 1 each call receives
+  a single text, and padding is relative to the longest one in the batch. With no
+  batch there is no padding to sort against; sorting the input does not change a
+  single runtime operation.
+- `embedDocuments` is called **per package** (`sync-source.ts:287-289`, inside the
+  video loop), so the sortable universe would be one video's fragments, not the
+  corpus the 1.93x was measured on.
+- The measurement from 4.3 already said so: batch 16 sorted by length yields
+  1.93x, against 2.27x for the batch 1 that was adopted. It was not an improvement
+  over batch 1; it was the alternative that batch 1 beat.
+- Reintroducing it would cost the determinism 4.3 celebrated: a fragment's vector
+  would come to depend on which other fragments of the same video have a similar
+  length.
 
-Queda como **medido y descartado con causa**, no como pendiente. Sólo
-reabrirlo si aparece un motivo independiente para volver a un lote mayor que 1.
+It stands as **measured and discarded with cause**, not as pending. Only reopen it
+if an independent reason appears to return to a batch larger than 1.
