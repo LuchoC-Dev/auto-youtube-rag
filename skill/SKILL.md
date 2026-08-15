@@ -204,6 +204,10 @@ cualquier carpeta y siempre vas a hablar con la misma biblioteca.
    }
    ```
 
+   `warnings` vacío significa que nada se degradó, **no** que el contenido sea
+   necesariamente relevante: el aviso de baja relevancia puede no dispararse
+   con material apenas tangencial. Juzgá siempre leyendo el contexto.
+
    Abrí `context_path` (`context.md`) para leer el contexto organizado en
    secciones fijas (`Query and scope`, `Highest-relevance context`,
    `Related rules and patterns`, `Additional relevant context`,
@@ -228,6 +232,20 @@ cualquier carpeta y siempre vas a hablar con la misma biblioteca.
 
    Si el recibo trae un `status` distinto de `"ok"` o `warnings` no vacíos,
    leé `references/troubleshooting.md` antes de interpretar la cobertura.
+
+   **Prestá atención a `LOW_RELEVANCE`.** Es la advertencia que vas a ver más
+   seguido, y no significa que algo falló: significa que la biblioteca no
+   tiene contenido sobre lo que preguntaste. La recuperación siempre devuelve
+   algo —no descarta nada por poca similitud—, así que sin ese aviso no habría
+   forma de distinguir una respuesta real de material apenas parecido. Cuando
+   aparezca, **decilo en tu respuesta** en vez de presentar ese contenido como
+   si contestara la pregunta.
+
+   El dato crudo detrás del aviso está siempre en
+   `metrics.top_vector_similarity` de `result.json`, dispare o no. Es la
+   similitud del mejor resultado semántico; sirve para juzgar por tu cuenta,
+   porque el umbral está calibrado sobre una colección concreta y el margen es
+   fino.
 
 7. **Citar con procedencia real.** Cuando uses contenido recuperado en tu
    respuesta, citá los IDs `[S0N]` tal como aparecen en `context.md`. Nunca
