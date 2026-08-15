@@ -1,5 +1,11 @@
 ## Layer A — mechanical metrics
 
+**Note on the bundles:** the 24 generated bundles (`context.md` and
+`result.json` per query and depth) are not versioned in this repository
+because they contain verbatim text derived from third-party YouTube videos.
+Regenerate them by running `evals/run-seed-queries.ts` over
+`evals/queries/seed-queries.json` against your own collection.
+
 | Query | Kind | Depth | Status | Expected | Match | Candidates | Units | Sources | Tokens | Budget exhausted | Omitted | Warnings |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | es-concept-brutalism | concept | focused | ok | ok | yes | 50 | 60 | 20 | 11681 | yes | 22 | — |
