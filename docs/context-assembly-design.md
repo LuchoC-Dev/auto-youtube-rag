@@ -1,57 +1,57 @@
-# Diseño de ensamblado de contexto
+# Context assembly design
 
-## Estado
+## Status
 
-Especificación **aprobada** el 12 de agosto de 2026 para el punto 2.3, con las
-seis decisiones de la sección final ya confirmadas por el usuario. Continúa
-[retrieval-design.md](retrieval-design.md), que ya reservó `getUnits` y
-`getAncestors` en `KnowledgeRepository` para este punto. El registro
-consolidado de las decisiones vive también en
+Specification **approved** on 12 August 2026 for point 2.3, with the six
+decisions of the final section already confirmed by the user. It continues
+[retrieval-design.md](retrieval-design.md), which already reserved `getUnits`
+and `getAncestors` in `KnowledgeRepository` for this point. The consolidated
+record of the decisions also lives in
 [decisions.md](decisions.md#approved-context-assembly-design).
 
-## Alcance
+## Scope
 
-2.3 toma `RetrievalOutcome` de `retrieveCandidates` (2.2) y produce el bundle
-`context.md` + `result.json` que consume el agente, más el comando `retrieve`
-de la CLI que lo expone.
+2.3 takes `RetrievalOutcome` from `retrieveCandidates` (2.2) and produces the
+`context.md` + `result.json` bundle that the agent consumes, plus the CLI's
+`retrieve` command that exposes it.
 
-| Dentro de 2.3                             | Fuera de 2.3 (queda para 3.x)           |
-| ----------------------------------------- | --------------------------------------- |
-| Expansión de candidatos a unidades padre  | Calibración de pesos RRF                |
-| Deduplicación de contenido repetido       | Umbral mínimo de similitud vectorial    |
-| Presupuesto de tokens por profundidad     | Evaluaciones de recall/precisión reales |
-| Asignación de citas `[S0N]`               | Interfaz humana                         |
-| Redacción de `context.md` y `result.json` | `rebuild` (no depende de este punto)    |
-| Comando `retrieve` de la CLI              | Reranking adicional o LLM interno       |
+| Inside 2.3                              | Outside 2.3 (left for 3.x)                |
+| --------------------------------------- | ----------------------------------------- |
+| Expansion of candidates to parent units | Calibration of RRF weights                |
+| Deduplication of repeated content       | Minimum vector similarity threshold       |
+| Token budget per depth                  | Real recall/precision evaluations         |
+| Assignment of `[S0N]` citations         | Human interface                           |
+| Writing `context.md` and `result.json`  | `rebuild` (does not depend on this point) |
+| The CLI's `retrieve` command            | Additional reranking or an internal LLM   |
 
-`retrieve` pasa a estar disponible recién al cerrar 2.3.
+`retrieve` becomes available only once 2.3 is closed.
 
-## Dónde vive cada pieza (decisión de capas)
+## Where each piece lives (layering decision)
 
-Siguiendo la arquitectura ya establecida (dominio puro, aplicación con
-puertos, infraestructura con detalles concretos):
+Following the architecture already established (a pure domain, an application
+with ports, infrastructure with concrete details):
 
-- **Dominio** (`src/domain/context/`): sólo el value object de presupuesto
-  (`ContextDepth`, resolución de tokens). Es la única regla de negocio con
-  invariantes propias (nombres de preset estables, override positivo). No
-  conoce Markdown, JSON ni el sistema de archivos.
-- **Aplicación** (`src/application/context/`): el caso de uso que orquesta
-  `KnowledgeRepository.getAncestors`, y las políticas puras de expansión,
-  deduplicación, presupuesto, citas y **renderizado a texto** (Markdown y el
-  objeto `result.json`). El renderizado es una función pura de tipos de
-  aplicación a `string`/objeto plano — no toca disco, así que vive aquí igual
-  que `render-cli-output.ts` vive en la interfaz pero sin abrir archivos.
-- **Infraestructura** (`src/infrastructure/filesystem/`): sólo la escritura
-  del bundle a disco (`<out>/<request_id>/context.md` y `result.json`) y la
-  generación de `request_id`.
-- **Interfaz** (`src/interfaces/cli/`): parseo de `retrieve` y el recibo
-  compacto en `stdout`, igual que los comandos existentes.
+- **Domain** (`src/domain/context/`): only the budget value object
+  (`ContextDepth`, token resolution). It is the only business rule with
+  invariants of its own (stable preset names, a positive override). It knows
+  nothing about Markdown, JSON or the filesystem.
+- **Application** (`src/application/context/`): the use case that orchestrates
+  `KnowledgeRepository.getAncestors`, and the pure policies of expansion,
+  deduplication, budget, citations and **rendering to text** (Markdown and the
+  `result.json` object). Rendering is a pure function from application types to
+  `string`/plain object — it does not touch disk, so it lives here just as
+  `render-cli-output.ts` lives in the interface but without opening files.
+- **Infrastructure** (`src/infrastructure/filesystem/`): only writing the bundle
+  to disk (`<out>/<request_id>/context.md` and `result.json`) and generating
+  `request_id`.
+- **Interface** (`src/interfaces/cli/`): parsing `retrieve` and the compact
+  receipt on `stdout`, just like the existing commands.
 
-Esto mantiene la misma regla que ya rige el proyecto: el dominio y la
-aplicación no conocen rutas de Node ni formatos de archivo concretos, y sólo
-la infraestructura escribe.
+This keeps the same rule that already governs the project: the domain and the
+application know nothing about Node paths or concrete file formats, and only
+infrastructure writes.
 
-## Modelo de presupuesto
+## Budget model
 
 ```ts
 export type ContextDepth = "focused" | "balanced" | "deep";
@@ -74,56 +74,54 @@ export class ContextBudget {
 }
 ```
 
-Implementado en `src/domain/context/context-budget.ts` siguiendo el mismo
-patrón que `RetrievalLimits`: constructor privado, `create()` valida y aplica
-valores por defecto, `default()` es un atajo sin overrides. `depth` por
-defecto es `balanced`, según `cli-contract.md`. `--max-tokens`
-reemplaza el número pero nunca los nombres públicos de los presets: el
-override es sólo un entero positivo, sin tope superior propio — un valor
-absurdamente alto simplemente nunca se alcanza porque no hay más evidencia que
-ofrecer.
+Implemented in `src/domain/context/context-budget.ts` following the same pattern
+as `RetrievalLimits`: a private constructor, `create()` validates and applies
+default values, `default()` is a shortcut with no overrides. The default `depth`
+is `balanced`, according to `cli-contract.md`. `--max-tokens` replaces the
+number but never the public names of the presets: the override is only a
+positive integer, with no upper cap of its own — an absurdly high value is
+simply never reached, because there is no more evidence to offer.
 
-## Solicitud de ensamblado
+## Assembly request
 
 ```ts
 export interface ContextRequest {
-  readonly query: RetrievalQuery; // reutiliza el value object de 2.2
-  readonly budget: ContextBudget; // ya resuelve depth + maxTokens (I1)
+  readonly query: RetrievalQuery; // reuses the value object of 2.2
+  readonly budget: ContextBudget; // already resolves depth + maxTokens (I1)
 }
 ```
 
-No se crea un nuevo value object de consulta: `RetrievalQuery` y
-`RetrievalFilter` de 2.2 ya cubren texto, filtros y límites de candidatos. El
-único concepto nuevo de 2.3 es el presupuesto, y se reutiliza `ContextBudget`
-en vez de repetir `depth`/`maxTokensOverride` sueltos.
+No new query value object is created: `RetrievalQuery` and `RetrievalFilter`
+from 2.2 already cover text, filters and candidate limits. The only new concept
+of 2.3 is the budget, and `ContextBudget` is reused instead of repeating loose
+`depth`/`maxTokensOverride` fields.
 
-## Expansión a unidades padre
+## Expansion to parent units
 
-1. Partir de `RetrievalOutcome.candidates` (ya deduplicados por unidad y
-   diversificados por video en 2.2; como máximo `fusedResults`, 50 por
-   defecto).
-2. Recolectar el conjunto único de `unitId` de los candidatos.
-3. Llamar **dos** lotes, no uno: `knowledgeRepository.getUnits(unitIds)` y
-   `knowledgeRepository.getAncestors(unitIds)`. `getAncestors` sólo devuelve
-   el conjunto plano y deduplicado de unidades ancestro —no dice qué ancestro
-   corresponde a qué candidato—, y `KnowledgeUnit` no transporta metadata de
-   video/documento (eso vive únicamente en `CandidateProvenance`). `getUnits`
-   recupera el `parentId` de cada candidato, indispensable para reconstruir su
-   cadena exacta y para que cada bloque de ancestro herede la metadata del
-   candidato que lo originó, ya que un ancestro nunca cruza de documento.
-   Sigue siendo O(1) en cantidad de consultas: dos lotes, no una consulta por
-   candidato.
-4. Construir un bloque citable (`ContextUnitBlock`) por cada candidato (usando
-   `provenance.content`, que ya es el texto completo de la unidad en el caso
-   común — sólo se fragmenta cuando una unidad excede el límite de tokens del
-   modelo, ver `fragment-knowledge-units.ts`) y, caminando `parentId` desde la
-   unidad de cada candidato hacia la raíz a través del mapa de ancestros, un
-   bloque por cada unidad ancestro no vista todavía (usando
-   `KnowledgeUnit.content`, siempre el texto íntegro de la unidad, nunca un
-   fragmento, y heredando `packageRef`, `documentKind`, `documentRelativePath`,
-   `videoTitle`, `creator`, `canonicalUrl` y `language` del candidato que lo
-   trajo). Si dos candidatos comparten un ancestro, el segundo camino se
-   detiene apenas encuentra un `unitId` ya construido.
+1. Start from `RetrievalOutcome.candidates` (already deduplicated by unit and
+   diversified by video in 2.2; at most `fusedResults`, 50 by default).
+2. Collect the unique set of `unitId`s of the candidates.
+3. Call **two** batches, not one: `knowledgeRepository.getUnits(unitIds)` and
+   `knowledgeRepository.getAncestors(unitIds)`. `getAncestors` returns only the
+   flat, deduplicated set of ancestor units — it does not say which ancestor
+   corresponds to which candidate — and `KnowledgeUnit` does not carry
+   video/document metadata (that lives only in `CandidateProvenance`).
+   `getUnits` recovers each candidate's `parentId`, indispensable in order to
+   reconstruct its exact chain and so that each ancestor block inherits the
+   metadata of the candidate that originated it, since an ancestor never crosses
+   documents. It is still O(1) in number of queries: two batches, not one query
+   per candidate.
+4. Build one citable block (`ContextUnitBlock`) per candidate (using
+   `provenance.content`, which is already the complete text of the unit in the
+   common case — it is only fragmented when a unit exceeds the model's token
+   limit, see `fragment-knowledge-units.ts`) and, walking `parentId` from each
+   candidate's unit towards the root through the ancestor map, one block per
+   ancestor unit not seen yet (using `KnowledgeUnit.content`, always the whole
+   text of the unit, never a fragment, and inheriting `packageRef`,
+   `documentKind`, `documentRelativePath`, `videoTitle`, `creator`,
+   `canonicalUrl` and `language` from the candidate that brought it in). If two
+   candidates share an ancestor, the second walk stops as soon as it finds a
+   `unitId` already built.
 
 ```ts
 export interface ContextUnitBlock {
@@ -133,11 +131,11 @@ export interface ContextUnitBlock {
   readonly headingPath: readonly string[];
   readonly title: string | null;
   readonly content: string;
-  readonly contentHash: string; // para la deduplicación de J2
+  readonly contentHash: string; // for the deduplication of J2
   readonly tokenCount: number;
   readonly origin: "candidate" | "ancestor";
-  readonly fusedScore: number; // propio, o el del candidato que expandió el ancestro
-  readonly depth: number; // profundidad jerárquica, 0 = documento
+  readonly fusedScore: number; // its own, or that of the candidate that expanded the ancestor
+  readonly depth: number; // hierarchical depth, 0 = document
   readonly documentKind: SourceDocumentKind;
   readonly documentRelativePath: string;
   readonly videoTitle: string | null;
@@ -149,81 +147,82 @@ export interface ContextUnitBlock {
 }
 ```
 
-Implementado en `src/application/context/context-blocks.ts`, junto con
-`BudgetAllocation` y `CitationRecord`. `fusedScore` nunca es `null`: un bloque
-de ancestro hereda el puntaje del candidato que lo trajo, porque J3 necesita
-un valor comparable para ordenar dentro de "Additional relevant context" sin
-introducir un segundo criterio de orden.
+Implemented in `src/application/context/context-blocks.ts`, together with
+`BudgetAllocation` and `CitationRecord`. `fusedScore` is never `null`: an
+ancestor block inherits the score of the candidate that brought it in, because
+J3 needs a comparable value in order to sort within "Additional relevant
+context" without introducing a second ordering criterion.
 
-El objeto `result.json` se tipó en `src/application/context/context-bundle.ts`
-(`ContextResultDocument`). `cli-contract.md` deja los ítems de `units[]` y
-`sources[]` sin schema explícito más allá del ejemplo de cita; 2.3 lo completa
-así: cada `ContextResultUnit` lleva los mismos campos de cita (`citation_id`,
-`source_name`, `video_id`, ...) más `section`
-(`highest_relevance | related_rules | additional_context`), `content` y
-`token_count`; cada `ContextResultSource` resume un `packageRef` distinto
+The `result.json` object was typed in
+`src/application/context/context-bundle.ts` (`ContextResultDocument`).
+`cli-contract.md` leaves the items of `units[]` and `sources[]` without an
+explicit schema beyond the citation example; 2.3 completes it like this: every
+`ContextResultUnit` carries the same citation fields (`citation_id`,
+`source_name`, `video_id`, ...) plus `section`
+(`highest_relevance | related_rules | additional_context`), `content` and
+`token_count`; every `ContextResultSource` summarises a distinct `packageRef`
 (`source_name`, `video_id`, `video_title`, `creator`, `canonical_url`).
 
-`ContextResultDocument` usa `snake_case` en sus campos porque ésa es la
-forma exacta ya aprobada del archivo, no una convención de TypeScript interna
-— a diferencia de `CitationRecord`/`ContextUnitBlock`, que son tipos internos
-en `camelCase`. `renderContextResult` (K2) es el único lugar que traduce de
-uno a otro, igual que `run-cli.ts` construye sus recibos `snake_case` a partir
-de tipos de aplicación en `camelCase`.
-`coverage` reporta conteos reales (`unitsByType`, `unitsBySource`,
-`omittedForBudget`, `budgetExhausted`), nunca texto inventado.
+`ContextResultDocument` uses `snake_case` in its fields because that is the
+exact, already approved shape of the file, not an internal TypeScript convention
+— unlike `CitationRecord`/`ContextUnitBlock`, which are internal types in
+`camelCase`. `renderContextResult` (K2) is the only place that translates from
+one to the other, just as `run-cli.ts` builds its `snake_case` receipts out of
+application types in `camelCase`.
+`coverage` reports real counts (`unitsByType`, `unitsBySource`,
+`omittedForBudget`, `budgetExhausted`), never invented text.
 
-`tokenCount` de un candidato viene de `provenance.tokenCount`; el de un
-ancestro viene de `KnowledgeUnit.estimatedTokens`. Ninguno de los dos se
-recalcula: ambos ya están persistidos desde la indexación (2.1), así que el
-ensamblado nunca vuelve a tokenizar ni depende del modelo de embeddings.
+A candidate's `tokenCount` comes from `provenance.tokenCount`; an ancestor's
+comes from `KnowledgeUnit.estimatedTokens`. Neither of the two is recomputed:
+both have been persisted since indexing (2.1), so assembly never tokenises again
+nor depends on the embedding model.
 
-## Deduplicación
+## Deduplication
 
-Dos niveles, ambos exigidos por `product-spec.md` ("deduplicar contenido
-repetido"):
+Two levels, both required by `product-spec.md` ("deduplicate repeated
+content"):
 
-1. **Por `unitId`**: una unidad que ya apareció como candidato nunca se repite
-   como ancestro de otro candidato (por ejemplo, dos `rule_item` hermanos que
-   comparten el mismo `rule_pattern` padre). Se construye un único bloque por
-   `unitId`, con prioridad de metadatos (`origin: "candidate"` gana sobre
-   `"ancestor"` si la misma unidad llega por ambos caminos).
-2. **Por `contentHash`**: en el caso raro de contenido idéntico bajo dos
-   `unitId` distintos (por ejemplo, una regla repetida verbatim en dos
-   paquetes), se conserva sólo el primero en orden de inclusión y el resto se
-   omite. No se fusionan referencias: la unidad omitida simplemente no genera
-   bloque ni cita.
+1. **By `unitId`**: a unit that already appeared as a candidate is never
+   repeated as an ancestor of another candidate (for example, two sibling
+   `rule_item`s that share the same parent `rule_pattern`). A single block is
+   built per `unitId`, with metadata priority (`origin: "candidate"` wins over
+   `"ancestor"` if the same unit arrives by both routes).
+2. **By `contentHash`**: in the rare case of identical content under two
+   different `unitId`s (for example, a rule repeated verbatim in two packages),
+   only the first in inclusion order is kept and the rest are omitted.
+   References are not merged: the omitted unit simply produces no block and no
+   citation.
 
-## Presupuesto y truncamiento
+## Budget and truncation
 
-El orden de entrada al presupuesto es fijo y determinista:
+The order of entry into the budget is fixed and deterministic:
 
-1. Bloques de candidato cuyo `unitType` sea `context_section`,
-   `context_document`, `rules_section`, `rules_document`,
-   `analysis_document`, `analysis_section` o `analysis_topic`, ordenados por
-   `fusedScore` descendente → alimentan "Highest-relevance context".
-2. Bloques de candidato cuyo `unitType` sea `rule_pattern`, `rule_item`,
-   `avoid_item`, `acceptance_criterion` o `analysis_recommendation`,
-   ordenados por `fusedScore` descendente → alimentan "Related rules and
-   patterns" (`analysis_recommendation` no es literalmente una regla, pero
-   comparte el rol funcional de contenido prescriptivo derivado del análisis;
-   ver "Bucketing" en `docs/analysis-schema-design.md`).
-3. Bloques de ancestro, ordenados por el `fusedScore` del candidato que los
-   originó (descendente) y, dentro de un mismo candidato, por `depth`
-   descendente —`depth` 0 es la raíz del documento, así que un `depth` mayor
-   es más cercano a la hoja— para que el padre inmediato preceda siempre al
-   abuelo → alimentan "Additional relevant context".
+1. Candidate blocks whose `unitType` is `context_section`, `context_document`,
+   `rules_section`, `rules_document`, `analysis_document`, `analysis_section` or
+   `analysis_topic`, ordered by descending `fusedScore` → they feed
+   "Highest-relevance context".
+2. Candidate blocks whose `unitType` is `rule_pattern`, `rule_item`,
+   `avoid_item`, `acceptance_criterion` or `analysis_recommendation`, ordered by
+   descending `fusedScore` → they feed "Related rules and patterns"
+   (`analysis_recommendation` is not literally a rule, but it shares the
+   functional role of prescriptive content derived from the analysis; see
+   "Bucketing" in `docs/analysis-schema-design.md`).
+3. Ancestor blocks, ordered by the `fusedScore` of the candidate that originated
+   them (descending) and, within the same candidate, by descending `depth` —
+   `depth` 0 is the root of the document, so a higher `depth` is closer to the
+   leaf — so that the immediate parent always precedes the grandparent → they
+   feed "Additional relevant context".
 
-Cada categoría de `unitType` cae en una sola sección: una unidad no aparece
-dos veces aunque coincida por ambas vías de búsqueda, porque ya llega
-deduplicada por `unitId` desde el paso anterior.
+Each `unitType` category falls into a single section: a unit does not appear
+twice even if it matches through both search paths, because it already arrives
+deduplicated by `unitId` from the previous step.
 
-`allocateBudget` recorre esa secuencia acumulando `tokenCount` y **nunca corta
-un bloque a la mitad**: incluye el bloque completo o lo omite entero, para que
-ninguna cita quede truncada. Regla de caso límite: si el primer bloque por sí
-solo ya excede el presupuesto, se incluye igual —el bundle nunca queda vacío
-habiendo evidencia relevante real— y el presupuesto se marca agotado
-inmediatamente después, sin agregar nada más.
+`allocateBudget` walks that sequence accumulating `tokenCount` and **never cuts
+a block in half**: it includes the complete block or omits it entirely, so that
+no citation is left truncated. Edge-case rule: if the first block on its own
+already exceeds the budget, it is included anyway — the bundle is never empty
+when there is real relevant evidence — and the budget is marked exhausted
+immediately afterwards, without adding anything else.
 
 ```ts
 export interface BudgetAllocation {
@@ -234,12 +233,12 @@ export interface BudgetAllocation {
 }
 ```
 
-## Citas
+## Citations
 
-Los IDs `[S01]`, `[S02]`... se asignan **después** del presupuesto, en el
-orden final de inclusión: un bloque omitido nunca reserva ni salta un número.
-Cada bloque incluido produce exactamente un registro de cita, siguiendo el
-esquema ya aprobado en `cli-contract.md`:
+The IDs `[S01]`, `[S02]`... are assigned **after** the budget, in the final
+inclusion order: an omitted block never reserves or skips a number. Every
+included block produces exactly one citation record, following the schema
+already approved in `cli-contract.md`:
 
 ```ts
 export interface CitationRecord {
@@ -251,58 +250,58 @@ export interface CitationRecord {
   readonly file: string; // documentRelativePath
   readonly headingPath: readonly string[];
   readonly unitType: KnowledgeUnitType;
-  readonly timestamp: string | null; // primer timestamp si existe
+  readonly timestamp: string | null; // the first timestamp if it exists
   readonly visualEvidence: readonly string[];
 }
 ```
 
-Dos bloques del mismo video reciben citas distintas si su `headingPath`
-difiere, tal como muestra el ejemplo de `cli-contract.md`.
+Two blocks from the same video receive different citations if their
+`headingPath` differs, exactly as the example in `cli-contract.md` shows.
 
-## Redacción de `context.md`
+## Writing `context.md`
 
-Función pura `renderContextMarkdown(request, allocation, citations, metrics)`
-que produce exactamente el documento aprobado en `cli-contract.md`:
-front-matter (`schema_version`, `query`, `depth`, `estimated_tokens`,
-`sources_used`) y las seis secciones fijas. Cada bloque se renderiza con su
-`headingPath` como subtítulo y su contenido íntegro seguido del marcador
-`[S0N]`; "corta" en el contrato describe el marcador de cita, no un recorte
-del contenido — el agente necesita el texto completo del bloque, no un
-resumen. "Coverage and limitations" enumera, sin inventar nada, sólo señales
-reales disponibles: advertencias de `RetrievalOutcome.warnings`,
-`budgetExhausted`, `omittedCount` y fuentes filtradas explícitamente por el
-usuario. "Source registry" lista cada `packageRef` distinto presente en los
-bloques incluidos, con su `sourceName`, `videoId`, título y creador.
+A pure function `renderContextMarkdown(request, allocation, citations, metrics)`
+that produces exactly the document approved in `cli-contract.md`: front matter
+(`schema_version`, `query`, `depth`, `estimated_tokens`, `sources_used`) and the
+six fixed sections. Each block is rendered with its `headingPath` as a subtitle
+and its whole content followed by the `[S0N]` marker; "short" in the contract
+describes the citation marker, not a trimming of the content — the agent needs
+the block's complete text, not a summary. "Coverage and limitations" enumerates,
+inventing nothing, only real available signals: warnings from
+`RetrievalOutcome.warnings`, `budgetExhausted`, `omittedCount` and sources
+filtered explicitly by the user. "Source registry" lists each distinct
+`packageRef` present in the included blocks, with its `sourceName`, `videoId`,
+title and creator.
 
-## Redacción de `result.json`
+## Writing `result.json`
 
-Función pura `renderContextResult(request, allocation, citations, metrics,
-warnings)` que produce el objeto versionado ya aprobado, con `units` (un
-elemento por bloque incluido, con su cita), `sources` (el mismo registro que
-la sección Markdown), `coverage` (conteos por `unitType` y por fuente) y
-`limitations` (texto derivado únicamente de warnings/truncamiento reales, en
-inglés). `status` es `"ok"` si hay al menos un bloque incluido, o
-`"no_results"` si `RetrievalOutcome.status` ya era `"no_results"` o si el
-presupuesto no permitió incluir ningún bloque (presupuesto absurdamente bajo,
-por ejemplo `--max-tokens 1`).
+A pure function `renderContextResult(request, allocation, citations, metrics,
+warnings)` that produces the versioned object already approved, with `units`
+(one element per included block, with its citation), `sources` (the same
+registry as the Markdown section), `coverage` (counts by `unitType` and by
+source) and `limitations` (text derived only from real warnings/truncation, in
+English). `status` is `"ok"` if there is at least one included block, or
+`"no_results"` if `RetrievalOutcome.status` was already `"no_results"` or if the
+budget did not allow including any block (an absurdly low budget, for example
+`--max-tokens 1`).
 
-## Escritura del bundle
+## Writing the bundle
 
-`writeContextBundle(bundle, outputDir)` en infraestructura crea
-`<outputDir>/<request_id>/context.md` y `result.json`. `request_id` sigue el
-mismo patrón ya usado para `SyncId` en `sync-source.ts`
-(`Date.now().toString(36)` + aleatorio), inyectable para pruebas
-deterministas. El formato `01J...` del ejemplo en `cli-contract.md` es
-ilustrativo, no una exigencia de ULID real: no se añade una dependencia nueva
-para generarlo, igual que `SyncId` no la necesitó.
+`writeContextBundle(bundle, outputDir)` in infrastructure creates
+`<outputDir>/<request_id>/context.md` and `result.json`. `request_id` follows
+the same pattern already used for `SyncId` in `sync-source.ts`
+(`Date.now().toString(36)` + random), injectable for deterministic tests. The
+`01J...` format of the example in `cli-contract.md` is illustrative, not a
+demand for a real ULID: no new dependency is added to generate it, just as
+`SyncId` did not need one.
 
-Sin `--out`, se usa `os.tmpdir()` con el mismo `request_id` como subcarpeta —
-consistente con "sin él, se utiliza un directorio temporal identificado por
-`request_id`" en `cli-contract.md`. `--out` con una ruta existente y no vacía
-que no sea ya un directorio de un `request_id` anterior debe fallar de forma
-explícita en vez de mezclar bundles.
+Without `--out`, `os.tmpdir()` is used with the same `request_id` as a
+subfolder — consistent with "without it, a temporary directory identified by
+`request_id` is used" in `cli-contract.md`. `--out` with an existing, non-empty
+path that is not already the directory of a previous `request_id` must fail
+explicitly instead of mixing bundles.
 
-## Comando `retrieve`
+## The `retrieve` command
 
 ```text
 auto-youtube-rag retrieve <query> \
@@ -312,84 +311,84 @@ auto-youtube-rag retrieve <query> \
   [--out <directory>]
 ```
 
-`--source` es repetible (igual patrón que otros filtros de lista). El
-comando:
+`--source` is repeatable (the same pattern as other list filters). The command:
 
-1. parsea argumentos y construye `RetrievalQuery`/`RetrievalFilter`/
-   `RetrievalLimits` con los valores por defecto de 2.2;
-2. llama `application.retrieveCandidates`;
-3. si `status` es `no_results`, ensambla igual un bundle mínimo con
-   `coverage`/`limitations` explicando la ausencia de evidencia, en vez de no
-   escribir nada — el agente siempre recibe un bundle que puede leer;
-4. si hay candidatos, expande, deduplica, presupuesta, cita y renderiza;
-5. escribe el bundle y emite el recibo compacto de `cli-contract.md` en
+1. parses arguments and builds `RetrievalQuery`/`RetrievalFilter`/
+   `RetrievalLimits` with the default values of 2.2;
+2. calls `application.retrieveCandidates`;
+3. if `status` is `no_results`, it assembles a minimal bundle all the same, with
+   `coverage`/`limitations` explaining the absence of evidence, instead of
+   writing nothing — the agent always receives a bundle it can read;
+4. if there are candidates, it expands, deduplicates, budgets, cites and
+   renders;
+5. writes the bundle and emits the compact receipt of `cli-contract.md` on
    `stdout`;
-6. código de salida `0` para `ok`/`no_results`, `1` si `retrieveCandidates`
-   sólo pudo completar una vía degradada y eso se refleja como `status:
-"partial"` en el recibo, `2` para uso inválido.
+6. exit code `0` for `ok`/`no_results`, `1` if `retrieveCandidates` could only
+   complete one degraded path and that is reflected as `status: "partial"` in
+   the receipt, `2` for invalid use.
 
-`stderr` recibe únicamente progreso ("Retrieving context...", "Assembling
-bundle..."), igual que `sync`.
+`stderr` receives progress only ("Retrieving context...", "Assembling
+bundle..."), just like `sync`.
 
-## Invariantes
+## Invariants
 
-- Ningún bloque se trunca a la mitad: se incluye completo o se omite.
-- Ninguna cita `[S0N]` queda sin su registro correspondiente en
-  `result.json`, y viceversa.
-- El ensamblado nunca vuelve a tokenizar ni abre el modelo de embeddings:
-  usa exclusivamente `tokenCount`/`estimatedTokens` ya persistidos.
-- El ensamblado nunca escribe en SQLite ni en las fuentes.
-- Un paquete fuente nunca se abre directamente: todo el contenido citado sale
-  de `KnowledgeRepository`.
-- `context.md` no responde la consulta ni agrega inferencias: sólo organiza
-  evidencia con procedencia.
-- `limitations` y "Coverage and limitations" nunca fabrican una causa: sólo
-  describen señales reales (`warnings`, `budgetExhausted`, `omittedCount`,
-  filtros aplicados).
-- `retrieve` no se anuncia como disponible hasta que este punto cierre.
+- No block is truncated in half: it is included whole or omitted.
+- No `[S0N]` citation is left without its corresponding record in
+  `result.json`, and vice versa.
+- Assembly never tokenises again nor opens the embedding model: it uses
+  exclusively the `tokenCount`/`estimatedTokens` already persisted.
+- Assembly never writes to SQLite or to the sources.
+- A source package is never opened directly: all cited content comes out of
+  `KnowledgeRepository`.
+- `context.md` does not answer the query nor add inferences: it only organises
+  evidence with provenance.
+- `limitations` and "Coverage and limitations" never fabricate a cause: they
+  only describe real signals (`warnings`, `budgetExhausted`, `omittedCount`,
+  applied filters).
+- `retrieve` is not announced as available until this point is closed.
 
-## Pruebas exigidas
+## Required tests
 
-- Presupuesto: `ContextDepth` resuelve los tres presets; `--max-tokens`
-  reemplaza el preset sin cambiar su nombre; un entero no positivo o no
-  entero se rechaza.
-- Expansión: un candidato hijo trae a su padre y abuelo hasta la raíz; dos
-  candidatos hermanos no duplican el padre común; una unidad ya candidata
-  nunca se repite como ancestro.
-- Deduplicación: dos unidades con `contentHash` idéntico producen un solo
-  bloque y una sola cita.
-- Presupuesto y truncamiento: un presupuesto pequeño omite bloques enteros,
-  nunca los recorta; el primer bloque se incluye igual si por sí solo excede
-  el presupuesto; `omittedCount` y `budgetExhausted` son correctos.
-- Citas: los IDs son secuenciales sin huecos en el orden final de inclusión;
-  dos bloques del mismo video con `headingPath` distinto reciben citas
-  distintas; todo `[S0N]` del Markdown resuelve en `result.json`.
-- Redacción: `context.md` conserva las seis secciones fijas y el
-  front-matter; `result.json` valida contra el esquema de `cli-contract.md`.
-- CLI: `retrieve` sin resultados escribe un bundle válido con
-  `status: "no_results"`; `--source` repetido filtra correctamente; `--out`
-  respeta la ruta pedida; sin `--out` usa un directorio temporal; los códigos
-  de salida coinciden con el contrato.
-- E2E: ciclo completo sobre la colección temporal reproducible, con
-  embeddings deterministas como en `test/e2e/retrieval.e2e.test.ts`, y digest
-  del árbol fuente sin cambios antes/después.
+- Budget: `ContextDepth` resolves the three presets; `--max-tokens` replaces the
+  preset without changing its name; a non-positive or non-integer value is
+  rejected.
+- Expansion: a child candidate brings in its parent and grandparent up to the
+  root; two sibling candidates do not duplicate the common parent; a unit
+  already present as a candidate is never repeated as an ancestor.
+- Deduplication: two units with an identical `contentHash` produce a single
+  block and a single citation.
+- Budget and truncation: a small budget omits whole blocks, never trims them;
+  the first block is included anyway if on its own it exceeds the budget;
+  `omittedCount` and `budgetExhausted` are correct.
+- Citations: the IDs are sequential with no gaps in the final inclusion order;
+  two blocks from the same video with different `headingPath`s receive different
+  citations; every `[S0N]` in the Markdown resolves in `result.json`.
+- Writing: `context.md` keeps the six fixed sections and the front matter;
+  `result.json` validates against the schema of `cli-contract.md`.
+- CLI: `retrieve` with no results writes a valid bundle with
+  `status: "no_results"`; a repeated `--source` filters correctly; `--out`
+  respects the requested path; without `--out` it uses a temporary directory;
+  the exit codes match the contract.
+- E2E: the complete cycle over the reproducible temporary collection, with
+  deterministic embeddings as in `test/e2e/retrieval.e2e.test.ts`, and a digest
+  of the source tree unchanged before/after.
 
-## Decisiones aprobadas el 12 de agosto de 2026
+## Decisions approved on 12 August 2026
 
-1. Bucketing fijo por `unitType`: unidades de documento/sección van siempre a
-   "Highest-relevance context" y reglas/patrones siempre a "Related rules and
-   patterns", nunca por puntaje puro.
-2. Ancestros de expansión caen siempre en "Additional relevant context",
-   nunca en las dos secciones anteriores, aunque el ancestro sea en sí un
-   `rule_pattern` relevante.
-3. Regla de bloque único que excede el presupuesto: se incluye igual y el
-   presupuesto se marca agotado de inmediato, en vez de omitirlo.
-4. Deduplicación en dos niveles desde el inicio de 2.3: por `unitId`
-   (estructural, bloque J1) y por `contentHash` (contenido idéntico bajo
-   unidades distintas, bloque J2). No se pospone.
-5. `request_id` usa el mismo generador ad-hoc que `SyncId` (sin dependencia
-   nueva). Es independiente de la decisión 4: una nombra el directorio del
-   bundle, la otra colapsa contenido repetido dentro del bundle.
-6. Presupuestos por profundidad: se mantienen los valores ya fijados en
-   `cli-contract.md` (`focused` 12k / `balanced` 32k / `deep` 64k) sin
-   recalibrar en este punto.
+1. Fixed bucketing by `unitType`: document/section units always go to
+   "Highest-relevance context" and rules/patterns always to "Related rules and
+   patterns", never by raw score.
+2. Expansion ancestors always fall into "Additional relevant context", never
+   into the two preceding sections, even if the ancestor is itself a relevant
+   `rule_pattern`.
+3. Rule for a single block that exceeds the budget: it is included anyway and
+   the budget is marked exhausted immediately, instead of omitting it.
+4. Deduplication at two levels from the start of 2.3: by `unitId` (structural,
+   block J1) and by `contentHash` (identical content under different units,
+   block J2). It is not postponed.
+5. `request_id` uses the same ad-hoc generator as `SyncId` (with no new
+   dependency). It is independent of decision 4: one names the bundle's
+   directory, the other collapses repeated content within the bundle.
+6. Per-depth budgets: the values already fixed in `cli-contract.md` are kept
+   (`focused` 12k / `balanced` 32k / `deep` 64k) without recalibrating in this
+   point.
