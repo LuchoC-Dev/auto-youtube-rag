@@ -6,7 +6,7 @@ Redactada y aprobada el 12 de agosto de 2026 para N1 de
 [`docs/eval-design.md`](../docs/eval-design.md). Ancla en `expected.notes` de
 cada consulta semilla ([`evals/queries/seed-queries.json`](queries/seed-queries.json))
 para no inventar un criterio nuevo, tal como especifica
-[`docs/eval-design.md`](../docs/eval-design.md#capa-b--relevancia-juzgada-por-codex-y-por-claude).
+[`docs/eval-design.md`](../docs/eval-design.md#layer-b--relevance-judged-by-codex-and-by-claude).
 
 ## Por qué existe este documento
 

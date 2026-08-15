@@ -1,137 +1,137 @@
-# Diseño de indexación incremental
+# Incremental indexing design
 
-## Estado
+## Status
 
-Especificación aprobada el 10 de agosto de 2026. Este documento es la fuente de
-verdad para entidades, puertos y esquema SQLite del punto 2.1. La implementación
-debe seguir un plan y tareas revisados antes de comenzar.
+Specification approved on 10 August 2026. This document is the source of truth
+for the entities, ports and SQLite schema of point 2.1. The implementation must
+follow a plan and tasks reviewed before starting.
 
-## Evidencia inspeccionada
+## Evidence inspected
 
-La colección real `auto-design` contiene 33 videos y una entrada web. Los 33
-`video_id` y slugs son únicos. Todos los videos poseen `context.md`,
-`rules.json` y `metadata.json`; en conjunto contienen 243 patrones. Los
-`rules.json` comparten la misma forma y los IDs de patrón son únicos al
-combinarlos con su video.
+The real `auto-design` collection contains 33 videos and one web entry. All 33
+`video_id`s and slugs are unique. Every video has `context.md`, `rules.json` and
+`metadata.json`; together they contain 243 patterns. The `rules.json` files
+share the same shape and the pattern IDs are unique once combined with their
+video.
 
-Los frontmatters de `context.md` varían ligeramente, pero comparten identidad,
-idiomas y procedencia. `metadata.json` es una salida extensa y volátil de
-yt-dlp, por lo que no debe copiarse completo al índice.
+The frontmatters of `context.md` vary slightly, but they share identity,
+languages and provenance. `metadata.json` is an extensive and volatile yt-dlp
+output, so it must not be copied whole into the index.
 
-## Suposiciones revisables
+## Revisable assumptions
 
-1. El `manifest.json` ubicado sobre `videos/` es el inventario autoritativo de
-   cada raíz registrada. `source add` acepta la raíz de colección o su carpeta
-   `videos/`; al registrar se resuelven y almacenan ambas rutas canónicas.
-2. `video_id` identifica el video y `(source_name, video_id)` identifica el
-   paquete concreto. El slug sólo localiza archivos y puede cambiar.
-3. El MVP procesa únicamente `manifest.videos`; ignora `manifest.pages` sin
-   considerarlo un error.
-4. `context.md` y `rules.json` aportan conocimiento. `manifest.json` y el
-   subconjunto seleccionado de `metadata.json` aportan inventario, filtros y
-   procedencia.
-5. Los archivos fuente son inmutables para el RAG. Todos los datos generados se
-   guardan en la biblioteca SQLite.
-6. Una misma instancia SQLite administra múltiples raíces.
+1. The `manifest.json` sitting above `videos/` is the authoritative inventory of
+   each registered root. `source add` accepts the collection root or its
+   `videos/` folder; on registering, both canonical paths are resolved and
+   stored.
+2. `video_id` identifies the video and `(source_name, video_id)` identifies the
+   concrete package. The slug only locates files and may change.
+3. The MVP processes `manifest.videos` only; it ignores `manifest.pages` without
+   treating that as an error.
+4. `context.md` and `rules.json` contribute knowledge. `manifest.json` and the
+   selected subset of `metadata.json` contribute inventory, filters and
+   provenance.
+5. Source files are immutable for the RAG. All generated data is stored in the
+   SQLite library.
+6. A single SQLite instance administers multiple roots.
 
-## Modelo del dominio
+## Domain model
 
 ### `SourceRoot`
 
-Raíz registrada por el usuario. Su nombre es único y estable; conserva las
-rutas canónicas de la colección, el manifest y `videos/`, además del estado
-habilitado y la fecha de registro. La ruta puede cambiar mediante una operación
-explícita futura, pero nunca se infiere por el slug de un paquete.
+A root registered by the user. Its name is unique and stable; it keeps the
+canonical paths of the collection, the manifest and `videos/`, along with the
+enabled state and the registration date. The path can change through a future
+explicit operation, but it is never inferred from a package's slug.
 
 ### `VideoPackage`
 
-Representa una aparición de un video dentro de una raíz. Su identidad natural
-es `(sourceName, videoId)`. Conserva slug, ruta relativa, estado del manifest,
-metadata estable, huella del paquete y última sincronización en la que fue
-observado.
+Represents one appearance of a video inside a root. Its natural identity is
+`(sourceName, videoId)`. It keeps the slug, relative path, manifest stage,
+stable metadata, package fingerprint and the last synchronisation in which it
+was observed.
 
 ### `SourceDocument`
 
-Archivo derivado de un paquete con tipo `context`, `rules`, `analysis` o
-`metadata`. `rules` y `analysis` son mutuamente excluyentes por paquete: cada
-video real trae `rules.json` (schema 1.0) o `analysis.json` (schema 2.0),
-nunca ambos — ver "Soporte de `analysis.json` (schema 2.0)" en
-`docs/decisions.md` y `docs/analysis-schema-design.md`. Conserva ruta
-relativa, hash SHA-256, tamaño y parser versionado. Un cambio de hash o de
-versión del parser invalida únicamente sus datos derivados.
+A file derived from a package with kind `context`, `rules`, `analysis` or
+`metadata`. `rules` and `analysis` are mutually exclusive per package: every
+real video carries either `rules.json` (schema 1.0) or `analysis.json`
+(schema 2.0), never both — see "`analysis.json` support (schema 2.0)" in
+`docs/decisions.md` and `docs/analysis-schema-design.md`. It keeps the relative
+path, SHA-256 hash, size and versioned parser. A change of hash or of parser
+version invalidates its derived data only.
 
 ### `KnowledgeUnit`
 
-Unidad amplia que puede devolverse al agente. Forma una jerarquía mediante
-`parentId`, `depth` y `ordinal`. Tipos iniciales:
+A broad unit that can be returned to the agent. It forms a hierarchy through
+`parentId`, `depth` and `ordinal`. Initial types:
 
-- `context_document` y `context_section`;
-- `rules_document` y `rules_section`;
-- `rule_pattern`, `rule_item`, `avoid_item` y `acceptance_criterion`;
-- `analysis_document` y `analysis_section` (punto 4.1, schema 2.0);
-- `analysis_topic` y `analysis_recommendation`.
+- `context_document` and `context_section`;
+- `rules_document` and `rules_section`;
+- `rule_pattern`, `rule_item`, `avoid_item` and `acceptance_criterion`;
+- `analysis_document` and `analysis_section` (point 4.1, schema 2.0);
+- `analysis_topic` and `analysis_recommendation`.
 
-Cada unidad conserva texto renderizado, representación estructurada opcional,
-ruta de encabezados, timestamps existentes, evidencia visual, estimación de
-tokens y procedencia. Los documentos raíz sirven para expansión; no necesitan
-ser candidatos de búsqueda si exceden el límite del modelo.
+Every unit keeps rendered text, an optional structured representation, heading
+path, existing timestamps, visual evidence, token estimate and provenance. Root
+documents serve for expansion; they need not be search candidates if they exceed
+the model's limit.
 
 ### `SearchFragment`
 
-Unidad pequeña que sí participa en FTS5 y embeddings. Pertenece a una
-`KnowledgeUnit` y conserva posición, texto y hash. Los fragmentos respetan
-límites semánticos —párrafos, listas y campos JSON— y se dividen de nuevo según
-el límite de entrada declarado por el generador de embeddings. Una coincidencia
-en un fragmento se expande después a su unidad y padres.
+A small unit that does take part in FTS5 and embeddings. It belongs to a
+`KnowledgeUnit` and keeps position, text and hash. Fragments respect semantic
+boundaries — paragraphs, lists and JSON fields — and are split again according
+to the input limit declared by the embedding generator. A match on a fragment is
+then expanded to its unit and its parents.
 
 ### `EmbeddingRecord`
 
-Vector asociado a un fragmento y a un modelo concreto. Incluye identificador y
-versión del modelo, dimensión, hash del fragmento y vector `float32` como BLOB.
-Una clave de modelo diferente permite reconstruir embeddings sin alterar las
-unidades.
+A vector associated with a fragment and a concrete model. It includes the model
+identifier and version, dimension, fragment hash and the `float32` vector as a
+BLOB. A different model key makes it possible to rebuild embeddings without
+altering the units.
 
-### `SyncRun` y `SyncIssue`
+### `SyncRun` and `SyncIssue`
 
-`SyncRun` registra alcance, inicio, fin, estado y contadores. `SyncIssue`
-registra problemas por paquete o archivo sin abortar los demás. Una lectura
-inválida conserva la última versión válida del paquete y marca el resultado
-como parcial.
+`SyncRun` records scope, start, end, status and counters. `SyncIssue` records
+problems per package or file without aborting the rest. An invalid read keeps
+the last valid version of the package and marks the result as partial.
 
-## Identificadores deterministas
+## Deterministic identifiers
 
-- Paquete: `(source_name, video_id)`.
-- Documento: `(package_id, document_kind)`.
-- Sección Markdown: hash de la ruta normalizada de encabezados más el número de
-  aparición cuando una ruta se repite.
-- Patrón: `pattern:<pattern.id>`, siempre dentro del paquete.
-- Hijo de patrón: tipo más posición estable dentro del patrón.
-- Fragmento: `(unit_id, ordinal)` más `content_hash` para invalidación.
+- Package: `(source_name, video_id)`.
+- Document: `(package_id, document_kind)`.
+- Markdown section: hash of the normalised heading path plus the occurrence
+  number when a path repeats.
+- Pattern: `pattern:<pattern.id>`, always within the package.
+- Pattern child: type plus stable position within the pattern.
+- Fragment: `(unit_id, ordinal)` plus `content_hash` for invalidation.
 
-Renombrar un encabezado crea una unidad nueva; cambiar sólo su contenido
-conserva la identidad y reemplaza fragmentos afectados. Los IDs internos de
-SQLite son sustitutos y nunca se exponen como identidad pública.
+Renaming a heading creates a new unit; changing only its content preserves the
+identity and replaces the affected fragments. SQLite's internal IDs are
+surrogates and are never exposed as public identity.
 
-## Metadata admitida
+## Admitted metadata
 
-Se conservan únicamente campos útiles y relativamente estables:
+Only useful and relatively stable fields are kept:
 
-- `video_id`, título, creador/canal y URL canónica;
-- duración, fecha de publicación e idiomas;
-- estado y slug del manifest;
-- tags y categorías cuando existan;
-- perfil y cobertura visual declarados en los deliverables;
-- limitaciones y rutas relativas de evidencia.
+- `video_id`, title, creator/channel and canonical URL;
+- duration, publication date and languages;
+- manifest stage and slug;
+- tags and categories when they exist;
+- visual profile and coverage declared in the deliverables;
+- limitations and relative paths of evidence.
 
-No se indexan como conocimiento contadores, formatos de descarga, URLs
-temporales, cookies, headers ni el objeto crudo completo de yt-dlp.
+Counters, download formats, temporary URLs, cookies, headers and the complete
+raw yt-dlp object are not indexed as knowledge.
 
-## Puertos de aplicación
+## Application ports
 
-Los contratos usan tipos propios; ningún tipo de SQLite, Transformers.js o del
-sistema de archivos los atraviesa.
+The contracts use their own types; no SQLite, Transformers.js or filesystem type
+crosses them.
 
-### Lectura e inventario
+### Reading and inventory
 
 ```ts
 interface PackageSourceReader {
@@ -147,7 +147,7 @@ interface SourceRegistry {
 }
 ```
 
-### Persistencia e indexación
+### Persistence and indexing
 
 ```ts
 interface IndexStore {
@@ -166,11 +166,11 @@ interface EmbeddingGenerator {
 }
 ```
 
-`applyPackage` es una operación atómica: reemplaza documentos, unidades,
-fragmentos, filas FTS y embeddings derivados sólo después de construir una
-versión completa y válida.
+`applyPackage` is an atomic operation: it replaces documents, units, fragments,
+FTS rows and derived embeddings only after building a complete and valid
+version.
 
-### Recuperación futura
+### Future retrieval
 
 ```ts
 interface KnowledgeRepository {
@@ -194,14 +194,14 @@ interface VectorSearchIndex {
 }
 ```
 
-Los puertos de recuperación se detallarán en los puntos 2.2 y 2.3. Aquí sólo se
-fijan las dependencias que la indexación debe alimentar.
+The retrieval ports will be detailed in points 2.2 and 2.3. Only the
+dependencies that indexing must feed are fixed here.
 
-## Esquema SQLite propuesto
+## Proposed SQLite schema
 
-Todas las fechas usan texto UTC ISO 8601; los booleanos usan `INTEGER` con
-`CHECK`; los JSON se validan con `json_valid`. Las claves foráneas y el modo
-WAL se habilitan al abrir la base.
+All dates use UTC ISO 8601 text; booleans use `INTEGER` with `CHECK`; JSON is
+validated with `json_valid`. Foreign keys and WAL mode are enabled when the
+database is opened.
 
 ```sql
 CREATE TABLE schema_meta (
@@ -326,70 +326,71 @@ CREATE TABLE sync_issues (
 );
 ```
 
-La migración inicial añadirá triggers para mantener `fragment_fts` sincronizada
-con `search_fragments`, índices sobre relaciones y filtros frecuentes, y un
-`schema_version` explícito. El SQL final vivirá en infraestructura; este esquema
-es su contrato lógico.
+The initial migration will add triggers to keep `fragment_fts` synchronised with
+`search_fragments`, indexes over frequent relations and filters, and an explicit
+`schema_version`. The final SQL will live in infrastructure; this schema is its
+logical contract.
 
-## Algoritmo de sincronización
+## Synchronisation algorithm
 
-1. Crear un `SyncRun` y leer el manifest sin modificarlo.
-2. Validar cada entrada de `manifest.videos` y construir su `PackageRef`.
-3. Comparar hashes y versiones de parser/modelo con `IndexedPackageState`.
-4. Saltar paquetes sin cambios.
-5. Parsear completamente los documentos cambiados en memoria.
-6. Construir jerarquía, fragmentos y embeddings antes de persistir.
-7. Aplicar cada paquete válido en una transacción atómica.
-8. Registrar issues y conservar la última versión válida de paquetes fallidos.
-9. Tras completar un escaneo válido del manifest, eliminar paquetes que no
-   fueron vistos en ese run.
-10. Confirmar el run como `ok` o `partial` y actualizar el índice vectorial en
-    memoria sólo después del commit SQLite.
+1. Create a `SyncRun` and read the manifest without modifying it.
+2. Validate each `manifest.videos` entry and build its `PackageRef`.
+3. Compare hashes and parser/model versions against `IndexedPackageState`.
+4. Skip packages with no changes.
+5. Parse the changed documents completely in memory.
+6. Build hierarchy, fragments and embeddings before persisting.
+7. Apply each valid package in an atomic transaction.
+8. Record issues and keep the last valid version of failed packages.
+9. After completing a valid scan of the manifest, delete the packages that were
+   not seen in that run.
+10. Confirm the run as `ok` or `partial` and update the in-memory vector index
+    only after the SQLite commit.
 
-Si el manifest completo es ilegible (raíz no es un objeto, `videos` no es un
-array, JSON inválido o archivo no leíble), no se interpretan todos los
-paquetes como eliminados. El run falla y el índice previo permanece intacto.
+If the whole manifest is unreadable (the root is not an object, `videos` is not
+an array, invalid JSON or an unreadable file), all the packages are not
+interpreted as deleted. The run fails and the previous index stays intact.
 
-**Una entrada individual inválida de `manifest.videos` no aborta el manifest
-completo.** Desde el 13 de agosto de 2026 (ver `docs/decisions.md`,
-"Validación tolerante por video"), un video con esquema roto o un id/slug
-duplicado se descarta como `ManifestVideoIssue` y el resto del manifest se
-procesa igual. `syncSource` registra cada una como `SyncIssue` y, si el video
-tenía una versión previa indexada, la marca vista para que sobreviva a la
-eliminación por "no visto en este run" — un video que retrocede a un esquema
-inválido nunca debe parecer eliminado de la colección.
+**An individual invalid `manifest.videos` entry does not abort the whole
+manifest.** Since 13 August 2026 (see `docs/decisions.md`, "Per-video tolerant
+validation in the manifest"), a video with a broken schema or a duplicate
+id/slug is dropped as a `ManifestVideoIssue` and the rest of the manifest is
+processed all the same. `syncSource` records each one as a `SyncIssue` and, if
+the video had a previously indexed version, marks it as seen so that it survives
+the "not seen in this run" deletion — a video that regresses to an invalid
+schema must never look deleted from the collection.
 
-## Invariantes
+## Invariants
 
-- Sin escrituras dentro de las raíces fuente.
-- Una unidad siempre pertenece a exactamente un documento y paquete.
-- Un fragmento nunca excede el límite declarado por el modelo.
-- Un embedding coincide en hash con su fragmento y en dimensión con su modelo.
-- FTS5 contiene exactamente los fragmentos persistidos.
-- Repetir `sync` sin cambios no crea filas ni recalcula embeddings.
-- Un error aislado no destruye la última versión válida del paquete.
-- Las eliminaciones sólo se aplican después de leer correctamente el manifest.
+- No writes inside the source roots.
+- A unit always belongs to exactly one document and package.
+- A fragment never exceeds the limit declared by the model.
+- An embedding matches its fragment in hash and its model in dimension.
+- FTS5 contains exactly the persisted fragments.
+- Repeating `sync` with no changes creates no rows and recomputes no embeddings.
+- An isolated error does not destroy the last valid version of the package.
+- Deletions are applied only after reading the manifest correctly.
 
-## Pruebas exigidas para implementar
+## Tests required in order to implement
 
-- Parser de manifest con videos y páginas mezclados.
-- Identidades estables ante cambios de slug y contenido.
-- Jerarquía Markdown con encabezados repetidos y niveles omitidos.
-- Conversión completa de cada forma de `rules.json` observada.
-- Selección explícita de metadata y rechazo de campos volátiles.
-- Fragmentación bajo el límite del modelo, incluso con un bloque largo.
-- Sincronización inicial, repetida, modificada y con eliminación.
-- Paquete inválido que conserva su última versión válida.
-- Manifest inválido que no provoca eliminaciones.
-- Atomicidad SQLite, cascadas, triggers FTS5 y reapertura.
-- Reconstrucción por cambio de parser o modelo.
+- Manifest parser with videos and pages mixed together.
+- Stable identities under slug and content changes.
+- Markdown hierarchy with repeated headings and skipped levels.
+- Complete conversion of every observed shape of `rules.json`.
+- Explicit selection of metadata and rejection of volatile fields.
+- Fragmentation under the model's limit, even with a long block.
+- Initial, repeated, modified and deleting synchronisation.
+- An invalid package that keeps its last valid version.
+- An invalid manifest that causes no deletions.
+- SQLite atomicity, cascades, FTS5 triggers and reopening.
+- Rebuilding on a parser or model change.
 
-## Decisiones aprobadas
+## Approved decisions
 
-El 10 de agosto de 2026 se aprobaron explícitamente:
+On 10 August 2026 the following were explicitly approved:
 
-1. la separación entre `KnowledgeUnit` amplia y `SearchFragment` pequeño;
-2. la identidad `(source_name, video_id)` del paquete;
-3. el subconjunto de metadata;
-4. la granularidad de `rules.json`;
-5. el esquema SQLite y la política de conservar el último paquete válido.
+1. the separation between the broad `KnowledgeUnit` and the small
+   `SearchFragment`;
+2. the `(source_name, video_id)` identity of the package;
+3. the metadata subset;
+4. the granularity of `rules.json`;
+5. the SQLite schema and the policy of keeping the last valid package.

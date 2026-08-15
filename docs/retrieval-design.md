@@ -1,69 +1,68 @@
-# Diseño de recuperación híbrida
+# Hybrid retrieval design
 
-## Estado
+## Status
 
-Especificación propuesta el 11 de agosto de 2026 para el punto 2.2. Este
-documento es la fuente de verdad de contratos, adaptadores y política de fusión
-de la recuperación. Continúa [indexing-design.md](indexing-design.md), que ya
-reservó las firmas de `KnowledgeRepository`, `TextSearchIndex` y
-`VectorSearchIndex`.
+Specification proposed on 11 August 2026 for point 2.2. This document is the
+source of truth for retrieval's contracts, adapters and fusion policy. It
+continues [indexing-design.md](indexing-design.md), which already reserved the
+signatures of `KnowledgeRepository`, `TextSearchIndex` and `VectorSearchIndex`.
 
-## Alcance
+## Scope
 
-El punto 2.2 entrega candidatos recuperados, fusionados, diversificados y con
-procedencia completa. No ensambla `context.md`, no aplica presupuestos por
-profundidad y no expone superficie de CLI.
+Point 2.2 delivers candidates that have been retrieved, fused, diversified and
+given complete provenance. It does not assemble `context.md`, does not apply
+per-depth budgets and exposes no CLI surface.
 
-| Dentro de 2.2                    | Fuera de 2.2 (corresponde a 2.3)     |
-| -------------------------------- | ------------------------------------ |
-| Consulta normalizada y filtros   | Presets `focused`/`balanced`/`deep`  |
-| Búsqueda FTS5 con `bm25()`       | Presupuesto de tokens                |
-| Búsqueda vectorial exacta con E5 | Expansión a unidades padre           |
-| Fusión RRF ponderada             | Redacción de `context.md`            |
-| Deduplicación y diversidad       | Asignación de citas `[S01]`          |
-| Procedencia hasta paquete        | Escritura del bundle y `result.json` |
-| Métricas y advertencias          | Comando `retrieve`                   |
+| Inside 2.2                     | Outside 2.2 (belongs to 2.3)         |
+| ------------------------------ | ------------------------------------ |
+| Normalised query and filters   | `focused`/`balanced`/`deep` presets  |
+| FTS5 search with `bm25()`      | Token budget                         |
+| Exact vector search with E5    | Expansion to parent units            |
+| Weighted RRF fusion            | Writing `context.md`                 |
+| Deduplication and diversity    | Assigning `[S01]` citations          |
+| Provenance down to the package | Writing the bundle and `result.json` |
+| Metrics and warnings           | The `retrieve` command               |
 
-`retrieve` no se anuncia como disponible hasta cerrar 2.3.
+`retrieve` is not announced as available until 2.3 is closed.
 
-## Decisión de fusión aprobada
+## Approved fusion decision
 
-El 11 de agosto de 2026 se aprobó **RRF ponderado detrás de una interfaz
-sustituible**, resolviendo el único asunto abierto de
-[product-spec.md](product-spec.md).
+On 11 August 2026 **weighted RRF behind a replaceable interface** was approved,
+resolving the only open matter of [product-spec.md](product-spec.md).
 
-`bm25()` devuelve valores negativos sin cota estable y la similitud coseno vive
-en `0..1`. No son comparables, y normalizarlos por lote haría que el orden
-dependa de qué otros candidatos aparecieron. RRF ignora la magnitud y combina
-únicamente posiciones:
+`bm25()` returns negative values with no stable bound and cosine similarity
+lives in `0..1`. They are not comparable, and normalising them per batch would
+make the ordering depend on which other candidates appeared. RRF ignores the
+magnitude and combines positions only:
 
 ```text
 score(f) = Σ  w_i / (k + rank_i(f))
 ```
 
-Baseline: `k = 60`, `wText = 1.0`, `wVector = 1.0`. Un fragmento que aparece en
-una sola lista conserva su aporte; un fragmento señalado por ambas vías gana por
-consenso. Esa preservación de los hits exclusivos es la razón de la decisión: el
-criterio de éxito del producto es cobertura amplia, no una única coincidencia.
+Baseline: `k = 60`, `wText = 1.0`, `wVector = 1.0`. A fragment appearing in a
+single list keeps its contribution; a fragment flagged by both paths wins by
+consensus. That preservation of the exclusive hits is the reason for the
+decision: the product's success criterion is broad coverage, not a single
+match.
 
-Se descartó la cascada —una vía filtra y la otra reordena— porque elimina los
-hits que sólo una vía encuentra. A la escala real (2.967 fragmentos, ~1,1 MB de
-vectores) ejecutar ambas vías completas no tiene costo relevante, de modo que la
-cascada no aporta rendimiento y sólo reduce recall.
+The cascade — one path filters and the other reranks — was rejected because it
+eliminates the hits that only one path finds. At the real scale (2,967
+fragments, ~1.1 MB of vectors) running both paths in full has no relevant cost,
+so the cascade contributes no performance and only reduces recall.
 
-Limitación conocida y aceptada: RRF descarta la distancia entre puntajes. Dos
-fragmentos con coseno 0,95 y 0,40 se tratan como primero y segundo. Por eso la
-estrategia queda detrás de `FusionStrategy` y los pesos se calibran en la etapa
-3.2 con consultas reales, sin modificar casos de uso ni adaptadores.
+Known and accepted limitation: RRF discards the distance between scores. Two
+fragments with cosine 0.95 and 0.40 are treated as first and second. That is why
+the strategy stays behind `FusionStrategy` and the weights get calibrated in
+stage 3.2 with real queries, without modifying use cases or adapters.
 
-## Modelo de recuperación
+## Retrieval model
 
-### Consulta normalizada
+### Normalised query
 
-`RetrievalQuery` es un value object del dominio. Normaliza el texto a NFC,
-recorta espacios y rechaza consultas vacías o exclusivamente de puntuación. No
-altera acentos ni mayúsculas: `remove_diacritics 2` ya resuelve los diacríticos
-del lado FTS5, y E5 recibe el texto original.
+`RetrievalQuery` is a domain value object. It normalises the text to NFC, trims
+whitespace and rejects queries that are empty or made only of punctuation. It
+does not alter accents or capitalisation: `remove_diacritics 2` already resolves
+the diacritics on the FTS5 side, and E5 receives the original text.
 
 ```ts
 interface RetrievalQuery {
@@ -80,36 +79,35 @@ interface RetrievalFilter {
 }
 
 interface RetrievalLimits {
-  readonly textCandidates: number; // por defecto 100
-  readonly vectorCandidates: number; // por defecto 100
-  readonly fusedResults: number; // por defecto 50
-  readonly maxPerVideo: number; // por defecto 4
+  readonly textCandidates: number; // 100 by default
+  readonly vectorCandidates: number; // 100 by default
+  readonly fusedResults: number; // 50 by default
+  readonly maxPerVideo: number; // 4 by default
 }
 ```
 
-Un filtro vacío significa "sin restricción". Los límites son de candidatos, no
-de tokens; el presupuesto es un asunto de 2.3.
+An empty filter means "no restriction". The limits are on candidates, not on
+tokens; the budget is a matter for 2.3.
 
-La consulta admite como máximo 1000 caracteres. El límite evita que un documento
-pegado por error llegue al modelo de embeddings o al parser de FTS5; las
-consultas reales de un agente son mucho más cortas. También se colapsan los
-espacios internos, de modo que dos escrituras de la misma consulta produzcan el
-mismo resultado.
+The query admits at most 1,000 characters. The limit stops a document pasted by
+mistake from reaching the embedding model or the FTS5 parser; an agent's real
+queries are much shorter. Internal whitespace is collapsed as well, so that two
+spellings of the same query produce the same result.
 
-Los tags de idioma se comparan en minúsculas porque los paquetes indexados los
-declaran de forma inconsistente. Las listas de filtro conservan la primera
-aparición de cada criterio: repetir un valor nunca cambia el SQL resultante.
+Language tags are compared in lower case because the indexed packages declare
+them inconsistently. The filter lists keep the first appearance of each
+criterion: repeating a value never changes the resulting SQL.
 
-### Hits y candidatos
+### Hits and candidates
 
-Cada vía devuelve `RankedHit`, con la posición ya resuelta por el adaptador.
-El caso de uso nunca compara puntajes crudos entre vías.
+Each path returns `RankedHit`, with the position already resolved by the
+adapter. The use case never compares raw scores across paths.
 
 ```ts
 interface RankedHit {
   readonly fragmentId: SearchFragmentId;
-  readonly rank: number; // 1-based, denso, sin huecos
-  readonly rawScore: number; // diagnóstico y evaluación; nunca fusionado
+  readonly rank: number; // 1-based, dense, with no gaps
+  readonly rawScore: number; // diagnostics and evaluation; never fused
 }
 
 interface RetrievalCandidate {
@@ -123,12 +121,12 @@ interface RetrievalCandidate {
 }
 ```
 
-`provenance` transporta ruta de encabezados, tipo de unidad, título y ruta
-relativa del documento, creador, timestamps y evidencia visual. Es la materia
-prima con la que 2.3 construye `[S01]`. Ninguna fila de SQLite ni tensor de
-Transformers.js cruza estos límites.
+`provenance` carries the heading path, unit type, title and relative path of the
+document, creator, timestamps and visual evidence. It is the raw material with
+which 2.3 builds `[S01]`. No SQLite row or Transformers.js tensor crosses these
+boundaries.
 
-### Resultado
+### Result
 
 ```ts
 interface RetrievalOutcome {
@@ -139,11 +137,11 @@ interface RetrievalOutcome {
 }
 ```
 
-Una consulta sin coincidencias es `no_results` con `candidates` vacío: es un
-estado terminal válido, no un error, y corresponde al código de proceso `0`
-según [cli-contract.md](cli-contract.md).
+A query with no matches is `no_results` with an empty `candidates`: it is a
+valid terminal state, not an error, and corresponds to process code `0`
+according to [cli-contract.md](cli-contract.md).
 
-## Puertos
+## Ports
 
 ```ts
 interface TextSearchIndex {
@@ -174,177 +172,175 @@ interface FusionStrategy {
 }
 ```
 
-`VectorSearchIndex` extiende el `VectorIndexSink` actual con lectura. Es
-deliberado: hoy `MemoryVectorIndexSink` recibe cambios pero no consulta, y
-mantener dos objetos con copias distintas de los mismos vectores permitiría que
-diverjan. `sync` sigue publicando exclusivamente después del commit SQLite.
+`VectorSearchIndex` extends the current `VectorIndexSink` with reading. That is
+deliberate: today `MemoryVectorIndexSink` receives changes but does not query,
+and keeping two objects with different copies of the same vectors would let them
+diverge. `sync` still publishes exclusively after the SQLite commit.
 
-`getUnits` y `getAncestors` se declaran e implementan en 2.2 porque el
-repositorio es un solo adaptador, pero su consumo real ocurre en 2.3.
+`getUnits` and `getAncestors` are declared and implemented in 2.2 because the
+repository is a single adapter, but their real consumption happens in 2.3.
 
-## Adaptador textual
+## Textual adapter
 
-`SqliteTextSearchIndex` consulta `fragment_fts` y ordena por `bm25()`.
+`SqliteTextSearchIndex` queries `fragment_fts` and orders by `bm25()`.
 
-### Sanitización de la consulta
+### Query sanitisation
 
-La gramática de `MATCH` no es `LIKE`. Una consulta cruda como `diseño 3d: guía
-(2024)` lanza un error de sintaxis, y palabras como `OR`, `NEAR` o `NOT` se
-interpretan como operadores. El adaptador convierte el texto en una consulta
-segura:
+The grammar of `MATCH` is not `LIKE`. A raw query such as `diseño 3d: guía
+(2024)` throws a syntax error, and words like `OR`, `NEAR` or `NOT` are
+interpreted as operators. The adapter turns the text into a safe query:
 
-1. extraer como tokens las secuencias de letras y números, exactamente lo que
-   el tokenizador `unicode61` considera token;
-2. descartar todo lo demás —comillas, dos puntos, asteriscos, acentos
-   circunflejos, paréntesis y guiones son separadores, de modo que la
-   puntuación hostil nunca llega al parser;
-3. deduplicar tokens sin distinguir mayúsculas, porque FTS5 pliega el caso al
-   indexar;
-4. envolver cada token en comillas dobles, lo que convierte `OR`, `NOT` y
-   `NEAR` en términos literales;
-5. limitar a 64 tokens para no agotar la profundidad de expresión de FTS5;
-6. unir con `OR` explícito para maximizar cobertura;
-7. si no queda ningún token, devolver `null` y no ejecutar SQL.
+1. extract as tokens the sequences of letters and numbers, exactly what the
+   `unicode61` tokenizer considers a token;
+2. discard everything else — quotes, colons, asterisks, circumflex accents,
+   parentheses and hyphens are separators, so hostile punctuation never reaches
+   the parser;
+3. deduplicate tokens without distinguishing case, because FTS5 folds case when
+   indexing;
+4. wrap each token in double quotes, which turns `OR`, `NOT` and `NEAR` into
+   literal terms;
+5. limit to 64 tokens so as not to exhaust FTS5's expression depth;
+6. join with an explicit `OR` to maximise coverage;
+7. if no token is left, return `null` and run no SQL.
 
-La suite verifica cada expresión generada contra un `MATCH` real de FTS5: la
-gramática del motor es la única autoridad sobre si una consulta parsea.
+The suite verifies every generated expression against a real FTS5 `MATCH`: the
+engine's grammar is the only authority on whether a query parses.
 
-El usuario nunca escribe sintaxis FTS5; ningún operador suyo se honra. Esto es
-una decisión de seguridad y de previsibilidad, no una limitación temporal.
+The user never writes FTS5 syntax; no operator of theirs is honoured. This is a
+decision about security and predictability, not a temporary limitation.
 
-### Puntaje y orden
+### Score and ordering
 
-`bm25()` es más negativo cuanto mejor la coincidencia, de modo que el orden es
-`ASC`. Las columnas se ponderan `title = 3.0`, `heading_path = 2.0`,
-`content = 1.0`: un fragmento cuyo encabezado nombra el concepto suele ser mejor
-contexto que uno que lo menciona de pasada. El desempate es `fragment_id ASC`
-para que el orden sea totalmente determinista.
+`bm25()` gets more negative the better the match, so the ordering is `ASC`. The
+columns are weighted `title = 3.0`, `heading_path = 2.0`, `content = 1.0`: a
+fragment whose heading names the concept is usually better context than one that
+mentions it in passing. The tie-break is `fragment_id ASC` so that the ordering
+is fully deterministic.
 
-Los filtros se aplican con `JOIN` sobre `search_fragments`, `knowledge_units`,
-`source_documents`, `video_packages` y `sources`, después del `MATCH`, para no
-invalidar el uso del índice FTS.
+The filters are applied with a `JOIN` over `search_fragments`,
+`knowledge_units`, `source_documents`, `video_packages` and `sources`, after the
+`MATCH`, so as not to invalidate the use of the FTS index.
 
-## Adaptador vectorial
+## Vector adapter
 
-`InMemoryVectorSearchIndex` mantiene un `Float32Array` contiguo de
-`fragmentos × 384` más un array paralelo de identidades y atributos de filtro.
+`InMemoryVectorSearchIndex` keeps a contiguous `Float32Array` of
+`fragments × 384` plus a parallel array of identities and filter attributes.
 
-### Carga
+### Loading
 
-Se construye perezosamente desde SQLite, no al crear la aplicación: abrir la CLI
-para `source list` no debe leer 1,1 MB de BLOBs ni tocar el modelo.
+It is built lazily from SQLite, not when the application is created: opening the
+CLI for `source list` must not read 1.1 MB of BLOBs nor touch the model.
 
-`sync` publica cambios que transportan vectores e identidades, pero no el tipo
-de unidad ni el idioma sobre los que filtra la recuperación. Por eso `apply` no
-parchea el índice —dejaría entradas nuevas imposibles de filtrar— sino que
-descarta el snapshot y deja que la siguiente consulta lo reconstruya. SQLite ya
-es la fuente de verdad y el cambio se publica después del commit, así que la
-reconstrucción es siempre correcta y cuesta milisegundos a esta escala.
-Reiniciar el proceso reconstruye por el mismo camino.
+`sync` publishes changes that carry vectors and identities, but not the unit
+type or the language that retrieval filters on. That is why `apply` does not
+patch the index — it would leave new entries impossible to filter — but instead
+discards the snapshot and lets the next query rebuild it. SQLite is already the
+source of truth and the change is published after the commit, so the rebuild is
+always correct and costs milliseconds at this scale. Restarting the process
+rebuilds by the same route.
 
-### Validación del modelo
+### Model validation
 
-Antes de consultar se compara `model_key`, `model_version` y `dimensions` de los
-embeddings persistidos contra el descriptor del generador activo. Una
-discrepancia produce un error explícito con código simbólico, nunca una
-comparación silenciosa entre espacios vectoriales distintos.
+Before querying, the `model_key`, `model_version` and `dimensions` of the
+persisted embeddings are compared against the descriptor of the active
+generator. A discrepancy produces an explicit error with a symbolic code, never
+a silent comparison between different vector spaces.
 
-### Similitud
+### Similarity
 
-Los vectores ya están normalizados en la indexación, de modo que el producto
-punto equivale al coseno y evita una raíz cuadrada por fragmento. La consulta se
-embebe con el prefijo `query:` de E5 —el prefijo asimétrico es parte del
-contrato del modelo y usar `passage:` degradaría la calidad—. El barrido es
-exacto sobre todos los fragmentos que pasan el filtro; a esta escala cuesta
-milisegundos y evita el error de aproximación de un índice ANN.
+The vectors are already normalised during indexing, so the dot product is
+equivalent to the cosine and avoids a square root per fragment. The query is
+embedded with E5's `query:` prefix — the asymmetric prefix is part of the
+model's contract and using `passage:` would degrade quality. The sweep is exact
+over every fragment that passes the filter; at this scale it costs milliseconds
+and avoids the approximation error of an ANN index.
 
-## Orquestación
+## Orchestration
 
-`retrieveCandidates` es el caso de uso y sólo conoce puertos:
+`retrieveCandidates` is the use case and knows only ports:
 
-1. normalizar y validar la consulta;
-2. lanzar ambas búsquedas en paralelo;
-3. si una vía falla, registrar una advertencia y continuar con la otra —una
-   recuperación degradada es preferible a ninguna—;
-4. fusionar con `FusionStrategy`;
-5. hidratar procedencia del conjunto fusionado completo en una sola consulta
-   por lote;
-6. deduplicar: conservar el mejor fragmento por `unitId`;
-7. diversificar: aplicar `maxPerVideo` recorriendo en orden de puntaje;
-8. truncar a `fusedResults`;
-9. devolver `RetrievalOutcome` con métricas.
+1. normalise and validate the query;
+2. launch both searches in parallel;
+3. if one path fails, record a warning and continue with the other — a degraded
+   retrieval is preferable to none;
+4. fuse with `FusionStrategy`;
+5. hydrate the provenance of the complete fused set in a single batched query;
+6. deduplicate: keep the best fragment per `unitId`;
+7. diversify: apply `maxPerVideo` walking in score order;
+8. truncate to `fusedResults`;
+9. return `RetrievalOutcome` with metrics.
 
-La deduplicación precede a la diversidad de forma deliberada: dos fragmentos de
-la misma sección son redundancia, mientras que dos secciones distintas del mismo
-video son contexto legítimo hasta el límite por video.
+Deduplication precedes diversity deliberately: two fragments of the same section
+are redundancy, whereas two different sections of the same video are legitimate
+context up to the per-video limit.
 
-Nota de implementación: la hidratación se adelantó respecto del orden original
-de este documento. `RankedHit` sólo lleva `fragmentId`; ni la deduplicación por
-`unitId` ni la diversidad por video son posibles sin conocer la procedencia, así
-que ambas etapas necesitan el lote hidratado. El conjunto a hidratar está
-acotado por `textCandidates + vectorCandidates`, de modo que sigue siendo una
-sola consulta por lote, no una por candidato. Un hit fusionado sin procedencia
-—una eliminación que compite con la consulta— se descarta en vez de mostrarse
-sin evidencia.
+Implementation note: hydration was brought forward with respect to the original
+order of this document. `RankedHit` carries only `fragmentId`; neither
+deduplication by `unitId` nor diversity by video is possible without knowing the
+provenance, so both stages need the hydrated batch. The set to hydrate is
+bounded by `textCandidates + vectorCandidates`, so it remains a single batched
+query, not one per candidate. A fused hit with no provenance — a deletion racing
+with the query — is discarded instead of being shown without evidence.
 
-## Ausencia de umbral en la búsqueda vectorial
+## No threshold in the vector search
 
-La búsqueda vectorial es un ranking exhaustivo, no un filtro: cada consulta
-devuelve todos los fragmentos que pasan el filtro de metadata, ordenados por
-similitud, hasta `vectorCandidates`. No existe un piso de similitud mínima.
+Vector search is an exhaustive ranking, not a filter: every query returns all
+the fragments that pass the metadata filter, ordered by similarity, up to
+`vectorCandidates`. There is no minimum similarity floor.
 
-Esto significa que `status: "no_results"` sólo ocurre cuando el filtro deja la
-biblioteca vacía o cuando ambas vías fallan; una consulta sobre una biblioteca
-no vacía y sin filtros restrictivos siempre devuelve candidatos, aunque su
-similitud semántica real sea baja. El E2E de recuperación lo confirma: verificar
-que una eliminación "desaparece de ambos rankings" requiere filtrar por el video
-eliminado, no sólo repetir la consulta original, porque el resto de la
-biblioteca sigue apareciendo vía la vía vectorial.
+This means that `status: "no_results"` only happens when the filter leaves the
+library empty or when both paths fail; a query over a non-empty library with no
+restrictive filters always returns candidates, even if their real semantic
+similarity is low. The retrieval E2E confirms it: verifying that a deletion
+"disappears from both rankings" requires filtering by the deleted video, not
+just repeating the original query, because the rest of the library still appears
+through the vector path.
 
-Un umbral mínimo de similitud —o un límite de calidad configurable— queda como
-candidato de calibración para la etapa 3.2, junto con los pesos de RRF; no se
-introduce ahora sin evaluaciones reales que lo justifiquen.
+A minimum similarity threshold — or a configurable quality limit — remains a
+calibration candidate for stage 3.2, along with the RRF weights; it is not
+introduced now without real evaluations justifying it.
 
-## Determinismo
+## Determinism
 
-La misma consulta sobre la misma base produce exactamente el mismo orden. Se
-consigue con desempates explícitos en cada etapa: `bm25` desempata por
-`fragment_id`, la similitud desempata por `fragment_id`, y la fusión desempata
-por puntaje, luego menor rango textual, luego `fragment_id`. Ninguna etapa
-depende del orden de resolución de promesas ni del orden de iteración de un
-`Map` construido concurrentemente.
+The same query over the same database produces exactly the same ordering. That
+is achieved with explicit tie-breaks at every stage: `bm25` breaks ties by
+`fragment_id`, similarity breaks ties by `fragment_id`, and fusion breaks ties
+by score, then by lower textual rank, then by `fragment_id`. No stage depends on
+the resolution order of promises nor on the iteration order of a `Map` built
+concurrently.
 
-## Invariantes
+## Invariants
 
-- Ninguna operación de recuperación escribe en SQLite ni en las fuentes.
-- Ninguna operación de recuperación accede a la red.
-- Ningún candidato se devuelve sin procedencia completa.
-- Nunca se comparan puntajes crudos de vías distintas.
-- Nunca se consultan embeddings de un modelo distinto al activo.
-- El índice vectorial nunca contiene fragmentos ausentes de SQLite.
-- Un paquete eliminado desaparece de ambos rankings sin reconstruir la base.
-- La consulta del usuario nunca se interpreta como sintaxis FTS5.
+- No retrieval operation writes to SQLite or to the sources.
+- No retrieval operation accesses the network.
+- No candidate is returned without complete provenance.
+- Raw scores from different paths are never compared.
+- Embeddings of a model other than the active one are never queried.
+- The vector index never contains fragments absent from SQLite.
+- A deleted package disappears from both rankings without rebuilding the
+  database.
+- The user's query is never interpreted as FTS5 syntax.
 
-## Pruebas exigidas
+## Required tests
 
-- Sanitización: acentos, mayúsculas, comillas, guiones, paréntesis, `OR`, `*`,
-  consulta vacía y consulta sólo de puntuación.
-- FTS5: término exacto raro, término frecuente, sin resultados, filtros por
-  fuente/video/idioma/tipo de unidad.
-- Vectorial: paráfrasis sin léxico compartido, consulta multilingüe, dimensión
-  incorrecta, modelo ausente, base sin embeddings.
-- Fusión: hit exclusivamente textual, exclusivamente vectorial, consenso,
-  empates, pesos asimétricos y determinismo entre corridas.
-- Diversidad: un video dominante no monopoliza el resultado.
-- Ciclo de vida: `sync` hace consultable un paquete nuevo sin reinicio; eliminar
-  un paquete lo retira de ambas vías; reiniciar reconstruye el índice.
-- Degradación: una vía caída produce advertencia y resultados de la otra.
+- Sanitisation: accents, capitals, quotes, hyphens, parentheses, `OR`, `*`, an
+  empty query and a punctuation-only query.
+- FTS5: rare exact term, frequent term, no results, filters by
+  source/video/language/unit type.
+- Vector: paraphrase with no shared vocabulary, multilingual query, incorrect
+  dimension, absent model, database with no embeddings.
+- Fusion: an exclusively textual hit, an exclusively vector one, consensus,
+  ties, asymmetric weights and determinism across runs.
+- Diversity: one dominant video does not monopolise the result.
+- Life cycle: `sync` makes a new package queryable without a restart; deleting a
+  package withdraws it from both paths; restarting rebuilds the index.
+- Degradation: a downed path produces a warning and results from the other.
 
-Las pruebas rápidas usan un generador de embeddings falso y determinista. El
-modelo real sólo interviene en el smoke ya existente.
+The fast tests use a fake, deterministic embedding generator. The real model
+only takes part in the already existing smoke test.
 
-## Criterio de cierre
+## Closing criterion
 
-2.2 se marca completo cuando las pruebas demuestran los ocho puntos del criterio
-provisional de [agent-handoff.md](agent-handoff.md), la suite rápida sigue
-offline y `npm run check` y `npm run build` pasan.
+2.2 is marked complete when the tests demonstrate the eight points of the
+provisional criterion of [agent-handoff.md](agent-handoff.md), the fast suite
+stays offline and `npm run check` and `npm run build` pass.
