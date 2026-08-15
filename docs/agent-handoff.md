@@ -518,101 +518,105 @@ retrieval wiring` in `test/main/create-application.test.ts`). It reuses exactly
 the same internal `retrieveCandidates`, so it can never drift out of sync with
 the retrieval engine.
 
-## Flujo exacto de `retrieveCandidates` (2.2)
+## Exact flow of `retrieveCandidates` (2.2)
 
-1. Normalizar y validar la consulta ya llegó resuelta como `RetrievalQuery`
-   (el dominio ya garantiza texto no vacío, NFC, ≤1000 caracteres).
-2. Lanzar `textIndex.search` y (`embeddingGenerator.describe` +
+1. Normalizing and validating the query already arrived resolved as a
+   `RetrievalQuery` (the domain already guarantees non-empty text, NFC, ≤1000
+   characters).
+2. Launch `textIndex.search` and (`embeddingGenerator.describe` +
    `embeddingGenerator.embedQuery` + `vectorIndex.load` +
-   `vectorIndex.search`) en paralelo.
-3. Si una vía falla, capturar el error, agregar un `RetrievalWarning` con
-   código `TEXT_SEARCH_UNAVAILABLE` o `VECTOR_SEARCH_UNAVAILABLE` y continuar
-   con hits vacíos de esa vía. Nunca aborta la consulta completa.
-4. Fusionar ambas listas de `RankedHit` con `FusionStrategy` (RRF ponderado
-   por defecto) → `FusedHit[]`.
-5. Hidratar procedencia del conjunto fusionado completo con
-   `knowledgeRepository.getFragmentProvenance` en un solo lote (acotado por
-   `textCandidates + vectorCandidates`). Un `FusedHit` sin procedencia
-   (fragmento borrado justo antes de esta consulta) se descarta.
-6. `selectCandidates`: deduplicar por `unitId` (conserva el de mejor score),
-   diversificar con `maxPerVideo`, truncar a `fusedResults`.
-7. Devolver `RetrievalOutcome` con `status` (`"ok"` o `"no_results"`),
-   `candidates`, `metrics` y `warnings`.
+   `vectorIndex.search`) in parallel.
+3. If one path fails, capture the error, add a `RetrievalWarning` with code
+   `TEXT_SEARCH_UNAVAILABLE` or `VECTOR_SEARCH_UNAVAILABLE` and continue with
+   empty hits from that path. It never aborts the whole query.
+4. Fuse both `RankedHit` lists with `FusionStrategy` (weighted RRF by default)
+   → `FusedHit[]`.
+5. Hydrate the provenance of the complete fused set with
+   `knowledgeRepository.getFragmentProvenance` in a single batch (bounded by
+   `textCandidates + vectorCandidates`). A `FusedHit` with no provenance (a
+   fragment deleted right before this query) is discarded.
+6. `selectCandidates`: deduplicate by `unitId` (keeping the best-scoring one),
+   diversify with `maxPerVideo`, truncate to `fusedResults`.
+7. Return a `RetrievalOutcome` with `status` (`"ok"` or `"no_results"`),
+   `candidates`, `metrics` and `warnings`.
 
-`vectorIndex.load()` devuelve la cantidad de vectores disponibles para el
-modelo activo (cambiado el 14 de agosto de 2026; antes era `Promise<void>`).
-Si la carga no falló, ese conteo es cero y la vía textual **sí** encontró
-hits, se emite el warning `VECTORS_STALE`: la biblioteca tiene contenido pero
-ningún vector para el modelo activo. Las tres condiciones juntas importan —
-ver `docs/decisions.md`, sección "Degradación silenciosa de la vía
-vectorial".
+`vectorIndex.load()` returns the number of vectors available for the active
+model (changed on 14 August 2026; it used to be `Promise<void>`). If the load
+did not fail, that count is zero and the text path **did** find hits, the
+`VECTORS_STALE` warning is emitted: the library has content but no vector for
+the active model. The three conditions together matter — see
+`docs/decisions.md`, section "Silent degradation of the vector path".
 
-**Gotcha que sigue vigente:** la búsqueda vectorial no tiene piso de similitud
-(ver la sección de decisiones de 2.2 más abajo). `status: "ok"` con candidatos
-de relevancia real baja es un resultado válido y esperado, no un bug. 2.3 lo
-heredó explícitamente: `assembleContext` nunca filtra por umbral de similitud,
-sólo por lo que el presupuesto de tokens permite incluir. El E2E de 2.3 lo
-confirma: el único camino confiable a `status: "no_results"` es un filtro que
-deja vacío el universo de candidatos (por ejemplo, `--source` de una fuente
-inexistente), no una consulta "sin sentido" sobre una biblioteca no vacía.
+**A gotcha that is still current:** vector search has no similarity floor (see
+the 2.2 decisions section below). `status: "ok"` with candidates of genuinely
+low relevance is a valid and expected result, not a bug. 2.3 inherited this
+explicitly: `assembleContext` never filters by a similarity threshold, only by
+what the token budget allows it to include. The 2.3 E2E confirms it: the only
+reliable path to `status: "no_results"` is a filter that empties the universe
+of candidates (for example, `--source` of a non-existent source), not a
+"meaningless" query over a non-empty library.
 
-## Flujo exacto de `assembleContext` (2.3)
+## Exact flow of `assembleContext` (2.3)
 
-1. Llamar `retrieveCandidates(request.query)` → `RetrievalOutcome`.
-2. Recolectar el conjunto único de `unitId` de `outcome.candidates`.
-3. Llamar `knowledgeRepository.getUnits(unitIds)` y
-   `knowledgeRepository.getAncestors(unitIds)` en paralelo — dos lotes, no una
-   consulta por candidato. `getUnits` recupera el `parentId` de cada
-   candidato (`RetrievalCandidate` no lo transporta); `getAncestors` resuelve
-   el conjunto plano deduplicado de ancestros alcanzables.
-4. `expandToAncestors`: camina `parentId` desde cada candidato hacia la raíz,
-   construye un `ContextUnitBlock` por `unitId` único (un ancestro nunca pisa
-   un candidato ya construido) y hereda `packageRef`/metadata de video del
-   candidato que lo trajo, porque `KnowledgeUnit` no la transporta.
-5. `deduplicateBlocks`: colapsa bloques con `contentHash` idéntico bajo
-   `unitId` distintos, conservando el primero en orden de entrada.
-6. `allocateBudget`: bucketing fijo (documento/sección → reglas/patrones →
-   ancestros, cada uno por `fusedScore` descendente; ancestros además por
-   `depth` descendente, padre inmediato antes que abuelo) y truncamiento
-   entero — nunca a la mitad. El primer bloque se incluye igual si por sí
-   solo excede el presupuesto, y el presupuesto se marca agotado de
-   inmediato.
-7. `assignCitations`: IDs `S01`, `S02`... en el orden final de inclusión.
-8. `renderContextMarkdown` y `renderContextResult`: redactan `context.md`
-   (Markdown con las seis secciones fijas) y el objeto `ContextResultDocument`
-   (`snake_case`, contrato ya aprobado en `cli-contract.md`).
-9. Devolver `ContextBundle { markdown, result }`. La escritura a disco
-   (`writeContextBundle`) ocurre después, en la capa de infraestructura/CLI,
-   nunca dentro de `assembleContext`.
+1. Call `retrieveCandidates(request.query)` → `RetrievalOutcome`.
+2. Collect the unique set of `unitId`s from `outcome.candidates`.
+3. Call `knowledgeRepository.getUnits(unitIds)` and
+   `knowledgeRepository.getAncestors(unitIds)` in parallel — two batches, not
+   one query per candidate. `getUnits` recovers each candidate's `parentId`
+   (`RetrievalCandidate` does not carry it); `getAncestors` resolves the flat
+   deduplicated set of reachable ancestors.
+4. `expandToAncestors`: walks `parentId` from each candidate towards the root,
+   builds one `ContextUnitBlock` per unique `unitId` (an ancestor never
+   overwrites an already built candidate) and inherits `packageRef`/video
+   metadata from the candidate that brought it in, because `KnowledgeUnit` does
+   not carry it.
+5. `deduplicateBlocks`: collapses blocks with an identical `contentHash` under
+   different `unitId`s, keeping the first one in input order.
+6. `allocateBudget`: fixed bucketing (document/section → rules/patterns →
+   ancestors, each one by descending `fusedScore`; ancestors additionally by
+   descending `depth`, immediate parent before grandparent) and whole-block
+   truncation — never halfway. The first block is included anyway if it alone
+   exceeds the budget, and the budget is marked exhausted immediately
+   afterwards.
+7. `assignCitations`: IDs `S01`, `S02`... in the final inclusion order.
+8. `renderContextMarkdown` and `renderContextResult`: render `context.md`
+   (Markdown with the six fixed sections) and the `ContextResultDocument`
+   object (`snake_case`, a contract already approved in `cli-contract.md`).
+9. Return `ContextBundle { markdown, result }`. Writing to disk
+   (`writeContextBundle`) happens afterwards, in the infrastructure/CLI layer,
+   never inside `assembleContext`.
 
-Una consulta `no_results` de 2.2, o un presupuesto tan chico que no cabe ni el
-primer bloque, produce igual un `ContextBundle` válido explicando la ausencia
-de evidencia — nunca nada sin escribir.
+A `no_results` query from 2.2, or a budget so small that not even the first
+block fits, still produces a valid `ContextBundle` explaining the absence of
+evidence — never nothing written at all.
 
-## Flujo exacto de `sync`
+## Exact flow of `sync`
 
-1. Crea y persiste un `SyncRun` en estado `running`.
-2. Lee y valida el manifest completo.
-3. Si el manifest falla, registra issue, cierra `failed` y no elimina paquetes.
-4. Obtiene descriptor de modelo y referencias persistidas.
-5. Por cada video, lee el paquete y calcula hash sobre documentos/versiones.
-6. Si no cambió, ejecuta `markPackageSeen` con el run actual; no recalcula
-   unidades ni embeddings.
-7. Si cambió, construye unidades, fragmenta bajo el tokenizador real, genera
-   embeddings y prepara el cambio completo.
-8. `applyPackage` reemplaza paquete y derivados en una única transacción.
-9. Sólo después del commit publica el cambio al sink vectorial.
-10. Un fallo aislado registra issue; si existía una versión válida, la marca
-    vista para conservarla.
-11. Después de un manifest válido elimina paquetes no vistos.
-12. Publica removals vectoriales y cierra el run como `ok` o `partial`.
-13. Si no hubo indexaciones ni borrados devuelve `no_changes`.
+1. It creates and persists a `SyncRun` in the `running` state.
+2. It reads and validates the complete manifest.
+3. If the manifest fails, it records an issue, closes as `failed` and deletes
+   no packages.
+4. It obtains the model descriptor and the persisted references.
+5. For each video, it reads the package and computes a hash over
+   documents/versions.
+6. If it did not change, it runs `markPackageSeen` with the current run; it
+   recomputes neither units nor embeddings.
+7. If it changed, it builds units, fragments under the real tokenizer,
+   generates embeddings and prepares the complete change.
+8. `applyPackage` replaces the package and its derivatives in a single
+   transaction.
+9. Only after the commit does it publish the change to the vector sink.
+10. An isolated failure records an issue; if a valid version existed, it marks
+    it seen to preserve it.
+11. After a valid manifest it deletes unseen packages.
+12. It publishes vector removals and closes the run as `ok` or `partial`.
+13. If there were neither indexings nor deletions it returns `no_changes`.
 
-## Esquema SQLite actual
+## Current SQLite schema
 
-Versión: `1`.
+Version: `1`.
 
-Tablas principales:
+Main tables:
 
 - `schema_meta`;
 - `sources`;
@@ -624,26 +628,25 @@ Tablas principales:
 - `embeddings`;
 - `sync_issues`.
 
-Tabla virtual: `fragment_fts`, external-content sobre `search_fragments`.
+Virtual table: `fragment_fts`, external-content over `search_fragments`.
 
-Triggers: insert, update y delete mantienen FTS5 alineado. Las eliminaciones de
-paquetes usan cascadas y `last_seen_sync_id`. Los embeddings incluyen modelo,
-versión, dimensión, hash y BLOB.
+Triggers: insert, update and delete keep FTS5 aligned. Package deletions use
+cascades and `last_seen_sync_id`. Embeddings include model, version, dimension,
+hash and BLOB.
 
-**2.2 no agregó ninguna migración ni tabla.** Los adaptadores de recuperación
-leen el esquema tal cual quedó en 2.1. Los identificadores de dominio de
-fragmento y documento (`SearchFragmentId`, `DocumentId`) no tienen columna
-propia: se reconstruyen en cada adaptador a partir de columnas existentes
+**2.2 added no migration and no table.** The retrieval adapters read the schema
+exactly as 2.1 left it. The fragment and document domain identifiers
+(`SearchFragmentId`, `DocumentId`) have no column of their own: they are
+rebuilt in each adapter out of existing columns
 (`knowledge_units.stable_key`, `search_fragments.ordinal`, `sources.name`,
-`video_packages.video_id`, `source_documents.kind`). Antes de proponer
-persistirlos explícitamente, leer la nota completa en
-`docs/retrieval-design.md` — a la escala actual (~3.000 fragmentos) no hace
-falta, y agregar una columna es un cambio de esquema que requiere aprobación
-explícita según los invariantes del proyecto.
+`video_packages.video_id`, `source_documents.kind`). Before proposing to
+persist them explicitly, read the full note in `docs/retrieval-design.md` — at
+the current scale (~3,000 fragments) it is not needed, and adding a column is a
+schema change that requires explicit approval under the project's invariants.
 
-## CLI implementada
+## Implemented CLI
 
-Implementado y anunciado como disponible:
+Implemented and announced as available:
 
 ```text
 auto-youtube-rag init
@@ -657,70 +660,71 @@ auto-youtube-rag retrieve <query> [--depth focused|balanced|deep] \
   [--max-tokens <positive-integer>] [--source <name>] [--out <directory>]
 ```
 
-`--source` es repetible. `--depth` y `--max-tokens` inválidos se rechazan en
-`parse-command.ts` con código de uso `2`, antes de instanciar la aplicación.
+`--source` is repeatable. Invalid `--depth` and `--max-tokens` values are
+rejected in `parse-command.ts` with usage code `2`, before the application is
+instantiated.
 
 ```text
 auto-youtube-rag rebuild --confirm
 ```
 
-`rebuild` se implementó en el punto 4.6 (14 de agosto de 2026). **Ya no queda
-ningún comando del contrato sin implementar.** Borra el índice derivado y lo
-regenera desde los paquetes en disco; preserva `sources`, la versión de
-esquema y el historial de runs. `--confirm` es obligatorio (sin él, código
-`2`) y no acepta `--force`.
+`rebuild` was implemented in point 4.6 (14 August 2026). **No command of the
+contract is left unimplemented.** It deletes the derived index and regenerates
+it from the packages on disk; it preserves `sources`, the schema version and
+the run history. `--confirm` is mandatory (without it, code `2`) and it does
+not accept `--force`.
 
-## Configuración de ejecución
+## Runtime configuration
 
-**Cambió en el punto 4.2 (14 de agosto de 2026).** Si una memoria de sesión
-vieja dice que las rutas son relativas al `cwd`, está desactualizada.
+**This changed in point 4.2 (14 August 2026).** If an old session memory says
+that paths are relative to the `cwd`, it is out of date.
 
-Todo vive en un hogar de usuario, resuelto por
-`src/infrastructure/config/resolve-paths.ts`, la **única** función que
-calcula estas rutas:
+Everything lives in a user home, resolved by
+`src/infrastructure/config/resolve-paths.ts`, the **only** function that
+computes these paths:
 
 ```text
-~/.auto-youtube-rag/          ← C:\Users\<usuario>\.auto-youtube-rag\
-  index.sqlite                ← la biblioteca
-  models/                     ← el modelo instalado (~130 MB)
+~/.auto-youtube-rag/          ← C:\Users\<user>\.auto-youtube-rag\
+  index.sqlite                ← the library
+  models/                     ← the installed model (~130 MB)
 ```
 
-Variables admitidas:
+Supported variables:
 
 ```text
-AUTO_YOUTUBE_RAG_HOME        ← mueve el hogar entero
-AUTO_YOUTUBE_RAG_MODELS_DIR  ← mueve sólo el modelo
+AUTO_YOUTUBE_RAG_HOME        ← moves the whole home
+AUTO_YOUTUBE_RAG_MODELS_DIR  ← moves only the model
 ```
 
-`AUTO_YOUTUBE_RAG_MODEL_CACHE` **ya no existe**: se renombró a
-`AUTO_YOUTUBE_RAG_MODELS_DIR` porque el modelo es estado instalado, no un
-caché que se regenere solo.
+`AUTO_YOUTUBE_RAG_MODEL_CACHE` **no longer exists**: it was renamed to
+`AUTO_YOUTUBE_RAG_MODELS_DIR` because the model is installed state, not a cache
+that regenerates on its own.
 
-El modelo se instala con el producto, no con npm:
+The model is installed with the product, not with npm:
 
 ```text
-auto-youtube-rag init                    # crea hogar, base y modelo
-auto-youtube-rag init --from <ruta>      # copia un modelo ya presente
-auto-youtube-rag init --skip-model       # sólo la base (CI, sin red)
-auto-youtube-rag models install [--force] [--from <ruta>]
+auto-youtube-rag init                    # creates home, database and model
+auto-youtube-rag init --from <path>      # copies an already present model
+auto-youtube-rag init --skip-model       # database only (CI, no network)
+auto-youtube-rag models install [--force] [--from <path>]
 auto-youtube-rag models status
 ```
 
-`models/.install.json` es el recibo de instalación: guarda el tamaño esperado
-de cada archivo y permite distinguir `absent`, `incomplete` (descarga
-truncada) e `installed` sin hashear 130 MB.
+`models/.install.json` is the installation receipt: it stores the expected size
+of each file and makes it possible to tell `absent`, `incomplete` (truncated
+download) and `installed` apart without hashing 130 MB.
 
-`npm run models:download` **sigue existiendo pero es sólo para benchmarks**
-(`benchmarks/embeddings/run.ts`, escribe en `<repo>/.cache/models`). No lo
-ofrezcas como remedio de producto: depende de `tsx` y de `benchmarks/`, que
-no existen fuera del repositorio clonado. El `.cache/` del repo es territorio
-exclusivo de benchmarks; el producto no lo lee nunca.
+`npm run models:download` **still exists but is only for benchmarks**
+(`benchmarks/embeddings/run.ts`, it writes into `<repo>/.cache/models`). Do not
+offer it as a product remedy: it depends on `tsx` and on `benchmarks/`, which
+do not exist outside the cloned repository. The repo's `.cache/` is exclusive
+benchmark territory; the product never reads it.
 
-El producto no debe descargar durante `sync`, `doctor` ni tests normales.
-Sólo `init` y `models install` usan la red, y sólo cuando el usuario los
-invoca por nombre.
+The product must not download during `sync`, `doctor` or normal tests. Only
+`init` and `models install` use the network, and only when the user invokes
+them by name.
 
-## Comandos de desarrollo y calidad
+## Development and quality commands
 
 ```powershell
 cd <repo>
@@ -735,99 +739,99 @@ npm.cmd run test:coverage
 npm.cmd run test:embedding:smoke
 ```
 
-En PowerShell puede ser necesario usar `npm.cmd` porque la política de ejecución
-puede bloquear `npm.ps1`.
+In PowerShell it may be necessary to use `npm.cmd`, because the execution
+policy can block `npm.ps1`.
 
-`npm run check` omite la inferencia real mediante el patrón `smoke`. El smoke de
-E5 se ejecuta explícitamente y nunca debe depender de red.
+`npm run check` skips real inference through the `smoke` pattern. The E5 smoke
+is run explicitly and must never depend on the network.
 
-**No borres `.gitattributes`.** Fija `* text=auto eol=lf` y existe desde el
-14 de agosto de 2026 (commit `7ee0a9b`). Sin él, `core.autocrlf=true` en
-Windows materializa CRLF en cada `checkout` y en cada clon nuevo, y
-`format:check` —parte de `npm run check`— falla sobre archivos que nadie
-editó. Es una trampa desconcertante porque `git diff` no muestra **nada**:
-git normaliza los finales de línea al comparar, así que sólo difiere la
-representación en disco. Si algún día `format:check` falla sobre archivos
-ajenos a tu cambio, verificá que `.gitattributes` siga existiendo antes de
-tocar cualquier otra cosa; el remedio inmediato es `npx prettier --write .`,
-que no produce ningún commit.
+**Do not delete `.gitattributes`.** It pins `* text=auto eol=lf` and has
+existed since 14 August 2026 (commit `7ee0a9b`). Without it,
+`core.autocrlf=true` on Windows materializes CRLF on every `checkout` and on
+every new clone, and `format:check` —part of `npm run check`— fails on files
+nobody edited. It is a baffling trap because `git diff` shows **nothing**: git
+normalizes line endings when comparing, so only the representation on disk
+differs. If one day `format:check` fails on files unrelated to your change,
+verify that `.gitattributes` still exists before touching anything else; the
+immediate remedy is `npx prettier --write .`, which produces no commit.
 
-## Última validación conocida
+## Last known validation
 
-### Puerta final de 2.1 (11 de agosto de 2026)
+### Final gate of 2.1 (11 August 2026)
 
-- 91 tests aprobados;
-- cobertura: 93,90% líneas, 81,73% ramas, 98,17% funciones;
-- `npm run build`: aprobado;
-- `npm run check`: aprobado;
-- `npm run test:embedding:smoke`: aprobado con E5 local;
-- worktree limpio.
+- 91 tests passing;
+- coverage: 93.90% lines, 81.73% branches, 98.17% functions;
+- `npm run build`: passing;
+- `npm run check`: passing;
+- `npm run test:embedding:smoke`: passing with the local E5;
+- clean worktree.
 
-Validación sobre una copia temporal de los recursos indexables de la colección
-real `auto-design`:
+Validation over a temporary copy of the indexable resources of the real
+`auto-design` collection:
 
-- 34 videos observados;
-- 34 paquetes persistidos;
-- 102 documentos;
-- 2.965 unidades de conocimiento;
-- 2.967 fragmentos y embeddings con el tokenizador real;
-- segundo `sync`: 34 unchanged, 0 indexed, estado `no_changes`;
-- `doctor`: integridad, foreign keys, FTS5, fuente y modelo en `ok`;
-- digest SHA-256 del árbol fuente idéntico antes y después.
+- 34 videos observed;
+- 34 packages persisted;
+- 102 documents;
+- 2,965 knowledge units;
+- 2,967 fragments and embeddings with the real tokenizer;
+- second `sync`: 34 unchanged, 0 indexed, `no_changes` state;
+- `doctor`: integrity, foreign keys, FTS5, source and model all `ok`;
+- SHA-256 digest of the source tree identical before and after.
 
-La copia y su base temporal fueron eliminadas tras validar.
+The copy and its temporary database were deleted after validating.
 
-### Puerta final de 2.2 (12 de agosto de 2026)
+### Final gate of 2.2 (12 August 2026)
 
-- 151 tests aprobados (91 heredados de 2.1 + 60 nuevos de recuperación);
-- cobertura: 94,66% líneas, 84,25% ramas, 98,23% funciones;
-- `npm run build`: aprobado;
-- `npm run check`: aprobado;
-- `npm run test:coverage`: aprobado;
-- `test/e2e/retrieval.e2e.test.ts` aprobado sobre SQLite real (no fakes),
-  fixture de dos fuentes, sin modelo E5 real (embedding determinista por
-  palabra clave, ver el propio archivo);
-- worktree limpio.
+- 151 tests passing (91 inherited from 2.1 + 60 new retrieval ones);
+- coverage: 94.66% lines, 84.25% branches, 98.23% functions;
+- `npm run build`: passing;
+- `npm run check`: passing;
+- `npm run test:coverage`: passing;
+- `test/e2e/retrieval.e2e.test.ts` passing over real SQLite (not fakes), a
+  two-source fixture, without the real E5 model (deterministic embedding by
+  keyword, see the file itself);
+- clean worktree.
 
-No se ejecutó una validación sobre la colección real `auto-design` con el
-modelo E5 real al cerrar 2.2, por decisión explícita del usuario. **Sigue sin
-ejecutarse al cerrar 2.3** — el mismo patrón documentado abajo aplica, y
-tampoco es un pendiente urgente por sí solo. Si se necesita (por ejemplo,
-antes de evaluaciones reales en 3.2, o si aparece un bug que sólo se
-manifiesta con datos reales), el patrón es: copiar la colección a un
-directorio temporal, sincronizar con el modelo real (ya cacheado en
-`.cache/models`), correr consultas de `evals/queries/seed-queries.json` contra
-`retrieveCandidates`/`assembleContext`, revisar cualitativamente, verificar el
-digest SHA-256 del árbol fuente antes/después, y borrar la copia y la base
-temporal al terminar.
+No validation over the real `auto-design` collection with the real E5 model was
+run when closing 2.2, by explicit decision of the user. **It is still not run
+when closing 2.3** — the same pattern documented below applies, and it is not
+an urgent pending item on its own either. If it becomes necessary (for example,
+before real evaluations in 3.2, or if a bug appears that only manifests with
+real data), the pattern is: copy the collection to a temporary directory,
+synchronize with the real model (already cached in `.cache/models`), run
+queries from `evals/queries/seed-queries.json` against
+`retrieveCandidates`/`assembleContext`, review qualitatively, verify the SHA-256
+digest of the source tree before/after, and delete the copy and the temporary
+database when finished.
 
-### Puerta final de 2.3 (12 de agosto de 2026)
+### Final gate of 2.3 (12 August 2026)
 
-- 221 tests aprobados (151 heredados de 2.1–2.2 + 70 nuevos de ensamblado de
-  contexto y CLI);
-- cobertura: 95,25% líneas, 86,02% ramas, 98,43% funciones;
-- `npm run build`: aprobado;
-- `npm run check`: aprobado;
-- `npm run test:coverage`: aprobado;
-- `test/e2e/context-assembly.e2e.test.ts` aprobado sobre SQLite real (no
-  fakes) y el comando `retrieve` real de la CLI, fixture de dos fuentes con
-  encabezados anidados (documento → sección → subsección) para ejercer la
-  expansión a ancestros, sin modelo E5 real (`FakeEmbeddingGenerator`);
-- worktree limpio.
+- 221 tests passing (151 inherited from 2.1–2.2 + 70 new ones for context
+  assembly and the CLI);
+- coverage: 95.25% lines, 86.02% branches, 98.43% functions;
+- `npm run build`: passing;
+- `npm run check`: passing;
+- `npm run test:coverage`: passing;
+- `test/e2e/context-assembly.e2e.test.ts` passing over real SQLite (not fakes)
+  and the real `retrieve` command of the CLI, a two-source fixture with nested
+  headings (document → section → subsection) to exercise the expansion to
+  ancestors, without the real E5 model (`FakeEmbeddingGenerator`);
+- clean worktree.
 
-**Nota de implementación descubierta durante la prueba E2E:** la búsqueda
-vectorial no tiene piso de similitud (heredado de 2.2), así que una consulta
-"sin sentido" sobre una biblioteca no vacía igual devuelve `status: "ok"`. El
-E2E prueba `no_results` filtrando por una fuente inexistente (`--source
-ghost-source`), que sí vacía el universo de candidatos, en vez de depender de
-una consulta sin coincidencias léxicas ni semánticas aparentes.
+**Implementation note discovered during the E2E test:** vector search has no
+similarity floor (inherited from 2.2), so a "meaningless" query over a
+non-empty library still returns `status: "ok"`. The E2E tests `no_results` by
+filtering on a non-existent source (`--source ghost-source`), which does empty
+the universe of candidates, instead of relying on a query with no apparent
+lexical or semantic matches.
 
-**Tampoco se ejecutó una validación de `retrieve` sobre la colección real
-`auto-design`.** Mismo patrón y mismo criterio que el párrafo anterior: no es
-un pendiente urgente, y el procedimiento a seguir es el mismo, agregando la
-inspección cualitativa de `context.md`/`result.json` generados (¿el bundle es
-legible?, ¿las citas resuelven?, ¿la expansión a padres aporta contexto real
-o sólo ruido?) antes de calibrar presupuestos en una etapa posterior.
+**A validation of `retrieve` over the real `auto-design` collection was not run
+either.** Same pattern and same criterion as the previous paragraph: it is not
+an urgent pending item, and the procedure to follow is the same, adding the
+qualitative inspection of the generated `context.md`/`result.json` (is the
+bundle readable? do the citations resolve? does the expansion to parents
+contribute real context or only noise?) before calibrating budgets at a later
+stage.
 
 ## Bugs importantes ya corregidos
 
