@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation and usage questions
+    url: https://github.com/LuchoC-Dev/auto-youtube-rag#readme
+    about: >
+      Start with the README's documentation map before opening an issue —
+      most "how do I..." questions are already answered in
+      docs/cli-contract.md or skill/references/troubleshooting.md.
