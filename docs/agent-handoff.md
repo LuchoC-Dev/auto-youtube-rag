@@ -219,307 +219,304 @@ for future citations or inspection.
 combination and reranking policy, which was the only pending one, was resolved
 on 11 August 2026 (weighted RRF, see `decisions.md`).
 
-## Estado completado
+## Completed state
 
-### Definición y stack
+### Definition and stack
 
-- Repositorio, especificaciones y tracker creados.
-- Contrato CLI y esquemas de salida aprobados.
-- Benchmarks de modelos realizados; E5 Small seleccionado.
-- Benchmark de `sqlite-vec` frente a búsqueda exacta realizado; exacta elegida.
-- Benchmark de clientes SQLite realizado; `node:sqlite` elegido.
-- Toolchain fijado y reproducible.
+- Repository, specifications and tracker created.
+- CLI contract and output schemas approved.
+- Model benchmarks performed; E5 Small selected.
+- Benchmark of `sqlite-vec` against exact search performed; exact was chosen.
+- SQLite client benchmark performed; `node:sqlite` was chosen.
+- Toolchain pinned and reproducible.
 
-### Punto 2.1 — indexación incremental
+### Point 2.1 — incremental indexing
 
-Los bloques A–E están completados:
+Blocks A–E are completed:
 
-- A: identidades, entidades, contenido, runs, issues, puertos y cambios
-  atómicos.
-- B: layout, manifest, Markdown, reglas, metadata, lector de paquetes, unidades
-  y fragmentación.
-- C: adaptador local E5 y smoke offline.
-- D: esquema SQLite, registro de fuentes, estado, runs, issues, reemplazo
-  transaccional, FTS5 y embeddings.
-- E: casos de uso de fuentes, orquestador `sync`, composition root, CLI,
-  `status`, `doctor` y E2E.
+- A: identities, entities, content, runs, issues, ports and atomic changes.
+- B: layout, manifest, Markdown, rules, metadata, package reader, units and
+  fragmentation.
+- C: local E5 adapter and offline smoke.
+- D: SQLite schema, source registry, state, runs, issues, transactional
+  replacement, FTS5 and embeddings.
+- E: source use cases, `sync` orchestrator, composition root, CLI, `status`,
+  `doctor` and E2E.
 
-### Punto 2.2 — recuperación híbrida
+### Point 2.2 — hybrid retrieval
 
-Los bloques F–H están completados:
+Blocks F–H are completed:
 
-- F: value objects de consulta/filtro/límites, puertos de recuperación
-  (`TextSearchIndex`, `VectorSearchIndex`, `KnowledgeRepository`) y fusión RRF
-  ponderada.
-- G: sanitizador de consultas FTS5, adaptador textual sobre `fragment_fts`,
-  índice vectorial exacto en memoria y repositorio de conocimiento SQLite.
-- H: selección (dedupe + diversidad), caso de uso `retrieveCandidates`,
-  cableado en el composition root y E2E completo.
+- F: query/filter/limits value objects, retrieval ports (`TextSearchIndex`,
+  `VectorSearchIndex`, `KnowledgeRepository`) and weighted RRF fusion.
+- G: FTS5 query sanitizer, text adapter over `fragment_fts`, exact in-memory
+  vector index and SQLite knowledge repository.
+- H: selection (dedupe + diversity), `retrieveCandidates` use case, wiring in
+  the composition root and complete E2E.
 
-Detalle completo, decisiones y notas de implementación en la sección
-["Punto 2.2 completado"](#punto-22-completado--recuperación-híbrida) más abajo,
-y en `docs/retrieval-design.md`.
+Full detail, decisions and implementation notes in the
+["Point 2.2 completed"](#point-22-completed--hybrid-retrieval) section below,
+and in `docs/retrieval-design.md`.
 
-### Punto 2.3 — ensamblado de contexto
+### Point 2.3 — context assembly
 
-Los bloques I–L están completados:
+Blocks I–L are completed:
 
-- I: presupuesto por profundidad (`ContextBudget`) y tipos de aplicación
+- I: budget by depth (`ContextBudget`) and application types
   (`ContextRequest`, `ContextUnitBlock`, `BudgetAllocation`, `CitationRecord`,
   `ContextBundle`/`ContextResultDocument`).
-- J: expansión a unidades padre (`expandToAncestors`), deduplicación por
-  `unitId` y por `contentHash` (`deduplicateBlocks`), presupuesto y
-  truncamiento (`allocateBudget`) y asignación de citas (`assignCitations`).
-- K: redacción de `context.md` (`renderContextMarkdown`) y `result.json`
-  (`renderContextResult`), orquestación (`assembleContext`) y escritura del
-  bundle a disco (`writeContextBundle`).
-- L: comando `retrieve` de la CLI, E2E completo y cierre de documentación.
+- J: expansion to parent units (`expandToAncestors`), deduplication by `unitId`
+  and by `contentHash` (`deduplicateBlocks`), budget and truncation
+  (`allocateBudget`) and citation assignment (`assignCitations`).
+- K: rendering of `context.md` (`renderContextMarkdown`) and `result.json`
+  (`renderContextResult`), orchestration (`assembleContext`) and writing the
+  bundle to disk (`writeContextBundle`).
+- L: the CLI's `retrieve` command, complete E2E and documentation closure.
 
-`retrieve` está anunciado y disponible. Detalle completo, decisiones y notas
-de implementación en `docs/context-assembly-design.md`.
+`retrieve` is announced and available. Full detail, decisions and
+implementation notes in `docs/context-assembly-design.md`.
 
-### Punto 2.4 — skill general
+### Point 2.4 — general skill
 
-Completado: `skill/SKILL.md` en la raíz del repositorio, autocontenida (sin
-depender de rutas relativas a `docs/` para poder instalarse fuera de este
-repo), enseña a un agente a operar `init`, `status`, `doctor`,
-`source add/list/remove`, `sync` y `retrieve` sin lógica específica de
-proveedor. No requirió cambios en `src/`.
+Completed: `skill/SKILL.md` at the root of the repository, self-contained (it
+does not depend on paths relative to `docs/`, so that it can be installed
+outside this repo), and it teaches an agent to operate `init`, `status`,
+`doctor`, `source add/list/remove`, `sync` and `retrieve` with no
+provider-specific logic. It required no changes in `src/`.
 
-Verificada con dos corridas de un subagente sin contexto previo del proyecto
-("en frío"), cada una con sólo el texto de la skill y una copia temporal de
-dos videos reales de `auto-design`. Detalle completo en la sección
-["Punto 2.4 completado"](#punto-24-completado--skill-general) más abajo.
+Verified with two runs of a subagent with no prior context of the project
+("cold"), each one with only the text of the skill and a temporary copy of two
+real `auto-design` videos. Full detail in the
+["Point 2.4 completed"](#point-24-completed--general-skill) section below.
 
-### Punto 3.2 — evaluaciones del MVP
+### Point 3.2 — MVP evaluations
 
-Completado el 13 de agosto de 2026, en dos capas independientes sin ground
-truth etiquetado a mano (diseño en `docs/eval-design.md`):
+Completed on 13 August 2026, in two independent layers with no hand-labelled
+ground truth (design in `docs/eval-design.md`):
 
-- Capa A (mecánica, bloque M): 24 bundles reales generados sobre la
-  colección `auto-design` con E5 real; integridad de citas perfecta;
-  agregador de métricas.
-- Capa B (juzgada, bloque N): rúbrica común respondida por Claude y por
-  Codex sobre los mismos 24 bundles, sin verse las respuestas entre sí; 9/24
-  pares divergen, ninguno por un defecto del producto.
-- Bloque O: decisión explícita de mantener los defaults de RRF y de
-  presupuestos por profundidad sin cambios, y reporte final de cierre.
+- Layer A (mechanical, block M): 24 real bundles generated over the
+  `auto-design` collection with the real E5; perfect citation integrity;
+  metrics aggregator.
+- Layer B (judged, block N): a shared rubric answered by Claude and by Codex
+  over the same 24 bundles, without seeing each other's answers; 9/24 pairs
+  diverge, none of them because of a product defect.
+- Block O: explicit decision to keep the RRF defaults and the budgets by depth
+  unchanged, plus the final closing report.
 
-Detalle completo, decisiones y hallazgos accionables en la sección
-["Punto 3.2 completado"](#punto-32-completado--evaluaciones-del-mvp) más
-abajo, en `docs/eval-design.md`, y en
-`evals/results/2026-08-12/report.md`.
+Full detail, decisions and actionable findings in the
+["Point 3.2 completed"](#point-32-completed--mvp-evaluations) section below, in
+`docs/eval-design.md`, and in `evals/results/2026-08-12/report.md`.
 
-`docs/build.md` marca 2.1, 2.2, 2.3, 2.4, 3.1 y 3.2 al 100%. El MVP completo
-está cerrado; no queda ningún bloque abierto.
+`docs/build.md` marks 2.1, 2.2, 2.3, 2.4, 3.1 and 3.2 at 100%. The complete MVP
+is closed; no block remains open.
 
-## Arquitectura implementada
+## Implemented architecture
 
-Inventario completo de `src/` a la fecha de este documento (69 archivos). Un
-agente frío puede confiar en esta lista en vez de explorar el árbol de nuevo;
-si diverge de la realidad, el árbol manda y esta lista está desactualizada.
+Complete inventory of `src/` as of the date of this document (69 files). A cold
+agent can trust this list instead of exploring the tree again; if it diverges
+from reality, the tree wins and this list is out of date.
 
-### Dominio — `src/domain`
+### Domain — `src/domain`
 
-No importa infraestructura.
+It does not import infrastructure.
 
 `src/domain/indexing/`:
 
-- identificadores (`identifiers.ts`): `SourceName`, `VideoId`, `PackageRef`,
+- identifiers (`identifiers.ts`): `SourceName`, `VideoId`, `PackageRef`,
   `DocumentId`, `KnowledgeUnitId`, `SearchFragmentId`, `SyncId`;
-- entidades: `source-root.ts`, `video-package.ts`, `source-document.ts`,
+- entities: `source-root.ts`, `video-package.ts`, `source-document.ts`,
   `knowledge-unit.ts`, `search-fragment.ts`, `embedding-record.ts`,
-  `sync-run.ts` (incluye `SyncIssue`);
-- `content-identity.ts`: SHA-256 y claves estructurales deterministas
+  `sync-run.ts` (includes `SyncIssue`);
+- `content-identity.ts`: SHA-256 and deterministic structural keys
   (`createMarkdownSectionKey`, `createRulePatternKey`, `createRuleChildKey`,
   `createFragmentKey`);
-- `domain-error.ts`: `DomainValidationError` con códigos simbólicos
-  compartidos por todo el dominio (`INVALID_IDENTIFIER`,
-  `INVALID_PACKAGE_REF`, `INVALID_RETRIEVAL_QUERY`).
+- `domain-error.ts`: `DomainValidationError` with symbolic codes shared across
+  the whole domain (`INVALID_IDENTIFIER`, `INVALID_PACKAGE_REF`,
+  `INVALID_RETRIEVAL_QUERY`).
 
-Identidad importante: un paquete es `(source_name, video_id)`. El slug sólo
-localiza el directorio y puede cambiar.
+Important identity: a package is `(source_name, video_id)`. The slug only
+locates the directory and can change.
 
-`src/domain/retrieval/` (nuevo en 2.2):
+`src/domain/retrieval/` (new in 2.2):
 
-- `retrieval-query.ts`: `RetrievalQuery`, `RetrievalLimits`, normalización NFC
-  y tope de 1000 caracteres;
-- `retrieval-filter.ts`: `RetrievalFilter`, deduplicación de criterios y
-  comparación de idioma en minúsculas.
+- `retrieval-query.ts`: `RetrievalQuery`, `RetrievalLimits`, NFC normalization
+  and a 1000-character cap;
+- `retrieval-filter.ts`: `RetrievalFilter`, criteria deduplication and
+  lowercase language comparison.
 
-`src/domain/context/` (nuevo en 2.3):
+`src/domain/context/` (new in 2.3):
 
-- `context-budget.ts`: `ContextBudget`, resuelve los presets
-  `focused`/`balanced`/`deep` (12k/32k/64k tokens) y valida el override
-  `--max-tokens` como entero positivo sin renombrar el preset público.
+- `context-budget.ts`: `ContextBudget`, resolves the `focused`/`balanced`/`deep`
+  presets (12k/32k/64k tokens) and validates the `--max-tokens` override as a
+  positive integer without renaming the public preset.
 
-### Aplicación — `src/application`
+### Application — `src/application`
 
-Puertos actuales (`src/application/ports/`):
+Current ports (`src/application/ports/`):
 
 - `package-source-reader.ts` → `PackageSourceReader`;
 - `source-registry.ts` → `SourceRegistry`;
 - `index-store.ts` → `IndexStore`;
 - `embedding-generator.ts` → `EmbeddingGenerator`;
-- `vector-index-sink.ts` → `VectorIndexSink` (sólo escritura; sigue existiendo
-  como base de `VectorSearchIndex`, no lo reemplaza `sync` directamente);
-- `text-search-index.ts` → `TextSearchIndex` (nuevo en 2.2);
-- `vector-search-index.ts` → `VectorSearchIndex` (nuevo en 2.2; extiende
-  `VectorIndexSink` con `load` y `search`);
-- `knowledge-repository.ts` → `KnowledgeRepository` (nuevo en 2.2).
+- `vector-index-sink.ts` → `VectorIndexSink` (write-only; it still exists as
+  the base of `VectorSearchIndex`, `sync` does not replace it directly);
+- `text-search-index.ts` → `TextSearchIndex` (new in 2.2);
+- `vector-search-index.ts` → `VectorSearchIndex` (new in 2.2; extends
+  `VectorIndexSink` with `load` and `search`);
+- `knowledge-repository.ts` → `KnowledgeRepository` (new in 2.2).
 
-Casos de uso y políticas puras:
+Use cases and pure policies:
 
 - `src/application/sources/`: `add-source.ts`, `list-sources.ts`,
   `remove-source.ts`;
 - `src/application/indexing/`: `build-knowledge-units.ts`,
-  `fragment-knowledge-units.ts`, `sync-source.ts` (orquestador `syncSource`),
+  `fragment-knowledge-units.ts`, `sync-source.ts` (`syncSource` orchestrator),
   `package-snapshots.ts`, `indexed-package-change.ts`;
 - `src/application/diagnostics/`: `get-status.ts`, `run-doctor.ts`;
-- `src/application/retrieval/` (nuevo en 2.2): `retrieval-results.ts` (tipos
-  compartidos `RankedHit`, `FusedHit`, `CandidateProvenance`,
-  `RetrievalCandidate`, `RetrievalOutcome`), `fusion-strategy.ts` (puerto
-  `FusionStrategy`), `rrf-fusion.ts` (`createRrfFusion`),
-  `select-candidates.ts` (`selectCandidates`, dedupe + diversidad),
-  `retrieve-candidates.ts` (`retrieveCandidates`, el orquestador de 2.2).
+- `src/application/retrieval/` (new in 2.2): `retrieval-results.ts` (shared
+  types `RankedHit`, `FusedHit`, `CandidateProvenance`, `RetrievalCandidate`,
+  `RetrievalOutcome`), `fusion-strategy.ts` (`FusionStrategy` port),
+  `rrf-fusion.ts` (`createRrfFusion`), `select-candidates.ts`
+  (`selectCandidates`, dedupe + diversity), `retrieve-candidates.ts`
+  (`retrieveCandidates`, the orchestrator of 2.2).
 
-`src/application/context/` (nuevo en 2.3):
+`src/application/context/` (new in 2.3):
 
-- `context-request.ts`: `ContextRequest` (consulta + `ContextBudget`);
+- `context-request.ts`: `ContextRequest` (query + `ContextBudget`);
 - `context-blocks.ts`: `ContextUnitBlock`, `BudgetAllocation`,
-  `CitationRecord`, `ContextSection` y `classifyContextSection` (bucketing
-  compartido por `allocateBudget` y los renderizadores);
+  `CitationRecord`, `ContextSection` and `classifyContextSection` (bucketing
+  shared by `allocateBudget` and the renderers);
 - `context-bundle.ts`: `ContextBundle`, `ContextResultDocument`,
-  `ContextResultUnit`, `ContextResultSource` — con nombres `snake_case`
-  porque son el contrato de cable ya aprobado en `cli-contract.md`, no una
-  convención interna de TypeScript;
-- `expand-to-ancestors.ts` (`expandToAncestors`): combina candidatos y
-  cadenas de ancestros ya resueltas en bloques citables sin duplicados;
-- `deduplicate-blocks.ts` (`deduplicateBlocks`): colapsa bloques con
-  `contentHash` idéntico bajo `unitId` distintos;
-- `allocate-budget.ts` (`allocateBudget`): orden fijo por bucket
-  (documento/sección → reglas/patrones → ancestros) y truncamiento entero,
-  nunca a la mitad;
-- `assign-citations.ts` (`assignCitations`): IDs `S01`, `S02`... en el orden
-  final de inclusión;
-- `render-context-markdown.ts` (`renderContextMarkdown`) y
-  `render-context-result.ts` (`renderContextResult`): redactores puros de
-  `context.md` y `result.json`;
-- `assemble-context.ts` (`assembleContext`): orquestador de 2.3, compone todo
-  lo anterior sobre `RetrievalOutcome`.
+  `ContextResultUnit`, `ContextResultSource` — with `snake_case` names because
+  they are the wire contract already approved in `cli-contract.md`, not an
+  internal TypeScript convention;
+- `expand-to-ancestors.ts` (`expandToAncestors`): combines candidates and
+  already resolved ancestor chains into citable blocks without duplicates;
+- `deduplicate-blocks.ts` (`deduplicateBlocks`): collapses blocks with an
+  identical `contentHash` under different `unitId`s;
+- `allocate-budget.ts` (`allocateBudget`): fixed order by bucket
+  (document/section → rules/patterns → ancestors) and whole-block truncation,
+  never halfway;
+- `assign-citations.ts` (`assignCitations`): IDs `S01`, `S02`... in the final
+  inclusion order;
+- `render-context-markdown.ts` (`renderContextMarkdown`) and
+  `render-context-result.ts` (`renderContextResult`): pure renderers of
+  `context.md` and `result.json`;
+- `assemble-context.ts` (`assembleContext`): orchestrator of 2.3, composes
+  everything above on top of `RetrievalOutcome`.
 
-El orquestador sólo conoce puertos. Tests de aplicación usan fakes
-(`test/fakes/`) y no cargan SQLite ni el modelo real.
+The orchestrator only knows ports. Application tests use fakes (`test/fakes/`)
+and load neither SQLite nor the real model.
 
-### Infraestructura — `src/infrastructure`
+### Infrastructure — `src/infrastructure`
 
 Filesystem (`src/infrastructure/filesystem/`):
 
-- `source-layout-resolver.ts`: resolución canónica de colección o carpeta
-  `videos/`;
-- `manifest-reader.ts`: parsing del manifest;
-- `context-markdown-parser.ts`, `rules-json-parser.ts`: parsing de
-  `context.md` y `rules.json`;
-- `metadata-selector.ts`: selección de metadata estable;
-- `filesystem-package-source-reader.ts`: lectura completa de paquetes sin
-  escrituras;
-- `write-context-bundle.ts` (nuevo en 2.3): `writeContextBundle`, escribe
-  `context.md` y `result.json` bajo `<outputDir>/<request_id>/`; `request_id`
-  usa el mismo generador ad-hoc que `SyncId` (sin dependencia ULID); falla
-  explícito si el directorio del `request_id` ya existe en vez de mezclar
-  archivos.
+- `source-layout-resolver.ts`: canonical resolution of a collection or a
+  `videos/` folder;
+- `manifest-reader.ts`: manifest parsing;
+- `context-markdown-parser.ts`, `rules-json-parser.ts`: parsing of `context.md`
+  and `rules.json`;
+- `metadata-selector.ts`: selection of stable metadata;
+- `filesystem-package-source-reader.ts`: complete reading of packages with no
+  writes;
+- `write-context-bundle.ts` (new in 2.3): `writeContextBundle`, writes
+  `context.md` and `result.json` under `<outputDir>/<request_id>/`;
+  `request_id` uses the same ad-hoc generator as `SyncId` (no ULID
+  dependency); it fails explicitly if the `request_id` directory already
+  exists instead of mixing files.
 
-Embeddings (`src/infrastructure/embeddings/`, renombrado en el punto 4.5):
+Embeddings (`src/infrastructure/embeddings/`, renamed in point 4.5):
 
-- `model-profile.ts` (nuevo en 4.5): `EmbeddingModelProfile`,
-  `EmbeddingInputPrefixes`, el perfil activo congelado `activeModelProfile`,
-  `modelVersion(profile)` y `modelDescriptorOf(profile)`. No importa nada:
-  ni Transformers.js, ni `node:fs`, ni otro módulo del proyecto. Es la única
-  fuente de la identidad del modelo (repositorio, revisión, `dtype`,
-  dimensiones, `maxInputTokens`, `requiredFiles`) y de su política de
-  prefijos. `"Xenova/multilingual-e5-small"` aparece una sola vez en todo
-  `src/`, acá.
-- `transformers-embedding-generator.ts` (antes `e5-embedding-generator.ts`):
-  `TransformersEmbeddingGenerator` carga perezosamente y recibe
-  `profile?: EmbeddingModelProfile` con default `activeModelProfile`; los
-  prefijos se aplican según `profile.inputPrefixes` (`null` = sin prefijo,
-  texto crudo), y `countTokens`/`embedDocuments` comparten la misma función
-  de prefijado; límite declarado: `profile.maxInputTokens` (512 con el
-  perfil activo); lotes configurables; vectores normalizados y validados;
-  runtime forzado a local mediante `env.allowRemoteModels = false` y
-  `env.cacheDir` antes de crear el pipeline. Tipos renombrados:
-  `EmbeddingAdapterError`/`...ErrorCode`, `EmbeddingSession`,
-  `EmbeddingRuntime`, `EmbeddingRuntimeLoadOptions` (antes con prefijo `E5`).
-  Los **valores** de los códigos de error no cambiaron.
-- `transformers-model-installer.ts` (antes `e5-model-installer.ts`):
-  `TransformersModelInstaller` recibe el perfil igual que el generador;
-  tipos renombrados `ModelDownloadRuntime`/`ModelDownloadOptions` (antes
+- `model-profile.ts` (new in 4.5): `EmbeddingModelProfile`,
+  `EmbeddingInputPrefixes`, the frozen active profile `activeModelProfile`,
+  `modelVersion(profile)` and `modelDescriptorOf(profile)`. It imports
+  nothing: not Transformers.js, not `node:fs`, not another module of the
+  project. It is the only source of the model's identity (repository,
+  revision, `dtype`, dimensions, `maxInputTokens`, `requiredFiles`) and of its
+  prefix policy. `"Xenova/multilingual-e5-small"` appears exactly once in all
+  of `src/`, here.
+- `transformers-embedding-generator.ts` (formerly
+  `e5-embedding-generator.ts`): `TransformersEmbeddingGenerator` loads lazily
+  and receives `profile?: EmbeddingModelProfile` defaulting to
+  `activeModelProfile`; prefixes are applied according to
+  `profile.inputPrefixes` (`null` = no prefix, raw text), and
+  `countTokens`/`embedDocuments` share the same prefixing function; declared
+  limit: `profile.maxInputTokens` (512 with the active profile); configurable
+  batches; normalized and validated vectors; runtime forced to local through
+  `env.allowRemoteModels = false` and `env.cacheDir` before creating the
+  pipeline. Renamed types: `EmbeddingAdapterError`/`...ErrorCode`,
+  `EmbeddingSession`, `EmbeddingRuntime`, `EmbeddingRuntimeLoadOptions`
+  (formerly prefixed with `E5`). The error code **values** did not change.
+- `transformers-model-installer.ts` (formerly `e5-model-installer.ts`):
+  `TransformersModelInstaller` receives the profile just like the generator;
+  renamed types `ModelDownloadRuntime`/`ModelDownloadOptions` (formerly
   `E5DownloadRuntime`/`E5DownloadOptions`).
 
 SQLite (`src/infrastructure/sqlite/`):
 
-- `open-database.ts`: apertura con WAL y foreign keys;
-- `migrations/001-initial.ts`: migración inicial versionada;
-- `sqlite-source-registry.ts`: registro de fuentes;
-- `sqlite-index-store.ts`: estado de paquetes y runs, aplicación
-  transaccional completa;
-- `sqlite-diagnostics.ts`: diagnósticos read-only para `status`/`doctor`;
-- `fts-query-sanitizer.ts` (nuevo en 2.2): traduce texto libre a una expresión
-  `MATCH` segura, tokenizando por letras/números y citando cada token;
-- `sqlite-text-search-index.ts` (nuevo en 2.2): `SQLiteTextSearchIndex`,
-  consulta `fragment_fts` con `bm25()` ponderado por columna;
-- `sqlite-knowledge-repository.ts` (nuevo en 2.2): `SQLiteKnowledgeRepository`,
-  procedencia por lote, unidades y ancestros.
+- `open-database.ts`: opening with WAL and foreign keys;
+- `migrations/001-initial.ts`: versioned initial migration;
+- `sqlite-source-registry.ts`: source registry;
+- `sqlite-index-store.ts`: package and run state, complete transactional
+  application;
+- `sqlite-diagnostics.ts`: read-only diagnostics for `status`/`doctor`;
+- `fts-query-sanitizer.ts` (new in 2.2): translates free text into a safe
+  `MATCH` expression, tokenizing by letters/numbers and quoting every token;
+- `sqlite-text-search-index.ts` (new in 2.2): `SQLiteTextSearchIndex`, queries
+  `fragment_fts` with `bm25()` weighted by column;
+- `sqlite-knowledge-repository.ts` (new in 2.2): `SQLiteKnowledgeRepository`,
+  batched provenance, units and ancestors.
 
-Vector (`src/infrastructure/vector/`, nuevo en 2.2):
+Vector (`src/infrastructure/vector/`, new in 2.2):
 
-- `sqlite-vector-loader.ts`: `SQLiteVectorSource`, decodifica BLOBs float32
-  little-endian desde `embeddings`;
-- `in-memory-vector-search-index.ts`: `InMemoryVectorSearchIndex`, matriz
-  contigua, carga perezosa, producto punto sobre vectores normalizados.
+- `sqlite-vector-loader.ts`: `SQLiteVectorSource`, decodes little-endian
+  float32 BLOBs from `embeddings`;
+- `in-memory-vector-search-index.ts`: `InMemoryVectorSearchIndex`, contiguous
+  matrix, lazy loading, dot product over normalized vectors.
 
-### Interfaz — `src/interfaces/cli`
+### Interface — `src/interfaces/cli`
 
-- `parse-command.ts`: argumentos estrictos con `parseArgs`; valida `--depth`
-  y `--max-tokens` como error de uso (código `2`) antes de que lleguen a
-  `ContextBudget`, para que un argumento mal escrito nunca produzca el
-  código `1` de fallo operativo;
-- `render-cli-output.ts`: JSON compacto versionado.
-- `run-cli.ts`: ejecución de casos de uso y códigos de salida; el comando
-  `retrieve` (nuevo en 2.3) construye `RetrievalQuery`/`RetrievalFilter`,
-  llama `application.assembleContext`, escribe el bundle con
-  `writeContextBundle` y emite el recibo compacto de `cli-contract.md`.
-- `src/main.ts`: entry point ESM y configuración por entorno.
+- `parse-command.ts`: strict arguments with `parseArgs`; it validates `--depth`
+  and `--max-tokens` as a usage error (code `2`) before they reach
+  `ContextBudget`, so that a mistyped argument never produces the operational
+  failure code `1`;
+- `render-cli-output.ts`: compact versioned JSON.
+- `run-cli.ts`: use case execution and exit codes; the `retrieve` command (new
+  in 2.3) builds `RetrievalQuery`/`RetrievalFilter`, calls
+  `application.assembleContext`, writes the bundle with `writeContextBundle`
+  and emits the compact receipt of `cli-contract.md`.
+- `src/main.ts`: ESM entry point and configuration by environment.
 
-`retrieve` está disponible desde el cierre de 2.3 (ver
-["CLI implementada"](#cli-implementada)).
+`retrieve` has been available since the closure of 2.3 (see
+["Implemented CLI"](#implemented-cli)).
 
 ### Composition root — `src/main/create-application.ts`
 
-Conecta adaptadores concretos y permite reemplazarlos mediante overrides
-(`ApplicationOverrides`). Crear la aplicación no descarga modelos, no
-sincroniza y no carga vectores. El modelo se carga sólo al contar tokens o
-generar embeddings; el índice vectorial se carga sólo en la primera consulta o
-`sync`.
+It wires concrete adapters and allows replacing them through overrides
+(`ApplicationOverrides`). Creating the application downloads no models, does
+not synchronize and does not load vectors. The model is loaded only when
+counting tokens or generating embeddings; the vector index is loaded only on
+the first query or `sync`.
 
-Cambio importante de 2.2: **`MemoryVectorIndexSink` fue eliminado.** El campo
-`vectorIndex` de `Application` ahora es un `VectorSearchIndex`
-(`InMemoryVectorSearchIndex` sobre `SQLiteVectorSource` por defecto). La misma
-instancia recibe los cambios que publica `sync` y sirve las consultas de
-`retrieveCandidates`, así que un cambio confirmado y una consulta nunca pueden
-ver vectores distintos. Si encontrás referencias a `MemoryVectorIndexSink` en
-código o memoria de sesiones viejas, están obsoletas.
+Important change from 2.2: **`MemoryVectorIndexSink` was removed.** The
+`vectorIndex` field of `Application` is now a `VectorSearchIndex`
+(`InMemoryVectorSearchIndex` over `SQLiteVectorSource` by default). The same
+instance receives the changes `sync` publishes and serves the
+`retrieveCandidates` queries, so a committed change and a query can never see
+different vectors. If you find references to `MemoryVectorIndexSink` in code or
+in memory from old sessions, they are obsolete.
 
-`Application` expone `retrieveCandidates(query: RetrievalQuery):
-Promise<RetrievalOutcome>`, además de `vectorIndex`, `textSearchIndex` y
-`knowledgeRepository` como propiedades reemplazables.
+`Application` exposes `retrieveCandidates(query: RetrievalQuery):
+Promise<RetrievalOutcome>`, as well as `vectorIndex`, `textSearchIndex` and
+`knowledgeRepository` as replaceable properties.
 
-Nuevo en 2.3: `Application` también expone `assembleContext(request:
-ContextRequest): Promise<ContextBundle>`, reemplazable igual que
-`retrieveCandidates` (ver el test `exposes assembleContext, reusing the same
-retrieval wiring` en `test/main/create-application.test.ts`). Reutiliza
-exactamente la misma `retrieveCandidates` interna, así que nunca puede quedar
-desincronizado del motor de recuperación.
+New in 2.3: `Application` also exposes `assembleContext(request:
+ContextRequest): Promise<ContextBundle>`, replaceable just like
+`retrieveCandidates` (see the test `exposes assembleContext, reusing the same
+retrieval wiring` in `test/main/create-application.test.ts`). It reuses exactly
+the same internal `retrieveCandidates`, so it can never drift out of sync with
+the retrieval engine.
 
 ## Flujo exacto de `retrieveCandidates` (2.2)
 
