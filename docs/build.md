@@ -1,437 +1,431 @@
-# Progreso de construcción
+# Build progress
 
-> **Nota:** este documento es el historial del proyecto, no un tracker de
-> trabajo pendiente. Registra qué entregó cada punto y cómo se validó contra
-> la colección real `auto-design`; no queda nada abierto salvo lo anotado
-> explícitamente.
+> **Note:** this document is the history of the project, not a tracker of
+> pending work. It records what each point delivered and how it was validated
+> against the real `auto-design` collection; nothing is left open except what is
+> explicitly noted.
 
-## Estados
+## States
 
-- ⚪ Pendiente
-- 🔵 En progreso
-- ✅ Completado
-
----
-
-| Fase                       | N°  | Etapa                                   | Estado |  %   | Descripción                                                |
-| -------------------------- | --- | --------------------------------------- | :----: | :--: | ---------------------------------------------------------- |
-| **1 — Definición**         | 1.1 | Repositorio y contexto inicial          |   ✅   | 100% | Git y decisiones documentadas                              |
-|                            | 1.2 | Contrato de CLI y salidas               |   ✅   | 100% | Comandos, formatos y códigos definidos                     |
-|                            | 1.3 | Stack y estrategia vectorial            |   ✅   | 100% | Stack y toolchain reproducible aprobados                   |
-| **2 — Implementación MVP** | 2.1 | Indexación incremental                  |   ✅   | 100% | Sync incremental y CLI verificadas                         |
-|                            | 2.2 | Recuperación híbrida                    |   ✅   | 100% | FTS5, vectores y ranking verificados                       |
-|                            | 2.3 | Ensamblado de contexto                  |   ✅   | 100% | Expansión, presupuesto, citas y `retrieve`                 |
-|                            | 2.4 | Skill general                           |   ✅   | 100% | `skill/SKILL.md` verificada en frío                        |
-| **3 — Calidad**            | 3.1 | Pruebas funcionales                     |   ✅   | 100% | Dominio, SQLite, CLI y E2E cubiertos                       |
-|                            | 3.2 | Evaluaciones del MVP                    |   ✅   | 100% | M, N y O completos; MVP cerrado                            |
-| **4 — Posterior al MVP**   | 4.1 | Soporte de `analysis.json` (schema 2.0) |   ✅   | 100% | Bloques P–T completos; validado contra `auto-design` real  |
-|                            | 4.2 | Instalación: hogar de usuario y `init`  |   ✅   | 100% | Bloques U–Z e Y completos; validado en frío desde cero     |
-|                            | 4.3 | Seguridad de `sync` y rendimiento       |   ✅   | 100% | Guard de concurrencia, runs fantasma y lote 1 (2,23x)      |
-|                            | 4.4 | Aviso de vectores obsoletos             |   ✅   | 100% | `VECTORS_STALE` y recarga del índice por versión de modelo |
-|                            | 4.5 | Perfil de modelo de embeddings          |   ✅   | 100% | Bloques AA–AD completos; validado sin reindexar            |
-|                            | 4.6 | Comando `rebuild --confirm`             |   ✅   | 100% | Bloques AE–AH completos; validado contra el binario real   |
-|                            | 4.7 | Aviso de baja relevancia                |   ✅   | 100% | `LOW_RELEVANCE` con umbral medido sobre 24 consultas       |
+- ⚪ Pending
+- 🔵 In progress
+- ✅ Completed
 
 ---
 
-## Detalle por etapa
+| Phase                      | No. | Stage                                | State |  %   | Description                                                   |
+| -------------------------- | --- | ------------------------------------ | :---: | :--: | ------------------------------------------------------------- |
+| **1 — Definition**         | 1.1 | Repository and initial context       |  ✅   | 100% | Git and documented decisions                                  |
+|                            | 1.2 | CLI contract and outputs             |  ✅   | 100% | Commands, formats and codes defined                           |
+|                            | 1.3 | Stack and vector strategy            |  ✅   | 100% | Stack and reproducible toolchain approved                     |
+| **2 — MVP implementation** | 2.1 | Incremental indexing                 |  ✅   | 100% | Incremental sync and CLI verified                             |
+|                            | 2.2 | Hybrid retrieval                     |  ✅   | 100% | FTS5, vectors and ranking verified                            |
+|                            | 2.3 | Context assembly                     |  ✅   | 100% | Expansion, budget, citations and `retrieve`                   |
+|                            | 2.4 | General skill                        |  ✅   | 100% | `skill/SKILL.md` verified cold                                |
+| **3 — Quality**            | 3.1 | Functional tests                     |  ✅   | 100% | Domain, SQLite, CLI and E2E covered                           |
+|                            | 3.2 | MVP evaluations                      |  ✅   | 100% | M, N and O complete; MVP closed                               |
+| **4 — Post-MVP**           | 4.1 | `analysis.json` support (schema 2.0) |  ✅   | 100% | Blocks P–T complete; validated against the real `auto-design` |
+|                            | 4.2 | Installation: user home and `init`   |  ✅   | 100% | Blocks U–Z and Y complete; validated cold from scratch        |
+|                            | 4.3 | `sync` safety and performance        |  ✅   | 100% | Concurrency guard, ghost runs and batch 1 (2.23x)             |
+|                            | 4.4 | Stale vector warning                 |  ✅   | 100% | `VECTORS_STALE` and index reload by model version             |
+|                            | 4.5 | Embedding model profile              |  ✅   | 100% | Blocks AA–AD complete; validated without reindexing           |
+|                            | 4.6 | `rebuild --confirm` command          |  ✅   | 100% | Blocks AE–AH complete; validated against the real binary      |
+|                            | 4.7 | Low-relevance warning                |  ✅   | 100% | `LOW_RELEVANCE` with a threshold measured over 24 queries     |
 
-### Etapa 1 — Definición
+---
 
-#### 1.1 Repositorio y contexto inicial
+## Detail by stage
 
-- [x] Crear el repositorio Git
-- [x] Documentar el objetivo y alcance
-- [x] Documentar la arquitectura acordada
-- [x] Registrar decisiones y asuntos abiertos
-- [x] Crear el seguimiento de construcción
+### Stage 1 — Definition
 
-#### 1.2 Contrato de CLI y salidas
+#### 1.1 Repository and initial context
 
-- [x] Definir comandos y argumentos
-- [x] Definir códigos de salida
-- [x] Definir formato Markdown
-- [x] Definir esquema JSON versionado
+- [x] Create the Git repository
+- [x] Document the objective and scope
+- [x] Document the agreed architecture
+- [x] Record decisions and open matters
+- [x] Create the build tracking
 
-#### 1.3 Stack y estrategia vectorial
+#### 1.2 CLI contract and outputs
 
-- [x] Elegir lenguaje y empaquetado
-- [x] Evaluar y elegir el modelo local
-- [x] Definir límites de dominio y adaptadores
-- [x] Comparar búsqueda exacta y sqlite-vec
-- [x] Elegir implementación vectorial inicial
-- [x] Evaluar clientes SQLite reproduciblemente
-- [x] Elegir `node:sqlite` y fijar Node 24.19.0
-- [x] Definir comandos de build, test y lint
+- [x] Define commands and arguments
+- [x] Define exit codes
+- [x] Define the Markdown format
+- [x] Define a versioned JSON schema
 
-### Etapa 2 — Implementación MVP
+#### 1.3 Stack and vector strategy
 
-#### 2.1 Indexación incremental
+- [x] Choose the language and packaging
+- [x] Evaluate and choose the local model
+- [x] Define domain boundaries and adapters
+- [x] Compare exact search and sqlite-vec
+- [x] Choose the initial vector implementation
+- [x] Evaluate SQLite clients reproducibly
+- [x] Choose `node:sqlite` and pin Node 24.19.0
+- [x] Define the build, test and lint commands
 
-- [x] Definir identidades validadas del dominio
-- [x] Definir entidades base de catálogo
-- [x] Definir unidades, fragmentos y embeddings
-- [x] Definir runs, issues e identidad de contenido
-- [x] Definir snapshots y cambio atómico
-- [x] Definir puertos de indexación
-- [x] Resolver layouts de fuentes
-- [x] Leer y validar manifests
-- [x] Parsear contextos Markdown
-- [x] Parsear reglas JSON
-- [x] Seleccionar metadata estable
-- [x] Registrar múltiples raíces
-- [x] Leer paquetes sin modificarlos
-- [x] Crear unidades jerárquicas
-- [x] Fragmentar unidades por tokens
-- [x] Generar embeddings E5 locales
-- [x] Validar el modelo local por smoke
-- [x] Detectar cambios mediante hashes
+### Stage 2 — MVP implementation
 
-#### 2.2 Recuperación híbrida
+#### 2.1 Incremental indexing
 
-- [x] Implementar búsqueda FTS5
-- [x] Implementar búsqueda semántica
-- [x] Combinar y diversificar resultados
-- [x] Filtrar por metadatos
+- [x] Define validated domain identities
+- [x] Define base catalog entities
+- [x] Define units, fragments and embeddings
+- [x] Define runs, issues and content identity
+- [x] Define snapshots and the atomic swap
+- [x] Define indexing ports
+- [x] Resolve source layouts
+- [x] Read and validate manifests
+- [x] Parse Markdown contexts
+- [x] Parse JSON rules
+- [x] Select stable metadata
+- [x] Register multiple roots
+- [x] Read packages without modifying them
+- [x] Create hierarchical units
+- [x] Fragment units by tokens
+- [x] Generate local E5 embeddings
+- [x] Validate the local model by smoke
+- [x] Detect changes through hashes
 
-#### 2.3 Ensamblado de contexto
+#### 2.2 Hybrid retrieval
 
-- [x] Expandir unidades padre
-- [x] Deduplicar contenido
-- [x] Aplicar presupuestos por profundidad
-- [x] Preservar citas y limitaciones
-- [x] Implementar el comando `retrieve` de la CLI
+- [x] Implement FTS5 search
+- [x] Implement semantic search
+- [x] Combine and diversify results
+- [x] Filter by metadata
 
-#### 2.4 Skill general
+#### 2.3 Context assembly
 
-- [x] Crear una skill canónica
-- [x] Invocar la CLI sin lógica de proveedor
-- [x] Verificar uso desde Claude (agente en frío, sin contexto previo)
-- [x] Verificar uso desde Codex (agente externo real; confirmado por el
-      mantenedor el 15/08/2026, funcionó)
+- [x] Expand parent units
+- [x] Deduplicate content
+- [x] Apply budgets by depth
+- [x] Preserve citations and limitations
+- [x] Implement the `retrieve` command of the CLI
 
-`skill/SKILL.md` es autocontenida (no depende de rutas relativas a `docs/`)
-para poder instalarse fuera de este repositorio. Verificada con dos corridas
-de un subagente en frío (sin contexto previo del proyecto, sólo el texto de
-la skill) contra una copia temporal de dos videos reales de `auto-design`: la
-primera corrida detectó que faltaba documentar `init` como paso previo
-obligatorio; corregido, la segunda corrida completó el flujo completo
-(`init` → `status` → `source add` → `sync` → `retrieve`) y produjo un bundle
-citado correctamente sin inspeccionar `src/`. Cerrado con verificación sólo
-en Claude por decisión explícita del usuario; ver `docs/agent-handoff.md`
-para el procedimiento de verificación en Codex si hace falta más adelante.
+#### 2.4 General skill
 
-### Etapa 3 — Calidad
+- [x] Create a canonical skill
+- [x] Invoke the CLI without provider-specific logic
+- [x] Verify use from Claude (cold agent, no previous context)
+- [x] Verify use from Codex (real external agent; confirmed by the
+      maintainer on 15 August 2026, it worked)
 
-#### 3.1 Pruebas funcionales
+`skill/SKILL.md` is self-contained (it does not depend on paths relative to
+`docs/`) so that it can be installed outside this repository. Verified with two
+runs of a cold subagent (with no previous context of the project, only the text
+of the skill) against a temporary copy of two real `auto-design` videos: the
+first run detected that `init` was not documented as a mandatory previous step;
+once corrected, the second run completed the whole flow (`init` → `status` →
+`source add` → `sync` → `retrieve`) and produced a correctly cited bundle
+without inspecting `src/`. Closed with verification only on Claude by explicit
+decision of the user; see `docs/agent-handoff.md` for the verification procedure
+on Codex should it be needed later on.
 
-- [x] Cubrir dominio e indexación
-- [x] Probar SQLite temporal
-- [x] Probar CLI y esquemas de salida
-- [x] Probar actualización y eliminación
+### Stage 3 — Quality
 
-#### 3.2 Evaluaciones del MVP
+#### 3.1 Functional tests
 
-Diseño propuesto y aprobado el 12 de agosto de 2026 en `docs/eval-design.md`
-(bloques M–O). Sin ground truth etiquetado: mide en dos capas independientes,
-mecánica (cobertura, integridad de citas) y juzgada (rúbrica respondida por
-Codex y por Claude sobre el mismo bundle).
+- [x] Cover the domain and indexing
+- [x] Test temporary SQLite
+- [x] Test the CLI and the output schemas
+- [x] Test updating and deletion
 
-- [x] M1. Verificador de integridad de citas (`evals/citation-integrity.ts`)
-- [x] M2. Script de orquestación de consultas semilla (`evals/run-seed-queries.ts`)
-- [x] M3. Agregador de métricas de Capa A (`evals/aggregate-mechanical-metrics.ts`)
-- [x] M4. Ejecución real sobre `auto-design` (24 bundles en `evals/results/2026-08-12/`; hallazgo de deriva de esquema en 17/51 videos del manifest real)
-- [x] N1. Plantilla de rúbrica (`evals/rubric-template.md`)
-- [x] N2. Juicio de Claude (`evals/results/2026-08-12/judgments/claude/`, subagente en frío)
-- [x] N3. Juicio de Codex (`evals/results/2026-08-12/judgments/codex/`, corrido por el usuario)
-- [x] N4. Comparación Codex vs. Claude (9/24 pares divergen, sólo por ambigüedad de rúbrica, ver `evals/results/2026-08-12/report.md`)
-- [x] O1. Decisión sobre pesos RRF y presupuestos (defaults mantenidos sin
-      cambios; evidencia y razonamiento en `docs/decisions.md`, sección
-      "Decisión de calibración (O1, punto 3.2)")
-- [x] O2. Reporte final y cierre de 3.2
+#### 3.2 MVP evaluations
+
+Design proposed and approved on 12 August 2026 in `docs/eval-design.md` (blocks
+M–O). Without labelled ground truth: it measures on two independent layers,
+mechanical (coverage, citation integrity) and judged (a rubric answered by Codex
+and by Claude over the same bundle).
+
+- [x] M1. Citation integrity checker (`evals/citation-integrity.ts`)
+- [x] M2. Seed query orchestration script (`evals/run-seed-queries.ts`)
+- [x] M3. Layer A metrics aggregator (`evals/aggregate-mechanical-metrics.ts`)
+- [x] M4. Real run over `auto-design` (24 bundles in `evals/results/2026-08-12/`; schema-drift finding in 17/51 videos of the real manifest)
+- [x] N1. Rubric template (`evals/rubric-template.md`)
+- [x] N2. Claude's judgement (`evals/results/2026-08-12/judgments/claude/`, cold subagent)
+- [x] N3. Codex's judgement (`evals/results/2026-08-12/judgments/codex/`, run by the user)
+- [x] N4. Codex vs. Claude comparison (9/24 pairs diverge, only because of rubric ambiguity, see `evals/results/2026-08-12/report.md`)
+- [x] O1. Decision on RRF weights and budgets (defaults kept without
+      changes; evidence and reasoning in `docs/decisions.md`, section
+      "Calibration decision (O1, point 3.2)")
+- [x] O2. Final report and closure of 3.2
       (`evals/results/2026-08-12/report.md`)
 
-MVP completo: 2.1–2.4 y 3.1–3.2 están al 100%. Decisión de calibración de
-O1 y hallazgos accionables de 3.2 en
-`evals/results/2026-08-12/report.md` y `docs/decisions.md`. Trabajo
-posterior razonable (piso de similitud vectorial, MCP, interfaz web,
-paquetes de páginas web) queda fuera de este MVP, documentado en
-`docs/agent-handoff.md`, no como pendiente urgente. El soporte de
-`analysis.json`/schema 2.0, el primer frente de trabajo posterior, ya se
-implementó y validó — ver 4.1 abajo.
+MVP complete: 2.1–2.4 and 3.1–3.2 are at 100%. The calibration decision of O1
+and the actionable findings of 3.2 are in
+`evals/results/2026-08-12/report.md` and `docs/decisions.md`. Reasonable later
+work (vector similarity floor, MCP, web interface, web page packages) stays
+outside this MVP, documented in `docs/agent-handoff.md`, not as an urgent
+pending item. The support for `analysis.json`/schema 2.0, the first front of
+later work, has already been implemented and validated — see 4.1 below.
 
-### Etapa 4 — Posterior al MVP
+### Stage 4 — Post-MVP
 
-#### 4.1 Soporte de `analysis.json` (schema 2.0)
+#### 4.1 `analysis.json` support (schema 2.0)
 
-Diseño propuesto y aprobado el 13 de agosto de 2026 en
-`docs/analysis-schema-design.md` (bloques P–T). Motivo: la skill productora
-`youtube-video-context` reemplazó `rules.json`/schema 1.0 por
-`analysis.json`/schema 2.0 el 2 de agosto de 2026; `auto-youtube-rag` nunca
-soportó el esquema nuevo, así que los 17 videos reales de `auto-design`
-generados con la skill actual —y todo video futuro— quedan fuera de la
-biblioteca. Decisiones cerradas: ambos esquemas se sostienen
-indefinidamente; `topics`/`recommendations` reutilizan las secciones fijas
-ya publicadas del bundle sin agregar una cuarta; la migración SQLite edita
-`001-initial.ts` in place (no existe base real que preservar). Detalle
-completo en `docs/decisions.md`.
+Design proposed and approved on 13 August 2026 in
+`docs/analysis-schema-design.md` (blocks P–T). Reason: the producing skill
+`youtube-video-context` replaced `rules.json`/schema 1.0 with
+`analysis.json`/schema 2.0 on 2 August 2026; `auto-youtube-rag` never supported
+the new schema, so the 17 real `auto-design` videos generated with the current
+skill —and every future video— stay outside the library. Closed decisions: both
+schemas are supported indefinitely; `topics`/`recommendations` reuse the fixed
+sections already published in the bundle without adding a fourth one; the SQLite
+migration edits `001-initial.ts` in place (there is no real database to
+preserve). Full detail in `docs/decisions.md`.
 
-- [x] P1–P3. Contratos de dominio y aplicación
-- [x] Q1. Parser de `analysis.json`
-- [x] R1–R2. Lectura de paquete y unidades de conocimiento
-- [x] S1–S3. Migración SQLite, bucketing y E2E con fixtures
-- [x] T1–T3. Validación real sobre `auto-design` y cierre
+- [x] P1–P3. Domain and application contracts
+- [x] Q1. `analysis.json` parser
+- [x] R1–R2. Package reading and knowledge units
+- [x] S1–S3. SQLite migration, bucketing and E2E with fixtures
+- [x] T1–T3. Real validation over `auto-design` and closure
 
-Cerrado el 13 de agosto de 2026. Validación real (bloque T) contra una
-copia temporal de la colección real `auto-design` (51 videos, incluidos
-los 17 con `analysis.json`) con el modelo E5 real: los 51 paquetes se
-indexaron sin ningún `issue`, `doctor` reportó los cinco checks en `ok`, y
-el digest SHA-256 del árbol fuente fue idéntico antes/después de `sync`.
-Una consulta semilla nueva (`es-analysis-neumorphism-accessibility`)
-orientada específicamente a contenido de `analysis.json` produjo un bundle
-real donde una cita resolvió a una unidad `analysis_topic` con procedencia
-correcta. `design-catalog` no se validó explícitamente: su manifest no
-declara ningún video con `resources.analysis`, así que no ejercita este
-trabajo. Detalle completo en `docs/decisions.md`, sección "Soporte de
-`analysis.json` (schema 2.0): implementado y validado".
+Closed on 13 August 2026. Real validation (block T) against a temporary copy of
+the real `auto-design` collection (51 videos, including the 17 with
+`analysis.json`) with the real E5 model: the 51 packages were indexed without a
+single `issue`, `doctor` reported the five checks as `ok`, and the SHA-256
+digest of the source tree was identical before and after `sync`. A new seed
+query (`es-analysis-neumorphism-accessibility`) aimed specifically at
+`analysis.json` content produced a real bundle where a citation resolved to an
+`analysis_topic` unit with correct provenance. `design-catalog` was not
+validated explicitly: its manifest declares no video with `resources.analysis`,
+so it does not exercise this work. Full detail in `docs/decisions.md`, section
+"`analysis.json` support (schema 2.0): implemented and validated".
 
-#### 4.2 Instalación: hogar de usuario, `init` instalador y preflight
+#### 4.2 Installation: user home, `init` as installer and preflight
 
-Origen: la corrida de verificación en frío del 13 de agosto falló con 63
-issues `MODEL_LOAD_FAILED` y expuso que **nunca se había decidido cómo se
-instala el producto**. El único instalador era el arnés de benchmarks, que
-no existe fuera del repositorio clonado, y cuatro lugares distintos
-calculaban la ruta del modelo con reglas incompatibles.
+Origin: the cold verification run of 13 August failed with 63
+`MODEL_LOAD_FAILED` issues and exposed that **it had never been decided how the
+product is installed**. The only installer was the benchmark harness, which does
+not exist outside the cloned repository, and four different places computed the
+model path with incompatible rules.
 
-- [x] U1–U2. Resolutor de rutas compartido, recibo y estado del modelo
-- [x] V1–V3. Eliminación de los tres defaults duplicados de `cwd`
-- [x] W1–W4. Puerto, adaptador de descarga y copia desde `--from`
-- [x] X1–X5. `models` e `init` en la CLI, `main.ts` y `doctor` alineados
-- [x] Z1–Z4. Preflight de requisitos y traducción de fallos de estado
-- [x] Y1–Y3. Smoke real, validación en frío y cierre
+- [x] U1–U2. Shared path resolver, receipt and model state
+- [x] V1–V3. Removal of the three duplicated `cwd` defaults
+- [x] W1–W4. Port, download adapter and copy from `--from`
+- [x] X1–X5. `models` and `init` in the CLI, `main.ts` and `doctor` aligned
+- [x] Z1–Z4. Requirements preflight and translation of state failures
+- [x] Y1–Y3. Real smoke, cold validation and closure
 
-Cerrado el 14 de agosto de 2026. Diseño en `docs/install-design.md`,
-decisiones en `docs/decisions.md`.
+Closed on 14 August 2026. Design in `docs/install-design.md`, decisions in
+`docs/decisions.md`.
 
-**Validación en frío (Y2)**: un subagente sin contexto previo, con acceso
-sólo a `skill/SKILL.md` y sus referencias, partió de una máquina sin hogar
-de usuario y llegó de cero a una respuesta citada. Instaló con
-`init --from`, registró `catalog-design`, indexó los 12 videos en 3 min
-54 s sin ningún `issue` y recuperó un bundle de 54 unidades con cero citas
-huérfanas. **No copió ningún archivo a mano ni relanzó ningún `sync`** —las
-dos cosas que había hecho la corrida anterior—, y encontró la bandera
-`--from` leyendo la skill, sin ayuda.
+**Cold validation (Y2)**: a subagent with no previous context, with access only
+to `skill/SKILL.md` and its references, started from a machine with no user home
+and got from zero to a cited answer. It installed with `init --from`, registered
+`catalog-design`, indexed the 12 videos in 3 min 54 s without a single `issue`
+and retrieved a bundle of 54 units with zero orphan citations. **It copied no
+file by hand and relaunched no `sync`** —the two things the previous run had
+done— and it found the `--from` flag by reading the skill, unaided.
 
-Dos hallazgos de la corrida:
+Two findings from the run:
 
-1. **`doctor` daba un parte falso de salud** ante un modelo truncado:
-   detectaba con `readdir(...).length > 0` aunque su mensaje ya apuntaba a
-   `models install`. Corregido; `runDoctor` recibe el estado ya resuelto.
-2. **El marcador de cita de `context.md` se lee mal.** Es de cierre y el
-   agente lo interpretó como de apertura, produciendo un resumen con
-   procedencia equivocada pese a que las 54 citas resuelven y no hay
-   huérfanas. Reprodujo dos veces, incluso leyendo el bundle entero de una
-   sola vez. Queda registrado como pendiente de decisión: cambiarlo toca el
-   contrato de `cli-contract.md`.
+1. **`doctor` gave a false bill of health** for a truncated model: it detected
+   with `readdir(...).length > 0` even though its message already pointed at
+   `models install`. Fixed; `runDoctor` receives the already-resolved state.
+2. **The citation marker of `context.md` is misread.** It is a closing marker
+   and the agent interpreted it as an opening one, producing a summary with the
+   wrong provenance even though the 54 citations resolve and there are no
+   orphans. It reproduced twice, even reading the whole bundle in one go. It is
+   recorded as pending a decision: changing it touches the contract of
+   `cli-contract.md`.
 
-#### 4.3 Seguridad de `sync` y rendimiento de indexación
+#### 4.3 `sync` safety and indexing performance
 
-Diseño en `docs/sync-safety-design.md`. Dos trabajos con el mismo origen: la
-corrida en frío del 13 de agosto.
+Design in `docs/sync-safety-design.md`. Two pieces of work with the same origin:
+the cold run of 13 August.
 
-- [x] AA. Guard de concurrencia en el store y regresión del borrado cruzado
-- [x] AB. `sync --force`, `RUN_SUPERSEDED` y `doctor` con `STALE_SYNC_RUN`
-- [x] AC. `defaultBatchSize` de 16 a 1
-- [x] AD. Cierre de la carrera entre procesos: `recordRun` bajo
-      `BEGIN IMMEDIATE` (14 de agosto, posterior al cierre inicial de 4.3)
+- [x] AA. Concurrency guard in the store and cross-deletion regression
+- [x] AB. `sync --force`, `RUN_SUPERSEDED` and `doctor` with `STALE_SYNC_RUN`
+- [x] AC. `defaultBatchSize` from 16 to 1
+- [x] AD. Closing the race between processes: `recordRun` under
+      `BEGIN IMMEDIATE` (14 August, after the initial closure of 4.3)
 
-Cerrado el 14 de agosto de 2026.
+Closed on 14 August 2026.
 
-**El borrado cruzado estaba confirmado, no supuesto.** La reproducción
-determinista mostró que dos runs solapados sobre una fuente la dejan
-completamente vacía: cada uno borra lo que no reclamó él, así que lo que el
-otro ya reclamó parece no visto. Ambos terminan sin error. Explica el
-`status` que reportó 13 videos habiendo 53.
+**The cross-deletion was confirmed, not assumed.** The deterministic
+reproduction showed that two overlapping runs over one source leave it
+completely empty: each one deletes what it did not claim itself, so what the
+other one already claimed looks unseen. Both finish without an error. It
+explains the `status` that reported 13 videos when there were 53.
 
-Verificado contra el binario real: con un run activo, `sync` rechaza con
-`SYNC_ALREADY_RUNNING` nombrando el run y su inicio; `doctor` lo reporta como
-`STALE_SYNC_RUN` con su antigüedad; `sync --force` lo marca fallido, deja un
-issue `RUN_SUPERSEDED` y arranca uno nuevo **conservando los 12 paquetes**.
+Verified against the real binary: with an active run, `sync` rejects with
+`SYNC_ALREADY_RUNNING` naming the run and its start; `doctor` reports it as
+`STALE_SYNC_RUN` with its age; `sync --force` marks it as failed, leaves a
+`RUN_SUPERSEDED` issue and starts a new one **preserving the 12 packages**.
 
-**Rendimiento: 2,23x medido de punta a punta.** La misma colección de 12
-videos pasó de 3 min 54 s a 1 min 45 s. La causa era el relleno dentro del
-lote: los fragmentos van de 13 a 511 tokens y todos se rellenaban hasta el
-más largo, así que uno corto costaba como uno de 511.
+**Performance: 2.23x measured end to end.** The same collection of 12 videos
+went from 3 min 54 s to 1 min 45 s. The cause was the padding inside the batch:
+the fragments range from 13 to 511 tokens and all of them were padded up to the
+longest one, so a short one cost as much as one of 511.
 
-**Paralelizar no servía**, y se midió antes de descartarlo: concurrencia 2 →
-0,99x, concurrencia 4 → 1,00x. ONNX ya satura los núcleos internamente.
+**Parallelising was of no use**, and it was measured before discarding it:
+concurrency 2 → 0.99x, concurrency 4 → 1.00x. ONNX already saturates the cores
+internally.
 
-#### 4.4 Aviso de vectores obsoletos
+#### 4.4 Stale vector warning
 
-- [x] `VECTORS_STALE` cuando la biblioteca tiene contenido y ningún vector
-      para el modelo activo
-- [x] `VectorSearchIndex.load()` devuelve el conteo de vectores cargados
-- [x] El índice recarga al cambiar `version` o `dimensions`, no sólo `key`
+- [x] `VECTORS_STALE` when the library has content and no vector for the
+      active model
+- [x] `VectorSearchIndex.load()` returns the count of loaded vectors
+- [x] The index reloads when `version` or `dimensions` change, not just `key`
 
-Cerrado el 14 de agosto de 2026. Detalle en `docs/decisions.md`, sección
-"Degradación silenciosa de la vía vectorial".
+Closed on 14 August 2026. Detail in `docs/decisions.md`, section "Silent
+degradation of the vector path".
 
-Cerró el hueco anotado al investigar el soporte de otros modelos:
-`retrieve` devolvía `status: "ok"` armado sólo con búsqueda textual, sin
-aviso, cuando los vectores no correspondían al modelo activo.
+It closed the gap noted while investigating support for other models:
+`retrieve` returned `status: "ok"` built with textual search only, with no
+warning, when the vectors did not correspond to the active model.
 
-**Un segundo defecto tapaba al primero.** El camino rápido del índice
-comparaba sólo `model.key` —que es `e5-small` y nunca cambia— en vez de
-`version`, que codifica revisión y cuantización. Reutilizar el snapshot
-devuelve un conteo mayor que cero, así que el warning nuevo jamás habría
-disparado. Lo detectó el agente que implementaba `VECTORS_STALE` y lo
-reportó en lugar de corregirlo en silencio.
+**A second defect was covering the first.** The fast path of the index compared
+only `model.key` —which is `e5-small` and never changes— instead of `version`,
+which encodes revision and quantisation. Reusing the snapshot returns a count
+greater than zero, so the new warning would never have fired. It was detected by
+the agent implementing `VECTORS_STALE`, who reported it instead of fixing it
+silently.
 
-#### 4.5 Perfil de modelo de embeddings
+#### 4.5 Embedding model profile
 
-Diseño en `docs/model-profile-design.md` (bloques AA–AD). Origen: los prefijos
-`passage: `/`query: ` de la familia E5 se aplicaban siempre, sin excepción,
-en `e5-embedding-generator.ts`; con otro modelo (MiniLM, BGE, Jina) degradan
-la calidad **sin ningún error**, el hueco que quedó anotado al investigar el
-punto 4.2 y que el usuario fijó como frente número 1 el 14 de agosto de 2026.
+Design in `docs/model-profile-design.md` (blocks AA–AD). Origin: the
+`passage: `/`query: ` prefixes of the E5 family were applied always, without
+exception, in `e5-embedding-generator.ts`; with another model (MiniLM, BGE,
+Jina) they degrade the quality **without any error**, the gap that was noted
+while investigating point 4.2 and that the user set as front number 1 on 14
+August 2026.
 
-- [x] AA. `model-profile.ts`: `EmbeddingModelProfile`, `activeModelProfile`
-      congelado, `modelVersion` y `modelDescriptorOf`
-- [x] AB. El generador aplica prefijos según el perfil inyectado;
-      `countTokens` y `embedDocuments` comparten la misma política de
-      prefijado
-- [x] AC. `model-install-state.ts` y el instalador consumen el perfil; mueren
-      los duplicados de `modelDirectory` y `requiredModelFiles`
-- [x] AD. Rename del adaptador y del instalador, validación real sin
-      reindexar, cierre de documentación
+- [x] AA. `model-profile.ts`: `EmbeddingModelProfile`, frozen
+      `activeModelProfile`, `modelVersion` and `modelDescriptorOf`
+- [x] AB. The generator applies prefixes according to the injected profile;
+      `countTokens` and `embedDocuments` share the same prefixing policy
+- [x] AC. `model-install-state.ts` and the installer consume the profile; the
+      duplicates of `modelDirectory` and `requiredModelFiles` die
+- [x] AD. Rename of the adapter and the installer, real validation without
+      reindexing, documentation closure
 
-Cerrado el 14 de agosto de 2026.
+Closed on 14 August 2026.
 
-`"Xenova/multilingual-e5-small"` pasó de estar escrito tres veces en `src/` a
-aparecer una sola vez, en `model-profile.ts`. `E5EmbeddingGenerator` y
-`E5ModelInstaller` se renombraron a `TransformersEmbeddingGenerator` y
-`TransformersModelInstaller` —ya no son específicos de E5—, sin cambiar los
-valores de ningún código de error público.
+`"Xenova/multilingual-e5-small"` went from being written three times in `src/`
+to appearing only once, in `model-profile.ts`. `E5EmbeddingGenerator` and
+`E5ModelInstaller` were renamed to `TransformersEmbeddingGenerator` and
+`TransformersModelInstaller` —they are no longer specific to E5— without
+changing the values of any public error code.
 
-**La decisión con más riesgo era no reindexar nada.** `modelVersion(profile)`
-pliega la política de prefijos en el `version` persistido (sufijo
-`+noprefix` sin prefijos), pero con el perfil activo produce, carácter por
-carácter, el mismo literal que ya existía:
-`"Xenova/multilingual-e5-small@main:q8"`. Un test de regresión fija ese
-literal. Validado además contra el binario real (AD3): sobre una copia
-temporal de 3 videos reales de `auto-design` ya sincronizados con el código
-anterior, `sync` con el código de 4.5 devolvió `status: "no_changes"`,
-`packagesIndexed: 0`; `retrieve` no mostró `VECTORS_STALE` ni ningún otro
-warning, confirmando que los vectores viejos siguen siendo válidos; `doctor`
-reportó los seis checks en `ok`; y el digest SHA-256 del árbol fuente fue
-idéntico antes y después. Detalle completo en `docs/decisions.md`, sección
-"Perfil de modelo y política de prefijos".
+**The riskiest decision was not to reindex anything.** `modelVersion(profile)`
+folds the prefix policy into the persisted `version` (a `+noprefix` suffix
+without prefixes), but with the active profile it produces, character by
+character, the same literal that already existed:
+`"Xenova/multilingual-e5-small@main:q8"`. A regression test pins that literal.
+Validated as well against the real binary (AD3): over a temporary copy of 3 real
+`auto-design` videos already synchronised with the previous code, `sync` with
+the code of 4.5 returned `status: "no_changes"`, `packagesIndexed: 0`;
+`retrieve` showed neither `VECTORS_STALE` nor any other warning, confirming that
+the old vectors are still valid; `doctor` reported the six checks as `ok`; and
+the SHA-256 digest of the source tree was identical before and after. Full
+detail in `docs/decisions.md`, section "Model profile and prefix policy".
 
-#### 4.6 Comando `rebuild --confirm`
+#### 4.6 `rebuild --confirm` command
 
-Diseño en `docs/rebuild-design.md` (bloques AE–AH). Origen: `rebuild` era el
-único comando con contrato público
-aprobado desde el MVP que nunca se implementó, y el punto 2 del orden de
-prioridad del 14 de agosto de 2026.
+Design in `docs/rebuild-design.md` (blocks AE–AH). Origin: `rebuild` was the
+only command with a public contract approved since the MVP that was never
+implemented, and point 2 of the priority order of 14 August 2026.
 
-- [x] AE. `purgeDerivedIndex` en el puerto y en SQLite, con el guard de
-      `sync` activo dentro de la misma transacción que el borrado
-- [x] AF. Caso de uso `rebuildIndex`: purga, publica la remoción vectorial y
-      re-sincroniza cada fuente reutilizando el cableado de `sync`
-- [x] AG. Superficie de CLI: `--confirm` obligatorio, requisito
-      `library_and_model`, recibo agregado y códigos de salida
-- [x] AH. E2E sobre SQLite real, contrato de CLI, `SKILL.md` y cierre
+- [x] AE. `purgeDerivedIndex` in the port and in SQLite, with the guard for an
+      active `sync` inside the same transaction as the deletion
+- [x] AF. `rebuildIndex` use case: it purges, publishes the vector removal and
+      re-synchronises each source reusing the wiring of `sync`
+- [x] AG. CLI surface: mandatory `--confirm`, `library_and_model` requirement,
+      aggregated receipt and exit codes
+- [x] AH. E2E over real SQLite, CLI contract, `SKILL.md` and closure
 
-Cerrado el 14 de agosto de 2026.
+Closed on 14 August 2026.
 
-`rebuild` cubre lo que `sync` no puede detectar: `unchanged()` sólo compara el
-hash del paquete y la identidad del modelo, así que un tamaño de lote nuevo
-(la reindexación que 4.3 dejó "recomendable pero no obligatoria" sin ninguna
-forma de ejercerla), un `parser_version` distinto o un cambio de
-fragmentación dejan la biblioteca inconsistente mientras `doctor` sigue
-reportando `ok`.
+`rebuild` covers what `sync` cannot detect: `unchanged()` only compares the hash
+of the package and the identity of the model, so a new batch size (the
+reindexing that 4.3 left as "advisable but not mandatory" with no way of
+exercising it), a different `parser_version` or a change of fragmentation leave
+the library inconsistent while `doctor` keeps reporting `ok`.
 
-**El bloque AH2 encontró un defecto real antes de que llegara a producción.**
-El diseño daba por sentado que el índice vectorial en memoria se invalidaría
-solo, porque ya lo hace en `apply`. Es falso: la purga borra filas por SQL, y
-SQL no publica nada, así que un rebuild que termina sin ningún paquete dejaba
-el índice sirviendo vectores fantasma —2 medidos sobre una biblioteca con cero
-embeddings—, exactamente el defecto que 4.4 había corregido, reapareciendo por
-un camino nuevo. Corregido publicando un `remove_packages` después del commit
-de la purga.
+**Block AH2 found a real defect before it reached production.** The design took
+for granted that the in-memory vector index would invalidate itself, because it
+already does so in `apply`. That is false: the purge deletes rows through SQL,
+and SQL publishes nothing, so a rebuild ending with no packages left the index
+serving phantom vectors —2 measured over a library with zero embeddings—,
+exactly the defect that 4.4 had fixed, reappearing through a new path. Fixed by
+publishing a `remove_packages` after the commit of the purge.
 
-**Validación contra el binario real**, no sólo con tests, sobre una copia
-temporal de 3 videos reales de `auto-design` (dos con `rules.json`, uno con
-`analysis.json`, para ejercitar ambos esquemas) y el modelo E5 real adoptado
-desde `.cache/models`:
+**Validation against the real binary**, not only with tests, over a temporary
+copy of 3 real `auto-design` videos (two with `rules.json`, one with
+`analysis.json`, so as to exercise both schemas) and the real E5 model adopted
+from `.cache/models`:
 
-- `sync` inicial: 3 paquetes, 252 unidades, 254 fragmentos y embeddings;
-- `rebuild` sin `--confirm` → código `2`; con `--force` → código `2`
-  (`--force` no existe para este comando);
-- `rebuild --confirm`: `status: "ok"`, 3 borrados, 3 reindexados, 24 s. Los
-  digests SHA-256 de unidades, fragmentos **y vectores** quedaron idénticos
-  bit a bit a los de antes — confirmación en datos reales de que con lote 1 el
-  embedding es determinista. `sync_runs` pasó de 1 a 2: el historial se
-  preservó y se sumó el run del rebuild;
-- `doctor`: los seis checks en `ok`; `retrieve --depth focused`: `ok`, 3
-  fuentes, **sin `VECTORS_STALE` ni ningún otro warning**;
-- con un run `running` inyectado a mano, `rebuild` fue rechazado con
-  `SYNC_ALREADY_RUNNING` y código `1` **sin borrar nada** (3 paquetes y 254
-  embeddings intactos), nombrando `sync --source design --force` como salida;
-- reparación real: corrompido un fragmento derivado, `sync` respondió
-  `no_changes` y lo dejó intacto —la brecha, reproducida con el binario—,
-  y `rebuild --confirm` lo eliminó devolviendo los tres digests a su valor
-  original.
+- initial `sync`: 3 packages, 252 units, 254 fragments and embeddings;
+- `rebuild` without `--confirm` → code `2`; with `--force` → code `2`
+  (`--force` does not exist for this command);
+- `rebuild --confirm`: `status: "ok"`, 3 deleted, 3 reindexed, 24 s. The
+  SHA-256 digests of units, fragments **and vectors** stayed identical bit for
+  bit to the previous ones — confirmation on real data that with batch 1 the
+  embedding is deterministic. `sync_runs` went from 1 to 2: the history was
+  preserved and the run of the rebuild was added;
+- `doctor`: the six checks as `ok`; `retrieve --depth focused`: `ok`, 3
+  sources, **without `VECTORS_STALE` or any other warning**;
+- with a `running` run injected by hand, `rebuild` was rejected with
+  `SYNC_ALREADY_RUNNING` and code `1` **without deleting anything** (3 packages
+  and 254 embeddings intact), naming `sync --source design --force` as the way
+  out;
+- a real repair: with a derived fragment corrupted, `sync` answered
+  `no_changes` and left it intact —the gap, reproduced with the binary—, and
+  `rebuild --confirm` removed it, returning the three digests to their original
+  value.
 
-El digest del árbol fuente fue idéntico antes y después de todo el
-procedimiento. La copia y la base temporales se borraron al terminar.
+The digest of the source tree was identical before and after the whole
+procedure. The temporary copy and database were deleted on finishing.
 
-**El punto 1 del orden de prioridad —ordenar fragmentos por longitud antes de
-lotear— se cerró sin escribir código.** Es inerte con el `batchSize = 1` que
-adoptó 4.3: el padding que el ordenamiento ataca sólo existe dentro de un lote
-de dos o más. Detalle en `docs/rebuild-design.md`, sección "Por qué el punto 1
-se cerró sin código".
+**Point 1 of the priority order —sorting fragments by length before
+batching— was closed without writing code.** It is inert with the
+`batchSize = 1` that 4.3 adopted: the padding that the sorting attacks only
+exists inside a batch of two or more. Detail in `docs/rebuild-design.md`,
+section "Why point 1 was closed without code".
 
-#### 4.7 Aviso de baja relevancia (`LOW_RELEVANCE`)
+#### 4.7 Low-relevance warning (`LOW_RELEVANCE`)
 
-Diseño en `docs/low-relevance-design.md` (bloques AI–AJ). Origen: una prueba
-manual sobre la biblioteca real preguntó por síntomas de diabetes tipo 2 y
-recibió `status: "ok"`, 31.982 tokens de contenido sobre diseño web y
-`warnings: []`. El producto tenía la señal de que nada respondía la consulta y
-no la comunicaba.
+Design in `docs/low-relevance-design.md` (blocks AI–AJ). Origin: a manual test
+over the real library asked about symptoms of type 2 diabetes and received
+`status: "ok"`, 31,982 tokens of content about web design and `warnings: []`.
+The product had the signal that nothing answered the query and did not
+communicate it.
 
-- [x] AI. Umbral medido, `LOW_RELEVANCE` y su emisión en `retrieveCandidates`
-- [x] AJ. Distinción entre advertencia informativa y degradación, contrato de
-      CLI, skill y cierre
+- [x] AI. Measured threshold, `LOW_RELEVANCE` and its emission in
+      `retrieveCandidates`
+- [x] AJ. Distinction between an informational warning and a degradation, CLI
+      contract, skill and closure
 
-Cerrado el 14 de agosto de 2026. Cierra —en una forma distinta a la
-prevista— el frente que 2.2 dejó abierto como "piso mínimo de similitud
-vectorial, salvo evidencia clara" y que 3.2 no pudo cerrar por falta de esa
-evidencia.
+Closed on 14 August 2026. It closes —in a form different from the one
+foreseen— the front that 2.2 left open as "a minimum vector similarity floor,
+barring clear evidence" and that 3.2 could not close for lack of that evidence.
 
-**La evidencia, esta vez, existe.** 24 consultas clasificadas a mano contra
-los 51 videos reales, midiendo el coseno del mejor hit vectorial: en dominio
-0,8657–0,9012; técnicas no cubiertas 0,8428–0,8600; fuera de dominio
-0,8149–0,8389. Las tres clases no se solapan, pero los márgenes son de
-milésimas y E5 comprime todo entre 0,81 y 0,90.
+**The evidence, this time, exists.** 24 queries classified by hand against the
+51 real videos, measuring the cosine of the best vector hit: in domain
+0.8657–0.9012; techniques not covered 0.8428–0.8600; out of domain
+0.8149–0.8389. The three classes do not overlap, but the margins are of
+thousandths and E5 compresses everything between 0.81 and 0.90.
 
-Esa fragilidad decidió el diseño: **el aviso informa y no filtra**. Un umbral
-mal calibrado produce como mucho un aviso de más; nunca oculta evidencia ni
-vacía un bundle. Se sigue descartando un piso que descarte candidatos, igual
-que en 2.2 y 3.2.
+That fragility decided the design: **the warning informs and does not filter**.
+A badly calibrated threshold produces at most one warning too many; it never
+hides evidence nor empties a bundle. A floor that discards candidates is still
+ruled out, just as in 2.2 and 3.2.
 
-**Defecto encontrado al verificar contra el binario, no con tests.** La
-primera versión funcionaba, pero el recibo pasó a `status: "partial"` con
-código de salida `1`: `run-cli.ts` trataba cualquier advertencia como
-degradación. `LOW_RELEVANCE` no lo es —todas las vías corrieron y el bundle
-está completo—, así que se introdujo `informationalWarningCodes` para
-separar "algo falló" de "esto es un dato sobre la respuesta". Verificado
-después contra el binario: `status: "ok"`, exit `0`, y el aviso presente
-tanto en `result.json` como en la sección legible de `context.md`.
+**A defect found while verifying against the binary, not with tests.** The first
+version worked, but the receipt turned into `status: "partial"` with exit code
+`1`: `run-cli.ts` treated any warning as a degradation. `LOW_RELEVANCE` is not
+one —every path ran and the bundle is complete—, so
+`informationalWarningCodes` was introduced to separate "something failed" from
+"this is a datum about the answer". Verified afterwards against the binary:
+`status: "ok"`, exit `0`, and the warning present both in `result.json` and in
+the readable section of `context.md`.
 
-**Revisado tras implementarlo: se agregó `metrics.top_vector_similarity`.** El
-coseno del mejor hit vectorial se reporta en toda consulta, dispare o no el
-aviso. Un veredicto binario entregado solo crea falsa confianza por ausencia y
-contradice la premisa de que el agente consultante es el único cerebro. La
-primera corrida real lo confirmó: la consulta fuera de dominio midió 0,8399
-contra un piso de 0,84 — una diezmilésima de margen.
+**Reviewed after implementing it: `metrics.top_vector_similarity` was added.**
+The cosine of the best vector hit is reported on every query, whether or not the
+warning fires. A binary verdict delivered on its own only creates false
+confidence by absence and contradicts the premise that the consuming agent is
+the only brain. The first real run confirmed it: the out-of-domain query
+measured 0.8399 against a floor of 0.84 — a ten-thousandth of margin.
