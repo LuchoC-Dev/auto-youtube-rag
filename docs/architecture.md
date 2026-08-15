@@ -1,10 +1,10 @@
-# Arquitectura acordada
+# Agreed architecture
 
-## Principio rector
+## Guiding principle
 
-El sistema usa una arquitectura centrada en el dominio con puertos y
-adaptadores. Las reglas de indexación, recuperación y ensamblado permanecen
-independientes de modelos, bases de datos, librerías y agentes concretos.
+The system uses a domain-centred architecture with ports and adapters. The
+indexing, retrieval and assembly rules remain independent of concrete models,
+databases, libraries and agents.
 
 ```text
 interfaces/cli ──→ application ──→ domain
@@ -12,168 +12,168 @@ interfaces/cli ──→ application ──→ domain
 infrastructure/adapters ─┘
 ```
 
-`domain` no importa ninguna capa externa. `application` orquesta el dominio y
-declara los puertos que necesita. `infrastructure` implementa esos puertos. La
-CLI recibe entradas y presenta salidas, mientras `main` selecciona y conecta
-los adaptadores concretos.
+`domain` imports no external layer. `application` orchestrates the domain and
+declares the ports it needs. `infrastructure` implements those ports. The CLI
+receives inputs and presents outputs, while `main` selects and wires the
+concrete adapters.
 
-## Límites de módulos
+## Module boundaries
 
-| Módulo | Contiene | No puede conocer |
+| Module | Contains | Must not know about |
 | --- | --- | --- |
-| Dominio | entidades, value objects, reglas y políticas | SQLite, E5, ONNX, CLI |
-| Aplicación | casos de uso, DTO internos y puertos | implementaciones concretas |
-| Infraestructura | SQLite, FTS5, E5 Small y búsqueda vectorial | decisiones de presentación |
-| Interfaces | comandos, validación y formatos públicos | detalles internos de adaptadores |
-| Main | configuración y composition root | reglas de negocio nuevas |
+| Domain | entities, value objects, rules and policies | SQLite, E5, ONNX, CLI |
+| Application | use cases, internal DTOs and ports | concrete implementations |
+| Infrastructure | SQLite, FTS5, E5 Small and vector search | presentation decisions |
+| Interfaces | commands, validation and public formats | internal adapter details |
+| Main | configuration and composition root | new business rules |
 
-Los puertos mínimos previstos son `EmbeddingGenerator`, `KnowledgeRepository`,
-`TextSearchIndex` y `VectorSearchIndex`. Sus nombres y firmas definitivos se
-especificarán antes de implementar, pero su responsabilidad y dirección de
-dependencias son requisitos aprobados.
+The minimum ports foreseen are `EmbeddingGenerator`, `KnowledgeRepository`,
+`TextSearchIndex` and `VectorSearchIndex`. Their final names and signatures will
+be specified before implementing, but their responsibility and dependency
+direction are approved requirements.
 
-## Flujo general
+## Overall flow
 
 ```text
-Paquetes validados en varias raíces
+Validated packages across several roots
               ↓
-       indexador incremental
+        incremental indexer
               ↓
-  SQLite + FTS5 + índice exacto en memoria
+  SQLite + FTS5 + exact in-memory index
               ↓
- recuperación híbrida de alta cobertura
+   high-coverage hybrid retrieval
               ↓
- expansión jerárquica y deduplicación
+ hierarchical expansion and deduplication
               ↓
-  paquete Markdown + resultado JSON
+   Markdown package + JSON result
               ↓
-         agente consultante
+         querying agent
 ```
 
-## Responsabilidades
+## Responsibilities
 
-### Skill general
+### General skill
 
-- Explicar cuándo y cómo invocar la CLI.
-- Elegir la profundidad solicitada.
-- Entregar el resultado al agente.
-- No implementar recuperación ni lógica específica de un proveedor.
+- Explain when and how to invoke the CLI.
+- Choose the requested depth.
+- Deliver the result to the agent.
+- Not implement retrieval or provider-specific logic.
 
 ### CLI
 
-- Validar argumentos y configuración.
-- Administrar raíces, indexación, búsqueda y diagnóstico.
-- Emitir salidas estables y códigos de proceso previsibles.
-- No generar respuestas mediante un LLM.
+- Validate arguments and configuration.
+- Manage roots, indexing, search and diagnostics.
+- Emit stable outputs and predictable process codes.
+- Not generate answers through an LLM.
 
-### Indexador
+### Indexer
 
-- Leer `manifest.json`, `context.md`, `rules.json` y `metadata.json`.
-- Crear unidades internas por documento, sección y regla.
-- Calcular hashes y embeddings solamente cuando cambie el contenido.
-- Mantener relaciones padre-hijo sin escribir en los paquetes fuente.
+- Read `manifest.json`, `context.md`, `rules.json` and `metadata.json`.
+- Create internal units per document, section and rule.
+- Compute hashes and embeddings only when the content changes.
+- Maintain parent-child relations without writing to the source packages.
 
-### Recuperador
+### Retriever
 
-- Combinar FTS5, similitud semántica y filtros.
-- Recuperar inicialmente un conjunto amplio de candidatos.
-- Expandir coincidencias a secciones o documentos padre.
-- Diversificar por video y eliminar duplicados.
+- Combine FTS5, semantic similarity and filters.
+- Initially retrieve a broad candidate set.
+- Expand matches to parent sections or documents.
+- Diversify by video and remove duplicates.
 
-### Ensamblador de contexto
+### Context assembler
 
-- Respetar la profundidad y el presupuesto configurados.
-- Organizar el material por tema y relevancia.
-- Preservar procedencia y limitaciones.
-- Generar Markdown para consumo directo y JSON para integración.
+- Respect the configured depth and budget.
+- Organize the material by topic and relevance.
+- Preserve provenance and limitations.
+- Produce Markdown for direct consumption and JSON for integration.
 
-## Índice jerárquico
+## Hierarchical index
 
 ```text
-Colección
+Collection
   └─ Video
-      ├─ Documento context.md completo
-      │   └─ Secciones y subsecciones
+      ├─ Complete context.md document
+      │   └─ Sections and subsections
       └─ rules.json
-          └─ Patrones y reglas
+          └─ Patterns and rules
 ```
 
-La jerarquía permite buscar con unidades pequeñas y devolver unidades amplias.
-No se crean documentos intermedios en las carpetas de origen.
+The hierarchy makes it possible to search with small units and return broad
+units. No intermediate documents are created in the source folders.
 
-## Persistencia y portabilidad
+## Persistence and portability
 
-SQLite es la persistencia confirmada para el MVP. FTS5 constituye la capa
-textual inicial. El adaptador inicial utilizará `node:sqlite` en Node.js 24.19.0
-LTS; el cliente no cruzará los puertos de aplicación. Los embeddings se
-almacenan junto con:
+SQLite is the confirmed persistence for the MVP. FTS5 constitutes the initial
+textual layer. The initial adapter will use `node:sqlite` on Node.js 24.19.0
+LTS; the client will not cross the application ports. Embeddings are stored
+together with:
 
-- identificador de modelo;
-- versión;
-- dimensión;
-- hash del contenido;
-- fecha de indexación.
+- model identifier;
+- version;
+- dimension;
+- content hash;
+- indexing date.
 
-La implementación aprobada de `VectorSearchIndex` carga los BLOB persistidos en
-un bloque contiguo `Float32Array` y ejecuta búsqueda exacta desde la aplicación.
-Los vectores de E5 Small están normalizados, por lo que ordenar por distancia L2
-produce el mismo ranking que similitud coseno. El índice en memoria se reconstruye
-al iniciar y se actualiza después de confirmar cambios persistidos.
+The approved implementation of `VectorSearchIndex` loads the persisted BLOBs
+into a contiguous `Float32Array` block and runs an exact search from the
+application. E5 Small vectors are normalized, so ordering by L2 distance
+produces the same ranking as cosine similarity. The in-memory index is rebuilt
+on startup and updated after persisted changes are committed.
 
-`sqlite-vec` no forma parte del runtime del MVP. Permanece como benchmark y como
-posible adaptador futuro si la memoria o el tiempo de carga se convierten en un
-problema. Una migración futura no debe cambiar la CLI, la skill ni el dominio.
+`sqlite-vec` is not part of the MVP runtime. It remains as a benchmark and as a
+possible future adapter if memory or load time becomes a problem. A future
+migration must not change the CLI, the skill or the domain.
 
-`better-sqlite3` tampoco forma parte del runtime del MVP. Se conserva como
-dependencia de desarrollo para el benchmark comparativo. Sustituir `node:sqlite`
-en el futuro sólo requerirá otro adaptador de infraestructura.
+`better-sqlite3` is not part of the MVP runtime either. It is kept as a
+development dependency for the comparative benchmark. Replacing `node:sqlite` in
+the future will only require another infrastructure adapter.
 
-E5 Small es el generador de embeddings aprobado para el MVP y vive en un
-adaptador de infraestructura. El identificador de modelo, versión y dimensión
-forman parte de la metadata del índice para detectar cuándo una sustitución
-requiere reindexación. Cambiar el modelo no modifica los casos de uso.
+E5 Small is the approved embedding generator for the MVP and lives in an
+infrastructure adapter. The model identifier, version and dimension are part of
+the index metadata so that it can be detected when a replacement requires
+reindexing. Changing the model does not modify the use cases.
 
-## Verificación de desacoplamiento
+## Decoupling verification
 
-- El dominio se prueba sin cargar SQLite, ONNX ni Transformers.js.
-- Los casos de uso se prueban con implementaciones en memoria de los puertos.
-- Cada adaptador ejecuta una suite de contrato compartida.
-- Las pruebas de integración verifican el wiring real desde el composition root.
-- Ningún tipo de una dependencia externa cruza un puerto público.
+- The domain is tested without loading SQLite, ONNX or Transformers.js.
+- Use cases are tested with in-memory implementations of the ports.
+- Every adapter runs a shared contract suite.
+- Integration tests verify the real wiring from the composition root.
+- No type from an external dependency crosses a public port.
 
-## Recuperación y ensamblado
+## Retrieval and assembly
 
 ```text
-consulta
-  → expansión y normalización
-  → candidatos textuales y semánticos
-  → combinación de puntuaciones
-  → agrupación por tema, sección y video
-  → expansión a unidades padre
-  → deduplicación y diversidad
-  → ensamblado hasta el presupuesto
+query
+  → expansion and normalization
+  → textual and semantic candidates
+  → score combination
+  → grouping by topic, section and video
+  → expansion to parent units
+  → deduplication and diversity
+  → assembly up to the budget
 ```
 
-Los modos previstos son `focused`, `balanced` y `deep`. Sus presupuestos y
-umbrales iniciales son 12k, 32k y 64k tokens estimados. Las evaluaciones podrán
-ajustar esas cifras sin cambiar los nombres públicos.
+The foreseen modes are `focused`, `balanced` and `deep`. Their initial budgets
+and thresholds are 12k, 32k and 64k estimated tokens. Evaluations may adjust
+those figures without changing the public names.
 
-## Bundle de recuperación
+## Retrieval bundle
 
-`retrieve` escribe `context.md` y `result.json` en un directorio temporal o en
-la ruta indicada por `--out`. La terminal recibe sólo un JSON compacto con las
-rutas, métricas y advertencias. Esto evita truncar contexto extenso en shells o
-herramientas de agentes.
+`retrieve` writes `context.md` and `result.json` into a temporary directory or
+into the path given by `--out`. The terminal receives only a compact JSON with
+the paths, metrics and warnings. This avoids truncating extensive context in
+shells or agent tools.
 
-El Markdown contiene unidades citadas mediante `[S01]` y equivalentes. El JSON
-resuelve cada cita a fuente, video, archivo, sección, timestamp opcional y
-evidencia visual. El RAG organiza evidencia, pero no responde ni infiere por el
-agente.
+The Markdown contains units cited through `[S01]` and equivalents. The JSON
+resolves every citation to source, video, file, section, optional timestamp and
+visual evidence. The RAG organizes evidence, but does not answer or infer on the
+agent's behalf.
 
-## Evolución prevista
+## Foreseen evolution
 
-1. MVP local para paquetes de video.
-2. Evaluaciones y ajuste de recuperación.
-3. Paquetes de páginas web.
-4. Interfaz humana.
-5. Búsqueda visual directa y base especializada si la escala lo requiere.
+1. Local MVP for video packages.
+2. Evaluations and retrieval tuning.
+3. Web page packages.
+4. Human interface.
+5. Direct visual search and a specialized database if the scale requires it.
