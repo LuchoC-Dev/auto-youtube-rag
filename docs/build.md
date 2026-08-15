@@ -426,3 +426,10 @@ está completo—, así que se introdujo `informationalWarningCodes` para
 separar "algo falló" de "esto es un dato sobre la respuesta". Verificado
 después contra el binario: `status: "ok"`, exit `0`, y el aviso presente
 tanto en `result.json` como en la sección legible de `context.md`.
+
+**Revisado tras implementarlo: se agregó `metrics.top_vector_similarity`.** El
+coseno del mejor hit vectorial se reporta en toda consulta, dispare o no el
+aviso. Un veredicto binario entregado solo crea falsa confianza por ausencia y
+contradice la premisa de que el agente consultante es el único cerebro. La
+primera corrida real lo confirmó: la consulta fuera de dominio midió 0,8399
+contra un piso de 0,84 — una diezmilésima de margen.

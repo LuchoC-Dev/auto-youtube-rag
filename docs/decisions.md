@@ -890,6 +890,24 @@ tipo 2 devolvió `status: "ok"` con 31.982 tokens sobre diseño web y
 Lo encontró la verificación contra el binario real, no la suite: los 348 tests
 pasaban con el defecto presente.
 
+**El número se reporta siempre, no sólo el juicio.**
+`metrics.top_vector_similarity` lleva el coseno del mejor hit vectorial en cada
+consulta (`null` si la vía no corrió). Decidido al revisar el punto: un aviso
+binario con umbral discutible, entregado solo, crea **falsa confianza por
+ausencia** —"no hay warning, entonces es relevante"— y contradice la premisa
+del producto de que el agente consultante es el único cerebro. Juzgar
+relevancia con un número calibrado sobre una colección es exactamente el tipo
+de decisión que el diseño le delega a él. Con el dato crudo puede aplicar su
+propio criterio.
+
+La primera corrida real tras implementarlo lo justificó sola: "síntomas de la
+diabetes tipo 2" midió **0,8399** contra el piso de 0,84 — una diezmilésima
+más y no habría avisado, con el contenido igual de irrelevante.
+
+**Limitación conocida:** el juicio usa sólo el coseno vectorial, así que una
+coincidencia léxica exacta con coseno bajo produciría un falso positivo. Está
+acotado porque el aviso no filtra, pero el criterio no lo cubre.
+
 ## Pendientes de decisión
 
 Ninguno.

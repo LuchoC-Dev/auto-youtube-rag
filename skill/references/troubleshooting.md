@@ -119,6 +119,13 @@ Qué hacer cuando aparece:
 - **Si esperabas cobertura y no la hay**, puede faltar sincronizar una fuente
   (`sync`) o directamente registrarla (`source add`).
 
+**El número está siempre disponible**, dispare o no el aviso:
+`metrics.top_vector_similarity` en `result.json` trae el coseno del mejor
+resultado semántico. Úsalo para juzgar por tu cuenta en vez de confiar sólo en
+la presencia o ausencia del aviso — el umbral está calibrado sobre una
+colección concreta y el margen es fino. Un caso real midió `0.8399` contra un
+piso de `0.84`: una diezmilésima más y no habría avisado.
+
 ## `sync` falló parcialmente
 
 Un paquete inválido no bloquea el resto de la colección: se aísla como issue

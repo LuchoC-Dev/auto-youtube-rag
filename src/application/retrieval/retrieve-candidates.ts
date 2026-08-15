@@ -125,13 +125,16 @@ export async function retrieveCandidates(
   // and adding this one on top would just be noise.
   const lowRelevanceCosine =
     dependencies.lowRelevanceCosine ?? defaultLowRelevanceCosine;
-  const bestCosine = vectorAttempt.value.hits.reduce(
-    (best, hit) => Math.max(best, hit.rawScore),
-    Number.NEGATIVE_INFINITY,
-  );
+  const bestCosine =
+    vectorAttempt.value.hits.length === 0
+      ? null
+      : vectorAttempt.value.hits.reduce(
+          (best, hit) => Math.max(best, hit.rawScore),
+          Number.NEGATIVE_INFINITY,
+        );
   if (
     vectorAttempt.warning === null &&
-    vectorAttempt.value.hits.length > 0 &&
+    bestCosine !== null &&
     bestCosine < lowRelevanceCosine
   ) {
     warnings.push({
@@ -206,6 +209,7 @@ export async function retrieveCandidates(
       sourcesCovered: new Set(
         candidates.map((candidate) => candidate.packageRef.sourceName.value),
       ).size,
+      topVectorSimilarity: bestCosine,
     },
     warnings,
   };

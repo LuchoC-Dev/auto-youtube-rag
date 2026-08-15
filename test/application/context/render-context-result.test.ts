@@ -76,6 +76,7 @@ function render(
     allocation,
     citations,
     warnings: overrides.warnings ?? [],
+    topVectorSimilarity: 0.88,
   });
 }
 

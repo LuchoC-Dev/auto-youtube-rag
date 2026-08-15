@@ -35,6 +35,7 @@ function emptyOutcome(): RetrievalOutcome {
       returnedCandidates: 0,
       videosCovered: 0,
       sourcesCovered: 0,
+      topVectorSimilarity: 0.88,
     },
     warnings: [],
   };
@@ -84,6 +85,7 @@ function seededScenario() {
       returnedCandidates: 1,
       videosCovered: 1,
       sourcesCovered: 1,
+      topVectorSimilarity: 0.88,
     },
     warnings: [],
   };

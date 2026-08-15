@@ -22,6 +22,8 @@ export interface RenderContextResultInput {
   /** Same order and length as `allocation.included`. */
   readonly citations: readonly CitationRecord[];
   readonly warnings: readonly RetrievalWarning[];
+  /** Carried straight from the retrieval metrics; `null` when no vector ran. */
+  readonly topVectorSimilarity: number | null;
 }
 
 function toResultUnit(
@@ -140,6 +142,7 @@ export function renderContextResult(
         input.allocation.included.map((block) => block.packageRef.serialize()),
       ).size,
       estimated_tokens: input.allocation.estimatedTokens,
+      top_vector_similarity: input.topVectorSimilarity,
     },
     units: entries,
     sources: toSources(input.allocation.included),

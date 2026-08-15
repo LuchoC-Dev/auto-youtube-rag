@@ -82,6 +82,7 @@ export async function assembleContext(
     allocation,
     citations,
     warnings: outcome.warnings,
+    topVectorSimilarity: outcome.metrics.topVectorSimilarity,
   });
 
   return { markdown, result };

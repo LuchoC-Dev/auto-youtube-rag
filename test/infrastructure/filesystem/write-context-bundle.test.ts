@@ -41,6 +41,7 @@ function sampleBundle(): ContextBundle {
         units_selected: 1,
         sources_used: 1,
         estimated_tokens: 10,
+        top_vector_similarity: 0.88,
       },
       units: [],
       sources: [],
