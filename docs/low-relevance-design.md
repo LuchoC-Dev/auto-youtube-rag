@@ -1,151 +1,152 @@
-# Diseño 4.7: aviso de baja relevancia (`LOW_RELEVANCE`)
+# Design 4.7: low relevance warning (`LOW_RELEVANCE`)
 
-## Estado
+## Status
 
-Propuesto e implementado el 14 de agosto de 2026, a partir de evidencia
-empírica sobre la biblioteca real de 51 videos.
+Proposed and implemented on 14 August 2026, from empirical evidence over the
+real library of 51 videos.
 
-Cierra —parcialmente y con una forma distinta a la prevista— el frente que 2.2
-dejó abierto como "piso mínimo de similitud vectorial, salvo evidencia clara"
-y que 3.2 no pudo cerrar por falta de esa evidencia.
+It closes — partially, and in a different shape from the one anticipated — the
+front that 2.2 left open as "a minimum vector similarity floor, barring clear
+evidence" and that 3.2 could not close for lack of that evidence.
 
-## El problema, reproducido con datos reales
+## The problem, reproduced with real data
 
-La búsqueda vectorial es un ranking exhaustivo sin piso de similitud: toda
-consulta sobre una biblioteca no vacía devuelve candidatos. Medido sobre la
-colección `auto-design` ya indexada:
+Vector search is an exhaustive ranking with no similarity floor: every query
+over a non-empty library returns candidates. Measured over the already indexed
+`auto-design` collection:
 
 ```text
 auto-youtube-rag retrieve "síntomas y tratamiento de la diabetes tipo 2 en adultos mayores"
-→ status: "ok", 31.982 tokens, 29 videos, warnings: []
+→ status: "ok", 31,982 tokens, 29 videos, warnings: []
 ```
 
-El primer bloque citado provenía de _"8 advanced rules of minimal Web Design"_ y
-hablaba de usar como máximo dos tipografías. **El bundle no declara en ninguna
-parte que nada de eso responde la consulta**: `warnings` vacío y `limitations`
-mencionando sólo el presupuesto agotado.
+The first cited block came from _"8 advanced rules of minimal Web Design"_ and
+talked about using at most two typefaces. **Nowhere does the bundle declare that
+none of that answers the query**: `warnings` empty and `limitations` mentioning
+only the exhausted budget.
 
-Un agente atento lo detecta al leer el contenido —es lo que 3.2 concluyó y
-sigue siendo cierto—, pero el producto tiene la señal y no la comunica.
+An attentive agent detects it while reading the content — that is what 3.2
+concluded and it remains true — but the product holds the signal and does not
+communicate it.
 
-## Por qué no se puede usar `fusedScore`
+## Why `fusedScore` cannot be used
 
-RRF asigna `1/(k + rank)`: codifica **posición, no similitud**. El primer
-candidato de una consulta perfecta y el de una absurda reciben exactamente el
-mismo `fusedScore`. Comparar `rawScore` entre vías tampoco sirve, y el propio
-puerto lo advierte: BM25 no tiene cota, el coseno vive en `0..1`.
+RRF assigns `1/(k + rank)`: it encodes **position, not similarity**. The first
+candidate of a perfect query and that of an absurd one receive exactly the same
+`fusedScore`. Comparing `rawScore` across paths is no use either, and the port
+itself warns about it: BM25 has no bound, cosine lives in `0..1`.
 
-La única señal con significado absoluto es el **coseno de la vía vectorial**.
+The only signal with an absolute meaning is the **cosine of the vector path**.
 
-## La medición
+## The measurement
 
-24 consultas contra la biblioteca real (51 videos, 3.635 fragmentos),
-clasificadas a mano en tres grupos, registrando el coseno del mejor hit:
+24 queries against the real library (51 videos, 3,635 fragments), classified by
+hand into three groups, recording the cosine of the best hit:
 
-| Clase                                | mín    | máx    | promedio |
-| ------------------------------------ | ------ | ------ | -------- |
-| **Alta** — en dominio (10 consultas) | 0,8657 | 0,9012 | 0,8824   |
-| **Media** — técnica no cubierta (5)  | 0,8428 | 0,8600 | 0,8526   |
-| **Baja** — fuera de dominio (9)      | 0,8149 | 0,8389 | 0,8253   |
+| Class                                 | min    | max    | average |
+| ------------------------------------- | ------ | ------ | ------- |
+| **High** — in domain (10 queries)     | 0.8657 | 0.9012 | 0.8824  |
+| **Medium** — technical, uncovered (5) | 0.8428 | 0.8600 | 0.8526  |
+| **Low** — out of domain (9)           | 0.8149 | 0.8389 | 0.8253  |
 
-Las tres clases **no se solapan**. Pero los márgenes son estrechos: 0,0057
-entre alta y media, y **0,0039** entre media y baja. E5 comprime toda la
-distribución entre 0,81 y 0,90, así que ningún valor baja de 0,80 por absurda
-que sea la consulta.
+The three classes **do not overlap**. But the margins are narrow: 0.0057
+between high and medium, and **0.0039** between medium and low. E5 compresses
+the whole distribution between 0.81 and 0.90, so no value drops below 0.80
+however absurd the query is.
 
-## Decisiones
+## Decisions
 
-**El umbral por defecto es `0.84`.** Separa limpiamente la clase baja (máximo
-0,8389) de la media (mínimo 0,8428) en el corpus medido. Se eligió el corte
-más conservador de los dos posibles: avisar sólo cuando la consulta está
-claramente fuera de dominio, en vez de intentar distinguir "media" de "alta",
-donde el margen es aún más fino y el juicio más discutible.
+**The default threshold is `0.84`.** It cleanly separates the low class
+(maximum 0.8389) from the medium one (minimum 0.8428) in the measured corpus.
+The more conservative of the two possible cuts was chosen: warn only when the
+query is clearly out of domain, instead of attempting to distinguish "medium"
+from "high", where the margin is even finer and the judgement more debatable.
 
-**El aviso no filtra nada.** `LOW_RELEVANCE` es informativo: el bundle se
-arma igual, con los mismos bloques y las mismas citas. Es la decisión de
-diseño más importante del punto, y se toma precisamente porque el umbral es
-frágil:
+**The warning filters nothing.** `LOW_RELEVANCE` is informational: the bundle is
+assembled just the same, with the same blocks and the same citations. It is the
+point's most important design decision, and it is taken precisely because the
+threshold is fragile:
 
-- un umbral demasiado alto produce un aviso de más — molesto, inocuo;
-- un umbral demasiado bajo guarda silencio — exactamente el comportamiento
-  de hoy.
+- a threshold that is too high produces one warning too many — annoying, harmless;
+- a threshold that is too low stays silent — exactly today's behaviour.
 
-Ninguno de los dos errores puede ocultar evidencia real ni vaciar un bundle.
-Un piso que **descartara** candidatos tendría el riesgo opuesto y mucho peor,
-y por eso se sigue descartando, igual que en 2.2 y 3.2.
+Neither of the two errors can hide real evidence or empty a bundle. A floor that
+**discarded** candidates would carry the opposite risk and a far worse one, and
+that is why it is still discarded, just as in 2.2 and 3.2.
 
-**El umbral es configurable, no una constante escondida.** Vive en
-`retrieval-thresholds.ts` junto a la tabla de mediciones que lo justifica, y se
-puede inyectar por dependencia. Está calibrado sobre **una** colección de
-diseño en español: otro corpus, otro idioma u otro modelo desplazan la
-distribución, y el número tendría que volver a medirse. Eso queda escrito
-donde vive el número, no sólo en este documento.
+**The threshold is configurable, not a hidden constant.** It lives in
+`retrieval-thresholds.ts` alongside the table of measurements that justifies it,
+and it can be injected by dependency. It is calibrated over **one** design
+collection in Spanish: another corpus, another language or another model shift
+the distribution, and the number would have to be measured again. That is
+written where the number lives, not only in this document.
 
-**No dispara cuando la vía vectorial no participó.** Si el vector falló, si no
-hay vectores para el modelo activo (`VECTORS_STALE`) o si no hubo hits, no hay
-coseno que evaluar y el aviso no se emite: ya existe un warning específico para
-cada uno de esos casos, y sumar `LOW_RELEVANCE` sólo agregaría ruido.
+**It does not fire when the vector path did not take part.** If the vector path
+failed, if there are no vectors for the active model (`VECTORS_STALE`) or if
+there were no hits, there is no cosine to evaluate and the warning is not
+emitted: a specific warning already exists for each of those cases, and adding
+`LOW_RELEVANCE` would only add noise.
 
-## Comportamiento esperado
+## Expected behaviour
 
-| Consulta                              | coseno | ¿avisa? |
+| Query                                 | cosine | warns?  |
 | ------------------------------------- | ------ | ------- |
-| "jerarquía tipográfica en diseño web" | 0,8914 | no      |
-| "arquitectura hexagonal en backend"   | 0,8600 | no      |
-| "cómo configurar un pipeline de CI"   | 0,8428 | no      |
-| "receta de pan de masa madre"         | 0,8389 | **sí**  |
-| "síntomas de la diabetes tipo 2"      | 0,8206 | **sí**  |
-| "historia de la revolución francesa"  | 0,8149 | **sí**  |
+| "jerarquía tipográfica en diseño web" | 0.8914 | no      |
+| "arquitectura hexagonal en backend"   | 0.8600 | no      |
+| "cómo configurar un pipeline de CI"   | 0.8428 | no      |
+| "receta de pan de masa madre"         | 0.8389 | **yes** |
+| "síntomas de la diabetes tipo 2"      | 0.8206 | **yes** |
+| "historia de la revolución francesa"  | 0.8149 | **yes** |
 
-## El número se reporta siempre, no sólo cuando avisa
+## The number is always reported, not only when it warns
 
-`metrics.top_vector_similarity` lleva el coseno del mejor hit vectorial en
-**cada** consulta (o `null` si la vía semántica no corrió). El aviso es un
-juicio con un umbral discutible; el número es el dato.
+`metrics.top_vector_similarity` carries the cosine of the best vector hit on
+**every** query (or `null` if the semantic path did not run). The warning is a
+judgement with a debatable threshold; the number is the fact.
 
-La razón es la filosofía del producto: el agente que consulta es el único
-cerebro. Decidir qué significa un 0,84 es exactamente el tipo de juicio que el
-diseño delega en él, así que darle sólo el veredicto —y no la evidencia— sería
-incoherente. Con el número puede aplicar su propio criterio, o calibrar otro
-umbral para su corpus sin tocar el producto.
+The reason is the product's philosophy: the querying agent is the only brain.
+Deciding what a 0.84 means is exactly the kind of judgement the design delegates
+to it, so giving it only the verdict — and not the evidence — would be
+incoherent. With the number it can apply its own criterion, or calibrate another
+threshold for its corpus without touching the product.
 
-También corrige un riesgo que el aviso solo introduce: **falsa confianza por
-ausencia**. Un agente podría razonar "no hay `LOW_RELEVANCE`, entonces esto es
-relevante", y es falso — el umbral puede no dispararse con contenido
-tangencial. Teniendo el número, la ausencia de aviso deja de ser la única
-información disponible.
+It also corrects a risk that the warning alone introduces: **false confidence
+through absence**. An agent could reason "there is no `LOW_RELEVANCE`, so this is
+relevant", and that is false — the threshold may not fire on tangential content.
+With the number at hand, the absence of a warning stops being the only available
+information.
 
-Lo estrecho del margen quedó demostrado en la primera corrida real tras
-implementarlo: "síntomas de la diabetes tipo 2" midió **0,8399** contra un piso
-de 0,84. Una diezmilésima más y no habría avisado, con el contenido siendo
-igual de irrelevante.
+How narrow the margin is was demonstrated in the first real run after
+implementing it: "síntomas de la diabetes tipo 2" measured **0.8399** against a
+floor of 0.84. One ten-thousandth more and it would not have warned, with the
+content being just as irrelevant.
 
-## Limitación conocida: la vía textual no participa
+## Known limitation: the text path does not take part
 
-El juicio se apoya sólo en el coseno vectorial. Si FTS5 encontrara una
-coincidencia léxica exacta —señal fuerte de relevancia— pero el coseno quedara
-bajo el piso, el aviso saltaría igual: un falso positivo.
+The judgement rests on the vector cosine alone. If FTS5 were to find an exact
+lexical match — a strong signal of relevance — but the cosine fell below the
+floor, the warning would fire regardless: a false positive.
 
-En la práctica es poco probable, porque un término presente en la colección
-suele elevar también el coseno. Y el costo está acotado por diseño: como el
-aviso informa y no filtra, un falso positivo cuesta una advertencia de más,
-nunca contenido perdido. Pero el criterio no cubre ese caso y conviene saberlo
-antes de subir el umbral.
+In practice it is unlikely, because a term present in the collection usually
+raises the cosine as well. And the cost is bounded by design: since the warning
+informs and does not filter, a false positive costs one warning too many, never
+lost content. But the criterion does not cover that case and it is worth knowing
+before raising the threshold.
 
-## Fuera de alcance
+## Out of scope
 
-- **Filtrar o descartar candidatos por umbral.** Se mantiene la decisión de
-  2.2 y 3.2.
-- **Calibrar el umbral por biblioteca en tiempo de ejecución.** Sería más
-  robusto que una constante, pero exige una línea base por corpus y no hay
-  evidencia todavía de que haga falta.
-- **Cambiar `status`.** Una consulta fuera de dominio sigue devolviendo `ok`
-  con código de salida `0`: hay evidencia real recuperada, sólo que poco
-  relacionada. Degradarla a `no_results` sería mentir en la otra dirección.
+- **Filtering or discarding candidates by threshold.** The decision from 2.2 and
+  3.2 is maintained.
+- **Calibrating the threshold per library at run time.** It would be more robust
+  than a constant, but it demands a baseline per corpus and there is no evidence
+  yet that it is needed.
+- **Changing `status`.** An out-of-domain query still returns `ok` with exit
+  code `0`: real evidence was retrieved, only loosely related. Degrading it to
+  `no_results` would be lying in the other direction.
 
-## Bloques
+## Blocks
 
-| Bloque | Contenido                                                          |
-| ------ | ------------------------------------------------------------------ |
-| AI     | Umbral medido, código de warning y emisión en `retrieveCandidates` |
-| AJ     | Propagación al bundle, documentación y skill                       |
+| Block | Content                                                               |
+| ----- | --------------------------------------------------------------------- |
+| AI    | Measured threshold, warning code and emission in `retrieveCandidates` |
+| AJ    | Propagation to the bundle, documentation and skill                    |
