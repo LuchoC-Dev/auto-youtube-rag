@@ -10,8 +10,8 @@ problem or the feature. Once the work is ready, open a pull request that
 references it with `Closes #N` in the PR description, so the issue closes
 automatically when the PR merges.
 
-**Never commit directly to `main`.** It is branch-protected, and all work
-happens on a branch off `main`, submitted as a PR.
+**Never commit directly to `main`.** All work happens on a branch off `main`
+and arrives through a PR; `main` is branch-protected to enforce it.
 
 ## Branch naming
 
@@ -106,4 +106,4 @@ sync, retrieval, indexing, or embeddings.
 ## Questions
 
 If something about the workflow, the architecture, or a command isn't clear,
-open a discussion or an issue — see the README for the documentation map.
+open an issue — see the README for the documentation map.
