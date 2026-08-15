@@ -100,7 +100,7 @@ suite doesn't cover. Before proposing a change, be aware of:
   code has crossed a boundary the architecture depends on.
 
 The full, current list lives in `docs/agent-handoff.md` under
-"Invariantes y límites obligatorios" — read it before a change that touches
+"Mandatory invariants and limits" — read it before a change that touches
 sync, retrieval, indexing, or embeddings.
 
 ## Questions
