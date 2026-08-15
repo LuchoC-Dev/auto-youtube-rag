@@ -33,7 +33,7 @@ these steps:
 git clone https://github.com/LuchoC-Dev/auto-youtube-rag.git
 cd auto-youtube-rag
 npm.cmd ci          # respects package-lock.json; do not use "npm install"
-npm.cmd run check   # 342 tests, no network and no model
+npm.cmd run check   # 352 tests, no network and no model
 npm.cmd run build
 ```
 
