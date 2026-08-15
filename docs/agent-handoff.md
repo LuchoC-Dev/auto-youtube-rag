@@ -1330,173 +1330,173 @@ that discards candidates is still discarded, just as in 2.2 and 3.2. See
   tangential catalogue (a 3.2 finding, not a bug).
 - Refine `evals/rubric-template.md` on the two ambiguity points from N4.
 
-## Punto 4.7 completado — aviso de baja relevancia
+## Point 4.7 completed — low-relevance warning
 
-Cerrado el 14 de agosto de 2026. Diseño en `docs/low-relevance-design.md`.
+Closed on 14 August 2026. Design in `docs/low-relevance-design.md`.
 
-Qué resuelve: la búsqueda vectorial es un ranking exhaustivo sin piso, así que
-toda consulta sobre una biblioteca no vacía devuelve candidatos. Preguntarle
-por síntomas de diabetes a la colección de diseño daba `status: "ok"`, 31.982
-tokens y `warnings: []`. El producto tenía la señal y no la comunicaba.
+What it solves: vector search is an exhaustive ranking with no floor, so every
+query over a non-empty library returns candidates. Asking the design collection
+about diabetes symptoms gave `status: "ok"`, 31,982 tokens and `warnings: []`.
+The product had the signal and did not communicate it.
 
-Qué cambió en `src/`:
+What changed in `src/`:
 
-- `retrieval-thresholds.ts`: `defaultLowRelevanceCosine = 0.84`, con la tabla
-  de mediciones que lo justifica escrita al lado.
-- `retrieveCandidates` emite `LOW_RELEVANCE` cuando el mejor coseno de la vía
-  vectorial queda bajo el piso, y reporta ese coseno en
-  `metrics.topVectorSimilarity` **en toda consulta** (`null` si la vía no
-  corrió).
-- `informationalWarningCodes` (`retrieval-results.ts`) separa advertencias
-  informativas de degradaciones; `run-cli.ts` sólo degrada a `partial` por las
-  segundas.
-- `metrics.top_vector_similarity` en el contrato del bundle.
+- `retrieval-thresholds.ts`: `defaultLowRelevanceCosine = 0.84`, with the table
+  of measurements that justifies it written right beside it.
+- `retrieveCandidates` emits `LOW_RELEVANCE` when the best cosine of the vector
+  path falls below the floor, and reports that cosine in
+  `metrics.topVectorSimilarity` **on every query** (`null` if the path did not
+  run).
+- `informationalWarningCodes` (`retrieval-results.ts`) separates informational
+  warnings from degradations; `run-cli.ts` only degrades to `partial` because
+  of the latter.
+- `metrics.top_vector_similarity` in the bundle contract.
 
-**Tres cosas que conviene no reabrir sin leer el diseño:**
+**Three things worth not reopening without reading the design:**
 
-1. **`fusedScore` no puede medir relevancia.** RRF asigna `1/(k + rank)`:
-   codifica posición, no similitud. El primer candidato de una consulta
-   perfecta y el de una absurda reciben el mismo valor. Por eso el coseno se
-   lee **antes** de fusionar.
-2. **El umbral se midió, no se eligió.** 24 consultas clasificadas a mano: en
-   dominio 0,8657–0,9012; técnicas no cubiertas 0,8428–0,8600; fuera de
-   dominio 0,8149–0,8389. Sin solapamiento, pero con márgenes de milésimas, y
-   calibrado sobre **una** colección de diseño en español.
-3. **El aviso informa y no filtra**, justamente por esa fragilidad. Un piso
-   que descarte candidatos se sigue descartando, igual que en 2.2 y 3.2.
+1. **`fusedScore` cannot measure relevance.** RRF assigns `1/(k + rank)`: it
+   encodes position, not similarity. The first candidate of a perfect query and
+   that of an absurd one receive the same value. That is why the cosine is read
+   **before** fusing.
+2. **The threshold was measured, not chosen.** 24 queries classified by hand:
+   in-domain 0.8657–0.9012; uncovered technical ones 0.8428–0.8600;
+   out-of-domain 0.8149–0.8389. No overlap, but with margins of thousandths,
+   and calibrated over **one** design collection in Spanish.
+3. **The warning informs and does not filter**, precisely because of that
+   fragility. A floor that discards candidates is still discarded, just as in
+   2.2 and 3.2.
 
-El margen fino no es teórico: la primera corrida real tras implementarlo midió
-**0,8399** contra el piso de 0,84. Una diezmilésima más y no habría avisado.
-Por eso el número se reporta siempre, para que el agente consumidor —que por
-diseño es el único cerebro— juzgue con su propio criterio en vez de heredar el
-umbral.
+The fine margin is not theoretical: the first real run after implementing it
+measured **0.8399** against the floor of 0.84. One ten-thousandth more and it
+would not have warned. That is why the number is always reported, so that the
+consuming agent —which by design is the only brain— judges with its own
+criterion instead of inheriting the threshold.
 
-**Limitación conocida:** el juicio usa sólo el coseno vectorial, así que una
-coincidencia léxica exacta con coseno bajo sería un falso positivo. Acotado
-porque el aviso no filtra, pero el criterio no lo cubre.
+**Known limitation:** the judgement uses only the vector cosine, so an exact
+lexical match with a low cosine would be a false positive. Bounded because the
+warning does not filter, but the criterion does not cover it.
 
-Estado final: **352 tests, 0 fallos**, verificado contra el binario real sobre
-la biblioteca de 51 videos.
+Final state: **352 tests, 0 failures**, verified against the real binary over
+the 51-video library.
 
-## Punto 4.6 completado — comando `rebuild --confirm`
+## Point 4.6 completed — `rebuild --confirm` command
 
-Cerrado el 14 de agosto de 2026. Diseño en `docs/rebuild-design.md`
-(bloques AE–AH).
+Closed on 14 August 2026. Design in `docs/rebuild-design.md` (blocks AE–AH).
 
-Qué resuelve: `sync` es incremental y `unchanged()` sólo compara el hash del
-paquete y la identidad del modelo. Un tamaño de lote distinto —la reindexación
-que 4.3 dejó "recomendable pero no obligatoria" sin ninguna forma de
-ejercerla—, un `parser_version` nuevo o un cambio de fragmentación dejan la
-biblioteca inconsistente mientras `doctor` sigue diciendo `ok`.
+What it solves: `sync` is incremental and `unchanged()` only compares the
+package hash and the model identity. A different batch size —the reindexing
+that 4.3 left as "recommended but not mandatory" with no way to exercise it—, a
+new `parser_version` or a change in fragmentation leave the library
+inconsistent while `doctor` keeps saying `ok`.
 
-Qué cambió en `src/`:
+What changed in `src/`:
 
-- `IndexStore.purgeDerivedIndex()`: borra `video_packages` y, por las cascadas
-  y triggers que ya existían, todo lo derivado. El `SELECT` de runs activos y
-  el `DELETE` comparten un `BEGIN IMMEDIATE`, igual que `recordRun`. **Sin
-  migración de esquema.**
-- `rebuild-index.ts` (`rebuildIndex`): purga, publica la remoción vectorial y
-  re-sincroniza cada fuente con la función `sync` inyectada — el mismo
-  cableado que usa `application.sync`, así que nunca puede indexar distinto.
-  Recorre las fuentes **secuencialmente**, no con `Promise.all`.
-- `Application.rebuildIndex()`, `kind: "rebuild"` en `parse-command.ts`,
-  entrada `library_and_model` en `command-requirements.ts` y la rama en
+- `IndexStore.purgeDerivedIndex()`: deletes `video_packages` and, through the
+  cascades and triggers that already existed, everything derived. The `SELECT`
+  of active runs and the `DELETE` share a `BEGIN IMMEDIATE`, just like
+  `recordRun`. **No schema migration.**
+- `rebuild-index.ts` (`rebuildIndex`): purges, publishes the vector removal and
+  re-synchronizes each source with the injected `sync` function — the same
+  wiring `application.sync` uses, so it can never index differently. It walks
+  the sources **sequentially**, not with `Promise.all`.
+- `Application.rebuildIndex()`, `kind: "rebuild"` in `parse-command.ts`, the
+  `library_and_model` entry in `command-requirements.ts` and the branch in
   `run-cli.ts`.
 
-Decisiones que no conviene reabrir sin motivo: regenera en vez de sólo purgar;
-preserva `sources` y el historial de runs; el guard va dentro de la purga; no
-acepta `--force`; sólo la purga es transaccional. Razonamiento completo en
-`docs/decisions.md`, sección "`rebuild` regenera en vez de sólo purgar (punto
-4.6)".
+Decisions not worth reopening without cause: it regenerates instead of only
+purging; it preserves `sources` and the run history; the guard goes inside the
+purge; it does not accept `--force`; only the purge is transactional. Full
+reasoning in `docs/decisions.md`, section "`rebuild` regenerates instead of
+only purging (point 4.6)".
 
-**El defecto que encontró AH2, y que vale recordar.** El diseño afirmaba que
-el índice vectorial en memoria se invalidaría solo, porque ya lo hace en
-`apply`. Es falso: la purga borra por SQL y SQL no publica nada, así que un
-rebuild que termina sin ningún paquete dejaba el índice sirviendo vectores
-fantasma — 2 medidos sobre una biblioteca con cero embeddings. Es el mismo
-defecto de 4.4 llegando por un camino nuevo. `rebuildIndex` ahora publica un
-`remove_packages` después del commit de la purga. **Si tocás la purga, mantené
-esa publicación.**
+**The defect AH2 found, which is worth remembering.** The design claimed the
+in-memory vector index would invalidate itself, because it already does so in
+`apply`. That is false: the purge deletes via SQL and SQL publishes nothing, so
+a rebuild that ends with no packages left the index serving phantom vectors — 2
+measured over a library with zero embeddings. It is the same defect as 4.4
+arriving by a new route. `rebuildIndex` now publishes a `remove_packages` after
+the commit of the purge. **If you touch the purge, keep that publication.**
 
-**Validado contra el binario real**, no sólo con tests: copia temporal de 3
-videos reales de `auto-design` (dos con `rules.json`, uno con
-`analysis.json`), modelo E5 real. `rebuild --confirm` dejó los digests
-SHA-256 de unidades, fragmentos **y vectores** idénticos bit a bit a los de
-antes —con lote 1 el embedding es determinista también sobre datos reales—,
-preservó el historial de runs, y `doctor` quedó en `ok` con `retrieve` sin
-ningún warning. Con un run `running` inyectado, el guard rechazó el comando
-sin borrar nada. Corrompiendo un fragmento derivado a mano: `sync` respondió
-`no_changes` y lo dejó intacto, `rebuild` lo reparó. Digest del árbol fuente
-idéntico antes y después; la copia y la base temporales se borraron al
-terminar. Detalle en `docs/build.md`.
+**Validated against the real binary**, not only with tests: a temporary copy of
+3 real `auto-design` videos (two with `rules.json`, one with `analysis.json`),
+the real E5 model. `rebuild --confirm` left the SHA-256 digests of units,
+fragments **and vectors** bit-for-bit identical to the previous ones —with
+batch 1 the embedding is deterministic over real data too—, preserved the run
+history, and `doctor` stayed in `ok` with `retrieve` showing no warning at all.
+With a `running` run injected, the guard rejected the command without deleting
+anything. Corrupting a derived fragment by hand: `sync` answered `no_changes`
+and left it intact, `rebuild` repaired it. Source tree digest identical before
+and after; the temporary copy and database were deleted when finished. Detail
+in `docs/build.md`.
 
-Estado final: **342 tests, 0 fallos**, `npm run check` y `npm run build` en
-verde.
+Final state: **342 tests, 0 failures**, `npm run check` and `npm run build`
+green.
 
-## Primer turno recomendado para el próximo agente
+## Recommended first turn for the next agent
 
-1. Confirmar `git status --short` vacío y revisar los últimos commits.
-   La rama es `main` y tiene remoto privado: **no pushees sin pedido
-   explícito**.
-2. Ejecutar `npm.cmd run check` y `npm.cmd run build`. La referencia al
-   cerrar el punto 4.6, el 14 de agosto: **342 tests, 0 fallos**.
-3. Leer los documentos del orden de lectura, incluidos los diseños
-   posteriores al MVP: `install-design.md`, `sync-safety-design.md`,
-   `model-profile-design.md` y `rebuild-design.md`.
-4. **No hay un frente decidido esperando.** El orden de prioridad que el
-   usuario fijó el 14 de agosto se agotó: sus dos puntos se cerraron ese
-   mismo día (4.6 el segundo; el primero, sin código, por inerte). Lo que
-   queda es lo que el usuario dejó explícitamente para el final —verificar la
-   skill desde Codex real, que requiere que la corra él, e higiene del
-   repositorio— y después el trabajo fuera de alcance del `product-spec.md`
-   original. **Preguntá antes de elegir**: acá sí corresponde.
-5. Proponer diseño y checklist fino **antes** de implementar, siguiendo el
-   patrón de `retrieval-design.md` / `install-design.md` /
-   `sync-safety-design.md` / `rebuild-design.md`, y esperar aprobación
-   explícita.
-6. Implementar en cortes de máximo cinco archivos por tarea. **Commitear con
-   la skill `/git-commit`**, nunca a mano — ver `docs/development.md` →
-   "Cómo commitear".
+1. Confirm that `git status --short` is empty and review the latest commits.
+   The branch is `main` and it has a private remote: **do not push without an
+   explicit request**.
+2. Run `npm.cmd run check` and `npm.cmd run build`. The reference at the
+   closure of point 4.6, on 14 August: **342 tests, 0 failures**.
+3. Read the documents of the reading order, including the post-MVP designs:
+   `install-design.md`, `sync-safety-design.md`, `model-profile-design.md` and
+   `rebuild-design.md`.
+4. **There is no decided front waiting.** The priority order the user set on 14
+   August is exhausted: its two points were closed that same day (4.6 the
+   second one; the first one, with no code, because it was inert). What is left
+   is what the user explicitly left for the end —verifying the skill from a
+   real Codex, which requires the user to run it, and repository hygiene— and
+   after that the work out of scope of the original `product-spec.md`. **Ask
+   before choosing**: here it is appropriate.
+5. Propose a design and a fine-grained checklist **before** implementing,
+   following the pattern of `retrieval-design.md` / `install-design.md` /
+   `sync-safety-design.md` / `rebuild-design.md`, and wait for explicit
+   approval.
+6. Implement in slices of at most five files per task. **Commit with the
+   `/git-commit` skill**, never by hand — see `docs/development.md` → "How to
+   commit".
 
-### Lo que enseñó la sesión del 13 y 14 de agosto
+### What the 13 and 14 August session taught
 
-Cinco defectos reales se corrigieron en dos días. **Cuatro de los cinco
-aparecieron verificando otra cosa**, no buscándolos. Vale la pena repetir el
-método:
+Five real defects were fixed in two days. **Four of the five appeared while
+verifying something else**, not while looking for them. The method is worth
+repeating:
 
-- **Verificá contra el binario real, no sólo con tests.** `doctor` daba un
-  parte de salud falso ante un modelo truncado y toda la suite pasaba; sólo
-  se vio corriendo el comando con un archivo dañado a propósito.
-- **Desconfiá del "todo bien".** Tres de los cinco defectos tenían la misma
-  forma: el sistema respondía correctamente mientras algo estaba roto. El
-  marcador de citas pasaba toda verificación mecánica y producía procedencia
-  falsa; `retrieve` devolvía `ok` con la búsqueda semántica muerta; `doctor`
-  decía `ok` con el modelo corrupto.
-- **Un arreglo puede estar tapado por otro.** `VECTORS_STALE` no podía
-  dispararse nunca porque el índice reutilizaba un snapshot obsoleto. Dos
-  defectos se cubrían mutuamente.
-- **Medí antes de optimizar.** El paralelismo parecía obvio y rindió 1,00x;
-  el tamaño de lote no parecía nada y rindió 2,23x. La primera medición del
-  embedding fue engañosa por usar textos cortos en vez de contenido real.
-- **Los subagentes que reportan lo que no arreglaron valen oro.** El hueco
-  del snapshot obsoleto lo encontró un subagente que decidió que estaba
-  fuera de su alcance y lo dijo, en vez de tocarlo en silencio.
+- **Verify against the real binary, not only with tests.** `doctor` gave a
+  false health report in the face of a truncated model and the whole suite
+  passed; it was only seen by running the command with a deliberately damaged
+  file.
+- **Distrust "everything is fine".** Three of the five defects had the same
+  shape: the system answered correctly while something was broken. The citation
+  marker passed every mechanical verification and produced false provenance;
+  `retrieve` returned `ok` with semantic search dead; `doctor` said `ok` with a
+  corrupt model.
+- **One fix can be masked by another.** `VECTORS_STALE` could never fire
+  because the index reused a stale snapshot. Two defects covered each other.
+- **Measure before optimizing.** Parallelism seemed obvious and yielded 1.00x;
+  batch size seemed like nothing and yielded 2.23x. The first embedding
+  measurement was misleading because it used short texts instead of real
+  content.
+- **Subagents that report what they did not fix are worth gold.** The stale
+  snapshot gap was found by a subagent that decided it was out of its scope and
+  said so, instead of touching it silently.
 
-Prompt sugerido para retomar:
+Suggested prompt for resuming:
 
-> Retoma `auto-youtube-rag` desde `docs/agent-handoff.md`. Verifica primero
-> el estado del repositorio y las pruebas. El MVP está completo, y también
-> los puntos 4.1 a 4.6: soporte de `analysis.json`, instalación con hogar de
-> usuario, seguridad de `sync` con guard de concurrencia, aviso de vectores
-> obsoletos, perfil de modelo de embeddings (prefijos ya no hardcodeados) y
-> el comando `rebuild --confirm`. No hay pendientes de decisión ni ningún
-> comando del contrato sin implementar, y el orden de prioridad del 14 de
-> agosto quedó agotado. Pregúntame qué priorizar antes de empezar, y propone
-> diseño y checklist antes de implementar nada.
+> Pick `auto-youtube-rag` back up from `docs/agent-handoff.md`. First verify
+> the state of the repository and the tests. The MVP is complete, and so are
+> points 4.1 to 4.6: `analysis.json` support, installation with a user home,
+> `sync` safety with a concurrency guard, the stale vector warning, the
+> embedding model profile (prefixes are no longer hardcoded) and the
+> `rebuild --confirm` command. There are no pending decisions and no command
+> of the contract left unimplemented, and the priority order of 14 August is
+> exhausted. Ask me what to prioritize before starting, and propose a design
+> and a checklist before implementing anything.
 
-## Historial reciente relevante
+## Recent relevant history
 
-Los commits más recientes.
+The most recent commits.
 
 ```text
 7ee0a9b build(repo): check every file out with LF so format:check survives a checkout
@@ -1536,52 +1536,50 @@ ef06e93 feat(cli): preflight requirements once, before building the Application
 c9b4ee4 fix(doctor): point the missing-model check at models install
 ```
 
-## Definición de éxito del relevo
+## Definition of a successful handoff
 
-Un agente está correctamente situado cuando puede explicar, antes de escribir
-código:
+An agent is correctly situated when it can explain, before writing code:
 
-1. por qué el agente consultante es el único LLM;
-2. por qué existen `KnowledgeUnit` y `SearchFragment` separados;
-3. cómo `sync` preserva paquetes válidos ante fallos;
-4. por qué los paquetes fuente son estrictamente read-only;
-5. cómo se mantienen alineados SQLite, FTS5 y embeddings;
-6. por qué la búsqueda vectorial inicial será exacta y reemplazable;
-7. qué entregó cada punto — 2.1 indexación, 2.2 recuperación, 2.3 ensamblado y
-   `retrieve`, 2.4 la skill portable, 3.2 la evaluación en dos capas — y por
-   qué el MVP completo ya está cerrado, no en curso;
-8. por qué RRF ponderado es el baseline de fusión, y por qué 3.2 decidió
-   mantener `k`/`wText`/`wVector` sin cambios en vez de calibrarlos;
-9. por qué la búsqueda vectorial no tiene piso de similitud, qué implica eso
-   tanto para `status: "no_results"` en 2.2 y en el bundle de 2.3, y por qué
-   3.2 concluyó que ese hueco no bloquea al agente consumidor (Capa B lo
-   compensa) ni justifica agregar un umbral todavía;
-10. por qué los identificadores de fragmento y documento son derivados en vez
-    de persistidos, y qué adaptadores dependen de esa reconstrucción;
-11. por qué `assembleContext` necesita `getUnits` además de `getAncestors`
-    (`KnowledgeUnit` no transporta metadata de video/documento, y hay que
-    conocer el `parentId` de cada candidato antes de poder caminarlo);
-12. por qué 3.2 mide en dos capas independientes sin ground truth etiquetado
-    (Capa A mecánica, Capa B juzgada por Codex y Claude sobre el mismo
-    bundle), y por qué ninguna de las 9 discrepancias entre jueces señala un
-    defecto del producto — son ambigüedad de la rúbrica, no de lectura;
-13. qué frentes quedan como trabajo posterior, en qué orden los priorizó el
-    usuario el 14 de agosto, y cuáles quedaron explícitamente para el final;
-14. por qué un bloque de ancestro siempre cae en "Additional relevant
-    context" aunque sea en sí una regla relevante, y por qué un presupuesto
-    nunca corta un bloque a la mitad;
-15. por qué la biblioteca y el modelo viven en el hogar del usuario y no en
-    el directorio de trabajo, y por qué el modelo es estado instalado y no
-    un caché;
-16. por qué dos `sync` concurrentes sobre una fuente la dejaban vacía, por
-    qué el guard va en `recordRun` bajo `BEGIN IMMEDIATE` en vez de un
-    índice único, y por qué no se abandona ningún run automáticamente;
-17. por qué `VECTORS_STALE` necesita tres condiciones y no una, y por qué el
-    índice vectorial debe recargar al cambiar `version`, no sólo `key`;
-18. por qué paralelizar la indexación no sirve —ONNX ya satura los núcleos—
-    y por qué bajar el lote a 1 rindió 2,23x;
-19. qué detecta `rebuild` que `sync` no puede detectar, por qué regenera en
-    vez de sólo purgar, por qué preserva el historial de runs, y por qué su
-    guard de concurrencia vive dentro de la transacción de la purga;
-20. por qué ordenar fragmentos por longitud dejó de tener sentido en cuanto
-    el lote bajó a 1, y por qué eso se cerró sin escribir código.
+1. why the querying agent is the only LLM;
+2. why `KnowledgeUnit` and `SearchFragment` exist separately;
+3. how `sync` preserves valid packages in the face of failures;
+4. why source packages are strictly read-only;
+5. how SQLite, FTS5 and embeddings are kept aligned;
+6. why the initial vector search will be exact and replaceable;
+7. what each point delivered — 2.1 indexing, 2.2 retrieval, 2.3 assembly and
+   `retrieve`, 2.4 the portable skill, 3.2 the two-layer evaluation — and why
+   the complete MVP is already closed, not in progress;
+8. why weighted RRF is the fusion baseline, and why 3.2 decided to keep
+   `k`/`wText`/`wVector` unchanged instead of calibrating them;
+9. why vector search has no similarity floor, what that implies both for
+   `status: "no_results"` in 2.2 and in the 2.3 bundle, and why 3.2 concluded
+   that this gap neither blocks the consuming agent (Layer B compensates for
+   it) nor justifies adding a threshold yet;
+10. why the fragment and document identifiers are derived instead of persisted,
+    and which adapters depend on that reconstruction;
+11. why `assembleContext` needs `getUnits` in addition to `getAncestors`
+    (`KnowledgeUnit` does not carry video/document metadata, and each
+    candidate's `parentId` must be known before it can be walked);
+12. why 3.2 measures in two independent layers with no labelled ground truth
+    (mechanical Layer A, Layer B judged by Codex and Claude over the same
+    bundle), and why none of the 9 discrepancies between judges points at a
+    product defect — they are rubric ambiguity, not reading ambiguity;
+13. which fronts remain as follow-up work, in what order the user prioritized
+    them on 14 August, and which ones were explicitly left for the end;
+14. why an ancestor block always falls into "Additional relevant context" even
+    if it is itself a relevant rule, and why a budget never cuts a block in
+    half;
+15. why the library and the model live in the user's home and not in the
+    working directory, and why the model is installed state and not a cache;
+16. why two concurrent `sync` runs over one source left it empty, why the guard
+    goes in `recordRun` under `BEGIN IMMEDIATE` instead of a unique index, and
+    why no run is abandoned automatically;
+17. why `VECTORS_STALE` needs three conditions and not one, and why the vector
+    index must reload when `version` changes, not just `key`;
+18. why parallelizing the indexing is useless —ONNX already saturates the
+    cores— and why lowering the batch to 1 yielded 2.23x;
+19. what `rebuild` detects that `sync` cannot detect, why it regenerates
+    instead of only purging, why it preserves the run history, and why its
+    concurrency guard lives inside the purge transaction;
+20. why sorting fragments by length stopped making sense as soon as the batch
+    dropped to 1, and why that was closed without writing code.
