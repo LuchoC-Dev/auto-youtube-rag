@@ -1,120 +1,123 @@
-# Instalación y entorno
+# Installation and environment
 
-Leé este archivo **sólo** cuando se cumpla alguna de estas condiciones:
+Read this file **only** when one of these conditions holds:
 
-- es la primera vez que usás la herramienta en esta máquina;
-- un comando falló con `LIBRARY_NOT_FOUND` o `MODEL_NOT_INSTALLED`;
-- `models status` devolvió `incomplete`;
-- querés mover la biblioteca a otra ubicación.
+- it is the first time you use the tool on this machine;
+- a command failed with `LIBRARY_NOT_FOUND` or `MODEL_NOT_INSTALLED`;
+- `models status` returned `incomplete`;
+- you want to move the library to another location.
 
-Si la biblioteca ya funciona, no necesitás nada de acá.
+If the library already works, you need nothing from here.
 
-## Cómo invocar la CLI
+## How to invoke the CLI
 
-La forma canónica es `auto-youtube-rag <comando>`. Si el comando no está en el
-`PATH`, buscá el repositorio del proyecto y usá
-`node "<ruta-al-repo>/dist/main.js" <comando>`; requiere haber corrido
-`npm run build` una vez en ese repositorio.
+The canonical form is `auto-youtube-rag <command>`. If the command is not on the
+`PATH`, find the repository of the project and use
+`node "<path-to-the-repo>/dist/main.js" <command>`; it requires having run
+`npm run build` once in that repository.
 
-## Dónde vive todo
+## Where everything lives
 
-Un único directorio, en el hogar del usuario:
+A single directory, in the user's home:
 
 ```text
 ~/.auto-youtube-rag/
-  index.sqlite       ← la biblioteca
-  models/            ← el modelo de embeddings (130 MB)
+  index.sqlite       ← the library
+  models/            ← the embedding model (130 MB)
 ```
 
-En Windows es `C:\Users\<usuario>\.auto-youtube-rag\`.
+On Windows it is `C:\Users\<user>\.auto-youtube-rag\`.
 
-**No depende del directorio desde el que ejecutás.** Podés invocar la CLI
-parado en cualquier carpeta y siempre vas a hablar con la misma biblioteca.
+**It does not depend on the directory you run from.** You can invoke the CLI
+standing in any folder and you will always be talking to the same library.
 
-Dos variables de entorno lo mueven, y sólo hacen falta en casos especiales
-—aislar una biblioteca de prueba, o compartir el modelo entre varios hogares:
+Two environment variables move it, and they are only needed in special cases
+—isolating a test library, or sharing the model between several homes:
 
-| Variable                      | Qué mueve                     |
-| ----------------------------- | ----------------------------- |
-| `AUTO_YOUTUBE_RAG_HOME`       | El hogar entero               |
-| `AUTO_YOUTUBE_RAG_MODELS_DIR` | Sólo el directorio del modelo |
+| Variable                      | What it moves            |
+| ----------------------------- | ------------------------ |
+| `AUTO_YOUTUBE_RAG_HOME`       | The whole home           |
+| `AUTO_YOUTUBE_RAG_MODELS_DIR` | Only the model directory |
 
-Si definís alguna, usá **el mismo valor en todas las invocaciones** de la
-sesión.
+If you define either, use **the same value in every invocation** of the
+session.
 
-## Instalar por primera vez
+## Installing for the first time
 
 ```text
 auto-youtube-rag init
 ```
 
-Crea el hogar, prepara la base y deja el modelo instalado. Es idempotente.
+It creates the home, prepares the database and leaves the model installed. It is
+idempotent.
 
-**Tarda.** Sin banderas descarga unos 130 MB, y es la única operación de toda
-la herramienta que usa la red. Dale un timeout holgado o corrélo en segundo
-plano.
+**It takes a while.** With no flags it downloads about 130 MB, and it is the
+only operation in the whole tool that uses the network. Give it a generous
+timeout or run it in the background.
 
-Dos banderas cambian ese comportamiento:
+Two flags change that behaviour:
 
-- **`--from <ruta>`**: copia un modelo que ya existe en disco en vez de
-  descargarlo. Tarda segundos. La ruta debe contener
-  `Xenova/multilingual-e5-small/` con sus cuatro archivos. Si no los tiene,
-  falla con `MODEL_SOURCE_INVALID` (código `2`) en vez de descargar en
-  silencio.
-- **`--skip-model`**: prepara sólo la base. Para CI o entornos sin red.
-  `sync` y `retrieve` no van a funcionar hasta que instales el modelo.
+- **`--from <path>`**: copies a model that already exists on disk instead of
+  downloading it. It takes seconds. The path must contain
+  `Xenova/multilingual-e5-small/` with its four files. If it does not have
+  them, it fails with `MODEL_SOURCE_INVALID` (code `2`) instead of downloading
+  silently.
+- **`--skip-model`**: prepares only the database. For CI or environments
+  without network. `sync` and `retrieve` will not work until you install the
+  model.
 
 ## `LIBRARY_NOT_FOUND`
 
-Falta la base. El mensaje incluye la ruta exacta donde la buscó.
+The database is missing. The message includes the exact path where it looked for
+it.
 
-Causas, en orden de probabilidad:
+Causes, in order of likelihood:
 
-1. **Nunca corriste `init`.** Corrélo.
-2. **Definiste `AUTO_YOUTUBE_RAG_HOME` con un valor distinto** al que usaste
-   antes, o lo definiste en una invocación y no en otra. Verificá que sea el
-   mismo valor en todas.
+1. **You never ran `init`.** Run it.
+2. **You defined `AUTO_YOUTUBE_RAG_HOME` with a value different** from the one
+   you used before, or you defined it in one invocation and not in another.
+   Check that it is the same value in all of them.
 
 ## `MODEL_NOT_INSTALLED`
 
-La base existe pero falta el modelo, o está dañado. `sync` y `retrieve` lo
-necesitan; `status`, `doctor` y `source` no.
+The database exists but the model is missing, or it is damaged. `sync` and
+`retrieve` need it; `status`, `doctor` and `source` do not.
 
 ```text
 auto-youtube-rag models install
-auto-youtube-rag models install --from <ruta-a-un-modelo-existente>
+auto-youtube-rag models install --from <path-to-an-existing-model>
 auto-youtube-rag models install --force
 ```
 
-**No es un fallo transitorio.** Reintentar `sync` sin instalar el modelo
-vuelve a fallar igual.
+**It is not a transient failure.** Retrying `sync` without installing the model
+fails again just the same.
 
-## `models status` devuelve `incomplete`
+## `models status` returns `incomplete`
 
-La instalación está a medias o dañada: típicamente una descarga cortada, que
-deja los archivos en su lugar con el tamaño equivocado. También aparece si
-alguien copió el modelo a mano, sin pasar por la herramienta.
+The installation is half-finished or damaged: typically an interrupted download,
+which leaves the files in place with the wrong size. It also appears if someone
+copied the model by hand, without going through the tool.
 
-El recibo `models/.install.json` guarda el tamaño esperado de cada archivo, y
-`models status` lista en `issues` cuáles no coinciden.
+The `models/.install.json` receipt stores the expected size of every file, and
+`models status` lists in `issues` which ones do not match.
 
-Se repara reinstalando encima:
+It is repaired by reinstalling on top:
 
 ```text
 auto-youtube-rag models install --force
 ```
 
-## Mover la biblioteca
+## Moving the library
 
-No hay comando de mudanza. Movés el directorio a mano y definís
-`AUTO_YOUTUBE_RAG_HOME` apuntando al lugar nuevo, en todas las invocaciones.
+There is no relocation command. You move the directory by hand and define
+`AUTO_YOUTUBE_RAG_HOME` pointing at the new place, in every invocation.
 
 ## `LEGACY_LIBRARY_FOUND`
 
-Advertencia, no error. Hay una base vieja en `<directorio-actual>/.auto-youtube-rag/`,
-de cuando la herramienta guardaba la biblioteca junto al directorio de
-trabajo. Ya no se lee.
+A warning, not an error. There is an old database in
+`<current-directory>/.auto-youtube-rag/`, from when the tool kept the library
+next to the working directory. It is no longer read.
 
-Si esa base tenía contenido que te importa, movela al hogar nuevo o apuntá
-`AUTO_YOUTUBE_RAG_HOME` hacia ella. La herramienta no la migra sola: mover
-datos del usuario sin pedirlo no es su trabajo.
+If that database had content you care about, move it to the new home or point
+`AUTO_YOUTUBE_RAG_HOME` at it. The tool does not migrate it on its own: moving
+the user's data without being asked is not its job.
