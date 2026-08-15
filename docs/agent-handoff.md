@@ -69,7 +69,7 @@ pendiente urgente.
 | Dimensión                 | 384                                                                                                    |
 | Instalación               | `auto-youtube-rag init` → `~/.auto-youtube-rag/` (base + modelo, ~130 MB)                              |
 | Operación                 | Exclusivamente local; sin APIs externas                                                                |
-| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1–4.6 al 100% en `docs/build.md`                                       |
+| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1–4.7 al 100% en `docs/build.md`                                       |
 | Próximo punto             | Ninguno abierto; el orden de prioridad del 14 de agosto quedó agotado (ver "Orden de prioridad" abajo) |
 
 **Cambió el 14 de agosto de 2026.** Hasta entonces todo el proyecto vivía en
@@ -132,8 +132,12 @@ Antes de modificar código, leer en este orden:
 21. `docs/rebuild-design.md` y `docs/rebuild-tasks.md`: el comando
     `rebuild --confirm` del punto 4.6, ya completado. Incluye por qué el
     ordenamiento por longitud se cerró sin escribir código.
-22. Este documento: estado operativo consolidado del MVP, de los puntos 4.1
-    a 4.4, el orden de prioridad decidido y lo que enseñó la sesión del 13 y
+22. `docs/low-relevance-design.md`: el aviso `LOW_RELEVANCE` y la métrica
+    `top_vector_similarity` del punto 4.7, ya completado. Incluye la tabla de
+    24 mediciones que fija el umbral y por qué `fusedScore` no sirve para
+    medir relevancia.
+23. Este documento: estado operativo consolidado del MVP, de los puntos 4.1
+    a 4.7, el orden de prioridad ya agotado y lo que enseñó la sesión del 13 y
     14 de agosto.
 
 `docs/development.md` sigue siendo la referencia del toolchain, y desde el 14
@@ -1344,6 +1348,54 @@ que descarte candidatos se sigue descartando, igual que en 2.2 y 3.2. Ver
 - Señal de densidad temática para que RRF distinga contenido específico de
   catálogo tangencial (hallazgo de 3.2, no un bug).
 - Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad de N4.
+
+## Punto 4.7 completado — aviso de baja relevancia
+
+Cerrado el 14 de agosto de 2026. Diseño en `docs/low-relevance-design.md`.
+
+Qué resuelve: la búsqueda vectorial es un ranking exhaustivo sin piso, así que
+toda consulta sobre una biblioteca no vacía devuelve candidatos. Preguntarle
+por síntomas de diabetes a la colección de diseño daba `status: "ok"`, 31.982
+tokens y `warnings: []`. El producto tenía la señal y no la comunicaba.
+
+Qué cambió en `src/`:
+
+- `retrieval-thresholds.ts`: `defaultLowRelevanceCosine = 0.84`, con la tabla
+  de mediciones que lo justifica escrita al lado.
+- `retrieveCandidates` emite `LOW_RELEVANCE` cuando el mejor coseno de la vía
+  vectorial queda bajo el piso, y reporta ese coseno en
+  `metrics.topVectorSimilarity` **en toda consulta** (`null` si la vía no
+  corrió).
+- `informationalWarningCodes` (`retrieval-results.ts`) separa advertencias
+  informativas de degradaciones; `run-cli.ts` sólo degrada a `partial` por las
+  segundas.
+- `metrics.top_vector_similarity` en el contrato del bundle.
+
+**Tres cosas que conviene no reabrir sin leer el diseño:**
+
+1. **`fusedScore` no puede medir relevancia.** RRF asigna `1/(k + rank)`:
+   codifica posición, no similitud. El primer candidato de una consulta
+   perfecta y el de una absurda reciben el mismo valor. Por eso el coseno se
+   lee **antes** de fusionar.
+2. **El umbral se midió, no se eligió.** 24 consultas clasificadas a mano: en
+   dominio 0,8657–0,9012; técnicas no cubiertas 0,8428–0,8600; fuera de
+   dominio 0,8149–0,8389. Sin solapamiento, pero con márgenes de milésimas, y
+   calibrado sobre **una** colección de diseño en español.
+3. **El aviso informa y no filtra**, justamente por esa fragilidad. Un piso
+   que descarte candidatos se sigue descartando, igual que en 2.2 y 3.2.
+
+El margen fino no es teórico: la primera corrida real tras implementarlo midió
+**0,8399** contra el piso de 0,84. Una diezmilésima más y no habría avisado.
+Por eso el número se reporta siempre, para que el agente consumidor —que por
+diseño es el único cerebro— juzgue con su propio criterio en vez de heredar el
+umbral.
+
+**Limitación conocida:** el juicio usa sólo el coseno vectorial, así que una
+coincidencia léxica exacta con coseno bajo sería un falso positivo. Acotado
+porque el aviso no filtra, pero el criterio no lo cubre.
+
+Estado final: **352 tests, 0 fallos**, verificado contra el binario real sobre
+la biblioteca de 51 videos.
 
 ## Punto 4.6 completado — comando `rebuild --confirm`
 
