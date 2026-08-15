@@ -1,159 +1,158 @@
-# Desarrollo local
+# Local development
 
-## Estado
+## Status
 
-Toolchain aprobado y en uso. Este documento define el contrato de calidad del
-repositorio y cómo ponerse a trabajar en una máquina nueva.
+Toolchain approved and in use. This document defines the quality contract of the
+repository and how to get to work on a new machine.
 
-La frase original decía que el repositorio "no implementa todavía el dominio ni
-los casos de uso". Quedó desactualizada hace tiempo: el MVP completo (2.1–2.4,
-3.1–3.2) y los puntos 4.1–4.6 están cerrados, con la CLI administrativa,
-`retrieve` y `rebuild` implementados y probados. Ver `docs/build.md`.
+The original sentence said that the repository "does not yet implement the
+domain or the use cases". That went out of date long ago: the complete MVP
+(2.1–2.4, 3.1–3.2) and points 4.1–4.6 are closed, with the administrative CLI,
+`retrieve` and `rebuild` implemented and tested. See `docs/build.md`.
 
-## Versiones fijadas
+## Pinned versions
 
-- Node.js 24.19.0 mediante `.node-version`.
-- TypeScript 6.0.3 en modo estricto.
-- ESLint 10 con las configuraciones `strictTypeChecked` y
-  `stylisticTypeChecked` de typescript-eslint.
-- Prettier 3.9.6 con `eslint-config-prettier`.
-- `node:test`, ejecutado sobre TypeScript mediante `tsx`.
+- Node.js 24.19.0 through `.node-version`.
+- TypeScript 6.0.3 in strict mode.
+- ESLint 10 with the `strictTypeChecked` and `stylisticTypeChecked`
+  configurations from typescript-eslint.
+- Prettier 3.9.6 with `eslint-config-prettier`.
+- `node:test`, run over TypeScript through `tsx`.
 
-TypeScript 7.0.2 no se utiliza por ahora porque typescript-eslint 8.67.0
-declara compatibilidad con TypeScript `>=4.8.4 <6.1.0`. Mantener el compilador
-en 6.0.3 evita una instalación forzada y permite lint con información de tipos.
-La actualización se reconsiderará cuando la cadena oficial sea compatible.
+TypeScript 7.0.2 is not used for now because typescript-eslint 8.67.0 declares
+compatibility with TypeScript `>=4.8.4 <6.1.0`. Keeping the compiler at 6.0.3
+avoids a forced installation and allows linting with type information. The
+upgrade will be reconsidered when the official chain is compatible.
 
-## Arrancar en una máquina nueva
+## Getting started on a new machine
 
-Nada de lo que no está versionado es irrecuperable. Un clon limpio se pone a
-trabajar con estos pasos:
+Nothing that is not versioned is unrecoverable. A clean clone gets to work with
+these steps:
 
 ```powershell
 git clone https://github.com/LuchoC-Dev/auto-youtube-rag.git
 cd auto-youtube-rag
-npm.cmd ci          # respeta package-lock.json; no uses "npm install"
-npm.cmd run check   # 342 tests, sin red y sin modelo
+npm.cmd ci          # respects package-lock.json; do not use "npm install"
+npm.cmd run check   # 342 tests, no network and no model
 npm.cmd run build
 ```
 
-Para dejar además el comando `auto-youtube-rag` disponible en el sistema,
-`npm.cmd run setup` (compila e instala globalmente). Ver la sección
-"Instalación global" más abajo.
+To also leave the `auto-youtube-rag` command available on the system,
+`npm.cmd run setup` (builds and installs globally). See the "Global
+installation" section below.
 
-**Hasta acá no hace falta ni red ni modelo de embeddings.** La suite rápida
-omite los smokes por el patrón `smoke` y trabaja con
-`FakeEmbeddingGenerator`, así que typecheck, lint, tests, formato y build
-corren enteros sobre un clon recién bajado.
+**Up to this point neither network nor embedding model is needed.** The fast
+suite skips the smokes through the `smoke` pattern and works with
+`FakeEmbeddingGenerator`, so typecheck, lint, tests, formatting and build all
+run in full on a freshly downloaded clone.
 
-Sólo dos cosas requieren un paso extra, y cada una tiene su comando:
+Only two things require an extra step, and each one has its command:
 
-| Para                            | Ejecutar                      | Requiere red |
-| ------------------------------- | ----------------------------- | ------------ |
-| Los dos smokes y los benchmarks | `npm.cmd run models:download` | Sí, ~129 MB  |
-| Usar el producto de verdad      | `auto-youtube-rag init`       | Sí, ~130 MB  |
+| For                               | Run                           | Requires network |
+| --------------------------------- | ----------------------------- | ---------------- |
+| The two smokes and the benchmarks | `npm.cmd run models:download` | Yes, ~129 MB     |
+| Actually using the product        | `auto-youtube-rag init`       | Yes, ~130 MB     |
 
-Son rutas distintas a propósito: `models:download` llena el caché **del
-repositorio** (`<repo>/.cache/models`) y es herramienta de desarrollo;
-`init` instala en el **hogar del usuario** y no sabe que este repositorio
-existe. Ver la sección siguiente.
+They are separate paths on purpose: `models:download` fills the **repository's**
+cache (`<repo>/.cache/models`) and is a development tool; `init` installs into
+the **user's home** and does not know that this repository exists. See the next
+section.
 
-Qué falta en un clon y cómo vuelve:
+What is missing in a clone and how it comes back:
 
-| Ausente         | Se regenera con               |
+| Missing         | Regenerated with              |
 | --------------- | ----------------------------- |
 | `node_modules/` | `npm.cmd ci`                  |
 | `dist/`         | `npm.cmd run build`           |
 | `.cache/models` | `npm.cmd run models:download` |
-| La biblioteca   | `auto-youtube-rag init`       |
+| The library     | `auto-youtube-rag init`       |
 
-`.cache/` está en `.gitignore` y **nunca viajó al remoto**: ninguna máquina lo
-recibe al clonar, y esa es la intención. Es territorio local de desarrollo,
-reconstruible en un comando.
+`.cache/` is in `.gitignore` and **never travelled to the remote**: no machine
+receives it when cloning, and that is the intention. It is local development
+territory, rebuildable in a single command.
 
-### Instalación global
+### Global installation
 
-`npm run setup` compila y después ejecuta `scripts/install-global.mjs`, que
-empaqueta con `npm pack` e instala **el tarball**, no el directorio.
+`npm run setup` builds and then runs `scripts/install-global.mjs`, which packs
+with `npm pack` and installs **the tarball**, not the directory.
 
-La distinción no es cosmética. `npm install --global .` **ignora el campo
-`files`** y copia la carpeta entera: medido acá, 605 MB y 8549 archivos, con
-`.git`, `.cache`, `node_modules`, `src`, `test`, `docs` y `evals` adentro.
-`npm pack` sí respeta `files`, así que el tarball lleva sólo `dist` (~150 kB
-comprimidos) y npm resuelve aparte la dependencia de runtime.
+The distinction is not cosmetic. `npm install --global .` **ignores the `files`
+field** and copies the whole folder: measured here, 605 MB and 8,549 files, with
+`.git`, `.cache`, `node_modules`, `src`, `test`, `docs` and `evals` inside.
+`npm pack` does respect `files`, so the tarball carries only `dist` (~150 kB
+compressed) and npm resolves the runtime dependency separately.
 
-Lo instalado queda en **1 MB de código propio** más ~375 MB de
-`node_modules`, de los cuales 338 MB son `onnxruntime-node` y
-`onnxruntime-web`, que arrastra `@huggingface/transformers`. Ese peso es
-inherente a la dependencia, no al empaquetado.
+What ends up installed is **1 MB of own code** plus ~375 MB of `node_modules`,
+of which 338 MB are `onnxruntime-node` and `onnxruntime-web`, dragged in by
+`@huggingface/transformers`. That weight is inherent to the dependency, not to
+the packaging.
 
-Se instala por **copia, no por enlace** (a diferencia de `npm link`), así que
-el clon queda descartable: se puede borrar sin romper el comando. Para
-desarrollar sobre el código conviene lo contrario —`npm link`, que sí enlaza
-al clon y refleja cada recompilación sin reinstalar.
+It installs by **copy, not by link** (unlike `npm link`), so the clone remains
+disposable: it can be deleted without breaking the command. To develop on the
+code the opposite is preferable — `npm link`, which does link to the clone and
+reflects every rebuild without reinstalling.
 
-Desinstalación: `npm uninstall --global auto-youtube-rag`.
+Uninstallation: `npm uninstall --global auto-youtube-rag`.
 
-**Este proyecto no usa `prepare`, `postinstall` ni ningún otro script de ciclo
-de vida para instalar.** No es una preferencia estilística: esta máquina tiene
-`ignore-scripts=true` en `~/.npmrc` —una precaución razonable contra paquetes
-que ejecutan código al instalarse— y con esa configuración los `pre`/`post`
-scripts **no se ejecutan y no avisan**. Un instalador que dependa de ellos
-falla en silencio. Por eso `build` encadena `npm run clean` explícitamente en
-vez de confiar en un `prebuild`, y por eso la instalación es un comando que el
-usuario escribe, no un efecto secundario de `npm install`.
+**This project does not use `prepare`, `postinstall` or any other lifecycle
+script to install.** This is not a stylistic preference: this machine has
+`ignore-scripts=true` in `~/.npmrc` — a reasonable precaution against packages
+that run code when installed — and with that configuration the `pre`/`post`
+scripts **do not run and do not warn**. An installer that depends on them fails
+silently. That is why `build` explicitly chains `npm run clean` instead of
+trusting a `prebuild`, and why the installation is a command that the user types,
+not a side effect of `npm install`.
 
-### Cuidado con la profundidad de la ruta en Windows
+### Watch out for path depth on Windows
 
-La ruta relativa más larga del repositorio mide **95 caracteres**
-(`evals/results/2026-08-12/judgments/...`). Con el límite de 260 caracteres de
-Windows, eso deja unos **164 para el directorio donde clones**. Pasado ese
-punto el `git clone` falla a mitad del checkout con `Filename too long` y deja
-un árbol incompleto — comprobado: un clon en una ruta de 170 caracteres se cayó
-con 7 archivos sin crear, mientras que uno en `C:\tmp-clone-test` trajo los 325
-archivos sin un solo error.
+The longest relative path in the repository is **95 characters**
+(`evals/results/2026-08-12/judgments/...`). With Windows' 260-character limit,
+that leaves about **164 for the directory you clone into**. Past that point
+`git clone` fails halfway through the checkout with `Filename too long` and
+leaves an incomplete tree — verified: a clone into a 170-character path failed
+with 7 files never created, while one into `C:\tmp-clone-test` brought in all
+325 files without a single error.
 
-Clonar en una ruta corta (`C:\dev\...`) alcanza. Si hace falta una profunda:
+Cloning into a short path (`C:\dev\...`) is enough. If a deep one is needed:
 
 ```powershell
 git config --global core.longpaths true
 ```
 
-Verificado el 14 de agosto de 2026 sobre un clon limpio en `C:\tmp-clone-test`:
-`npm ci`, `npm run check` (342 tests) y `npm run build` pasaron **sin `.cache/`
-y sin red**. `test:embedding:smoke` falló con su mensaje indicando
-`npm run models:download`, y `test:install:smoke` se saltó solo, tal como está
-diseñado.
+Verified on 14 August 2026 on a clean clone in `C:\tmp-clone-test`: `npm ci`,
+`npm run check` (342 tests) and `npm run build` passed **without `.cache/` and
+without network**. `test:embedding:smoke` failed with its message pointing at
+`npm run models:download`, and `test:install:smoke` skipped itself, exactly as
+designed.
 
-Lo único que existe sólo en la máquina donde se corrió son los resultados
-sueltos de benchmark (`benchmarks/*/results/`, salvo los `baseline.*`
-versionados). Es deliberado: las **conclusiones** de cada benchmark están en
-`docs/decisions.md`, que sí se versiona; los datos crudos de cada corrida no
-se conservan.
+The only thing that exists solely on the machine where it was run are the loose
+benchmark results (`benchmarks/*/results/`, except the versioned `baseline.*`).
+This is deliberate: the **conclusions** of every benchmark are in
+`docs/decisions.md`, which is versioned; the raw data of each run is not kept.
 
-## Comandos
+## Commands
 
-| Comando                        | Responsabilidad                                            |
-| ------------------------------ | ---------------------------------------------------------- |
-| `npm run build`                | Compilar `src/` en `dist/` con declaraciones y source maps |
-| `npm run typecheck`            | Verificar todo el TypeScript sin emitir archivos           |
-| `npm run lint`                 | Ejecutar reglas estrictas y conscientes de tipos           |
-| `npm test`                     | Ejecutar pruebas con el runner nativo de Node              |
-| `npm run test:watch`           | Repetir las pruebas afectadas durante el desarrollo        |
-| `npm run test:coverage`        | Generar cobertura con el soporte nativo de Node            |
-| `npm run test:embedding:smoke` | Validar E5 Small usando sólo el modelo local               |
-| `npm run format`               | Aplicar Prettier                                           |
-| `npm run format:check`         | Verificar formato sin modificar archivos                   |
-| `npm run check`                | Ejecutar typecheck, lint, tests y formato                  |
+| Command                        | Responsibility                                                |
+| ------------------------------ | ------------------------------------------------------------- |
+| `npm run build`                | Compile `src/` into `dist/` with declarations and source maps |
+| `npm run typecheck`            | Verify all the TypeScript without emitting files              |
+| `npm run lint`                 | Run the strict, type-aware rules                              |
+| `npm test`                     | Run the tests with Node's native runner                       |
+| `npm run test:watch`           | Repeat the affected tests during development                  |
+| `npm run test:coverage`        | Generate coverage with Node's native support                  |
+| `npm run test:embedding:smoke` | Validate E5 Small using only the local model                  |
+| `npm run format`               | Apply Prettier                                                |
+| `npm run format:check`         | Verify formatting without modifying files                     |
+| `npm run check`                | Run typecheck, lint, tests and formatting                     |
 
-Los benchmarks conservan comandos separados porque no forman parte de la
-puerta rápida de calidad de cada cambio.
+The benchmarks keep separate commands because they are not part of the fast
+quality gate of every change.
 
-### Smoke local de E5 Small
+### Local smoke of E5 Small
 
-El smoke del modelo es deliberadamente independiente de `npm run check`. La
-suite rápida descubre su archivo, pero lo omite por el patrón `smoke`; sólo el
-comando explícito ejecuta la inferencia:
+The model smoke is deliberately independent of `npm run check`. The fast suite
+discovers its file, but skips it through the `smoke` pattern; only the explicit
+command runs the inference:
 
 ```text
 npm run models:download
@@ -161,69 +160,70 @@ npm run test:embedding:smoke
 npm run test:install:smoke
 ```
 
-`models:download` descarga únicamente E5 Small **al caché del repositorio**
-(`<repo>/.cache/models`). Es herramienta de desarrollo: alimenta los
-benchmarks y los dos smokes. Para descargar todos los modelos del benchmark
-histórico se usa `npm run models:download:benchmarks`.
+`models:download` downloads only E5 Small **into the repository's cache**
+(`<repo>/.cache/models`). It is a development tool: it feeds the benchmarks and
+the two smokes. To download every model of the historical benchmark, use
+`npm run models:download:benchmarks`.
 
-**No es la forma de instalar el producto.** Desde el punto 4.2, el usuario
-instala con `auto-youtube-rag init`, que escribe en el hogar de usuario
-(`~/.auto-youtube-rag/models/`) y no sabe que este repositorio existe.
-`models:download` depende de `tsx` y de `benchmarks/`, ninguno de los cuales
-está disponible fuera de un repositorio clonado. El `.cache/` del repositorio
-es territorio exclusivo de desarrollo.
+**This is not the way to install the product.** Since point 4.2, the user
+installs with `auto-youtube-rag init`, which writes into the user's home
+(`~/.auto-youtube-rag/models/`) and does not know that this repository exists.
+`models:download` depends on `tsx` and on `benchmarks/`, neither of which is
+available outside a cloned repository. The repository's `.cache/` is exclusively
+development territory.
 
-El smoke de embeddings exige los archivos en `.cache/models`, trabaja con
-`local_files_only` y nunca accede a la red. `test:install:smoke` copia ese
-mismo modelo a un hogar temporal para ejercitar la adopción real por
-`--from`; se omite si el caché no existe, en vez de fallar. Ambos quedan
-fuera de `npm run check` por el patrón `smoke`.
+The embedding smoke requires the files in `.cache/models`, works with
+`local_files_only` and never accesses the network. `test:install:smoke` copies
+that same model into a temporary home in order to exercise the real adoption
+through `--from`; it is skipped if the cache does not exist, instead of failing.
+Both are left out of `npm run check` through the `smoke` pattern.
 
-## Estructura y límites
+## Structure and boundaries
 
-`tsconfig.json` cubre producto, pruebas y benchmarks. `tsconfig.build.json`
-emite únicamente `src/`. Los benchmarks históricos siguen bajo typecheck, pero
-se excluyen temporalmente de ESLint y Prettier para no mezclar su migración con
-la implementación del producto. Todo código nuevo en `src/` y `test/` utiliza
-el baseline estricto. Los directorios generados, cachés, resultados y pesos
-locales quedan excluidos de lint, formato y Git según corresponda.
+`tsconfig.json` covers product, tests and benchmarks. `tsconfig.build.json`
+emits only `src/`. The historical benchmarks are still under typecheck, but are
+temporarily excluded from ESLint and Prettier so as not to mix their migration
+with the implementation of the product. All new code in `src/` and `test/` uses
+the strict baseline. Generated directories, caches, results and local weights
+are excluded from lint, formatting and Git as appropriate.
 
-`src/main.ts` es el entry point real de la CLI: resuelve las rutas del hogar de
-usuario con `resolvePaths` y delega en `runCli`, que implementa todos los
-comandos del contrato. Fue un smoke scaffold al principio del proyecto y esta
-sección lo describía así; dejó de serlo al cerrarse el punto 2.1.
+`src/main.ts` is the real entry point of the CLI: it resolves the user home
+paths with `resolvePaths` and delegates to `runCli`, which implements every
+command of the contract. It was a smoke scaffold at the beginning of the project
+and this section described it that way; it stopped being one when point 2.1 was
+closed.
 
-## Cómo commitear
+## How to commit
 
-**Los commits se hacen con la skill `/git-commit`, no con `git commit` a
-mano.** Es la convención del proyecto y aplica a cualquier agente que trabaje
-acá, sin excepción por urgencia o por tamaño del cambio.
+**Commits are made with the `/git-commit` skill, not with `git commit` by
+hand.** It is the project convention and applies to any agent working here,
+with no exception for urgency or for the size of the change.
 
-La skill analiza el diff real para elegir tipo y alcance, en vez de confiar en
-lo que el autor cree haber cambiado, y evita las desviaciones que aparecen
-cuando cada quien redacta el mensaje a su criterio.
+The skill analyses the real diff to choose type and scope, instead of trusting
+what the author believes they changed, and it avoids the deviations that appear
+when everyone writes the message to their own criteria.
 
-Reglas que la acompañan:
+Rules that go with it:
 
-- Un cambio lógico por commit; máximo cinco archivos por tarea. Si un commit
-  necesita más, decilo explícitamente en el cuerpo y explicá por qué partirlo
-  habría sido peor.
-- Mensajes en inglés, siguiendo el historial del repositorio.
-- Nunca `Co-Authored-By`.
-- Nunca `--no-verify` ni saltear hooks.
-- **Nunca pushear ni reescribir historial sin pedido explícito del usuario**:
-  `main` está publicada en un repositorio privado y el push la hace visible
-  fuera de esta máquina.
+- One logical change per commit; at most five files per task. If a commit needs
+  more, say so explicitly in the body and explain why splitting it would have
+  been worse.
+- Messages in English, following the repository's history.
+- Never `Co-Authored-By`.
+- Never `--no-verify` or skipping hooks.
+- **Never push or rewrite history without an explicit request from the user**:
+  `main` is published in a private repository and pushing makes it visible
+  outside this machine.
 
-## Criterio de aceptación
+## Acceptance criteria
 
-Antes de integrar un cambio deben pasar:
+Before integrating a change, these must pass:
 
 ```text
 npm run build
 npm run check
 ```
 
-Las pruebas funcionales crecerán junto con cada caso de uso. Las suites de
-contrato de adaptadores y las pruebas SQLite usarán recursos temporales y no
-dependerán del índice personal del usuario.
+The functional tests will grow along with every use case. The adapter contract
+suites and the SQLite tests will use temporary resources and will not depend on
+the user's personal index.
