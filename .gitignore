@@ -17,6 +17,12 @@ benchmarks/vector-search/results/*
 !benchmarks/vector-search/results/baseline.json
 !benchmarks/vector-search/results/baseline.md
 
+# Generated eval bundles; they carry verbatim third-party video text and
+# can't be redistributed under the repo's MIT license. Keep the closing
+# reports and the Layer B judgments, which are the project's own evidence.
+evals/results/*/*/*/context.md
+evals/results/*/*/*/result.json
+
 # Local databases and generated indexes
 *.db
 *.db-*
