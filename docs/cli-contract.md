@@ -4,7 +4,7 @@
 
 Contrato aprobado y completo para el MVP, ampliado el 13 de agosto de 2026
 con el punto 4.2 (hogar de usuario e instalación del modelo). Diseño en
-`docs/install-design.md`, checklist fino en `docs/install-tasks.md`.
+`docs/install-design.md`.
 
 ## Principios
 
@@ -76,7 +76,7 @@ Ejemplo:
 
 ```powershell
 auto-youtube-rag source add `
-  "C:\Users\lucho\Desktop\Programacion\ai-transcripcion\auto-design\videos" `
+  "C:\Users\<usuario>\ai-transcripcion\auto-design\videos" `
   --name auto-design
 ```
 
@@ -184,7 +184,7 @@ Recibo:
   "schema_version": "1.0",
   "status": "installed",
   "model": { "key": "e5-small", "version": "1", "dimensions": 384 },
-  "cache_path": "C:\\Users\\lucho\\.auto-youtube-rag\\models",
+  "cache_path": "C:\\Users\\<user>\\.auto-youtube-rag\\models",
   "bytes": 135266304,
   "source": "download"
 }
@@ -207,7 +207,7 @@ auto-youtube-rag models status
   "schema_version": "1.0",
   "status": "incomplete",
   "model": { "key": "e5-small", "version": "1", "dimensions": 384 },
-  "cache_path": "C:\\Users\\lucho\\.auto-youtube-rag\\models",
+  "cache_path": "C:\\Users\\<user>\\.auto-youtube-rag\\models",
   "issues": [{ "path": "onnx/model_quantized.onnx", "reason": "missing" }]
 }
 ```

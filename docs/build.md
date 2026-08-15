@@ -1,5 +1,10 @@
 # Progreso de construcción
 
+> **Nota:** este documento es el historial del proyecto, no un tracker de
+> trabajo pendiente. Registra qué entregó cada punto y cómo se validó contra
+> la colección real `auto-design`; no queda nada abierto salvo lo anotado
+> explícitamente.
+
 ## Estados
 
 - ⚪ Pendiente
@@ -127,16 +132,15 @@ para el procedimiento de verificación en Codex si hace falta más adelante.
 
 #### 3.2 Evaluaciones del MVP
 
-Diseño y checklist fino propuestos y aprobados el 12 de agosto de 2026 en
-`docs/eval-design.md` y `docs/eval-tasks.md` (bloques M–O). Sin ground truth
-etiquetado: mide en dos capas independientes, mecánica (cobertura, integridad
-de citas) y juzgada (rúbrica respondida por Codex y por Claude sobre el mismo
-bundle). Checklist fino en `docs/eval-tasks.md`, bloques M–O.
+Diseño propuesto y aprobado el 12 de agosto de 2026 en `docs/eval-design.md`
+(bloques M–O). Sin ground truth etiquetado: mide en dos capas independientes,
+mecánica (cobertura, integridad de citas) y juzgada (rúbrica respondida por
+Codex y por Claude sobre el mismo bundle).
 
 - [x] M1. Verificador de integridad de citas (`evals/citation-integrity.ts`)
 - [x] M2. Script de orquestación de consultas semilla (`evals/run-seed-queries.ts`)
 - [x] M3. Agregador de métricas de Capa A (`evals/aggregate-mechanical-metrics.ts`)
-- [x] M4. Ejecución real sobre `auto-design` (24 bundles en `evals/results/2026-08-12/`; hallazgo de deriva de esquema en 17/51 videos del manifest real, ver `docs/eval-tasks.md`)
+- [x] M4. Ejecución real sobre `auto-design` (24 bundles en `evals/results/2026-08-12/`; hallazgo de deriva de esquema en 17/51 videos del manifest real)
 - [x] N1. Plantilla de rúbrica (`evals/rubric-template.md`)
 - [x] N2. Juicio de Claude (`evals/results/2026-08-12/judgments/claude/`, subagente en frío)
 - [x] N3. Juicio de Codex (`evals/results/2026-08-12/judgments/codex/`, corrido por el usuario)
@@ -161,8 +165,7 @@ implementó y validó — ver 4.1 abajo.
 #### 4.1 Soporte de `analysis.json` (schema 2.0)
 
 Diseño propuesto y aprobado el 13 de agosto de 2026 en
-`docs/analysis-schema-design.md`, checklist fino en
-`docs/analysis-schema-tasks.md` (bloques P–T). Motivo: la skill productora
+`docs/analysis-schema-design.md` (bloques P–T). Motivo: la skill productora
 `youtube-video-context` reemplazó `rules.json`/schema 1.0 por
 `analysis.json`/schema 2.0 el 2 de agosto de 2026; `auto-youtube-rag` nunca
 soportó el esquema nuevo, así que los 17 videos reales de `auto-design`
@@ -208,7 +211,7 @@ calculaban la ruta del modelo con reglas incompatibles.
 - [x] Y1–Y3. Smoke real, validación en frío y cierre
 
 Cerrado el 14 de agosto de 2026. Diseño en `docs/install-design.md`,
-checklist en `docs/install-tasks.md`, decisiones en `docs/decisions.md`.
+decisiones en `docs/decisions.md`.
 
 **Validación en frío (Y2)**: un subagente sin contexto previo, con acceso
 sólo a `skill/SKILL.md` y sus referencias, partió de una máquina sin hogar
@@ -286,8 +289,7 @@ reportó en lugar de corregirlo en silencio.
 
 #### 4.5 Perfil de modelo de embeddings
 
-Diseño en `docs/model-profile-design.md`, checklist fino en
-`docs/model-profile-tasks.md` (bloques AA–AD). Origen: los prefijos
+Diseño en `docs/model-profile-design.md` (bloques AA–AD). Origen: los prefijos
 `passage: `/`query: ` de la familia E5 se aplicaban siempre, sin excepción,
 en `e5-embedding-generator.ts`; con otro modelo (MiniLM, BGE, Jina) degradan
 la calidad **sin ningún error**, el hueco que quedó anotado al investigar el
@@ -327,8 +329,8 @@ idéntico antes y después. Detalle completo en `docs/decisions.md`, sección
 
 #### 4.6 Comando `rebuild --confirm`
 
-Diseño en `docs/rebuild-design.md`, checklist fino en `docs/rebuild-tasks.md`
-(bloques AE–AH). Origen: `rebuild` era el único comando con contrato público
+Diseño en `docs/rebuild-design.md` (bloques AE–AH). Origen: `rebuild` era el
+único comando con contrato público
 aprobado desde el MVP que nunca se implementó, y el punto 2 del orden de
 prioridad del 14 de agosto de 2026.
 

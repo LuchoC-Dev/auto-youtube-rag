@@ -33,7 +33,7 @@ export interface InstallModelResult {
  * the CLI receipt can report `model: {key, version, dimensions}` without
  * the installer duplicating that knowledge. No SQLite, no filesystem, no
  * Hugging Face: both dependencies are ports, so this is testable with
- * fakes alone (docs/install-tasks.md, W4).
+ * fakes alone (docs/install-design.md).
  */
 export async function installModel(
   deps: InstallModelDependencies,
