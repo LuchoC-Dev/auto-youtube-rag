@@ -1,0 +1,85 @@
+name: Bug report
+description: Something in the CLI or its output is not behaving as documented.
+title: "fix: <short description>"
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. This tool is non-interactive and JSON-first,
+        so the fields below are what actually make a report actionable — please
+        fill them in rather than describing the problem only in prose.
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Exact command run
+      description: The full command line, including flags, exactly as you ran it.
+      placeholder: |
+        auto-youtube-rag retrieve "typographic hierarchy" --depth balanced
+      render: shell
+    validations:
+      required: true
+
+  - type: dropdown
+    id: exit-code
+    attributes:
+      label: Exit code
+      description: >
+        The process exit code. 0 = success, 1 = operational failure or
+        partial result, 2 = invalid usage, 130 = interrupted.
+      options:
+        - "0"
+        - "1"
+        - "2"
+        - "130"
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: json-receipt
+    attributes:
+      label: JSON receipt (stdout)
+      description: >
+        The full JSON object the CLI printed to stdout for this command. Do
+        not summarize it — paste it as-is.
+      placeholder: |
+        {
+          "status": "...",
+          ...
+        }
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor-output
+    attributes:
+      label: "`auto-youtube-rag doctor` output"
+      description: >
+        `doctor` is read-only and safe to run at any time. Paste its full
+        output here.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What you expected to happen instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: >
+        OS, Node version (`node -v`), how the tool was installed (`npm run
+        setup` vs. global `npm install`), size/shape of the affected source
+        collection, or anything else relevant.
+    validations:
+      required: false
