@@ -1,167 +1,166 @@
-# Relevo detallado para continuar `auto-youtube-rag`
+# Detailed handoff to continue `auto-youtube-rag`
 
-## Propósito de este documento
+## Purpose of this document
 
-Este documento permite que un agente nuevo retome el proyecto sin depender de
-la conversación que lo originó. Describe el objetivo del producto, el estado
-exacto del repositorio, las decisiones confirmadas, la arquitectura ya
-implementada, las invariantes que no deben romperse, las validaciones realizadas
-y el siguiente bloque recomendado.
+This document lets a new agent pick up the project without depending on the
+conversation that originated it. It describes the product goal, the exact state
+of the repository, the confirmed decisions, the architecture already
+implemented, the invariants that must not be broken, the validations already
+performed, and the recommended next block.
 
-Estado de referencia: **14 de agosto de 2026**, después de cerrar los puntos
-4.2 —instalación: hogar de usuario, `init` instalador y preflight—, 4.3
-—seguridad de `sync` y rendimiento de indexación—, 4.4 —aviso de vectores
-obsoletos—, 4.5 —perfil de modelo de embeddings y política de prefijos—, 4.6
-—el comando `rebuild --confirm`— y 4.7 —el aviso `LOW_RELEVANCE`.
+Reference state: **14 August 2026**, after closing points 4.2 —installation:
+user home, `init` as installer and preflight—, 4.3 —`sync` safety and indexing
+performance—, 4.4 —stale vector warning—, 4.5 —embedding model profile and
+prefix policy—, 4.6 —the `rebuild --confirm` command— and 4.7 —the
+`LOW_RELEVANCE` warning.
 
-**Lo que más probablemente contradiga tu memoria de sesiones viejas**, en
-orden de impacto:
+**What is most likely to contradict your memory of older sessions**, in order
+of impact:
 
-1. La base y el modelo **ya no son relativos al directorio de trabajo**.
-   Viven en `~/.auto-youtube-rag/`, se instalan con `auto-youtube-rag init`,
-   y `AUTO_YOUTUBE_RAG_MODEL_CACHE` se renombró a
+1. The database and the model are **no longer relative to the working
+   directory**. They live in `~/.auto-youtube-rag/`, they are installed with
+   `auto-youtube-rag init`, and `AUTO_YOUTUBE_RAG_MODEL_CACHE` was renamed to
    `AUTO_YOUTUBE_RAG_MODELS_DIR`.
-2. La rama es **`main`**, con remoto privado, no `feat/sqlite-vec-benchmark`.
-3. **No podés lanzar dos `sync` a la vez** sobre una fuente: el producto los
-   rechaza con `SYNC_ALREADY_RUNNING`. `sync --force` existe para destrabar
-   un run fantasma.
-4. **El marcador de cita abre el bloque, dentro del encabezado**
-   (`### [S01] ...`), no lo cierra en una línea suelta.
-5. `init` **ya no es instantáneo**: instala el modelo salvo `--skip-model`.
-6. **`rebuild --confirm` ya está implementado.** Si una memoria vieja dice
-   que el contrato lo aprueba pero no existe, está desactualizada: se cerró
-   como punto 4.6. La CLI no tiene ningún comando pendiente de implementar.
+2. The branch is **`main`**, with a private remote, not
+   `feat/sqlite-vec-benchmark`.
+3. **You cannot launch two `sync` runs at once** over one source: the product
+   rejects them with `SYNC_ALREADY_RUNNING`. `sync --force` exists to unblock
+   a ghost run.
+4. **The citation marker opens the block, inside the heading**
+   (`### [S01] ...`); it does not close it on a separate line.
+5. `init` is **no longer instantaneous**: it installs the model unless
+   `--skip-model` is passed.
+6. **`rebuild --confirm` is already implemented.** If an old memory says the
+   contract approves it but it does not exist, that memory is out of date: it
+   was closed as point 4.6. The CLI has no command left to implement.
 
-Ver "Configuración de ejecución" más abajo antes de asumir cualquier ruta.
+See "Runtime configuration" below before assuming any path.
 
-Antes se habían cerrado el punto
-3.2 — evaluaciones del MVP — y el punto 4.1 — soporte de
-`analysis.json` (schema 2.0), el primer trabajo posterior al MVP. El MVP
-completo descrito en `product-spec.md` (2.1–2.4 y 3.1–3.2) está terminado.
-El comando `retrieve` de la CLI y la skill portable (`skill/SKILL.md`) están
-implementados, probados y anunciados como disponibles; las evaluaciones de
-recuperación y ensamblado están corridas sobre la colección real con
-resultado documentado. Además, `auto-youtube-rag` ahora indexa y recupera
-`analysis.json` (schema 2.0) de punta a punta, validado contra los 17 videos
-reales de `auto-design` que lo usan. La identidad del modelo de embeddings y
-su política de prefijos ya son un dato explícito e inyectable
-(`EmbeddingModelProfile`), en vez de constantes hardcodeadas específicas de
-E5 — el frente número 1 del orden de prioridad que el usuario fijó el 14 de
-agosto ya está cerrado. No hay ningún bloque abierto en `docs/build.md`. El
-trabajo que sigue —si el usuario lo pide— es explícitamente posterior al MVP
-(ver "Trabajo posterior razonable, fuera de este MVP" más abajo), no un
-pendiente urgente.
+Previously, point 3.2 — MVP evaluations — and point 4.1 — `analysis.json`
+support (schema 2.0), the first piece of post-MVP work — had been closed. The
+complete MVP described in `product-spec.md` (2.1–2.4 and 3.1–3.2) is finished.
+The CLI's `retrieve` command and the portable skill (`skill/SKILL.md`) are
+implemented, tested and announced as available; the retrieval and assembly
+evaluations have been run over the real collection with a documented result.
+On top of that, `auto-youtube-rag` now indexes and retrieves `analysis.json`
+(schema 2.0) end to end, validated against the 17 real `auto-design` videos
+that use it. The identity of the embedding model and its prefix policy are now
+an explicit, injectable piece of data (`EmbeddingModelProfile`) instead of
+hardcoded E5-specific constants — front number 1 of the priority order the
+user set on 14 August is already closed. There is no open block in
+`docs/build.md`. The work that follows —if the user asks for it— is explicitly
+post-MVP (see "Reasonable later work, outside this MVP" below), not an urgent
+pending item.
 
-## Datos rápidos
+## Quick facts
 
-| Dato                      | Valor                                                                                                  |
-| ------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Proyecto                  | `auto-youtube-rag`                                                                                     |
-| Repositorio               | `<repo>` (raíz del checkout local)                                                                     |
-| Rama actual               | `main`                                                                                                 |
-| Remoto                    | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (privado)                                          |
-| Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.6                           |
-| Estado Git al cerrar      | Worktree limpio; `main` pusheada y sincronizada con `origin/main` (0 de diferencia); única rama        |
-| Runtime                   | Node.js 24.19.0 LTS, ESM                                                                               |
-| Lenguaje                  | TypeScript 6.0.3 estricto                                                                              |
-| Persistencia              | SQLite mediante `node:sqlite`                                                                          |
-| Modelo                    | `Xenova/multilingual-e5-small`, revisión `main`, cuantización `q8`                                     |
-| Dimensión                 | 384                                                                                                    |
-| Instalación               | `auto-youtube-rag init` → `~/.auto-youtube-rag/` (base + modelo, ~130 MB)                              |
-| Operación                 | Exclusivamente local; sin APIs externas                                                                |
-| Estado del MVP            | Completo — 2.1–2.4, 3.1–3.2 y 4.1–4.7 al 100% en `docs/build.md`                                       |
-| Próximo punto             | Ninguno abierto; el orden de prioridad del 14 de agosto quedó agotado (ver "Orden de prioridad" abajo) |
+| Fact                   | Value                                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| Project                | `auto-youtube-rag`                                                                       |
+| Repository             | `<repo>` (root of the local checkout)                                                    |
+| Current branch         | `main`                                                                                   |
+| Remote                 | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (private)                            |
+| Last documented commit | see `git log --oneline -1`; the work of this document closes point 4.6                   |
+| Git state at closing   | Clean worktree; `main` pushed and in sync with `origin/main` (0 difference); only branch |
+| Runtime                | Node.js 24.19.0 LTS, ESM                                                                 |
+| Language               | Strict TypeScript 6.0.3                                                                  |
+| Persistence            | SQLite through `node:sqlite`                                                             |
+| Model                  | `Xenova/multilingual-e5-small`, revision `main`, `q8` quantization                       |
+| Dimension              | 384                                                                                      |
+| Installation           | `auto-youtube-rag init` → `~/.auto-youtube-rag/` (database + model, ~130 MB)             |
+| Operation              | Exclusively local; no external APIs                                                      |
+| MVP state              | Complete — 2.1–2.4, 3.1–3.2 and 4.1–4.7 at 100% in `docs/build.md`                       |
+| Next point             | None open; the 14 August priority order is exhausted (see "Priority order" below)        |
 
-**Cambió el 14 de agosto de 2026.** Hasta entonces todo el proyecto vivía en
-una rama llamada `feat/sqlite-vec-benchmark` —nombre heredado de un benchmark
-descartado— sin ninguna rama `main` y sin remoto. Se creó `main` sobre la
-punta de esa rama, así que contiene los 128 commits desde el primero sin
-necesidad de merge, y se publicó en un repositorio privado. Si una memoria de
-sesión vieja menciona `feat/sqlite-vec-benchmark` como rama de trabajo, está
-desactualizada.
+**This changed on 14 August 2026.** Until then the whole project lived on a
+branch called `feat/sqlite-vec-benchmark` —a name inherited from a discarded
+benchmark— with no `main` branch and no remote. `main` was created on the tip
+of that branch, so it contains the 128 commits since the first one with no need
+for a merge, and it was published to a private repository. If an old session
+memory mentions `feat/sqlite-vec-benchmark` as the working branch, it is out of
+date.
 
-`sqlite-vec` sigue siendo una opción evaluada y **descartada** para el MVP: el
-nombre viejo de la rama no significa que se esté trabajando en eso.
+`sqlite-vec` is still an evaluated and **discarded** option for the MVP: the
+old branch name does not mean anyone is working on it.
 
-No reescribas historial ni fuerces pushes sin autorización explícita.
+Do not rewrite history or force pushes without explicit authorization.
 
-**`main` es ahora la única rama, local y remota.** Las tres ramas locales
-muertas —`feat/sqlite-vec-benchmark`, `docs/bootstrap-project` y
-`feat/embedding-benchmark`— se borraron el 14 de agosto de 2026 con
-`git branch -d`, después de confirmar que ninguna tenía un solo commit que
-`main` no contuviera ya. Nada se perdió: sus commits siguen en la historia de
-`main`.
+**`main` is now the only branch, local and remote.** The three dead local
+branches —`feat/sqlite-vec-benchmark`, `docs/bootstrap-project` and
+`feat/embedding-benchmark`— were deleted on 14 August 2026 with
+`git branch -d`, after confirming that none of them held a single commit that
+`main` did not already contain. Nothing was lost: their commits are still in
+`main`'s history.
 
-## Orden de lectura recomendado
+## Recommended reading order
 
-Antes de modificar código, leer en este orden:
+Before modifying code, read in this order:
 
-1. `docs/product-spec.md`: objetivo, alcance, límites y producto completo.
-2. `docs/decisions.md`: decisiones confirmadas y alternativas descartadas.
-3. `docs/cli-contract.md`: contrato público aprobado, incluso comandos futuros.
-4. `docs/build.md`: historial de construcción, qué entregó cada punto y cómo
-   se validó.
-5. `docs/indexing-design.md`: modelo lógico y arquitectura del punto 2.1, ya
-   completado.
-6. `docs/retrieval-design.md`: contratos, adaptadores y política de fusión del
-   punto 2.2, ya completado.
-7. `docs/context-assembly-design.md`: contratos, capas, expansión,
-   deduplicación, presupuesto, citas y contrato de bundle del punto 2.3, ya
-   completado.
-8. `skill/SKILL.md`: skill portable ya verificada, punto 2.4 completado.
-9. `docs/eval-design.md`: diseño de dos capas de evaluación del punto 3.2,
-   ya completado.
-10. `evals/results/2026-08-12/report.md`: reporte final de 3.2 — resumen
-    ejecutivo, métricas de Capa A, comparación Codex/Claude de Capa B,
-    hallazgos accionables y la decisión de calibración (O1).
-11. `docs/analysis-schema-design.md`: diseño de soporte de `analysis.json`
-    (schema 2.0), punto 4.1, ya completado.
-12. `docs/install-design.md`: diseño de instalación —hogar de usuario, `init`
-    como instalador y preflight— del punto 4.2, ya completado. Incluye la
-    nota "qué haría falta para soportar otro modelo", que es el punto de
-    partida del frente siguiente.
-13. `docs/sync-safety-design.md`: guard de concurrencia, runs fantasma y
-    tamaño de lote del punto 4.3, ya completado.
-14. `docs/rebuild-design.md`: el comando `rebuild --confirm` del punto 4.6,
-    ya completado. Incluye por qué el ordenamiento por longitud se cerró sin
-    escribir código.
-15. `docs/low-relevance-design.md`: el aviso `LOW_RELEVANCE` y la métrica
-    `top_vector_similarity` del punto 4.7, ya completado. Incluye la tabla de
-    24 mediciones que fija el umbral y por qué `fusedScore` no sirve para
-    medir relevancia.
-16. Este documento: estado operativo consolidado del MVP, de los puntos 4.1
-    a 4.7, el orden de prioridad ya agotado y lo que enseñó la sesión del 13 y
-    14 de agosto.
+1. `docs/product-spec.md`: goal, scope, limits and the complete product.
+2. `docs/decisions.md`: confirmed decisions and discarded alternatives.
+3. `docs/cli-contract.md`: approved public contract, including future commands.
+4. `docs/build.md`: build history, what each point delivered and how it was
+   validated.
+5. `docs/indexing-design.md`: logical model and architecture of point 2.1,
+   already completed.
+6. `docs/retrieval-design.md`: contracts, adapters and fusion policy of point
+   2.2, already completed.
+7. `docs/context-assembly-design.md`: contracts, layers, expansion,
+   deduplication, budget, citations and bundle contract of point 2.3, already
+   completed.
+8. `skill/SKILL.md`: portable skill already verified, point 2.4 completed.
+9. `docs/eval-design.md`: two-layer evaluation design of point 3.2, already
+   completed.
+10. `evals/results/2026-08-12/report.md`: final report of 3.2 — executive
+    summary, Layer A metrics, Layer B Codex/Claude comparison, actionable
+    findings and the calibration decision (O1).
+11. `docs/analysis-schema-design.md`: design of `analysis.json` support
+    (schema 2.0), point 4.1, already completed.
+12. `docs/install-design.md`: installation design —user home, `init` as
+    installer and preflight— of point 4.2, already completed. It includes the
+    note "what it would take to support another model", which is the starting
+    point of the next front.
+13. `docs/sync-safety-design.md`: concurrency guard, ghost runs and batch size
+    of point 4.3, already completed.
+14. `docs/rebuild-design.md`: the `rebuild --confirm` command of point 4.6,
+    already completed. It includes why sorting by length was closed without
+    writing code.
+15. `docs/low-relevance-design.md`: the `LOW_RELEVANCE` warning and the
+    `top_vector_similarity` metric of point 4.7, already completed. It includes
+    the table of 24 measurements that sets the threshold and why `fusedScore`
+    is useless for measuring relevance.
+16. This document: consolidated operational state of the MVP, of points 4.1 to
+    4.7, the already exhausted priority order and what the 13 and 14 August
+    session taught.
 
-`docs/development.md` sigue siendo la referencia del toolchain, y desde el 14
-de agosto de 2026 también la de **cómo arrancar en una máquina nueva** (sección
-"Arrancar en una máquina nueva"): `npm ci` + `npm run check` + `npm run build`
-funcionan sobre un clon limpio **sin red y sin modelo**, porque la suite rápida
-omite los smokes y usa fakes. Sólo los smokes y los benchmarks necesitan
-`npm run models:download`, y sólo usar el producto necesita
-`auto-youtube-rag init`. Su frase que describía el repositorio como un scaffold
-sin dominio ya se corrigió.
+`docs/development.md` is still the toolchain reference, and since 14 August
+2026 also the reference for **how to get started on a new machine** (section
+"Getting started on a new machine"): `npm ci` + `npm run check` +
+`npm run build` work on a clean clone **with no network and no model**, because
+the fast suite skips the smokes and uses fakes. Only the smokes and the
+benchmarks need `npm run models:download`, and only using the product needs
+`auto-youtube-rag init`. Its sentence describing the repository as a scaffold
+with no domain has already been corrected.
 
-## Objetivo del producto
+## Product goal
 
-El sistema construye una biblioteca local consultable a partir de los paquetes
-autónomos generados por la skill de contexto de videos. No intenta responder con
-un LLM interno. El agente que consulta —Codex, Claude u otro— es el único cerebro
-generativo.
+The system builds a queryable local library out of the self-contained packages
+generated by the video context skill. It does not attempt to answer with an
+internal LLM. The querying agent —Codex, Claude or another— is the only
+generative brain.
 
-El producto debe recuperar contexto amplio, ordenado, citado y con procedencia.
-No está diseñado sólo para encontrar una coincidencia puntual. Por ejemplo, una
-consulta sobre un estilo de diseño debe entregar suficiente contexto relacionado
-para que el agente pueda razonar correctamente sobre hechos, reglas, patrones,
-limitaciones y evidencia.
+The product must retrieve broad, ordered, cited context with provenance. It is
+not designed only to find a single pinpoint match. For example, a query about a
+design style must deliver enough related context for the agent to reason
+correctly about facts, rules, patterns, limitations and evidence.
 
-El MVP es para agentes, no para búsqueda humana. La integración aprobada es una
-CLI consumida por una única skill portable. MCP, API, interfaz web y soporte de
-paquetes de páginas web quedan para fases posteriores.
+The MVP is for agents, not for human search. The approved integration is a CLI
+consumed by a single portable skill. MCP, API, web interface and support for
+web page packages are left for later phases.
 
-## Alcance de las fuentes
+## Scope of the sources
 
-Cada raíz registrada sigue la estructura producida por la skill de videos:
+Every registered root follows the structure produced by the video skill:
 
 ```text
 collection/
@@ -171,54 +170,54 @@ collection/
       deliverables/context.md
       deliverables/rules.json
       source/metadata.json
-      ...otros archivos no indexados por el MVP
+      ...other files not indexed by the MVP
 ```
 
-Se indexan:
+Indexed:
 
-- `manifest.json` como inventario autoritativo;
-- `context.md` como conocimiento narrativo principal;
-- `rules.json` como conocimiento estructurado de patrones;
-- una allowlist estable de `metadata.json` para filtros y procedencia.
+- `manifest.json` as the authoritative inventory;
+- `context.md` as the main narrative knowledge;
+- `rules.json` as structured pattern knowledge;
+- a stable allowlist of `metadata.json` for filters and provenance.
 
-No se indexan como conocimiento:
+Not indexed as knowledge:
 
-- transcripciones redundantes;
-- subtítulos equivalentes en varios formatos;
-- imágenes o frames por nombre de archivo;
-- páginas web del manifest;
-- metadata volátil completa de yt-dlp;
-- videos fuente.
+- redundant transcripts;
+- equivalent subtitles in several formats;
+- images or frames by file name;
+- web pages from the manifest;
+- the full volatile yt-dlp metadata;
+- source videos.
 
-Las rutas de evidencia visual y timestamps existentes sí se preservan dentro de
-las unidades para futuras citas o inspección.
+Existing visual evidence paths and timestamps are preserved inside the units
+for future citations or inspection.
 
-## Decisiones confirmadas que no deben reabrirse sin motivo
+## Confirmed decisions that should not be reopened without cause
 
-- Ejecución local exclusiva.
-- TypeScript sobre Node 24.19.0; no Go ni Rust para este MVP.
-- SQLite, no PostgreSQL.
-- `node:sqlite` como cliente; `better-sqlite3` sólo permanece por benchmarks
-  históricos.
-- FTS5 para recuperación textual.
-- E5 Small multilingüe `q8` para documentos y consultas.
-- Vectores persistidos como BLOB `Float32Array` little-endian y búsqueda exacta
-  en memoria durante el MVP.
-- `sqlite-vec` no se integra inicialmente: el benchmark no justificó asumir su
-  inestabilidad y complejidad operativa en este punto.
-- Dominio y aplicación no conocen SQLite, Transformers.js ni formatos de
-  archivo.
-- Una sola skill general para Codex, Claude y futuros agentes.
-- CLI con `node:util.parseArgs` estricto, sin framework adicional.
-- Códigos de proceso públicos: `0`, `1`, `2`, `130`.
-- Claves técnicas y códigos simbólicos en inglés; contenido en su idioma
-  original.
-- Los paquetes fuente son inmutables.
-- Las evaluaciones de recuperación se preparan antes de cerrar el MVP.
+- Exclusively local execution.
+- TypeScript on Node 24.19.0; not Go or Rust for this MVP.
+- SQLite, not PostgreSQL.
+- `node:sqlite` as the client; `better-sqlite3` only remains because of
+  historical benchmarks.
+- FTS5 for textual retrieval.
+- Multilingual E5 Small `q8` for documents and queries.
+- Vectors persisted as little-endian `Float32Array` BLOBs and exact in-memory
+  search during the MVP.
+- `sqlite-vec` is not integrated initially: the benchmark did not justify
+  taking on its instability and operational complexity at this point.
+- Domain and application know nothing about SQLite, Transformers.js or file
+  formats.
+- A single general skill for Codex, Claude and future agents.
+- CLI with strict `node:util.parseArgs`, with no additional framework.
+- Public process codes: `0`, `1`, `2`, `130`.
+- Technical keys and symbolic codes in English; content in its original
+  language.
+- Source packages are immutable.
+- Retrieval evaluations are prepared before closing the MVP.
 
-`product-spec.md` no tiene asuntos abiertos que bloqueen la implementación: la
-política de combinación y reranking de resultados, que era el único pendiente,
-se resolvió el 11 de agosto de 2026 (RRF ponderado, ver `decisions.md`).
+`product-spec.md` has no open items blocking implementation: the results
+combination and reranking policy, which was the only pending one, was resolved
+on 11 August 2026 (weighted RRF, see `decisions.md`).
 
 ## Estado completado
 
