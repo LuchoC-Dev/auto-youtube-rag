@@ -1,154 +1,152 @@
-# Diseño de instalación: hogar de usuario y `models install`
+# Installation design: user home and `models install`
 
-## Estado
+## Status
 
-Propuesto el 13 de agosto de 2026. Punto 4.2, posterior al MVP. Requiere
-aprobación explícita antes de implementar.
+Proposed on 13 August 2026. Point 4.2, after the MVP. Requires explicit approval
+before implementation.
 
-## Contexto
+## Context
 
-La corrida de verificación en frío del 13 de agosto (subagente sin contexto
-previo, dos colecciones reales, ver `docs/decisions.md` → "Skill dividida")
-falló en su primer `sync` con **63 issues `MODEL_LOAD_FAILED`**, uno por
-video. El agente lo resolvió copiando a mano el caché del repositorio.
+The cold verification run of 13 August (a subagent with no prior context, two
+real collections, see `docs/decisions.md` → "Skill split") failed on its first
+`sync` with **63 `MODEL_LOAD_FAILED` issues**, one per video. The agent resolved
+it by copying the repository's cache by hand.
 
-La causa inmediata es que el modelo se busca en `<cwd>/.cache/models`. La
-causa real es más profunda y quedó expuesta al investigar cómo se instala el
-producto: **nunca se decidió cómo se instala.** `package.json` declara
-`"private": true` junto con un `bin`, ninguna especificación describe la
-distribución, y el único instalador que existe es un script de benchmark.
+The immediate cause is that the model is looked for in `<cwd>/.cache/models`.
+The real cause is deeper and was exposed while investigating how the product is
+installed: **it was never decided how it is installed.** `package.json` declares
+`"private": true` alongside a `bin`, no specification describes distribution, and
+the only installer that exists is a benchmark script.
 
-La auditoría del código encontró **cuatro lugares distintos** que calculan la
-ruta del caché de modelos, cada uno con su propia regla:
+The code audit found **four different places** computing the model cache path,
+each with its own rule:
 
-| Dónde                                  | Regla                           |
-| -------------------------------------- | ------------------------------- |
-| `benchmarks/embeddings/run.ts`         | `<raíz-del-repo>/.cache/models` |
-| `src/main.ts`                          | `<cwd>/.cache/models`           |
-| `e5-embedding-generator.ts` (fallback) | `<cwd>/.cache/models`           |
-| `evals/run-seed-queries.ts` (default)  | `<cwd>/.cache/models`           |
+| Where                                  | Rule                        |
+| -------------------------------------- | --------------------------- |
+| `benchmarks/embeddings/run.ts`         | `<repo-root>/.cache/models` |
+| `src/main.ts`                          | `<cwd>/.cache/models`       |
+| `e5-embedding-generator.ts` (fallback) | `<cwd>/.cache/models`       |
+| `evals/run-seed-queries.ts` (default)  | `<cwd>/.cache/models`       |
 
-El que descarga y los que leen sólo coinciden si se ejecuta parado
-exactamente en la raíz del repositorio. Fuera de ahí —el caso normal— miran a
-lugares distintos, sin ningún aviso. Los tres defaults duplicados de `cwd`
-son además una trampa latente: cambiar uno solo deja los otros apuntando al
-lugar viejo.
+The one that downloads and the ones that read only agree if execution starts
+exactly at the repository root. Outside of that — the normal case — they look at
+different places, with no warning whatsoever. The three duplicated `cwd` defaults
+are also a latent trap: changing only one leaves the others pointing at the old
+place.
 
-`npm run models:download` es además `tsx benchmarks/embeddings/run.ts
---download-only --models=e5-small`: el arnés de benchmarks, que conoce cuatro
-modelos, filtrado a uno. `tsx` es `devDependency` y `benchmarks/` es material
-de desarrollo, así que ese comando **no existe** para nadie que no tenga el
-repositorio clonado. La skill se lo indicaba igual, y el subagente reportó la
-contradicción.
+`npm run models:download` is furthermore `tsx benchmarks/embeddings/run.ts
+--download-only --models=e5-small`: the benchmark harness, which knows four
+models, filtered down to one. `tsx` is a `devDependency` and `benchmarks/` is
+development material, so that command **does not exist** for anyone without the
+repository cloned. The skill pointed at it all the same, and the subagent
+reported the contradiction.
 
-## Decisión de producto que habilita este trabajo
+## Product decision that enables this work
 
-El usuario confirmó el 13 de agosto que la CLI se distribuye como **comando
-global tipo npm**, y descartó explícitamente un hook `postinstall` porque hay
-instalaciones con scripts deshabilitados —la suya incluida—. Ese criterio ya
-tenía precedente en el proyecto: `docs/benchmarks/sqlite-client.md` eligió
-`node:sqlite` sobre `better-sqlite3` en parte porque "funciona con
-instalaciones que deshabilitan scripts". Un `postinstall` de 129 MB
-contradiría una decisión ya tomada.
+The user confirmed on 13 August that the CLI is distributed as an **npm-style
+global command**, and explicitly discarded a `postinstall` hook because there are
+installations with scripts disabled — theirs included. That criterion already had
+precedent in the project: `docs/benchmarks/sqlite-client.md` chose `node:sqlite`
+over `better-sqlite3` partly because it "works with installations that disable
+scripts". A 129 MB `postinstall` would contradict a decision already taken.
 
-## Alcance
+## Scope
 
-Entra:
+In:
 
-- un hogar único de usuario para base de datos y modelo;
-- un resolutor de rutas compartido por todo lo que lea o escriba esas rutas,
-  eliminando los tres defaults duplicados;
-- `init` como instalador completo del sistema;
-- un subcomando `models` de la CLI, con `install` y `status`;
-- reutilización de un modelo ya presente en disco mediante `--from` explícito;
-- un recibo de instalación que distingue "falta" de "está roto";
-- preflight de requisitos por comando, una vez y no por video;
-- `doctor` alineado con el hogar nuevo;
-- documentación y skill actualizadas.
+- a single user home for the database and the model;
+- a path resolver shared by everything that reads or writes those paths,
+  eliminating the three duplicated defaults;
+- `init` as the complete system installer;
+- a `models` subcommand of the CLI, with `install` and `status`;
+- reuse of a model already present on disk through an explicit `--from`;
+- an installation receipt that distinguishes "missing" from "broken";
+- a per-command requirements preflight, run once and not per video;
+- `doctor` aligned with the new home;
+- updated documentation and skill.
 
-No entra:
+Out:
 
-- cambiar el modelo por defecto ni su dimensión (invariante: requiere
-  aprobación propia);
-- publicar el paquete en npm (`private: true` no se toca en este punto);
-- guard de concurrencia de `sync` (pendiente independiente);
+- changing the default model or its dimension (invariant: requires its own
+  approval);
+- publishing the package on npm (`private: true` is not touched in this point);
+- the `sync` concurrency guard (an independent pending item);
 - `rebuild --confirm`.
 
-## Decisión 1: un hogar, no dos ubicaciones sueltas
+## Decision 1: one home, not two loose locations
 
-Hoy hay dos rutas independientes con dos variables independientes. Se
-unifican bajo un solo directorio:
+Today there are two independent paths with two independent variables. They are
+unified under a single directory:
 
 ```text
 ~/.auto-youtube-rag/          ← AUTO_YOUTUBE_RAG_HOME
-  index.sqlite                ← la biblioteca
-  models/                     ← el modelo de embeddings
+  index.sqlite                ← the library
+  models/                     ← the embedding model
 ```
 
-En Windows resuelve a `C:\Users\<usuario>\.auto-youtube-rag\`, vía
+On Windows it resolves to `C:\Users\<user>\.auto-youtube-rag\`, via
 `os.homedir()`.
 
-El directorio se llama `models/`, no `cache/`, y la variable pasa a llamarse
-`AUTO_YOUTUBE_RAG_MODELS_DIR`. **El modelo dejó de ser un caché**: un caché es
-dato derivado que se regenera solo, y el invariante del proyecto prohíbe
-descargar implícitamente (el adaptador fuerza `allowRemoteModels = false`).
-Si se borra, nada lo repone: `sync` falla hasta que el usuario reinstale a
-mano. Eso es una dependencia instalada. El nombre `.cache/` venía heredado del
-vocabulario de Transformers.js, que sí trata su `cacheDir` como caché porque
-descarga solo — capacidad que este producto deshabilita deliberadamente.
+The directory is called `models/`, not `cache/`, and the variable is renamed
+`AUTO_YOUTUBE_RAG_MODELS_DIR`. **The model stopped being a cache**: a cache is
+derived data that regenerates itself, and the project's invariant forbids
+downloading implicitly (the adapter forces `allowRemoteModels = false`). If it is
+deleted, nothing replaces it: `sync` fails until the user reinstalls by hand.
+That is an installed dependency. The name `.cache/` was inherited from the
+vocabulary of Transformers.js, which does treat its `cacheDir` as a cache because
+it downloads on its own — a capability this product deliberately disables.
 
-El renombre es barato ahora: sólo `src/main.ts` lee la variable, se documentó
-el 13 de agosto y el paquete nunca se publicó (`private: true`). Dentro del
-adaptador el parámetro sigue llamándose `cacheDir`, porque ahí se habla el
-idioma de Transformers.js; lo que debe decir la verdad es la superficie
-pública.
+The rename is cheap now: only `src/main.ts` reads the variable, it was documented
+on 13 August and the package was never published (`private: true`). Inside the
+adapter the parameter is still called `cacheDir`, because there the language of
+Transformers.js is spoken; what has to tell the truth is the public surface.
 
-Orden de precedencia del modelo:
+Model precedence order:
 
-1. `AUTO_YOUTUBE_RAG_MODELS_DIR` si está definida;
+1. `AUTO_YOUTUBE_RAG_MODELS_DIR` if defined;
 2. `<AUTO_YOUTUBE_RAG_HOME>/models`;
 3. `<os.homedir()>/.auto-youtube-rag/models`.
 
-Y para la base:
+And for the database:
 
-1. `AUTO_YOUTUBE_RAG_HOME` si está definida;
+1. `AUTO_YOUTUBE_RAG_HOME` if defined;
 2. `<os.homedir()>/.auto-youtube-rag/`.
 
-`AUTO_YOUTUBE_RAG_MODELS_DIR` se conserva como override independiente porque
-permite compartir 130 MB entre varios hogares sin duplicarlos. Hoy ninguna
-otra parte del proyecto lee estas variables: sólo `src/main.ts`. Los tests y
-el arnés de evaluaciones no usan variables de entorno (ver Decisión 3).
+`AUTO_YOUTUBE_RAG_MODELS_DIR` is kept as an independent override because it
+allows 130 MB to be shared between several homes without duplicating them. Today
+no other part of the project reads these variables: only `src/main.ts`. The tests
+and the evaluation harness do not use environment variables (see Decision 3).
 
-## Decisión 2: por qué el hogar de usuario reemplaza al `cwd`
+## Decision 2: why the user home replaces the `cwd`
 
-La posición inicial de esta discusión fue que la base relativa al `cwd` era
-defendible por permitir una biblioteca por proyecto. Se descarta, por tres
-razones en orden de peso:
+The opening position in this discussion was that a `cwd`-relative database was
+defensible for allowing one library per project. It is discarded, for three
+reasons in order of weight:
 
-1. **El caso de uso principal está roto por defecto.** La skill existe para
-   que un agente que trabaja en _otro_ proyecto consulte la biblioteca. Con
-   la base relativa al `cwd`, ese agente encuentra una biblioteca vacía y
-   debería reindexar la colección entera por cada carpeta desde la que
-   trabaje.
-2. **Falla en silencio.** Pararse en otra carpeta no produce error: `status`
-   informa cero fuentes y aparenta pérdida de datos. `skill/references/setup.md`
-   ya documenta el síntoma; eliminar el fallo es mejor que documentarlo.
-3. **La evidencia de la corrida en frío.** La biblioteca construida por el
-   subagente —63 paquetes, 4.799 embeddings, ~20 minutos de cómputo— quedó
-   en un directorio temporal y es inservible. Con hogar de usuario habría
-   sido reutilizable desde cualquier carpeta.
+1. **The main use case is broken by default.** The skill exists so that an agent
+   working in _another_ project can query the library. With the database relative
+   to the `cwd`, that agent finds an empty library and would have to reindex the
+   entire collection for every folder it works from.
+2. **It fails silently.** Standing in another folder produces no error: `status`
+   reports zero sources and looks like data loss. `skill/references/setup.md`
+   already documents the symptom; removing the failure is better than documenting
+   it.
+3. **The evidence from the cold run.** The library built by the subagent — 63
+   packages, 4,799 embeddings, ~20 minutes of computation — ended up in a
+   temporary directory and is useless. With a user home it would have been
+   reusable from any folder.
 
-El contraargumento real —tests y evaluaciones necesitan bibliotecas
-desechables— ya está cubierto por `AUTO_YOUTUBE_RAG_HOME`, que el arnés fija
-explícitamente. El default no tiene que cargar con esa necesidad.
+The real counter-argument — tests and evaluations need disposable libraries — is
+already covered by `AUTO_YOUTUBE_RAG_HOME`, which the harness sets explicitly.
+The default does not have to carry that need.
 
-## Decisión 3: el resolutor de rutas es una función compartida
+## Decision 3: the path resolver is a shared function
 
-El desajuste actual existe porque dos programas calculan la misma ruta con
-reglas distintas. La corrección estructural es que exista **una sola
-función**, y que tanto el lector como el escritor la usen.
+The current mismatch exists because two programs compute the same path with
+different rules. The structural correction is for **a single function** to exist,
+and for both the reader and the writer to use it.
 
-Archivo nuevo: `src/infrastructure/config/resolve-paths.ts`.
+New file: `src/infrastructure/config/resolve-paths.ts`.
 
 ```ts
 export interface ResolvedPaths {
@@ -163,175 +161,173 @@ export function resolvePaths(
 ): ResolvedPaths;
 ```
 
-`env` y `homedir` se inyectan para que los tests no dependan del entorno real
-ni del usuario que corre la suite. `src/main.ts` la llama con
-`process.env` y `os.homedir`.
+`env` and `homedir` are injected so that the tests do not depend on the real
+environment or on the user running the suite. `src/main.ts` calls it with
+`process.env` and `os.homedir`.
 
-Vive en infraestructura, no en dominio ni aplicación: es conocimiento de
-sistema de archivos y de variables de entorno, y el invariante del proyecto
-prohíbe que dominio y aplicación conozcan rutas de Node.
+It lives in infrastructure, not in the domain or the application: it is knowledge
+of the file system and of environment variables, and the project's invariant
+forbids the domain and the application from knowing about Node paths.
 
-El campo `config.modelCachePath` que hoy reciben `runCli` y
-`createApplication` **conserva su nombre** en este punto: es interno, lo usan
-los tres E2E y varios tests, y renombrarlo mezclaría un refactor amplio con
-un cambio de comportamiento. Lo que sí cambia de nombre es la superficie
-pública — la variable de entorno y el directorio.
+The `config.modelCachePath` field that `runCli` and `createApplication` receive
+today **keeps its name** in this point: it is internal, the three E2Es and
+several tests use it, and renaming it would mix a broad refactor with a change of
+behaviour. What does change name is the public surface — the environment variable
+and the directory.
 
-Los tres defaults duplicados de `cwd` **se eliminan**, no se dejan como
-respaldo:
+The three duplicated `cwd` defaults **are removed**, not left as a fallback:
 
-- `e5-embedding-generator.ts` pasa a exigir `cacheDir`. Hoy tiene un fallback
-  a `<cwd>/.cache/models` que sólo puede enmascarar un cableado incompleto:
-  el composition root siempre lo entrega.
-- `evals/run-seed-queries.ts` pasa a resolver su default con `resolvePaths`,
-  conservando su flag `--model-cache` como override explícito.
-- `benchmarks/embeddings/run.ts` **no se toca**: es una herramienta de
-  investigación que legítimamente trabaja contra el repositorio, y ya no se
-  ofrece como remedio de producto.
+- `e5-embedding-generator.ts` comes to require `cacheDir`. Today it has a
+  fallback to `<cwd>/.cache/models` that can only mask incomplete wiring: the
+  composition root always supplies it.
+- `evals/run-seed-queries.ts` comes to resolve its default with `resolvePaths`,
+  keeping its `--model-cache` flag as an explicit override.
+- `benchmarks/embeddings/run.ts` **is not touched**: it is a research tool that
+  legitimately works against the repository, and it is no longer offered as a
+  product remedy.
 
-**El riesgo del cambio es mucho menor de lo que aparenta**, y conviene dejarlo
-escrito para que nadie sobredimensione el bloque V: los tests no leen
-variables de entorno ni el `cwd`. Construyen sus rutas en directorios
-temporales y las inyectan como `config` a `runCli` y `createApplication`
-(ver `test/helpers/create-test-collection.ts` y los tres E2E). La superficie
-real que cambia de comportamiento es `src/main.ts`, que es el único punto del
-producto que consulta el entorno.
+**The risk of the change is far smaller than it appears**, and it is worth
+writing down so nobody oversizes block V: the tests do not read environment
+variables or the `cwd`. They build their paths in temporary directories and
+inject them as `config` into `runCli` and `createApplication` (see
+`test/helpers/create-test-collection.ts` and the three E2Es). The real surface
+that changes behaviour is `src/main.ts`, which is the product's only point that
+consults the environment.
 
-## Decisión 4: `init` instala el sistema completo
+## Decision 4: `init` installs the complete system
 
-El sistema necesita cuatro cosas para funcionar. Sólo dos son
-responsabilidad de este producto:
+The system needs four things in order to work. Only two are this product's
+responsibility:
 
-| Qué                    | Quién lo provee                   |
-| ---------------------- | --------------------------------- |
-| Node ≥ 24.19.0         | Prerrequisito del entorno         |
-| La CLI en el `PATH`    | npm (`i -g` / `link`)             |
-| **El modelo (130 MB)** | **Este producto**                 |
-| **El hogar y la base** | **Este producto**                 |
-| Fuentes registradas    | Datos del usuario, no instalación |
+| What                    | Who provides it             |
+| ----------------------- | --------------------------- |
+| Node ≥ 24.19.0          | Environment prerequisite    |
+| The CLI on the `PATH`   | npm (`i -g` / `link`)       |
+| **The model (130 MB)**  | **This product**            |
+| **The home and the DB** | **This product**            |
+| Registered sources      | User data, not installation |
 
-`init` pasa a cubrir las dos propias en un solo comando: crea el hogar, migra
-la base y deja el modelo instalado.
+`init` comes to cover the two of its own in a single command: it creates the
+home, migrates the database and leaves the model installed.
 
 ```text
-auto-youtube-rag init [--skip-model] [--from <ruta>]
-auto-youtube-rag models install [--force] [--from <ruta>]
+auto-youtube-rag init [--skip-model] [--from <path>]
+auto-youtube-rag models install [--force] [--from <path>]
 auto-youtube-rag models status
 ```
 
-`--skip-model` existe para CI y entornos sin red. `models install` sobrevive
-para reparar o reinstalar el modelo sin tocar la base.
+`--skip-model` exists for CI and environments with no network. `models install`
+survives in order to repair or reinstall the model without touching the database.
 
-**Cambia la naturaleza de `init`**, que hoy es instantáneo y offline y pasa a
-tardar lo que tarde bajar 130 MB. Es aceptable porque es un comando de
-primera vez, pero exige documentar la duración con la misma prominencia que
-la de `sync` — la corrida en frío demostró que una operación larga no
-anunciada bloquea al agente consumidor.
+**It changes the nature of `init`**, which today is instantaneous and offline and
+comes to take however long downloading 130 MB takes. That is acceptable because
+it is a first-time command, but it demands documenting the duration with the same
+prominence as `sync`'s — the cold run demonstrated that an unannounced long
+operation blocks the consuming agent.
 
-El instalador pasa a ser parte del producto:
+The installer becomes part of the product:
 
-Cinco consecuencias buscadas:
+Five intended consequences:
 
-- usa la única dependencia de producción (`@huggingface/transformers`), no
-  `tsx` ni `benchmarks/`;
-- resuelve la ruta de destino con `resolvePaths`, **la misma** que usa el
-  lector — el desajuste desaparece por construcción, no por documentación;
-- existe para cualquiera que tenga la CLI, con repositorio o sin él;
-- respeta el invariante de no descargar implícitamente: la descarga sólo
-  ocurre cuando el usuario la pide por nombre;
-- deja lugar natural a un futuro cambio de modelo (ver "Nota: qué haría falta
-  para soportar otro modelo"). Cambiar el modelo por defecto sigue requiriendo
-  aprobación explícita; este punto sólo habilita la mecánica de instalación.
+- it uses the only production dependency (`@huggingface/transformers`), not `tsx`
+  or `benchmarks/`;
+- it resolves the destination path with `resolvePaths`, **the same one** the
+  reader uses — the mismatch disappears by construction, not by documentation;
+- it exists for anyone who has the CLI, with or without the repository;
+- it respects the invariant of not downloading implicitly: the download only
+  happens when the user asks for it by name;
+- it leaves a natural place for a future model change (see "Note: what it would
+  take to support another model"). Changing the default model still requires
+  explicit approval; this point only enables the installation mechanics.
 
-`npm run models:download` **se conserva** apuntando a los benchmarks, que es
-su lugar legítimo. Deja de mencionarse como remedio de producto.
+`npm run models:download` **is kept** pointing at the benchmarks, which is its
+legitimate place. It stops being mentioned as a product remedy.
 
-## Decisión 5: reutilizar un modelo existente sólo con `--from` explícito
+## Decision 5: reuse an existing model only with an explicit `--from`
 
-`models install` e `init` aceptan `--from <ruta>` para copiar un modelo que ya
-está en disco en vez de descargarlo. Orden de resolución:
+`models install` and `init` accept `--from <path>` in order to copy a model that
+is already on disk instead of downloading it. Resolution order:
 
-1. si el destino ya contiene el modelo instalado → `already_installed`, no
-   hace nada (salvo `--force`);
-2. si se pasó `--from <ruta>` y esa ruta contiene el modelo completo →
-   **copiar** al destino, escribir el recibo y reportar `adopted`;
-3. si se pasó `--from` y la ruta no contiene el modelo completo → error de
-   uso, código `2`. No cae a descargar en silencio: el usuario pidió algo
-   concreto y hay que decirle que no estaba;
-4. en caso contrario → descargar y reportar `installed`.
+1. if the destination already contains the installed model → `already_installed`,
+   it does nothing (except with `--force`);
+2. if `--from <path>` was passed and that path contains the complete model →
+   **copy** to the destination, write the receipt and report `adopted`;
+3. if `--from` was passed and the path does not contain the complete model →
+   usage error, code `2`. It does not silently fall back to downloading: the user
+   asked for something specific and has to be told it was not there;
+4. otherwise → download and report `installed`.
 
-**Se descartó la detección automática del repositorio.** Era más cómoda la
-primera vez, pero le daría al producto conocimiento de la estructura del
-repositorio, y el principio acordado es el opuesto: el repo es código fuente
-y el producto no debe poder correr desde él sin haberse instalado. Con
-`--from`, el producto no sabe que existe un repositorio; simplemente copia
-desde donde le digan.
+**Automatic detection of the repository was discarded.** It was more convenient
+the first time, but it would give the product knowledge of the repository's
+structure, and the agreed principle is the opposite: the repo is source code and
+the product must not be able to run from it without having been installed. With
+`--from`, the product does not know a repository exists; it simply copies from
+wherever it is told.
 
-Se copia y no se mueve: vaciar el origen rompería los benchmarks y el smoke
-de E5, que leen el caché del repositorio por su cuenta.
+It copies rather than moves: emptying the origin would break the benchmarks and
+the E5 smoke test, which read the repository's cache on their own.
 
-"Modelo completo" en el origen significa que existen los cuatro archivos que
-el runtime necesita: `config.json`, `tokenizer.json`, `tokenizer_config.json`
-y `onnx/model_quantized.onnx`, bajo
-`<origen>/Xenova/multilingual-e5-small/`. Un directorio a medio bajar no
-califica. El origen no necesita recibo — típicamente no lo va a tener, porque
-no fue instalado por este producto.
+"Complete model" at the origin means that the four files the runtime needs exist:
+`config.json`, `tokenizer.json`, `tokenizer_config.json` and
+`onnx/model_quantized.onnx`, under `<origin>/Xenova/multilingual-e5-small/`. A
+half-downloaded directory does not qualify. The origin does not need a receipt —
+typically it will not have one, because it was not installed by this product.
 
-## Decisión 6: el cambio de comportamiento se avisa, no se silencia
+## Decision 6: the change of behaviour is announced, not silenced
 
-Una base existente en `<cwd>/.auto-youtube-rag/` deja de leerse. Silenciar
-eso reproduce el fallo que este trabajo viene a eliminar.
+An existing database in `<cwd>/.auto-youtube-rag/` stops being read. Silencing
+that reproduces the very failure this work sets out to eliminate.
 
-`init` y `status` detectan el caso: si el hogar resuelto no contiene base
-pero **sí** existe `<cwd>/.auto-youtube-rag/index.sqlite`, agregan un warning
-`LEGACY_LIBRARY_FOUND` con ambas rutas y la indicación de mover el archivo o
-fijar `AUTO_YOUTUBE_RAG_HOME`. No se migra automáticamente: mover datos del
-usuario sin pedirlo excede el mandato de estos comandos.
+`init` and `status` detect the case: if the resolved home contains no database
+but `<cwd>/.auto-youtube-rag/index.sqlite` **does** exist, they add a
+`LEGACY_LIBRARY_FOUND` warning with both paths and the instruction to move the
+file or set `AUTO_YOUTUBE_RAG_HOME`. It does not migrate automatically: moving
+the user's data unasked exceeds these commands' mandate.
 
-El warning se emite sólo cuando el hogar resuelto está vacío. Si ya hay una
-biblioteca en el hogar, una base vieja en el `cwd` es ruido y no se menciona.
+The warning is emitted only when the resolved home is empty. If there is already
+a library in the home, an old database in the `cwd` is noise and is not
+mentioned.
 
-## Decisión 7: preflight de requisitos, una vez por comando
+## Decision 7: requirements preflight, once per command
 
-Las dos corridas en frío dejaron medidos los dos fallos de arranque, y ambos
-son defectos propios, no del entorno:
+The two cold runs left both startup failures measured, and both are defects of
+our own, not of the environment:
 
-| Falta     | Comportamiento actual                                                                               |
-| --------- | --------------------------------------------------------------------------------------------------- |
-| La base   | `ERR_SQLITE_ERROR: unable to open database file`, error crudo                                       |
-| El modelo | **63 issues `MODEL_LOAD_FAILED`**, uno por video, apuntando a un comando inexistente fuera del repo |
+| Missing      | Current behaviour                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------ |
+| The database | `ERR_SQLITE_ERROR: unable to open database file`, a raw error                                                |
+| The model    | **63 `MODEL_LOAD_FAILED` issues**, one per video, pointing at a command that does not exist outside the repo |
 
-El segundo es el más caro: el sistema descubrió que faltaba el modelo una vez
-por cada video, procesando paquete por paquete hasta terminar en `partial`.
-Podía saberlo antes de empezar.
+The second is the costlier one: the system discovered the model was missing once
+per video, processing package by package until it ended in `partial`. It could
+have known before starting.
 
-Cada comando declara qué requisitos necesita, y la CLI los verifica **una
-sola vez, antes de ejecutar nada**:
+Each command declares which requirements it needs, and the CLI verifies them
+**once only, before executing anything**:
 
-| Comando                           | Requisitos         |
-| --------------------------------- | ------------------ |
-| `init`                            | ninguno (los crea) |
-| `status`, `doctor`                | base               |
-| `source add/list/remove`          | base               |
-| `sync`, `retrieve`                | base + modelo      |
-| `models install`, `models status` | ninguno            |
+| Command                           | Requirements           |
+| --------------------------------- | ---------------------- |
+| `init`                            | none (it creates them) |
+| `status`, `doctor`                | database               |
+| `source add/list/remove`          | database               |
+| `sync`, `retrieve`                | database + model       |
+| `models install`, `models status` | none                   |
 
-Un requisito ausente produce **un** error accionable con el comando que lo
-resuelve (`auto-youtube-rag init`), código de salida `1`, y códigos
-simbólicos `LIBRARY_NOT_FOUND` o `MODEL_NOT_INSTALLED`. Nunca 63 issues
-idénticas ni un error crudo de SQLite.
+A missing requirement produces **one** actionable error naming the command that
+resolves it (`auto-youtube-rag init`), exit code `1`, and the symbolic codes
+`LIBRARY_NOT_FOUND` or `MODEL_NOT_INSTALLED`. Never 63 identical issues nor a raw
+SQLite error.
 
-`doctor` es la excepción deliberada: corre igual sin modelo, porque su
-trabajo es justamente diagnosticar qué falta.
+`doctor` is the deliberate exception: it runs regardless without a model, because
+its job is precisely to diagnose what is missing.
 
-### Recibo de instalación
+### Installation receipt
 
-Distinguir "falta" de "está roto" necesita algo más que existencia de
-archivos. Una descarga cortada deja los cuatro archivos presentes con tamaño
-incorrecto, y el fallo aparece recién al cargar el modelo, como un error de
-ONNX incomprensible.
+Distinguishing "missing" from "broken" needs more than the existence of files. A
+cut-off download leaves the four files present with the wrong size, and the
+failure only shows up when loading the model, as an incomprehensible ONNX error.
 
-`models/.install.json`, escrito por la instalación:
+`models/.install.json`, written by the installation:
 
 ```json
 {
@@ -347,28 +343,28 @@ ONNX incomprensible.
 }
 ```
 
-Permite tres estados verificables sin hashear 130 MB:
+It allows three verifiable states without hashing 130 MB:
 
-- **`absent`**: no hay recibo ni archivos.
-- **`incomplete`**: el recibo no coincide con el disco (archivo faltante o de
-  tamaño distinto), o hay archivos sin recibo. Se repara con
+- **`absent`**: there is no receipt and no files.
+- **`incomplete`**: the receipt does not match the disk (a missing file or one of
+  a different size), or there are files with no receipt. Repaired with
   `models install --force`.
-- **`installed`**: recibo y disco coinciden.
+- **`installed`**: receipt and disk match.
 
-Se comparan tamaños, no hashes: detecta descargas truncadas —el fallo real—
-sin leer 130 MB en cada `doctor`.
+Sizes are compared, not hashes: it detects truncated downloads — the real failure
+— without reading 130 MB on every `doctor`.
 
-Un directorio con archivos pero sin recibo cuenta como `incomplete`, no como
-`installed`: es el caso de alguien que copió el modelo a mano, y conviene que
-`models install --force` lo normalice escribiendo el recibo.
+A directory with files but no receipt counts as `incomplete`, not as
+`installed`: that is the case of someone who copied the model by hand, and it is
+best for `models install --force` to normalise it by writing the receipt.
 
-### Base corrupta
+### Corrupt database
 
-`doctor` ya detecta corrupción con `integrity_check`. Lo que falta es que
-`sync` y `retrieve` traduzcan un error de integridad de SQLite a un mensaje
-que mande a `doctor`, en vez de propagar el error crudo del driver.
+`doctor` already detects corruption with `integrity_check`. What is missing is
+for `sync` and `retrieve` to translate a SQLite integrity error into a message
+that sends the user to `doctor`, instead of propagating the driver's raw error.
 
-## Contrato de salida
+## Output contract
 
 `models install`:
 
@@ -383,160 +379,162 @@ que mande a `doctor`, en vez de propagar el error crudo del driver.
 }
 ```
 
-`status` admite `installed`, `already_installed` y `adopted`. `source` admite
-`download` y `copy`.
+`status` admits `installed`, `already_installed` and `adopted`. `source` admits
+`download` and `copy`.
 
-`models status` devuelve la misma forma sin `bytes` ni descarga, con
-`status: "installed"`, `"incomplete"` o `"absent"`, y código de salida `0` en
-los tres casos: informar ausencia no es un fallo operativo. Cuando el estado
-es `incomplete`, suma `issues` con los archivos que no coinciden con el
-recibo.
+`models status` returns the same shape without `bytes` and without downloading,
+with `status: "installed"`, `"incomplete"` or `"absent"`, and exit code `0` in
+all three cases: reporting absence is not an operational failure. When the state
+is `incomplete`, it adds `issues` with the files that do not match the receipt.
 
-`init` suma `home` y `model` al recibo, junto al `database_path` que ya emite.
+`init` adds `home` and `model` to the receipt, alongside the `database_path` it
+already emits.
 
-Códigos simbólicos nuevos:
+New symbolic codes:
 
-| Código                  | Tipo             | Cuándo                                         |
-| ----------------------- | ---------------- | ---------------------------------------------- |
-| `MODEL_DOWNLOAD_FAILED` | error, retryable | La red falló durante la descarga               |
-| `MODEL_NOT_INSTALLED`   | error            | Preflight: `sync`/`retrieve` sin modelo        |
-| `LIBRARY_NOT_FOUND`     | error            | Preflight: falta la base                       |
-| `MODEL_SOURCE_INVALID`  | uso (`2`)        | `--from` apunta a una ruta sin modelo completo |
-| `LEGACY_LIBRARY_FOUND`  | warning          | Hay base vieja relativa al `cwd`               |
+| Code                    | Type             | When                                             |
+| ----------------------- | ---------------- | ------------------------------------------------ |
+| `MODEL_DOWNLOAD_FAILED` | error, retryable | The network failed during the download           |
+| `MODEL_NOT_INSTALLED`   | error            | Preflight: `sync`/`retrieve` with no model       |
+| `LIBRARY_NOT_FOUND`     | error            | Preflight: the database is missing               |
+| `MODEL_SOURCE_INVALID`  | usage (`2`)      | `--from` points at a path with no complete model |
+| `LEGACY_LIBRARY_FOUND`  | warning          | There is an old `cwd`-relative database          |
 
-## Impacto en `doctor`
+## Impact on `doctor`
 
-El check de modelo ya existe y lee `modelCachePath`. Pasa a recibir la ruta
-del resolutor, y su mensaje de error deja de decir "Run npm run
-models:download first" para decir `auto-youtube-rag models install`. Es el
-mensaje que leyó el subagente y lo mandó a un comando inexistente en su
-contexto.
+The model check already exists and reads `modelCachePath`. It comes to receive
+the resolver's path, and its error message stops saying "Run npm run
+models:download first" and says `auto-youtube-rag models install` instead. It is
+the message the subagent read, and it sent them to a command that did not exist
+in their context.
 
-## Riesgo principal y cómo se acota
+## Main risk and how it is bounded
 
-La hipótesis inicial era que el hogar de usuario podía romper la suite. La
-auditoría la descartó: los tests inyectan `config` con rutas temporales y no
-consultan el entorno, así que el bloque V queda como verificación acotada y
-no como refactor. Se conserva igual, y antes de `main.ts`, porque confirmar
-una hipótesis benigna es barato y descubrirla falsa a mitad de camino no.
+The initial hypothesis was that the user home could break the suite. The audit
+discarded it: the tests inject `config` with temporary paths and do not consult
+the environment, so block V remains a bounded verification rather than a refactor.
+It is kept all the same, and before `main.ts`, because confirming a benign
+hypothesis is cheap and discovering it false halfway through is not.
 
-El riesgo que sí queda es la **eliminación de los defaults duplicados**: si
-algún camino construye `E5EmbeddingGenerator` sin `cacheDir`, hoy funciona
-por accidente y pasaría a fallar en compilación. Eso es deseable —convierte
-un fallo silencioso en uno visible— pero hay que revisar cada construcción
-antes de exigir el parámetro.
+The risk that does remain is the **removal of the duplicated defaults**: if some
+path constructs `E5EmbeddingGenerator` without `cacheDir`, today it works by
+accident and would come to fail at compile time. That is desirable — it turns a
+silent failure into a visible one — but every construction has to be reviewed
+before the parameter is required.
 
-Riesgo secundario: `models install` descarga de red. Debe quedar fuera de
-`npm run check` mediante el patrón `smoke` ya existente, igual que el smoke
-de E5.
+Secondary risk: `models install` downloads from the network. It must be kept out
+of `npm run check` through the existing `smoke` pattern, just like the E5 smoke
+test.
 
-## Nota: qué haría falta para soportar otro modelo
+## Note: what it would take to support another model
 
-Fuera del alcance de 4.2, registrado acá porque la auditoría del código lo
-dejó claro y conviene no volver a investigarlo desde cero.
+Outside the scope of 4.2, recorded here because the code audit made it clear and
+it is best not to investigate it from scratch again.
 
-**Lo que ya está resuelto:**
+**What is already resolved:**
 
-- La dimensión es genérica de punta a punta. `embeddings` guarda
-  `dimensions`, `model_key` y `model_version` por fila; el loader filtra por
-  el modelo activo; el índice en memoria arma su matriz desde
-  `model.dimensions` sin ningún `384` hardcodeado, y valida que lo guardado
-  coincida con lo declarado.
-- **La reindexación automática al cambiar de modelo ya funciona.**
-  `unchanged()` en `sync-source.ts` incluye `key`, `version` y `dimensions`
-  del modelo activo en su criterio, así que cambiar cualquiera de los tres
-  invalida todos los paquetes y el `sync` siguiente reindexa. `version` es
-  `"Xenova/multilingual-e5-small@main:q8"`, de modo que cambiar revisión o
-  cuantización también dispara.
+- The dimension is generic end to end. `embeddings` stores `dimensions`,
+  `model_key` and `model_version` per row; the loader filters by the active
+  model; the in-memory index builds its matrix from `model.dimensions` with no
+  hardcoded `384`, and validates that what was stored matches what was declared.
+- **Automatic reindexing when the model changes already works.** `unchanged()` in
+  `sync-source.ts` includes the active model's `key`, `version` and `dimensions`
+  in its criterion, so changing any of the three invalidates every package and
+  the next `sync` reindexes. `version` is
+  `"Xenova/multilingual-e5-small@main:q8"`, so changing revision or quantisation
+  also triggers it.
 
-**Lo que falta:**
+**What is missing:**
 
-- ~~La identidad del modelo son constantes de módulo en
-  `e5-embedding-generator.ts` (`modelRepository`, `modelRevision`,
-  `modelDtype`, `modelDescriptor`). Cambiar de modelo es cambiar código.~~
-  **Corregido el 14 de agosto de 2026.** Nace
-  `src/infrastructure/embeddings/model-profile.ts` con
-  `EmbeddingModelProfile` y el perfil activo congelado `activeModelProfile`;
-  el generador (renombrado `TransformersEmbeddingGenerator`) y el instalador
-  (renombrado `TransformersModelInstaller`) lo reciben por inyección, con
-  ese perfil como default. `"Xenova/multilingual-e5-small"` aparece ahora una
-  sola vez en todo `src/`. Detalle en `docs/decisions.md`, sección "Perfil de
-  modelo y política de prefijos".
-- ~~**Los prefijos E5 (`passage: ` / `query: `) están hardcodeados** y se
-  aplican siempre. Son específicos de la familia E5: con MiniLM, Jina o BGE
-  degradan la calidad **sin ningún error**. El arnés de benchmarks ya
-  contempla esto con un flag `e5Prefixes` en su `ModelDefinition`; el
-  producto no. Mover los prefijos al descriptor del modelo es el trabajo real
-  de "modelo configurable", no la dimensión.~~ **Corregido el 14 de agosto de 2026.** `EmbeddingModelProfile.inputPrefixes` es `EmbeddingInputPrefixes |
-null` — `null` es explícito ("este modelo no lleva prefijos"), no un
-  default olvidado. `countTokens` y `embedDocuments` comparten la misma
-  política de prefijado. La política participa de `modelVersion(profile)`
-  (sufijo `+noprefix` sin prefijos), así que un perfil futuro sin prefijos
-  invalida y reindexa automáticamente; con el perfil activo el literal de
-  `version` no cambió, así que nada se reindexó al implementar esto (validado
-  en AD3 de `docs/model-profile-design.md`). Detalle en `docs/decisions.md`.
-- **Dos modelos no conviven en la práctica**, aunque el esquema lo permita
-  (`PRIMARY KEY (fragment_id, model_key)`). `applyPackage` hace `DELETE FROM
-source_documents`, y la cascada `source_documents → knowledge_units →
-search_fragments → embeddings` borra los vectores de todos los modelos del
-  paquete. Cada `sync` deja exactamente un modelo. Comparar dos modelos sobre
-  el mismo corpus requeriría un camino de código que hoy no existe.
-- ~~**Hueco de degradación silenciosa.**~~ **Corregido el 14 de agosto de 2026.** Entre cambiar el modelo y correr `sync`, el loader filtraba por el
-  modelo activo, no encontraba vectores y `retrieve` devolvía `status: "ok"`
-  con sólo la vía textual, sin aviso. Ahora emite `VECTORS_STALE`. Detalle en
-  `docs/decisions.md`, sección "Degradación silenciosa de la vía vectorial".
+- ~~The model's identity is module constants in `e5-embedding-generator.ts`
+  (`modelRepository`, `modelRevision`, `modelDtype`, `modelDescriptor`). Changing
+  model means changing code.~~ **Corrected on 14 August 2026.**
+  `src/infrastructure/embeddings/model-profile.ts` is born with
+  `EmbeddingModelProfile` and the frozen active profile `activeModelProfile`; the
+  generator (renamed `TransformersEmbeddingGenerator`) and the installer (renamed
+  `TransformersModelInstaller`) receive it by injection, with that profile as the
+  default. `"Xenova/multilingual-e5-small"` now appears only once in all of
+  `src/`. Detail in `docs/decisions.md`, section "Model profile and prefix
+  policy".
+- ~~**The E5 prefixes (`passage: ` / `query: `) are hardcoded** and are always
+  applied. They are specific to the E5 family: with MiniLM, Jina or BGE they
+  degrade quality **with no error at all**. The benchmark harness already
+  accounts for this with an `e5Prefixes` flag in its `ModelDefinition`; the
+  product does not. Moving the prefixes into the model descriptor is the real
+  work of "configurable model", not the dimension.~~ **Corrected on 14 August 2026.** `EmbeddingModelProfile.inputPrefixes` is `EmbeddingInputPrefixes | null`
+  — `null` is explicit ("this model carries no prefixes"), not a forgotten
+  default. `countTokens` and `embedDocuments` share the same prefixing policy.
+  The policy takes part in `modelVersion(profile)` (a `+noprefix` suffix when
+  there are no prefixes), so a future profile without prefixes invalidates and
+  reindexes automatically; with the active profile the `version` literal did not
+  change, so nothing was reindexed when implementing this (validated in AD3 of
+  `docs/model-profile-design.md`). Detail in `docs/decisions.md`.
+- **Two models do not coexist in practice**, even though the schema allows it
+  (`PRIMARY KEY (fragment_id, model_key)`). `applyPackage` does
+  `DELETE FROM source_documents`, and the cascade
+  `source_documents → knowledge_units → search_fragments → embeddings` deletes the
+  vectors of every model in the package. Each `sync` leaves exactly one model.
+  Comparing two models over the same corpus would require a code path that does
+  not exist today.
+- ~~**Silent degradation gap.**~~ **Corrected on 14 August 2026.** Between
+  changing the model and running `sync`, the loader filtered by the active model,
+  found no vectors and `retrieve` returned `status: "ok"` with the text path
+  alone, with no warning. It now emits `VECTORS_STALE`. Detail in
+  `docs/decisions.md`, section "Silent degradation of the vector path".
 
-Un LLM generativo queda descartado por definición del producto: el sistema
-necesita un vector de tamaño fijo por texto, y la decisión fundacional es que
-no hay LLM interno.
+A generative LLM is discarded by the product's definition: the system needs a
+fixed-size vector per text, and the founding decision is that there is no
+internal LLM.
 
-## Documentos a actualizar al implementar
+## Documents to update on implementation
 
-- `docs/cli-contract.md`: comando `models` y sus recibos.
-- `docs/product-spec.md`: sección de instalación, hoy inexistente.
-- `docs/development.md`: `models:download` es de benchmarks, no de producto.
-- `docs/decisions.md`: cerrar los dos pendientes que abrió el test — el
-  default del caché queda resuelto acá; el guard de concurrencia sigue
-  abierto y así debe quedar registrado.
-- `skill/SKILL.md` y `skill/references/setup.md`: el hogar de usuario elimina
-  buena parte del texto de rutas que se agregó el 13 de agosto.
-- `docs/build.md`: punto 4.2.
-- `docs/agent-handoff.md`: estado operativo.
+- `docs/cli-contract.md`: the `models` command and its receipts.
+- `docs/product-spec.md`: the installation section, non-existent today.
+- `docs/development.md`: `models:download` belongs to benchmarks, not to the
+  product.
+- `docs/decisions.md`: close the two pending items the test opened — the cache
+  default is resolved here; the concurrency guard remains open and must be
+  recorded as such.
+- `skill/SKILL.md` and `skill/references/setup.md`: the user home removes a good
+  part of the path text that was added on 13 August.
+- `docs/build.md`: point 4.2.
+- `docs/agent-handoff.md`: operational status.
 
-## Plan de bloques
+## Block plan
 
-| Bloque | Contenido                                                    |
-| ------ | ------------------------------------------------------------ |
-| U      | Resolutor de rutas, recibo y estado del modelo               |
-| V      | Eliminación de los tres defaults duplicados                  |
-| W      | Descarga de modelo: puerto, adaptador y copia desde `--from` |
-| X      | `models` e `init` en la CLI, `main.ts` y `doctor` alineados  |
-| Z      | Preflight de requisitos y traducción de fallos de estado     |
-| Y      | Validación real en frío y cierre de documentación            |
+| Block | Content                                                        |
+| ----- | -------------------------------------------------------------- |
+| U     | Path resolver, receipt and model state                         |
+| V     | Removal of the three duplicated defaults                       |
+| W     | Model download: port, adapter and copy from `--from`           |
+| X     | `models` and `init` in the CLI, `main.ts` and `doctor` aligned |
+| Z     | Requirements preflight and translation of state failures       |
+| Y     | Real cold validation and documentation closure                 |
 
-Orden de ejecución: U → V → W → X → Z → Y.
+Execution order: U → V → W → X → Z → Y.
 
-## Decisiones confirmadas (13 de agosto de 2026)
+## Confirmed decisions (13 August 2026)
 
-- Distribución como comando global; sin `postinstall`, porque hay
-  instalaciones con scripts deshabilitados.
-- Hogar único de usuario `~/.auto-youtube-rag/`, con `AUTO_YOUTUBE_RAG_HOME`
-  para moverlo entero y `AUTO_YOUTUBE_RAG_MODELS_DIR` para el modelo.
-- El directorio se llama `models/`, no `cache/`: el modelo es estado
-  instalado, no dato derivado que se regenere solo.
-- El resolutor es una sola función compartida por lector y escritor; los tres
-  defaults duplicados de `cwd` se eliminan.
-- `init` instala el sistema completo (hogar, base y modelo), con
-  `--skip-model` para CI.
-- El instalador es un subcomando del producto; `npm run models:download`
-  queda como herramienta de benchmarks, válida sólo desde el repositorio.
-- Un modelo ya presente en disco se reutiliza sólo con `--from` explícito. Se
-  descartó la detección automática del repositorio: el producto no debe
-  conocer la estructura del repo, ni poder correr desde él sin instalarse.
-- Se copia, no se mueve: vaciar el origen rompería benchmarks y smoke.
-- La base vieja relativa al `cwd` se avisa (`LEGACY_LIBRARY_FOUND`), no se
-  migra sola.
-- Preflight de requisitos una vez por comando, no una vez por video.
-- Recibo `models/.install.json` para distinguir ausente, incompleto e
-  instalado, comparando tamaños y no hashes.
-- El modelo por defecto y su dimensión no cambian en este punto.
+- Distribution as a global command; no `postinstall`, because there are
+  installations with scripts disabled.
+- A single user home `~/.auto-youtube-rag/`, with `AUTO_YOUTUBE_RAG_HOME` to move
+  it as a whole and `AUTO_YOUTUBE_RAG_MODELS_DIR` for the model.
+- The directory is called `models/`, not `cache/`: the model is installed state,
+  not derived data that regenerates itself.
+- The resolver is a single function shared by reader and writer; the three
+  duplicated `cwd` defaults are removed.
+- `init` installs the complete system (home, database and model), with
+  `--skip-model` for CI.
+- The installer is a subcommand of the product; `npm run models:download` remains
+  a benchmark tool, valid only from the repository.
+- A model already present on disk is reused only with an explicit `--from`.
+  Automatic detection of the repository was discarded: the product must not know
+  the repo's structure, nor be able to run from it without being installed.
+- It copies, it does not move: emptying the origin would break benchmarks and
+  smoke tests.
+- The old `cwd`-relative database is announced (`LEGACY_LIBRARY_FOUND`), it does
+  not migrate on its own.
+- Requirements preflight once per command, not once per video.
+- A `models/.install.json` receipt to distinguish absent, incomplete and
+  installed, comparing sizes and not hashes.
+- The default model and its dimension do not change in this point.

@@ -1,42 +1,43 @@
-# Benchmark de modelos de embeddings
+# Embedding model benchmark
 
-## Objetivo
+## Objective
 
-Comparar modelos locales multilingües compatibles con Transformers.js antes de
-seleccionar el backend semántico del MVP. El benchmark no evalúa la calidad del
-RAG completo; aísla la recuperación densa sobre un fixture pequeño y trazable.
+Compare local multilingual models compatible with Transformers.js before
+selecting the MVP's semantic backend. The benchmark does not evaluate the
+quality of the complete RAG; it isolates dense retrieval over a small, traceable
+fixture.
 
-## Modelos
+## Models
 
-| ID | Repositorio | Dimensión esperada | Configuración |
-| --- | --- | ---: | --- |
-| `e5-small` | `Xenova/multilingual-e5-small` | 384 | `q8`, prefijos E5 |
-| `minilm` | `Xenova/paraphrase-multilingual-MiniLM-L12-v2` | 384 | `q8` |
-| `e5-base` | `Xenova/multilingual-e5-base` | 768 | `q8`, prefijos E5 |
-| `jina-es` | `jinaai/jina-embeddings-v2-base-es` | 768 | ONNX cuantizado explícito |
+| ID          | Repository                                    | Expected dimension | Configuration              |
+| ----------- | --------------------------------------------- | -----------------: | -------------------------- |
+| `e5-small`  | `Xenova/multilingual-e5-small`                |                384 | `q8`, E5 prefixes          |
+| `minilm`    | `Xenova/paraphrase-multilingual-MiniLM-L12-v2` |                384 | `q8`                       |
+| `e5-base`   | `Xenova/multilingual-e5-base`                 |                768 | `q8`, E5 prefixes          |
+| `jina-es`   | `jinaai/jina-embeddings-v2-base-es`           |                768 | Explicit quantised ONNX    |
 
 ## Fixture
 
-El fixture contiene fragmentos derivados de paquetes reales y validados de
-`auto-design`. Las consultas mezclan español e inglés para medir recuperación
-monolingüe y cruzada. Cada consulta declara uno o más IDs relevantes.
+The fixture contains fragments derived from real, validated `auto-design`
+packages. The queries mix Spanish and English in order to measure monolingual
+and cross-lingual retrieval. Each query declares one or more relevant IDs.
 
-El fixture es deliberadamente pequeño. Sirve para detectar incompatibilidad,
-regresiones obvias y diferencias iniciales; no reemplaza las evaluaciones del
-MVP sobre todo el corpus.
+The fixture is deliberately small. It serves to detect incompatibility, obvious
+regressions and initial differences; it does not replace the MVP's evaluations
+over the whole corpus.
 
-## Métricas
+## Metrics
 
-- `hit_at_1`: proporción de consultas cuyo primer resultado es relevante.
-- `recall_at_5`: proporción con al menos un relevante entre los cinco primeros.
-- `mrr`: media del recíproco del rango del primer relevante.
-- tiempo de carga del modelo;
-- tiempo y rendimiento de indexación del fixture;
-- latencia media de consultas;
-- RSS observado después de cargar y ejecutar;
-- bytes presentes en la caché del modelo.
+- `hit_at_1`: proportion of queries whose first result is relevant.
+- `recall_at_5`: proportion with at least one relevant result among the first five.
+- `mrr`: mean reciprocal rank of the first relevant result.
+- model load time;
+- fixture indexing time and throughput;
+- average query latency;
+- RSS observed after loading and running;
+- bytes present in the model cache.
 
-## Procedimiento
+## Procedure
 
 ```text
 npm install
@@ -45,19 +46,19 @@ npm run models:download:benchmarks
 npm run benchmark:embeddings
 ```
 
-La descarga usa `.cache/models`, ignorada por Git. La medición final se ejecuta
-con `local_files_only` para no mezclar tiempo de red con inferencia. Los modelos
-se procesan secuencialmente para reducir la presión de memoria.
+The download uses `.cache/models`, ignored by Git. The final measurement runs
+with `local_files_only` so that network time is not mixed with inference. The
+models are processed sequentially to reduce memory pressure.
 
-La comparación de memoria se repite con un proceso Node fresco por modelo para
-evitar que las reservas nativas de ONNX contaminen la medición siguiente.
+The memory comparison is repeated with a fresh Node process per model to prevent
+ONNX's native reservations from contaminating the next measurement.
 
-La línea base revisada se conserva en
-`benchmarks/embeddings/results/baseline.md` y `baseline.json`.
+The reviewed baseline is kept in
+`benchmarks/embeddings/results/baseline.md` and `baseline.json`.
 
-## Criterio de decisión
+## Decision criterion
 
-Se prefiere el modelo más pequeño que mantenga buena recuperación en español,
-inglés y consultas cruzadas. Una mejora marginal de calidad no justifica
-duplicar memoria o latencia en el hardware objetivo. El ganador deberá volver a
-evaluarse sobre consultas reales al completar el MVP.
+The smallest model that maintains good retrieval in Spanish, English and
+cross-lingual queries is preferred. A marginal quality improvement does not
+justify doubling memory or latency on the target hardware. The winner will have
+to be evaluated again over real queries once the MVP is complete.
