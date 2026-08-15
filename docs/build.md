@@ -107,8 +107,8 @@
 - [x] Crear una skill canónica
 - [x] Invocar la CLI sin lógica de proveedor
 - [x] Verificar uso desde Claude (agente en frío, sin contexto previo)
-- [ ] Verificar uso desde Codex (agente externo real, pendiente de que el
-      usuario la corra)
+- [x] Verificar uso desde Codex (agente externo real; confirmado por el
+      mantenedor el 15/08/2026, funcionó)
 
 `skill/SKILL.md` es autocontenida (no depende de rutas relativas a `docs/`)
 para poder instalarse fuera de este repositorio. Verificada con dos corridas
