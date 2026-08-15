@@ -1,8 +1,17 @@
 {
   "name": "auto-youtube-rag",
   "version": "0.1.0",
+  "description": "Local-first RAG library that turns knowledge packages produced from YouTube videos into wide, ordered, cited context for an AI agent to reason over.",
   "private": true,
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuchoC-Dev/auto-youtube-rag.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LuchoC-Dev/auto-youtube-rag/issues"
+  },
+  "homepage": "https://github.com/LuchoC-Dev/auto-youtube-rag#readme",
   "bin": {
     "auto-youtube-rag": "dist/main.js"
   },
