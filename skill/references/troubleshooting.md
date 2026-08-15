@@ -1,199 +1,195 @@
-# Códigos, estados y recuperación de fallos
+# Codes, states and failure recovery
 
-Leé este archivo cuando un comando falle, devuelva un código de salida
-distinto de `0`, o produzca `warnings` que no sepas interpretar. Para
-problemas de instalación, rutas o del modelo de embeddings, leé
-`setup.md` en su lugar.
+Read this file when a command fails, returns an exit code other than `0`, or
+produces `warnings` you do not know how to interpret. For problems with the
+installation, the paths or the embedding model, read `setup.md` instead.
 
-## Códigos de salida del proceso
+## Process exit codes
 
-| Código | Significado                                               | Qué hacer                                                 |
-| -----: | --------------------------------------------------------- | --------------------------------------------------------- |
-|    `0` | Éxito, incluidos `no_results`, `no_changes`, etc.         | Continuar normalmente.                                    |
-|    `1` | Fallo operativo o resultado parcial (`status: "partial"`) | Revisar `warnings`/`limitations`; no reintentar a ciegas. |
-|    `2` | Uso inválido de la CLI (argumento mal escrito)            | Corregir el comando, no es un bug del producto.           |
-|  `130` | Interrupción manual (Ctrl+C)                              | No aplica a uso no interactivo.                           |
+|  Code | Meaning                                                     | What to do                                            |
+| ----: | ----------------------------------------------------------- | ----------------------------------------------------- |
+|   `0` | Success, including `no_results`, `no_changes`, etc.         | Carry on normally.                                    |
+|   `1` | Operational failure or partial result (`status: "partial"`) | Check `warnings`/`limitations`; do not retry blindly. |
+|   `2` | Invalid use of the CLI (a misspelled argument)              | Fix the command, it is not a bug of the product.      |
+| `130` | Manual interruption (Ctrl+C)                                | Does not apply to non-interactive use.                |
 
-Un código `2` siempre es tuyo: un flag mal escrito, un preset de `--depth`
-inventado o un `--max-tokens` que no es un entero positivo. Corregí el
-comando en vez de investigar el producto.
+A code `2` is always yours: a misspelled flag, an invented `--depth` preset or a
+`--max-tokens` that is not a positive integer. Fix the command instead of
+investigating the product.
 
-## `status` en el recibo de `retrieve`
+## `status` in the `retrieve` receipt
 
-- `"ok"`: hay bundle con evidencia. Un `status: "ok"` con relevancia baja
-  sigue siendo un resultado válido y esperado, no un error — la búsqueda
-  semántica no descarta nada por similitud, así que consultas poco
-  relacionadas con la colección igual devuelven candidatos. **Desde el punto
-  4.7 eso ya no es silencioso**: cuando el mejor puntaje queda bajo el piso
-  calibrado aparece `LOW_RELEVANCE` en `warnings` (ver más abajo). Igual
-  conviene leer `Coverage and limitations` en `context.md` antes de confiar
-  ciegamente en la relevancia: el aviso puede no dispararse y el contenido
-  ser tangencial.
-- `"no_results"`: la biblioteca (tras aplicar `--source` u otros filtros)
-  quedó vacía de candidatos. El bundle igual se escribe, explicando la
-  ausencia de evidencia. No es un fallo del comando.
-- `"partial"`: una vía de recuperación se degradó (por ejemplo, búsqueda
-  textual o vectorial no disponible) pero igual se produjo un bundle
-  utilizable. Revisá `warnings` antes de confiar en la cobertura.
+- `"ok"`: there is a bundle with evidence. A `status: "ok"` with low relevance
+  is still a valid and expected result, not an error — semantic search discards
+  nothing for similarity, so queries barely related to the collection still
+  return candidates. **Since point 4.7 that is no longer silent**: when the best
+  score stays below the calibrated floor, `LOW_RELEVANCE` appears in `warnings`
+  (see below). It is still worth reading `Coverage and limitations` in
+  `context.md` before trusting the relevance blindly: the warning may not fire
+  and the content may be tangential.
+- `"no_results"`: the library (after applying `--source` or other filters) was
+  left with no candidates. The bundle is written all the same, explaining the
+  absence of evidence. It is not a failure of the command.
+- `"partial"`: a retrieval path degraded (for example, textual or vector search
+  unavailable) but a usable bundle was produced anyway. Check `warnings` before
+  trusting the coverage.
 
-## Códigos simbólicos
+## Symbolic codes
 
-Cada salida JSON incluye códigos simbólicos estables (por ejemplo
-`SOURCE_NOT_FOUND`, `PACKAGE_INVALID`) y un `retryable` cuando corresponde.
-Usalos para decidir si tiene sentido reintentar o si hace falta intervención
-humana.
+Every JSON output includes stable symbolic codes (for example
+`SOURCE_NOT_FOUND`, `PACKAGE_INVALID`) and a `retryable` where appropriate. Use
+them to decide whether retrying makes sense or whether human intervention is
+needed.
 
-Códigos de estado de instalación, todos resueltos en `setup.md`:
+Installation status codes, all resolved in `setup.md`:
 
-| Código                     | Qué significa                                                    |
-| -------------------------- | ---------------------------------------------------------------- |
-| `LIBRARY_NOT_FOUND`        | Falta la base. Corré `init`.                                     |
-| `MODEL_NOT_INSTALLED`      | Falta el modelo o está dañado. Corré `models install`.           |
-| `MODEL_SOURCE_INVALID`     | `--from` apunta a una ruta sin el modelo completo. Error de uso. |
-| `MODEL_DOWNLOAD_FAILED`    | La red falló durante la descarga. Es retryable.                  |
-| `DATABASE_INTEGRITY_ERROR` | La base está dañada. Corré `doctor` para el detalle.             |
-| `LEGACY_LIBRARY_FOUND`     | Advertencia: hay una base vieja relativa al directorio actual.   |
+| Code                       | What it means                                                        |
+| -------------------------- | -------------------------------------------------------------------- |
+| `LIBRARY_NOT_FOUND`        | The database is missing. Run `init`.                                 |
+| `MODEL_NOT_INSTALLED`      | The model is missing or damaged. Run `models install`.               |
+| `MODEL_SOURCE_INVALID`     | `--from` points at a path without the complete model. A usage error. |
+| `MODEL_DOWNLOAD_FAILED`    | The network failed during the download. It is retryable.             |
+| `DATABASE_INTEGRITY_ERROR` | The database is damaged. Run `doctor` for the detail.                |
+| `LEGACY_LIBRARY_FOUND`     | Warning: there is an old database relative to the current directory. |
 
-Ninguno de los tres primeros es transitorio: reintentar el mismo comando sin
-cambiar nada vuelve a fallar igual.
+None of the first three is transient: retrying the same command without changing
+anything fails again just the same.
 
-Aparte, en los `warnings` de `retrieve`:
+Separately, in the `warnings` of `retrieve`:
 
-| Código                      | Qué significa                                                                  |
-| --------------------------- | ------------------------------------------------------------------------------ |
-| `EMBEDDING_MODEL_MISSING`   | La vía vectorial se degradó; el bundle igual se produce, sólo con vía textual. |
-| `VECTOR_SEARCH_UNAVAILABLE` | La vía vectorial falló con error; el bundle se armó sólo con búsqueda textual. |
-| `TEXT_SEARCH_UNAVAILABLE`   | La vía textual falló; el bundle se armó sólo con búsqueda semántica.           |
-| `VECTORS_STALE`             | La biblioteca tiene contenido pero **ningún vector** para el modelo activo.    |
-| `LOW_RELEVANCE`             | Nada de la biblioteca responde de verdad la consulta. Ver abajo.               |
+| Code                        | What it means                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------------ |
+| `EMBEDDING_MODEL_MISSING`   | The vector path degraded; the bundle is produced anyway, with the textual path only. |
+| `VECTOR_SEARCH_UNAVAILABLE` | The vector path failed with an error; the bundle was built with textual search only. |
+| `TEXT_SEARCH_UNAVAILABLE`   | The textual path failed; the bundle was built with semantic search only.             |
+| `VECTORS_STALE`             | The library has content but **no vector** for the active model.                      |
+| `LOW_RELEVANCE`             | Nothing in the library really answers the query. See below.                          |
 
-En los tres primeros el bundle sirve, pero se armó con una sola vía. Decilo
-si vas a apoyarte en esa evidencia.
+In the first three the bundle is usable, but it was built with a single path.
+Say so if you are going to rely on that evidence.
 
-**`VECTORS_STALE` merece atención aparte.** Significa que la búsqueda
-semántica no participó en absoluto: los resultados salieron sólo de
-coincidencia léxica, así que la cobertura es bastante peor de lo normal. Pasa
-cuando los vectores no corresponden al modelo activo, típicamente porque la
-biblioteca se indexó con otro modelo y todavía no se regeneró.
+**`VECTORS_STALE` deserves separate attention.** It means that semantic search
+did not take part at all: the results came only from lexical matching, so the
+coverage is considerably worse than usual. It happens when the vectors do not
+correspond to the active model, typically because the library was indexed with
+another model and has not been regenerated yet.
 
-Se resuelve reindexando:
+It is resolved by reindexing:
 
 ```text
 auto-youtube-rag sync
 ```
 
-Si `sync` responde `no_changes` y el warning **sigue apareciendo**, los
-paquetes no cambiaron y el modelo tampoco, así que la indexación incremental no
-tiene nada que recalcular. Ahí hace falta forzar la regeneración completa:
+If `sync` answers `no_changes` and the warning **keeps appearing**, the packages
+did not change and neither did the model, so incremental indexing has nothing to
+recalculate. At that point the full regeneration has to be forced:
 
 ```text
 auto-youtube-rag rebuild --confirm
 ```
 
-Hasta entonces podés usar el bundle, pero **avisá en tu respuesta que la
-búsqueda semántica no participó**: puede faltar contenido relevante que la
-coincidencia léxica no alcanza a encontrar.
+Until then you can use the bundle, but **say in your answer that semantic search
+did not take part**: relevant content that lexical matching cannot reach may be
+missing.
 
 ## `LOW_RELEVANCE`
 
-**No es una degradación**: todas las vías funcionaron, el bundle está completo
-y bien citado. Lo que dice es que la biblioteca **no tiene contenido sobre el
-tema consultado**, y por eso `status` sigue siendo `"ok"` con código de salida
-`0`.
+**It is not a degradation**: every path worked, the bundle is complete and
+properly cited. What it says is that the library **has no content on the topic
+queried**, and that is why `status` is still `"ok"` with exit code `0`.
 
-Aparece porque la búsqueda vectorial es un ranking exhaustivo sin piso: toda
-consulta sobre una biblioteca no vacía devuelve algo, aunque sea el material
-menos lejano en vez de una respuesta. El mensaje incluye el puntaje real y el
-umbral, por ejemplo `0.8206 against a 0.84 relevance floor`.
+It appears because vector search is an exhaustive ranking with no floor: any
+query over a non-empty library returns something, even if it is the least
+distant material rather than an answer. The message includes the real score and
+the threshold, for example `0.8206 against a 0.84 relevance floor`.
 
-Qué hacer cuando aparece:
+What to do when it appears:
 
-- **Decilo en tu respuesta.** No presentes ese contenido como si respondiera
-  la pregunta; lo más probable es que no tenga relación.
-- **Leé igual el bundle antes de descartarlo.** El umbral está calibrado sobre
-  una colección concreta y puede equivocarse: si el contenido resulta
-  pertinente, usalo y aclará el matiz.
-- **No reintentes el mismo comando**: va a dar exactamente lo mismo. Si creés
-  que la biblioteca sí cubre el tema, reformulá la consulta con los términos
-  que usaría el video.
-- **Si esperabas cobertura y no la hay**, puede faltar sincronizar una fuente
-  (`sync`) o directamente registrarla (`source add`).
+- **Say so in your answer.** Do not present that content as if it answered the
+  question; most likely it is unrelated.
+- **Read the bundle anyway before discarding it.** The threshold is calibrated
+  over a particular collection and can be wrong: if the content turns out to be
+  pertinent, use it and state the nuance.
+- **Do not retry the same command**: it will give exactly the same thing. If you
+  believe the library does cover the topic, rephrase the query with the terms
+  the video would use.
+- **If you expected coverage and there is none**, a source may need
+  synchronising (`sync`) or registering outright (`source add`).
 
-**El número está siempre disponible**, dispare o no el aviso:
-`metrics.top_vector_similarity` en `result.json` trae el coseno del mejor
-resultado semántico. Úsalo para juzgar por tu cuenta en vez de confiar sólo en
-la presencia o ausencia del aviso — el umbral está calibrado sobre una
-colección concreta y el margen es fino. Un caso real midió `0.8399` contra un
-piso de `0.84`: una diezmilésima más y no habría avisado.
+**The number is always available**, whether or not the warning fires:
+`metrics.top_vector_similarity` in `result.json` carries the cosine of the best
+semantic result. Use it to judge on your own instead of trusting only the
+presence or absence of the warning — the threshold is calibrated over a
+particular collection and the margin is thin. A real case measured `0.8399`
+against a floor of `0.84`: one ten-thousandth more and it would not have warned.
 
-## `sync` falló parcialmente
+## `sync` failed partially
 
-Un paquete inválido no bloquea el resto de la colección: se aísla como issue
-y los demás videos se indexan igual. Revisá `warnings` en el recibo para ver
-qué videos quedaron afuera y por qué.
+An invalid package does not block the rest of the collection: it is isolated as
+an issue and the other videos are indexed all the same. Check `warnings` in the
+receipt to see which videos were left out and why.
 
-Un `sync` interrumpido, relanzado o cortado a la mitad **no corrompe la
-biblioteca**: la siguiente corrida completa reconstruye el estado correcto.
-No intentes reparar nada a mano.
+An interrupted, relaunched or half-cut `sync` **does not corrupt the library**:
+the next complete run rebuilds the correct state. Do not try to repair anything
+by hand.
 
-## `sync` parece colgado
+## `sync` looks hung
 
-Antes de asumir que falló, leé la sección de `sync` en `SKILL.md`: la primera
-indexación de una colección grande tarda entre 5 y 10 minutos, y eso es
+Before assuming it failed, read the `sync` section of `SKILL.md`: the first
+indexing of a large collection takes between 5 and 10 minutes, and that is
 normal.
 
-No uses el conteo de videos de `status` como señal de progreso: mientras un
-`sync` está en curso puede subir y bajar. La única señal fiable de que
-terminó es el recibo JSON del propio comando.
+Do not use the video count of `status` as a progress signal: while a `sync` is
+in progress it can go up and down. The only reliable signal that it finished is
+the JSON receipt of the command itself.
 
-Un segundo `sync` simultáneo ya no es posible: el producto lo rechaza con
+A second simultaneous `sync` is no longer possible: the product rejects it with
 `SYNC_ALREADY_RUNNING`.
 
 ## `SYNC_ALREADY_RUNNING`
 
-Hay un run activo para esa fuente. Dos casos:
+There is an active run for that source. Two cases:
 
-1. **Un `sync` sigue trabajando de verdad.** Esperá su recibo JSON. No
-   fuerces nada.
-2. **Un `sync` anterior murió** (Ctrl+C, terminal cerrada, corte) y dejó su
-   registro marcado como activo. `doctor` lo reporta como `STALE_SYNC_RUN`
-   con su antigüedad. Para destrabarlo:
+1. **A `sync` is really still working.** Wait for its JSON receipt. Do not force
+   anything.
+2. **A previous `sync` died** (Ctrl+C, terminal closed, power cut) and left its
+   record marked as active. `doctor` reports it as `STALE_SYNC_RUN` with its
+   age. To unblock it:
 
    ```text
    auto-youtube-rag sync --force
    ```
 
-   Marca el run abandonado como fallido —dejando un issue `RUN_SUPERSEDED`
-   como constancia— y arranca uno nuevo.
+   It marks the abandoned run as failed —leaving a `RUN_SUPERSEDED` issue as a
+   record— and starts a new one.
 
-La antigüedad que informa `doctor` es la señal para distinguir los dos casos:
-un run de minutos probablemente siga vivo; uno de horas, no.
+The age that `doctor` reports is the signal that tells the two cases apart: a
+run of minutes is probably still alive; one of hours is not.
 
-`rebuild` emite el mismo código, con una diferencia: abarca **todas** las
-fuentes, así que un run activo en cualquiera de ellas lo bloquea, y **no acepta
-`--force`**. Destrabá primero con `sync --source <nombre> --force` y después
-corré el rebuild.
+`rebuild` emits the same code, with one difference: it covers **every** source,
+so an active run in any of them blocks it, and it **does not accept `--force`**.
+Unblock first with `sync --source <name> --force` and then run the rebuild.
 
-## `rebuild` terminó en `partial` o `failed`
+## `rebuild` ended in `partial` or `failed`
 
-`partial` significa que alguna fuente se degradó mientras se regeneraba, y las
-demás se reconstruyeron bien; `failed`, que ninguna pudo reconstruirse. En los
-dos casos el código de salida es `1` y los `issues` del recibo dicen qué video
-falló y por qué — se leen igual que los de `sync`.
+`partial` means that some source degraded while being regenerated, and the
+others were rebuilt correctly; `failed`, that none could be rebuilt. In both
+cases the exit code is `1` and the `issues` of the receipt say which video
+failed and why — they are read just like those of `sync`.
 
-**La biblioteca no queda corrupta.** Si el proceso se interrumpe a la mitad
-(Ctrl+C, corte, terminal cerrada) queda parcialmente reconstruida, que no es un
-estado dañado ni requiere reparación manual: volvé a correr
-`rebuild --confirm`, que deja siempre el mismo resultado. Mientras tanto
-`retrieve` puede devolver menos contexto del esperado.
+**The library is not left corrupt.** If the process is interrupted halfway
+(Ctrl+C, power cut, terminal closed) it is left partially rebuilt, which is not
+a damaged state and requires no manual repair: run `rebuild --confirm` again,
+which always leaves the same result. In the meantime `retrieve` may return less
+context than expected.
 
-Lo que `rebuild` **no** arregla: un `sync` que falló por un paquete inválido.
-Eso se resuelve leyendo los `issues` del recibo de `sync`, no borrando y
-regenerando la biblioteca entera.
+What `rebuild` does **not** fix: a `sync` that failed because of an invalid
+package. That is solved by reading the `issues` of the `sync` receipt, not by
+deleting and regenerating the whole library.
 
-## Verificar integridad
+## Verifying integrity
 
-`auto-youtube-rag doctor` corre un chequeo de sólo lectura sobre SQLite,
-FTS5, el modelo local y el esquema. Es seguro correrlo en cualquier momento
-y no modifica nada. Si `doctor` da `ok` pero un resultado te parece raro, el
-problema no es de integridad de la base.
+`auto-youtube-rag doctor` runs a read-only check over SQLite, FTS5, the local
+model and the schema. It is safe to run at any moment and modifies nothing. If
+`doctor` says `ok` but a result looks odd to you, the problem is not one of
+database integrity.
