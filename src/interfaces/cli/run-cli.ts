@@ -116,7 +116,7 @@ async function legacyLibraryWarnings(
 
 /**
  * Verifies a command's requirement exactly once, before the Application is
- * built (Z2 of docs/install-tasks.md): a missing library or model produces
+ * built (docs/install-design.md): a missing library or model produces
  * one accessible error naming the command that fixes it, instead of the
  * raw ERR_SQLITE_ERROR (missing library) or one MODEL_LOAD_FAILED issue
  * per video (missing model) the 13 August cold run hit.
@@ -152,7 +152,7 @@ async function preflight(
 
 /**
  * Recognizes a raw SQLite driver failure so it can be translated instead
- * of propagated (Z4 of docs/install-tasks.md): `SQLiteMigrationError`
+ * of propagated (docs/install-design.md): `SQLiteMigrationError`
  * (open-database.ts's own schema/version checks) and `ERR_SQLITE_ERROR`
  * (node:sqlite's code for a file that fails to open as a database, e.g.
  * "file is not a database").
@@ -266,7 +266,7 @@ export async function runCli(options: RunCliOptions): Promise<number> {
 
       // doctor's whole job is diagnosing what is broken: it must keep
       // running and report the detail instead of crashing the same way
-      // sync/retrieve do (Z4 of docs/install-tasks.md).
+      // sync/retrieve do (docs/install-design.md).
       if (command.kind === "doctor") {
         options.stdout.write(
           renderCliSuccess(

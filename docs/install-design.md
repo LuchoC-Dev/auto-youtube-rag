@@ -377,7 +377,7 @@ que mande a `doctor`, en vez de propagar el error crudo del driver.
   "schema_version": "1.0",
   "status": "installed",
   "model": { "key": "e5-small", "version": "1", "dimensions": 384 },
-  "cache_path": "C:\\Users\\lucho\\.auto-youtube-rag\\models",
+  "cache_path": "C:\\Users\\<user>\\.auto-youtube-rag\\models",
   "bytes": 135266304,
   "source": "download"
 }
