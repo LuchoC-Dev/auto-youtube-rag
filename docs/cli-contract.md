@@ -4,7 +4,7 @@
 
 Contrato aprobado y completo para el MVP, ampliado el 13 de agosto de 2026
 con el punto 4.2 (hogar de usuario e instalación del modelo). Diseño en
-`docs/install-design.md`, checklist fino en `docs/install-tasks.md`.
+`docs/install-design.md`.
 
 ## Principios
 

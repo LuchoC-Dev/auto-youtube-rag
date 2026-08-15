@@ -268,8 +268,8 @@ a la de `rules.json` (`patterns`/`principle`/`problem`/`rules`/`avoid`/
 manifest ni reusar `rules-json-parser.ts`.
 
 El 13 de agosto de 2026 se aprobó el diseño completo en
-[analysis-schema-design.md](analysis-schema-design.md) (checklist fino en
-`docs/analysis-schema-tasks.md`, bloques P–T), con estas decisiones:
+[analysis-schema-design.md](analysis-schema-design.md) (bloques P–T), con
+estas decisiones:
 
 - **Ambos esquemas se sostienen indefinidamente.** `rules.json`/schema 1.0
   no se congela ni se deprecia — los 34 videos existentes de `auto-design`
@@ -291,8 +291,8 @@ El 13 de agosto de 2026 se aprobó el diseño completo en
   `analysis.json` de `auto-design` fue incluida en este trabajo, no
   pospuesta.
 
-**Implementado y cerrado el 13 de agosto de 2026** — bloques P–T de
-`docs/analysis-schema-tasks.md` completos. Validación real (bloque T)
+**Implementado y cerrado el 13 de agosto de 2026** — bloques P–T
+completos. Validación real (bloque T)
 ejecutada contra una copia temporal de la colección real `auto-design`
 (51 videos, incluidos los 17 con `analysis.json`) con el modelo E5 real:
 
@@ -387,8 +387,8 @@ mismo tipo de corrida con la skill ya dividida.
 ## Instalación: hogar de usuario, `init` instalador y preflight (punto 4.2)
 
 Implementado el 13 y 14 de agosto de 2026. Diseño completo en
-`docs/install-design.md`, checklist en `docs/install-tasks.md`. Cierra el
-pendiente "Default del caché del modelo" que había abierto la corrida en frío.
+`docs/install-design.md`. Cierra el pendiente "Default del caché del modelo"
+que había abierto la corrida en frío.
 
 La investigación arrancó por un síntoma —63 issues `MODEL_LOAD_FAILED`— y
 llegó a una causa mucho más profunda: **nunca se había decidido cómo se
@@ -669,10 +669,9 @@ no debe haberse escrito.
 
 ## Perfil de modelo y política de prefijos
 
-Implementado el 14 de agosto de 2026. Diseño en `docs/model-profile-design.md`,
-checklist fino en `docs/model-profile-tasks.md` (punto 4.5). Cierra el frente
-número 1 del orden de prioridad fijado el 14 de agosto en
-`docs/agent-handoff.md`.
+Implementado el 14 de agosto de 2026. Diseño en `docs/model-profile-design.md`
+(punto 4.5). Cierra el frente número 1 del orden de prioridad fijado el 14 de
+agosto en `docs/agent-handoff.md`.
 
 **El problema.** Los prefijos `passage: ` y `query: ` se aplicaban **siempre**,
 en dos funciones de módulo de lo que era `e5-embedding-generator.ts`. Son

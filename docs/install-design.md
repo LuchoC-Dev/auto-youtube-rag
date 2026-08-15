@@ -3,8 +3,7 @@
 ## Estado
 
 Propuesto el 13 de agosto de 2026. Punto 4.2, posterior al MVP. Requiere
-aprobación explícita antes de implementar. Checklist fino en
-`docs/install-tasks.md`.
+aprobación explícita antes de implementar.
 
 ## Contexto
 
@@ -475,7 +474,7 @@ null` — `null` es explícito ("este modelo no lleva prefijos"), no un
   (sufijo `+noprefix` sin prefijos), así que un perfil futuro sin prefijos
   invalida y reindexa automáticamente; con el perfil activo el literal de
   `version` no cambió, así que nada se reindexó al implementar esto (validado
-  en AD3 de `docs/model-profile-tasks.md`). Detalle en `docs/decisions.md`.
+  en AD3 de `docs/model-profile-design.md`). Detalle en `docs/decisions.md`.
 - **Dos modelos no conviven en la práctica**, aunque el esquema lo permita
   (`PRIMARY KEY (fragment_id, model_key)`). `applyPackage` hace `DELETE FROM
 source_documents`, y la cascada `source_documents → knowledge_units →
@@ -515,8 +514,7 @@ no hay LLM interno.
 | Z      | Preflight de requisitos y traducción de fallos de estado     |
 | Y      | Validación real en frío y cierre de documentación            |
 
-Orden de ejecución: U → V → W → X → Z → Y. Detalle en
-`docs/install-tasks.md`.
+Orden de ejecución: U → V → W → X → Z → Y.
 
 ## Decisiones confirmadas (13 de agosto de 2026)
 

@@ -4,8 +4,8 @@
 
 **Aprobado el 13 de agosto de 2026, implementado y validado el mismo día.**
 Las cuatro decisiones abiertas quedaron resueltas (ver "Decisiones
-confirmadas" al final). Checklist fino en `docs/analysis-schema-tasks.md`
-(bloques P–T, completos). Validación real contra la colección `auto-design`
+confirmadas" al final). Bloques P–T, completos. Validación real contra la
+colección `auto-design`
 en `docs/decisions.md`, sección "Soporte de `analysis.json` (schema 2.0):
 implementado y validado".
 
@@ -348,7 +348,7 @@ real ya poblada la dejaría en un estado inconsistente (`CHECK` nuevo, pero
 `schema_version` desactualizada frente a lo que el código de ese momento
 esperaba).
 
-## Documentos a actualizar al implementar (ver T3 en `analysis-schema-tasks.md`)
+## Documentos a actualizar al implementar (ver T3)
 
 - `docs/product-spec.md`: agregar `analysis.json` a la tabla de contenido
   indexado.
@@ -364,7 +364,7 @@ esperaba).
   ejerciten específicamente contenido de `analysis.json` — no es parte de
   este diseño, se anota para no perderlo.
 
-## Plan de bloques (detallado en `docs/analysis-schema-tasks.md`)
+## Plan de bloques
 
 - **Bloque P** — contratos: snapshots de aplicación, `ManifestResourceSnapshot`
   extendido, `readResource` opcional, `KnowledgeUnitType` nuevos, `sourceDocumentKinds`

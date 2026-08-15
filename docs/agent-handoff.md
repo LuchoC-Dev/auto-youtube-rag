@@ -57,7 +57,7 @@ pendiente urgente.
 | Dato                      | Valor                                                                                                  |
 | ------------------------- | ------------------------------------------------------------------------------------------------------ |
 | Proyecto                  | `auto-youtube-rag`                                                                                     |
-| Repositorio               | `C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag`                               |
+| Repositorio               | `<repo>` (raíz del checkout local)                                                                     |
 | Rama actual               | `main`                                                                                                 |
 | Remoto                    | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (privado)                                          |
 | Último commit documentado | ver `git log --oneline -1`; el trabajo de este documento cierra el punto 4.6                           |
@@ -99,44 +99,37 @@ Antes de modificar código, leer en este orden:
 1. `docs/product-spec.md`: objetivo, alcance, límites y producto completo.
 2. `docs/decisions.md`: decisiones confirmadas y alternativas descartadas.
 3. `docs/cli-contract.md`: contrato público aprobado, incluso comandos futuros.
-4. `docs/build.md`: tracker de etapas y porcentaje real.
-5. `docs/indexing-design.md`: modelo lógico y arquitectura del punto 2.1.
-6. `docs/indexing-plan.md`: estrategia por bloques A–E.
-7. `docs/indexing-tasks.md`: checklist fino ya completado para 2.1.
-8. `docs/retrieval-design.md`: contratos, adaptadores y política de fusión del
+4. `docs/build.md`: historial de construcción, qué entregó cada punto y cómo
+   se validó.
+5. `docs/indexing-design.md`: modelo lógico y arquitectura del punto 2.1, ya
+   completado.
+6. `docs/retrieval-design.md`: contratos, adaptadores y política de fusión del
    punto 2.2, ya completado.
-9. `docs/retrieval-tasks.md`: checklist fino completado F1–H5 para 2.2.
-10. `docs/context-assembly-design.md`: contratos, capas, expansión,
-    deduplicación, presupuesto, citas y contrato de bundle del punto 2.3, ya
-    completado.
-11. `docs/context-assembly-tasks.md`: checklist fino completado I1–L3 para
-    2.3.
-12. `skill/SKILL.md`: skill portable ya verificada, punto 2.4 completado.
-13. `docs/eval-design.md`: diseño de dos capas de evaluación del punto 3.2,
-    ya completado.
-14. `docs/eval-tasks.md`: checklist fino completado M1–O2 para 3.2.
-15. `evals/results/2026-08-12/report.md`: reporte final de 3.2 — resumen
+7. `docs/context-assembly-design.md`: contratos, capas, expansión,
+   deduplicación, presupuesto, citas y contrato de bundle del punto 2.3, ya
+   completado.
+8. `skill/SKILL.md`: skill portable ya verificada, punto 2.4 completado.
+9. `docs/eval-design.md`: diseño de dos capas de evaluación del punto 3.2,
+   ya completado.
+10. `evals/results/2026-08-12/report.md`: reporte final de 3.2 — resumen
     ejecutivo, métricas de Capa A, comparación Codex/Claude de Capa B,
     hallazgos accionables y la decisión de calibración (O1).
-16. `docs/analysis-schema-design.md`: diseño de soporte de `analysis.json`
+11. `docs/analysis-schema-design.md`: diseño de soporte de `analysis.json`
     (schema 2.0), punto 4.1, ya completado.
-17. `docs/analysis-schema-tasks.md`: checklist fino completado P1–T3 para
-    4.1.
-18. `docs/install-design.md`: diseño de instalación —hogar de usuario, `init`
+12. `docs/install-design.md`: diseño de instalación —hogar de usuario, `init`
     como instalador y preflight— del punto 4.2, ya completado. Incluye la
     nota "qué haría falta para soportar otro modelo", que es el punto de
     partida del frente siguiente.
-19. `docs/install-tasks.md`: checklist fino completado U–Z e Y para 4.2.
-20. `docs/sync-safety-design.md`: guard de concurrencia, runs fantasma y
+13. `docs/sync-safety-design.md`: guard de concurrencia, runs fantasma y
     tamaño de lote del punto 4.3, ya completado.
-21. `docs/rebuild-design.md` y `docs/rebuild-tasks.md`: el comando
-    `rebuild --confirm` del punto 4.6, ya completado. Incluye por qué el
-    ordenamiento por longitud se cerró sin escribir código.
-22. `docs/low-relevance-design.md`: el aviso `LOW_RELEVANCE` y la métrica
+14. `docs/rebuild-design.md`: el comando `rebuild --confirm` del punto 4.6,
+    ya completado. Incluye por qué el ordenamiento por longitud se cerró sin
+    escribir código.
+15. `docs/low-relevance-design.md`: el aviso `LOW_RELEVANCE` y la métrica
     `top_vector_similarity` del punto 4.7, ya completado. Incluye la tabla de
     24 mediciones que fija el umbral y por qué `fusedScore` no sirve para
     medir relevancia.
-23. Este documento: estado operativo consolidado del MVP, de los puntos 4.1
+16. Este documento: estado operativo consolidado del MVP, de los puntos 4.1
     a 4.7, el orden de prioridad ya agotado y lo que enseñó la sesión del 13 y
     14 de agosto.
 
@@ -266,7 +259,7 @@ Los bloques F–H están completados:
 
 Detalle completo, decisiones y notas de implementación en la sección
 ["Punto 2.2 completado"](#punto-22-completado--recuperación-híbrida) más abajo,
-y en `docs/retrieval-design.md` / `docs/retrieval-tasks.md`.
+y en `docs/retrieval-design.md`.
 
 ### Punto 2.3 — ensamblado de contexto
 
@@ -284,8 +277,7 @@ Los bloques I–L están completados:
 - L: comando `retrieve` de la CLI, E2E completo y cierre de documentación.
 
 `retrieve` está anunciado y disponible. Detalle completo, decisiones y notas
-de implementación en `docs/context-assembly-design.md` y
-`docs/context-assembly-tasks.md`.
+de implementación en `docs/context-assembly-design.md`.
 
 ### Punto 2.4 — skill general
 
@@ -316,7 +308,7 @@ truth etiquetado a mano (diseño en `docs/eval-design.md`):
 
 Detalle completo, decisiones y hallazgos accionables en la sección
 ["Punto 3.2 completado"](#punto-32-completado--evaluaciones-del-mvp) más
-abajo, en `docs/eval-design.md` / `docs/eval-tasks.md`, y en
+abajo, en `docs/eval-design.md`, y en
 `evals/results/2026-08-12/report.md`.
 
 `docs/build.md` marca 2.1, 2.2, 2.3, 2.4, 3.1 y 3.2 al 100%. El MVP completo
@@ -735,7 +727,7 @@ invoca por nombre.
 ## Comandos de desarrollo y calidad
 
 ```powershell
-cd C:\Users\lucho\Desktop\Programacion\fast-weekend-core\auto-youtube-rag
+cd <repo>
 node --version
 npm.cmd run typecheck
 npm.cmd run lint
@@ -953,7 +945,7 @@ Invariantes propias de ensamblado de contexto (2.3):
 ## Punto 2.2 completado — recuperación híbrida
 
 Bloques F–H están completados (contratos, adaptadores, orquestación). Detalle
-completo en `docs/retrieval-design.md` y `docs/retrieval-tasks.md`.
+completo en `docs/retrieval-design.md`.
 
 Decisiones cerradas durante 2.2 que no deben reabrirse sin motivo:
 
@@ -992,7 +984,7 @@ cualitativa sobre la colección real, en
 
 Bloques I–L están completados (contratos, expansión/deduplicación/presupuesto/
 citas, redacción, orquestación, CLI). Detalle completo en
-`docs/context-assembly-design.md` y `docs/context-assembly-tasks.md`.
+`docs/context-assembly-design.md`.
 
 Decisiones cerradas durante 2.3 que no deben reabrirse sin motivo (registradas
 también en `decisions.md`):
@@ -1076,8 +1068,8 @@ add` espera la ruta a la
 ## Punto 3.2 completado — evaluaciones del MVP
 
 Bloques M–O están completados (Capa A mecánica, Capa B juzgada, calibración
-y cierre). Diseño en `docs/eval-design.md`, checklist fino en
-`docs/eval-tasks.md`, reporte final en `evals/results/2026-08-12/report.md`.
+y cierre). Diseño en `docs/eval-design.md`, reporte final en
+`evals/results/2026-08-12/report.md`.
 
 Fue, según lo previsto, la primera validación completa sobre la colección
 real `auto-design` con el modelo E5 real (no fixtures ni copias parciales),
@@ -1168,10 +1160,10 @@ motivo (registrados también en `decisions.md` y en el reporte final):
 ## Punto 4.1 completado — soporte de `analysis.json` (schema 2.0)
 
 Primer trabajo posterior al MVP, cerrado el 13 de agosto de 2026. Bloques
-P–T de `docs/analysis-schema-tasks.md` completos (contratos, parser,
-lectura de paquete, unidades de conocimiento, migración SQLite, bucketing,
-E2E con fixtures y validación real). Diseño completo en
-`docs/analysis-schema-design.md`, decisión de cierre en `docs/decisions.md`
+P–T completos (contratos, parser, lectura de paquete, unidades de
+conocimiento, migración SQLite, bucketing, E2E con fixtures y validación
+real). Diseño completo en `docs/analysis-schema-design.md`, decisión de
+cierre en `docs/decisions.md`
 sección "Soporte de `analysis.json` (schema 2.0): implementado y
 validado".
 
@@ -1221,8 +1213,8 @@ ningún video con `resources.analysis`.
 
 ## Punto 4.5 completado — perfil de modelo de embeddings
 
-Cerrado el 14 de agosto de 2026. Diseño en `docs/model-profile-design.md`,
-checklist fino en `docs/model-profile-tasks.md` (bloques AA–AD). Origen: los
+Cerrado el 14 de agosto de 2026. Diseño en `docs/model-profile-design.md`
+(bloques AA–AD). Origen: los
 prefijos `passage:`/`query:` de E5 se aplicaban siempre, sin excepción, y
 degradaban en silencio cualquier otro modelo — hueco anotado al investigar
 4.2, fijado como frente número 1 el 14 de agosto.
@@ -1399,8 +1391,8 @@ la biblioteca de 51 videos.
 
 ## Punto 4.6 completado — comando `rebuild --confirm`
 
-Cerrado el 14 de agosto de 2026. Diseño en `docs/rebuild-design.md`, checklist
-fino en `docs/rebuild-tasks.md` (bloques AE–AH).
+Cerrado el 14 de agosto de 2026. Diseño en `docs/rebuild-design.md`
+(bloques AE–AH).
 
 Qué resuelve: `sync` es incremental y `unchanged()` sólo compara el hash del
 paquete y la identidad del modelo. Un tamaño de lote distinto —la reindexación
@@ -1460,8 +1452,8 @@ verde.
 2. Ejecutar `npm.cmd run check` y `npm.cmd run build`. La referencia al
    cerrar el punto 4.6, el 14 de agosto: **342 tests, 0 fallos**.
 3. Leer los documentos del orden de lectura, incluidos los diseños
-   posteriores al MVP: `install-design.md`, `install-tasks.md`,
-   `sync-safety-design.md`, `model-profile-design.md` y `rebuild-design.md`.
+   posteriores al MVP: `install-design.md`, `sync-safety-design.md`,
+   `model-profile-design.md` y `rebuild-design.md`.
 4. **No hay un frente decidido esperando.** El orden de prioridad que el
    usuario fijó el 14 de agosto se agotó: sus dos puntos se cerraron ese
    mismo día (4.6 el segundo; el primero, sin código, por inerte). Lo que
