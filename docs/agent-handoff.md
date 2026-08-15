@@ -1061,281 +1061,274 @@ Decisions closed during 2.4 that should not be reopened without cause:
 - No file of `src/`, `docs/cli-contract.md` or `docs/product-spec.md` was
   modified: 2.4 was strictly usage documentation over an already closed CLI.
 
-## Punto 3.2 completado — evaluaciones del MVP
+## Point 3.2 completed — MVP evaluations
 
-Bloques M–O están completados (Capa A mecánica, Capa B juzgada, calibración
-y cierre). Diseño en `docs/eval-design.md`, reporte final en
+Blocks M–O are completed (mechanical Layer A, judged Layer B, calibration and
+closure). Design in `docs/eval-design.md`, final report in
 `evals/results/2026-08-12/report.md`.
 
-Fue, según lo previsto, la primera validación completa sobre la colección
-real `auto-design` con el modelo E5 real (no fixtures ni copias parciales),
-usando el procedimiento ya documentado en "Última validación conocida" →
-notas de 2.2/2.3.
+It was, as planned, the first complete validation over the real `auto-design`
+collection with the real E5 model (not fixtures or partial copies), using the
+procedure already documented in "Last known validation" → the 2.2/2.3 notes.
 
-Decisiones y hallazgos cerrados durante 3.2 que no deben reabrirse sin
-motivo (registrados también en `decisions.md` y en el reporte final):
+Decisions and findings closed during 3.2 that should not be reopened without
+cause (also recorded in `decisions.md` and in the final report):
 
-- **Sin ground truth etiquetado a mano.** Mide en dos capas independientes:
-  Capa A mecánica (verificable con código, sin agente) y Capa B juzgada
-  (rúbrica corta respondida por el agente consumidor real sobre el bundle ya
-  ensamblado). El criterio de éxito del producto es cobertura amplia y
-  citada, no coincidencia puntual contra una lista de "fragmentos
-  correctos".
-- **Deriva de esquema real en `auto-design`, con causa raíz identificada
-  fuera de este repositorio.** La colección creció de 34 a 51 videos; 17
-  usan `resources.analysis` en vez de `resources.rules`. Investigación
-  posterior a 3.2 (13 de agosto) contra el repositorio real de la skill
-  productora (`youtube-video-context`) encontró la causa exacta: el 2 de
-  agosto esa skill reemplazó `rules.json`/schema 1.0 por
-  `analysis.json`/schema 2.0 en un breaking change deliberado y documentado
-  (commit `aecdde9`, "deja de producir un manual de reglas de diseño para
-  producir un análisis general"). No es un rename de campo — la forma de
-  `analysis.json` (`topics`/`recommendations`/`assessment`/
-  `evidence_boundary`) es incompatible con la de `rules.json`
-  (`patterns`/`principle`/`rules`/`avoid`/`acceptanceCriteria`). Los 34
-  videos "válidos" son los generados **antes** del pivot; los 17 "rotos" son
-  los generados **con la skill actual** — es `auto-youtube-rag` el que
-  quedó atrás, no al revés, y todo video nuevo de acá en adelante va a usar
-  schema 2.0. Detalle completo en `docs/decisions.md`, sección "Pendientes
-  de decisión" → "Soporte de `analysis.json` (schema 2.0)".
+- **No hand-labelled ground truth.** It measures in two independent layers:
+  mechanical Layer A (verifiable with code, without an agent) and judged Layer
+  B (a short rubric answered by the real consuming agent over the already
+  assembled bundle). The product's success criterion is broad, cited coverage,
+  not a pinpoint match against a list of "correct fragments".
+- **Real schema drift in `auto-design`, with a root cause identified outside
+  this repository.** The collection grew from 34 to 51 videos; 17 use
+  `resources.analysis` instead of `resources.rules`. Investigation after 3.2
+  (13 August) against the real repository of the producing skill
+  (`youtube-video-context`) found the exact cause: on 2 August that skill
+  replaced `rules.json`/schema 1.0 with `analysis.json`/schema 2.0 in a
+  deliberate and documented breaking change (commit `aecdde9`, "deja de
+  producir un manual de reglas de diseño para producir un análisis general").
+  It is not a field rename — the shape of `analysis.json`
+  (`topics`/`recommendations`/`assessment`/`evidence_boundary`) is incompatible
+  with that of `rules.json`
+  (`patterns`/`principle`/`rules`/`avoid`/`acceptanceCriteria`). The 34 "valid"
+  videos are the ones generated **before** the pivot; the 17 "broken" ones are
+  the ones generated **with the current skill** — it is `auto-youtube-rag` that
+  fell behind, not the other way around, and every new video from here on will
+  use schema 2.0. Full detail in `docs/decisions.md`, section "`analysis.json`
+  support (schema 2.0): implemented and validated".
 
-  **Ya resuelto (13 de agosto): la mitad "amplificadora" del problema.**
-  Antes, una sola entrada de video con esquema roto abortaba la lectura de
-  _todo_ el manifest (`parseManifest` tiraba en el primer video inválido),
-  así que ningún video de la fuente podía sincronizar — ni siquiera los 34
-  válidos. `parseManifest` (`manifest-reader.ts`) ahora es tolerante por
-  video: sólo los fallos de raíz (root no objeto, `videos` no array, JSON
-  inválido, archivo no legible) siguen siendo fatales; una entrada de video
-  con esquema inválido o un id/slug duplicado se descarta y se reporta como
-  `ManifestVideoIssue` en `ManifestSnapshot.issues`, sin tumbar el resto.
-  `syncSource` traduce cada una en un `SyncIssue`
-  (`MANIFEST_ENTRY_SCHEMA_INVALID`/`MANIFEST_ENTRY_DUPLICATE`) y protege de
-  borrado cualquier paquete previamente indexado de ese video. Ver
-  `docs/decisions.md`, sección "Validación tolerante por video en el
-  manifest", y `docs/indexing-design.md`.
+  **Already resolved (13 August): the "amplifying" half of the problem.**
+  Before, a single video entry with a broken schema aborted the reading of
+  _the whole_ manifest (`parseManifest` threw on the first invalid video), so
+  no video of the source could sync — not even the 34 valid ones.
+  `parseManifest` (`manifest-reader.ts`) is now tolerant per video: only root
+  failures (root not an object, `videos` not an array, invalid JSON, unreadable
+  file) remain fatal; a video entry with an invalid schema or a duplicate
+  id/slug is discarded and reported as a `ManifestVideoIssue` in
+  `ManifestSnapshot.issues`, without bringing down the rest. `syncSource`
+  translates each one into a `SyncIssue`
+  (`MANIFEST_ENTRY_SCHEMA_INVALID`/`MANIFEST_ENTRY_DUPLICATE`) and protects any
+  previously indexed package of that video from deletion. See
+  `docs/decisions.md`, section "Per-video tolerant validation in the manifest",
+  and `docs/indexing-design.md`.
 
-  **Todavía pendiente: la mitad "de fondo".** Los 17 videos con
-  `resources.analysis` siguen sin indexarse — ahora aislados como `issue`
-  en vez de bloquear la fuente entera, pero su contenido real
-  (`analysis.json`) sigue sin tener parser ni modelo de dominio en
-  `auto-youtube-rag`. Requiere diseño propio (parser nuevo, snapshot nuevo,
-  decisión de bucketing en `assembleContext`, decisión sobre sostener ambos
-  esquemas o congelar schema 1.0) y aprobación explícita antes de
-  implementar — no se resuelve con un alias de campo.
+  **Still pending: the "substantive" half.** The 17 videos with
+  `resources.analysis` are still not indexed — now isolated as an `issue`
+  instead of blocking the entire source, but their real content
+  (`analysis.json`) still has neither a parser nor a domain model in
+  `auto-youtube-rag`. It requires its own design (a new parser, a new snapshot,
+  a bucketing decision in `assembleContext`, a decision about supporting both
+  schemas or freezing schema 1.0) and explicit approval before implementing —
+  it is not solved with a field alias.
 
-- **Precisión aparente limitada por ruido de catálogo compartido, no por
-  errores de recuperación.** La mayoría de consultas semilla recupera del
-  mismo subconjunto de videos sobre catálogos de estilos/tendencias; más
-  profundidad tiende a sumar más catálogo tangencial, no más contenido
-  específico. Es una característica del corpus real; RRF no tiene hoy una
-  señal adicional (tipo de unidad, densidad temática) para distinguirlo.
-- **Decisión de calibración (O1): se mantienen los defaults sin cambios** —
-  RRF `k = 60`, `wText = wVector = 1.0`, presupuestos `focused` 12k /
-  `balanced` 32k / `deep` 64k. Ninguna señal de M3 o N4 cruzó la barra de
-  "evidencia clara" que fijaba `eval-design.md`: el agotamiento de
-  presupuesto casi universal es el comportamiento esperado de recuperar un
-  universo amplio de candidatos; la cobertura juzgada se aplana de
-  `balanced` a `deep` sin que ningún preset rinda peor que uno menor; y
-  `es-no-answer-unrelated-topic` —el único caso que nunca produce
-  `status: "no_results"`— igual obtiene `precision_aparente = 0.00` sin
-  divergencia entre jueces, así que el producto ya comunica la ausencia de
-  contenido relevante sin necesitar un piso de similitud vectorial.
-  Razonamiento completo, punto por punto, en `docs/decisions.md`, sección
-  "Decisión de calibración (O1, punto 3.2)".
-- **Las 9 discrepancias de 24 entre los jueces Codex y Claude (N4) no
-  señalan ningún defecto del producto.** Se explican por severidad de
-  criterio en `precision_aparente` (2 casos) o por ambigüedad real en
-  `evals/rubric-template.md` sobre "cobertura suficiente" y "cruce
-  multilingüe demostrado" (7 casos) — ningún juez leyó mal un bundle ni
-  inventó contenido. Afinar la rúbrica queda anotado para una futura pasada
-  de evaluación, no como pendiente de 3.2.
-- No se modificó ningún archivo de `src/`: 3.2 fue estrictamente medición
-  sobre un producto ya cerrado, y la única decisión con potencial de tocar
-  código (O1) concluyó en mantener los defaults.
+- **Apparent precision limited by shared catalogue noise, not by retrieval
+  errors.** Most seed queries retrieve from the same subset of videos about
+  style/trend catalogues; more depth tends to add more tangential catalogue,
+  not more specific content. It is a characteristic of the real corpus; RRF
+  has no additional signal today (unit type, topical density) to tell them
+  apart.
+- **Calibration decision (O1): the defaults are kept unchanged** — RRF
+  `k = 60`, `wText = wVector = 1.0`, budgets `focused` 12k / `balanced` 32k /
+  `deep` 64k. No signal from M3 or N4 cleared the "clear evidence" bar that
+  `eval-design.md` set: the almost universal budget exhaustion is the expected
+  behaviour of retrieving a broad universe of candidates; judged coverage
+  flattens out from `balanced` to `deep` without any preset performing worse
+  than a smaller one; and `es-no-answer-unrelated-topic` —the only case that
+  never produces `status: "no_results"`— still gets
+  `precision_aparente = 0.00` with no divergence between judges, so the
+  product already communicates the absence of relevant content without needing
+  a vector similarity floor. Full point-by-point reasoning in
+  `docs/decisions.md`, section "Calibration decision (O1, point 3.2)".
+- **The 9 discrepancies out of 24 between the Codex and Claude judges (N4)
+  point at no product defect.** They are explained by severity of criterion in
+  `precision_aparente` (2 cases) or by real ambiguity in
+  `evals/rubric-template.md` about "sufficient coverage" and "demonstrated
+  multilingual crossover" (7 cases) — no judge misread a bundle or invented
+  content. Refining the rubric is noted for a future evaluation pass, not as a
+  pending item of 3.2.
+- No file of `src/` was modified: 3.2 was strictly measurement over an already
+  closed product, and the only decision with the potential to touch code (O1)
+  concluded in keeping the defaults.
 
-## Punto 4.1 completado — soporte de `analysis.json` (schema 2.0)
+## Point 4.1 completed — `analysis.json` support (schema 2.0)
 
-Primer trabajo posterior al MVP, cerrado el 13 de agosto de 2026. Bloques
-P–T completos (contratos, parser, lectura de paquete, unidades de
-conocimiento, migración SQLite, bucketing, E2E con fixtures y validación
-real). Diseño completo en `docs/analysis-schema-design.md`, decisión de
-cierre en `docs/decisions.md`
-sección "Soporte de `analysis.json` (schema 2.0): implementado y
-validado".
+The first piece of post-MVP work, closed on 13 August 2026. Blocks P–T complete
+(contracts, parser, package reading, knowledge units, SQLite migration,
+bucketing, E2E with fixtures and real validation). Full design in
+`docs/analysis-schema-design.md`, closing decision in `docs/decisions.md`
+section "`analysis.json` support (schema 2.0): implemented and validated".
 
-Qué cambió en `src/`:
+What changed in `src/`:
 
-- `structuredContentKinds`/`StructuredContentKind` reemplaza los dos
-  booleanos `rules`/`analysis` de `ManifestResourceSnapshot` por un enum
-  obligatorio de tres valores; `manifest-reader.ts` colapsa los booleanos
-  crudos (cada uno opcional) y rechaza declarar ambos a la vez como
-  `MANIFEST_SCHEMA_INVALID`.
-- `analysis-json-parser.ts` (`parseAnalysisJson`) es un espejo de
-  `rules-json-parser.ts` para el schema 2.0
+- `structuredContentKinds`/`StructuredContentKind` replaces the two
+  `rules`/`analysis` booleans of `ManifestResourceSnapshot` with a mandatory
+  three-value enum; `manifest-reader.ts` collapses the raw booleans (each one
+  optional) and rejects declaring both at once as `MANIFEST_SCHEMA_INVALID`.
+- `analysis-json-parser.ts` (`parseAnalysisJson`) is a mirror of
+  `rules-json-parser.ts` for schema 2.0
   (`topics`/`recommendations`/`assessment`/`evidence_boundary`).
-- `filesystem-package-source-reader.ts` lee `deliverables/analysis.json`
-  mediante un `switch` exhaustivo sobre `structuredContent` (antes era un
-  `if` sólo para `rules`).
-- Cuatro `KnowledgeUnitType` nuevos: `analysis_document`, `analysis_section`,
+- `filesystem-package-source-reader.ts` reads `deliverables/analysis.json`
+  through an exhaustive `switch` over `structuredContent` (it used to be an
+  `if` only for `rules`).
+- Four new `KnowledgeUnitType`s: `analysis_document`, `analysis_section`,
   `analysis_topic`, `analysis_recommendation`. `buildAnalysisUnits`
-  (`build-knowledge-units.ts`) construye la jerarquía: raíz →
-  cinco secciones fijas (`Summary and lens`, `Evidence boundary`,
-  `Assessment`, cabecera `Topics`, cabecera `Recommendations`) →
-  `analysis_topic`/`analysis_recommendation` searchable bajo su cabecera.
-- `source_documents.kind` en SQLite acepta `'analysis'` (edición in-place de
-  `001-initial.ts`, no una migración incremental — no había ninguna base
-  real que preservar).
-- `classifyContextSection` (`context-blocks.ts`) suma
-  `analysis_document`/`analysis_section`/`analysis_topic` a
-  `highest_relevance` y `analysis_recommendation` a `related_rules`, sin
-  agregar una tercera sección al bundle ni tocar `cli-contract.md`.
-- `rules.json`/schema 1.0 sigue funcionando exactamente igual que antes;
-  ambos esquemas se sostienen indefinidamente, seleccionados por
-  `structuredContent`, no como versiones donde una reemplaza a la otra.
+  (`build-knowledge-units.ts`) builds the hierarchy: root → five fixed sections
+  (`Summary and lens`, `Evidence boundary`, `Assessment`, the `Topics` header,
+  the `Recommendations` header) → searchable
+  `analysis_topic`/`analysis_recommendation` under their header.
+- `source_documents.kind` in SQLite accepts `'analysis'` (an in-place edit of
+  `001-initial.ts`, not an incremental migration — there was no real database
+  to preserve).
+- `classifyContextSection` (`context-blocks.ts`) adds
+  `analysis_document`/`analysis_section`/`analysis_topic` to
+  `highest_relevance` and `analysis_recommendation` to `related_rules`, without
+  adding a third section to the bundle or touching `cli-contract.md`.
+- `rules.json`/schema 1.0 keeps working exactly as before; both schemas are
+  supported indefinitely, selected by `structuredContent`, not as versions
+  where one replaces the other.
 
-Validación real (bloque T, no fixtures): copia temporal de la colección
-real `auto-design` (51 videos, 17 con `analysis.json`) sincronizada con el
-modelo E5 real. Los 51 paquetes se indexaron sin ningún `issue`; `doctor`
-en `ok`; digest SHA-256 del árbol fuente idéntico antes/después. La consulta
-semilla nueva `es-analysis-neumorphism-accessibility`
-(`evals/queries/seed-queries.json`) produjo, vía `retrieve --depth
-balanced`, una cita real (`[S45]`) resuelta a una unidad `analysis_topic`
-del video real `psyw2_j_5jk`, en la sección "Highest-relevance context", con
-procedencia correcta y `context.md` legible. La copia temporal se borró al
-terminar. `design-catalog` (mencionada en diseños previos como segunda
-colección real candidata; en disco vive como `catalog-design` bajo
-`ai-transcripcion/`) no se usó para esta validación: su manifest no declara
-ningún video con `resources.analysis`.
+Real validation (block T, not fixtures): a temporary copy of the real
+`auto-design` collection (51 videos, 17 with `analysis.json`) synchronized with
+the real E5 model. The 51 packages were indexed without a single `issue`;
+`doctor` in `ok`; SHA-256 digest of the source tree identical before/after. The
+new seed query `es-analysis-neumorphism-accessibility`
+(`evals/queries/seed-queries.json`) produced, via `retrieve --depth balanced`,
+a real citation (`[S45]`) resolved to an `analysis_topic` unit of the real
+video `psyw2_j_5jk`, in the "Highest-relevance context" section, with correct
+provenance and a readable `context.md`. The temporary copy was deleted when
+finished. `design-catalog` (mentioned in previous designs as a second candidate
+real collection; on disk it lives as `catalog-design` under
+`ai-transcripcion/`) was not used for this validation: its manifest declares no
+video with `resources.analysis`.
 
-## Punto 4.5 completado — perfil de modelo de embeddings
+## Point 4.5 completed — embedding model profile
 
-Cerrado el 14 de agosto de 2026. Diseño en `docs/model-profile-design.md`
-(bloques AA–AD). Origen: los
-prefijos `passage:`/`query:` de E5 se aplicaban siempre, sin excepción, y
-degradaban en silencio cualquier otro modelo — hueco anotado al investigar
-4.2, fijado como frente número 1 el 14 de agosto.
+Closed on 14 August 2026. Design in `docs/model-profile-design.md` (blocks
+AA–AD). Origin: E5's `passage:`/`query:` prefixes were applied always, without
+exception, and silently degraded any other model — a gap noted while
+investigating 4.2, set as front number 1 on 14 August.
 
-Qué cambió en `src/` (ver también la sección de inventario más arriba):
+What changed in `src/` (see also the inventory section above):
 
-- Nace `model-profile.ts`: `EmbeddingModelProfile`, `activeModelProfile`
-  congelado, `modelVersion(profile)` y `modelDescriptorOf(profile)`. No
-  importa nada de fuera. `"Xenova/multilingual-e5-small"` pasó de tres
-  copias en `src/` a una sola.
-- El generador y el instalador reciben el perfil por inyección, con
-  `activeModelProfile` como default; ningún llamador de producto
-  (`create-application.ts`, `run-cli.ts`) pasa perfil explícito.
-  `countTokens` y `embedDocuments` comparten la misma función de prefijado.
-- `model-install-state.ts` recibe el perfil (o `repository`/`requiredFiles`)
-  en vez de leer constantes de módulo propias.
+- `model-profile.ts` is born: `EmbeddingModelProfile`, the frozen
+  `activeModelProfile`, `modelVersion(profile)` and
+  `modelDescriptorOf(profile)`. It imports nothing from outside.
+  `"Xenova/multilingual-e5-small"` went from three copies in `src/` to a single
+  one.
+- The generator and the installer receive the profile by injection, with
+  `activeModelProfile` as the default; no product caller
+  (`create-application.ts`, `run-cli.ts`) passes an explicit profile.
+  `countTokens` and `embedDocuments` share the same prefixing function.
+- `model-install-state.ts` receives the profile (or
+  `repository`/`requiredFiles`) instead of reading its own module constants.
 - Rename: `E5EmbeddingGenerator` → `TransformersEmbeddingGenerator`,
-  `E5ModelInstaller` → `TransformersModelInstaller`, con sus archivos y
-  tipos. Los valores de los códigos de error públicos no cambiaron.
+  `E5ModelInstaller` → `TransformersModelInstaller`, along with their files and
+  types. The values of the public error codes did not change.
 
-**La decisión de mayor riesgo:** la política de prefijos participa de
-`modelVersion`, así que apagar los prefijos algún día invalida y reindexa
-automáticamente por diseño, pero con el perfil activo el literal de
-`version` no se movió un carácter
-(`"Xenova/multilingual-e5-small@main:q8"`), fijado con un test de regresión.
-Validado contra el binario real (no sólo tests): sobre una copia temporal de
-3 videos reales de `auto-design` ya sincronizados con el código anterior a
-4.5, `sync` con el código nuevo devolvió `status: "no_changes"`,
-`packagesIndexed: 0`; `retrieve` no mostró `VECTORS_STALE` ni ningún otro
-warning; `doctor` reportó los seis checks en `ok`; el digest SHA-256 del
-árbol fuente fue idéntico antes y después. La copia y la base temporal se
-borraron al terminar.
+**The highest-risk decision:** the prefix policy takes part in `modelVersion`,
+so turning the prefixes off some day invalidates and reindexes automatically by
+design, but with the active profile the `version` literal did not move a single
+character (`"Xenova/multilingual-e5-small@main:q8"`), pinned with a regression
+test. Validated against the real binary (not only tests): over a temporary copy
+of 3 real `auto-design` videos already synchronized with the code prior to 4.5,
+`sync` with the new code returned `status: "no_changes"`, `packagesIndexed: 0`;
+`retrieve` showed neither `VECTORS_STALE` nor any other warning; `doctor`
+reported the six checks in `ok`; the SHA-256 digest of the source tree was
+identical before and after. The copy and the temporary database were deleted
+when finished.
 
-Hallazgo colateral, anotado en `docs/decisions.md`, no un pendiente:
-`parseManifest` rechaza un `manifest.json` con BOM UTF-8
-(`MANIFEST_JSON_INVALID`) — apareció por cómo PowerShell escribió el
-manifest de prueba, no afecta a los manifests reales de la skill productora.
+A collateral finding, noted in `docs/decisions.md`, not a pending item:
+`parseManifest` rejects a `manifest.json` with a UTF-8 BOM
+(`MANIFEST_JSON_INVALID`) — it appeared because of how PowerShell wrote the
+test manifest, and it does not affect the real manifests of the producing
+skill.
 
-`skill/SKILL.md` no se tocó: nada observable cambió para un agente
-consumidor. Estado final: **325 tests, 0 fallos**, `npm run check` y
-`npm run build` en verde, smoke real del modelo en verde.
+`skill/SKILL.md` was not touched: nothing observable changed for a consuming
+agent. Final state: **325 tests, 0 failures**, `npm run check` and
+`npm run build` green, real model smoke green.
 
-## MVP completo — cierre y trabajo posterior
+## MVP complete — closure and follow-up work
 
-Con 3.2 cerrado, `docs/build.md` marca 2.1, 2.2, 2.3, 2.4, 3.1 y 3.2 al
-100%. El MVP descrito en `docs/product-spec.md` está completo: indexación
-incremental, recuperación híbrida, ensamblado de contexto citado, comando
-`retrieve`, skill portable para agentes, pruebas funcionales y evaluación en
-dos capas sobre la colección real.
+With 3.2 closed, `docs/build.md` marks 2.1, 2.2, 2.3, 2.4, 3.1 and 3.2 at 100%.
+The MVP described in `docs/product-spec.md` is complete: incremental indexing,
+hybrid retrieval, cited context assembly, the `retrieve` command, a portable
+skill for agents, functional tests and a two-layer evaluation over the real
+collection.
 
-Después del MVP se cerraron seis puntos más: 4.1 (`analysis.json`), 4.2
-(instalación), 4.3 (seguridad de `sync` y rendimiento), 4.4 (aviso de vectores
-obsoletos), 4.5 (perfil de modelo de embeddings y política de prefijos) y 4.6
-(el comando `rebuild --confirm`). Los cinco primeros se originaron en corridas
-de verificación en frío o en investigación de sus hallazgos; 4.6 vino del
-orden de prioridad que el usuario fijó el 14 de agosto.
+After the MVP, six more points were closed: 4.1 (`analysis.json`), 4.2
+(installation), 4.3 (`sync` safety and performance), 4.4 (stale vector
+warning), 4.5 (embedding model profile and prefix policy) and 4.6 (the
+`rebuild --confirm` command). The first five originated in cold verification
+runs or in the investigation of their findings; 4.6 came from the priority
+order the user set on 14 August.
 
-### Orden de prioridad fijado por el usuario el 14 de agosto de 2026
+### Priority order set by the user on 14 August 2026
 
-Este orden ya está decidido. **No vuelvas a preguntarlo**; si el usuario
-cambia de idea lo dirá.
+This order is already decided. **Do not ask about it again**; if the user
+changes their mind, they will say so.
 
-~~1. **Prefijos E5 hardcodeados.**~~ **Cerrado el 14 de agosto de 2026 como
-punto 4.5.** `passage:` y `query:` ya no se aplican incondicionalmente:
-`EmbeddingModelProfile.inputPrefixes` los hace un dato explícito
-(`null` = sin prefijo), inyectable en el generador y en el instalador con el
-perfil activo como default. La política de prefijos participa de
-`modelVersion`, así que un cambio futuro de política dispara reindexación
-automática; con el perfil activo hoy no cambió nada y no se reindexó
-(validado contra el binario real). Detalle en `docs/decisions.md`, sección
-"Perfil de modelo y política de prefijos", y en `docs/model-profile-design.md`.
+~~1. **Hardcoded E5 prefixes.**~~ **Closed on 14 August 2026 as point 4.5.**
+`passage:` and `query:` are no longer applied unconditionally:
+`EmbeddingModelProfile.inputPrefixes` makes them an explicit piece of data
+(`null` = no prefix), injectable into the generator and the installer with the
+active profile as the default. The prefix policy takes part in `modelVersion`,
+so a future policy change triggers automatic reindexing; with the active
+profile nothing changed today and nothing was reindexed (validated against the
+real binary). Detail in `docs/decisions.md`, section "Model profile and prefix
+policy", and in `docs/model-profile-design.md`.
 
-~~1. **Ordenar fragmentos por longitud antes de lotear.**~~ **Cerrado el 14 de
-agosto de 2026 sin escribir código.** Es inerte con el `batchSize = 1` que
-adoptó 4.3: el padding que ataca sólo existe dentro de un lote de dos o más, y
-`defaultBatchSize` es 1 sin que ningún llamador de producto lo sobrescriba.
-Además `embedDocuments` se llama por paquete, así que el universo ordenable
-serían los fragmentos de un video, no el corpus del benchmark. Y la propia
-medición de 4.3 ya lo decía: 1,93x contra 2,27x del lote 1 — no era una mejora
-sobre el lote 1, era la alternativa que el lote 1 le ganó. Detalle en
-`docs/decisions.md`, sección "Ordenar fragmentos por longitud: medido y
-descartado".
+~~1. **Sorting fragments by length before batching.**~~ **Closed on 14 August
+2026 without writing code.** It is inert with the `batchSize = 1` that 4.3
+adopted: the padding it attacks only exists inside a batch of two or more, and
+`defaultBatchSize` is 1 with no product caller overriding it. Besides,
+`embedDocuments` is called per package, so the sortable universe would be the
+fragments of one video, not the benchmark's corpus. And 4.3's own measurement
+already said so: 1.93x against 2.27x for batch 1 — it was not an improvement
+over batch 1, it was the alternative that batch 1 beat. Detail in
+`docs/decisions.md`, section "Sorting fragments by length: measured and
+rejected".
 
-~~2. **Comando `rebuild --confirm`.**~~ **Cerrado el 14 de agosto de 2026 como
-punto 4.6.** Ver `docs/rebuild-design.md`.
+~~2. **`rebuild --confirm` command.**~~ **Closed on 14 August 2026 as point
+4.6.** See `docs/rebuild-design.md`.
 
-**El orden de prioridad del 14 de agosto quedó agotado.** Lo único que sigue
-en pie de esa lista es lo que el usuario dejó explícitamente para el final
-(abajo). Después de eso: **MCP, interfaz web y soporte de paquetes de páginas
-web**, fuera de alcance desde el `product-spec.md` original.
+**The priority order of 14 August is exhausted.** The only thing still standing
+from that list is what the user explicitly left for the end (below). After
+that: **MCP, web interface and support for web page packages**, out of scope
+since the original `product-spec.md`.
 
-Explícitamente **para el final**, por decisión del usuario:
+Explicitly **for the end**, by decision of the user:
 
-- **Verificar `skill/SKILL.md` desde Codex real.** Es la única casilla sin
-  marcar de `docs/build.md` (punto 2.4). Gana valor porque la skill cambió
-  mucho el 13 y 14 de agosto —se dividió en tres archivos, cambió el modelo
-  de instalación, sumó `models`, `--force` y códigos nuevos— y todo eso se
-  validó en frío **sólo con agentes Claude**. Requiere que lo corra el
-  usuario: un agente Claude no puede invocar Codex.
-- ~~**Higiene del repositorio.**~~ **Hecha el 14 de agosto de 2026.** Se
-  borraron las tres ramas locales muertas y se limpió `.cache/` de 2110 MB a
-  **129 MB**: se fueron `sqlite-client-benchmark` (995 MB),
-  `vector-benchmark` (418 MB) y los tres modelos que el benchmark descartó
-  (`multilingual-e5-base`, `jina-embeddings-v2-base-es`,
-  `paraphrase-multilingual-MiniLM-L12-v2`, 568 MB juntos). **Se conservó
-  deliberadamente `Xenova/multilingual-e5-small`**: es la única copia local
-  del modelo activo, la que exige `test:embedding:smoke` y la que
-  `test:install:smoke` y `models install --from` adoptan para validar contra
-  el binario real sin bajar 129 MB de red. Ambos smokes se verificaron en
-  verde después de limpiar. Si algún día falta, `npm run models:download` lo
-  repone.
+- **Verify `skill/SKILL.md` from a real Codex.** It is the only unchecked box
+  in `docs/build.md` (point 2.4). It gains value because the skill changed a
+  lot on 13 and 14 August —it was split into three files, the installation
+  model changed, it gained `models`, `--force` and new codes— and all of that
+  was validated cold **only with Claude agents**. It requires the user to run
+  it: a Claude agent cannot invoke Codex.
+- ~~**Repository hygiene.**~~ **Done on 14 August 2026.** The three dead local
+  branches were deleted and `.cache/` was cleaned from 2110 MB down to **129
+  MB**: `sqlite-client-benchmark` (995 MB), `vector-benchmark` (418 MB) and the
+  three models the benchmark discarded (`multilingual-e5-base`,
+  `jina-embeddings-v2-base-es`, `paraphrase-multilingual-MiniLM-L12-v2`, 568 MB
+  together) are gone. **`Xenova/multilingual-e5-small` was deliberately
+  kept**: it is the only local copy of the active model, the one
+  `test:embedding:smoke` requires and the one `test:install:smoke` and
+  `models install --from` adopt to validate against the real binary without
+  downloading 129 MB over the network. Both smokes were verified green after
+  cleaning. If it is ever missing, `npm run models:download` restores it.
 
-Frentes anteriores que siguen sin evidencia que los justifique, y que no
-están en el orden de arriba:
+Earlier fronts that still lack evidence justifying them, and that are not in
+the order above:
 
-~~- Piso mínimo de similitud vectorial.~~ **Resuelto el 14 de agosto de 2026
-como punto 4.7, en una forma distinta a la prevista.** La evidencia apareció
-probando la biblioteca real; se midió el coseno sobre 24 consultas y se
-emite `LOW_RELEVANCE` bajo `0.84`. **El aviso informa, no filtra**: un piso
-que descarte candidatos se sigue descartando, igual que en 2.2 y 3.2. Ver
+~~- Minimum vector similarity floor.~~ **Resolved on 14 August 2026 as point
+4.7, in a different form than expected.** The evidence appeared while testing
+the real library; the cosine was measured over 24 queries and `LOW_RELEVANCE`
+is emitted below `0.84`. **The warning informs, it does not filter**: a floor
+that discards candidates is still discarded, just as in 2.2 and 3.2. See
 `docs/low-relevance-design.md`.
 
-- Señal de densidad temática para que RRF distinga contenido específico de
-  catálogo tangencial (hallazgo de 3.2, no un bug).
-- Afinar `evals/rubric-template.md` en los dos puntos de ambigüedad de N4.
+- A topical density signal so that RRF can tell specific content from
+  tangential catalogue (a 3.2 finding, not a bug).
+- Refine `evals/rubric-template.md` on the two ambiguity points from N4.
 
 ## Punto 4.7 completado — aviso de baja relevancia
 
