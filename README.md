@@ -10,8 +10,8 @@ cerebro generativo. Todo corre en tu máquina, sin APIs externas.
 
 **Estado: completo y en uso.** El MVP (indexación incremental, recuperación
 híbrida, ensamblado de contexto y skill portable) está cerrado, y también los
-seis puntos posteriores, hasta `rebuild`. No queda ningún comando del contrato
-sin implementar. Ver [`docs/build.md`](docs/build.md).
+siete puntos posteriores, hasta el aviso de baja relevancia. No queda ningún
+comando del contrato sin implementar. Ver [`docs/build.md`](docs/build.md).
 
 ## Instalación
 
@@ -29,6 +29,10 @@ globalmente. **A partir de acá el clon es descartable**: podés borrar la
 carpeta, porque la instalación copia lo suyo y no queda enlazada al
 repositorio.
 
+El paquete no se publica en el registro de npm a propósito: `"private": true`
+en `package.json` es deliberado, no un olvido. La instalación prevista es
+`git clone` + `npm run setup`.
+
 Después, preparar la biblioteca y el modelo de embeddings:
 
 ```text
@@ -38,6 +42,10 @@ auto-youtube-rag init
 `init` crea `~/.auto-youtube-rag/` con la base SQLite y el modelo (~130 MB).
 **Es la única operación de toda la herramienta que usa la red**, y tarda: dale
 tiempo. Es idempotente, así que repetirlo no rompe nada.
+
+El modelo de embeddings (`Xenova/multilingual-e5-small`) que descarga `init`
+tiene su propia licencia, distinta de la de este repositorio; revisala en su
+página en Hugging Face si te importa el detalle.
 
 Dos banderas útiles: `--from <ruta>` copia un modelo que ya tengas en disco en
 vez de descargarlo (segundos en lugar de minutos), y `--skip-model` prepara
