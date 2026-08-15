@@ -7,7 +7,7 @@ seis decisiones de la sección final ya confirmadas por el usuario. Continúa
 [retrieval-design.md](retrieval-design.md), que ya reservó `getUnits` y
 `getAncestors` en `KnowledgeRepository` para este punto. El registro
 consolidado de las decisiones vive también en
-[decisions.md](decisions.md#diseño-de-ensamblado-de-contexto-aprobado).
+[decisions.md](decisions.md#approved-context-assembly-design).
 
 ## Alcance
 
