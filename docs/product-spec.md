@@ -1,237 +1,236 @@
-# Especificación de producto: auto-youtube-rag
+# Product specification: auto-youtube-rag
 
-## Estado
+## Status
 
-Fase `SPECIFY`. Las decisiones confirmadas son fuente de verdad; los asuntos
-marcados como pendientes no deben resolverse durante la implementación sin
-actualizar primero esta especificación.
+`SPECIFY` phase. The confirmed decisions are the source of truth; the matters
+marked as pending must not be resolved during implementation without first
+updating this specification.
 
-## Objetivo
+## Goal
 
-Construir una biblioteca RAG local que indexe los paquetes validados generados
-por la skill de videos y entregue a un agente un paquete de contexto temático
-amplio, ordenado, deduplicado y citado.
+Build a local RAG library that indexes the validated packages produced by the
+video skill and hands an agent a broad, ordered, deduplicated and cited
+thematic context package.
 
-El producto no contiene un agente generativo interno. El agente que ejecuta la
-consulta es el único responsable de interpretar el contexto y redactar la
-respuesta.
+The product does not contain an internal generative agent. The agent running the
+query is the only one responsible for interpreting the context and writing the
+answer.
 
-### Capacidades objetivo
+### Target capabilities
 
-- Encontrar videos que tratan un concepto.
-- Buscar elementos y características descritas visualmente.
-- Comparar recomendaciones entre varios videos.
-- Recuperar reglas, patrones, procedimientos y antipatrones.
-- Exponer coincidencias, diferencias y contradicciones entre fuentes.
-- Ensamblar contexto suficiente para consultas factuales amplias.
+- Find videos that deal with a concept.
+- Search for elements and characteristics described visually.
+- Compare recommendations across several videos.
+- Retrieve rules, patterns, procedures and antipatterns.
+- Expose agreements, differences and contradictions between sources.
+- Assemble enough context for broad factual queries.
 
-Localizar momentos específicos del video no es una función del producto. Los
-timestamps existentes pueden conservarse únicamente como procedencia.
+Locating specific moments of a video is not a function of the product. Existing
+timestamps may be kept solely as provenance.
 
-## Criterio de éxito
+## Success criterion
 
-Ante una consulta, el sistema recupera y organiza una porción suficientemente
-amplia del conocimiento relevante, elimina repeticiones, conserva la
-procedencia y construye un paquete citado dentro de un presupuesto configurable.
-El agente debe poder responder basándose principalmente en ese paquete, sin
-consultar los videos originales.
+Given a query, the system retrieves and organises a sufficiently broad portion
+of the relevant knowledge, removes repetitions, preserves provenance and builds
+a cited package within a configurable budget. The agent must be able to answer
+based mainly on that package, without consulting the original videos.
 
-El resultado no se limita a un número fijo pequeño de fragmentos. La búsqueda
-recupera candidatos con alta cobertura, expande las coincidencias a sus secciones
-padre, diversifica fuentes y ensambla contexto hasta alcanzar el presupuesto.
+The result is not limited to a small fixed number of fragments. The search
+retrieves candidates with high coverage, expands the matches to their parent
+sections, diversifies sources and assembles context until it reaches the budget.
 
-## Usuarios y compatibilidad
+## Users and compatibility
 
-- MVP consumido por agentes, no por humanos.
-- Compatibilidad mínima con Codex y Claude.
-- Diseño neutral respecto del proveedor.
-- Una única skill canónica, instalable o enlazable desde diferentes agentes.
-- Interfaz humana reservada para una fase posterior.
+- MVP consumed by agents, not by humans.
+- Minimum compatibility with Codex and Claude.
+- Provider-neutral design.
+- A single canonical skill, installable or linkable from different agents.
+- Human interface reserved for a later phase.
 
-## Fuentes de entrada
+## Input sources
 
-El sistema admite varias raíces registradas, inicialmente:
+The system supports several registered roots, initially:
 
 - `auto-design\videos`
 - `catalog-design\videos`
 
-Cada paquete conserva su estructura original. El indexador no agrega ni modifica
-archivos dentro de esos paquetes.
+Every package keeps its original structure. The indexer does not add or modify
+files inside those packages.
 
-| Fuente                       | Uso en el MVP                                                                                             |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `manifest.json`              | Inventario y estado; no corpus semántico                                                                  |
-| `deliverables/context.md`    | Fuente principal de conocimiento                                                                          |
-| `deliverables/rules.json`    | Patrones y reglas estructuradas (schema 1.0)                                                              |
-| `deliverables/analysis.json` | Análisis general estructurado (schema 2.0, punto 4.1); mutuamente excluyente con `rules.json` por paquete |
-| `source/metadata.json`       | Identidad, filtros y procedencia                                                                          |
-| `transcript/source.txt`      | Respaldo opcional; no indexado por defecto                                                                |
-| Archivos VTT                 | No indexados                                                                                              |
-| `visual/coverage.json`       | Metadatos de evidencia                                                                                    |
-| Imágenes                     | Ruta preservada; sin embeddings en el MVP                                                                 |
+| Source                       | Use in the MVP                                                                                        |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `manifest.json`              | Inventory and status; not a semantic corpus                                                           |
+| `deliverables/context.md`    | Main source of knowledge                                                                              |
+| `deliverables/rules.json`    | Structured patterns and rules (schema 1.0)                                                            |
+| `deliverables/analysis.json` | Structured general analysis (schema 2.0, point 4.1); mutually exclusive with `rules.json` per package |
+| `source/metadata.json`       | Identity, filters and provenance                                                                      |
+| `transcript/source.txt`      | Optional backup; not indexed by default                                                               |
+| VTT files                    | Not indexed                                                                                           |
+| `visual/coverage.json`       | Evidence metadata                                                                                     |
+| Images                       | Path preserved; no embeddings in the MVP                                                              |
 
-## Alcance del MVP
+## MVP scope
 
-- Registrar múltiples raíces de paquetes.
-- Indexar y sincronizar paquetes de video de manera incremental e idempotente.
-- Detectar altas, cambios y eliminaciones mediante hashes de contenido.
-- Ejecutar búsqueda textual, semántica y por metadatos.
-- Recuperar jerárquicamente documentos, secciones y reglas.
-- Deduplicar y diversificar fuentes.
-- Ensamblar un paquete de contexto con profundidad configurable.
-- Entregar Markdown para el agente y JSON versionado para integración.
-- Incluir procedencia, cobertura y limitaciones.
-- Proporcionar una CLI local consumible desde la skill general.
+- Register multiple package roots.
+- Index and synchronise video packages incrementally and idempotently.
+- Detect additions, changes and deletions through content hashes.
+- Run textual, semantic and metadata search.
+- Retrieve documents, sections and rules hierarchically.
+- Deduplicate and diversify sources.
+- Assemble a context package with configurable depth.
+- Deliver Markdown for the agent and versioned JSON for integration.
+- Include provenance, coverage and limitations.
+- Provide a local CLI consumable from the general skill.
 
-## Fuera del MVP
+## Outside the MVP
 
-- Chat o LLM interno.
+- Chat or internal LLM.
 - MCP.
-- API remota.
-- Interfaz web para humanos.
-- Procesamiento directo de videos crudos.
-- Indexación semántica de imágenes.
-- OCR adicional.
+- Remote API.
+- Web interface for humans.
+- Direct processing of raw videos.
+- Semantic indexing of images.
+- Additional OCR.
 - GraphRAG.
-- Paquetes generados por la skill de páginas web.
+- Packages produced by the web page skill.
 
-## Stack confirmado
+## Confirmed stack
 
-- Lenguaje: TypeScript 6.0.3 estricto.
-- Runtime: Node.js 24 o superior, módulos ESM.
-- Empaquetado: npm con `package-lock.json`.
-- Arquitectura: dominio central con puertos y adaptadores.
-- Persistencia inicial: SQLite detrás de un puerto reemplazable.
-- Búsqueda textual: SQLite FTS5.
-- Búsqueda semántica: E5 Small multilingüe local, implementado como adaptador.
-- Vectores: BLOB versionado en SQLite e índice exacto `Float32Array` en memoria.
-- Integración: CLI y una única skill portable.
+- Language: strict TypeScript 6.0.3.
+- Runtime: Node.js 24 or higher, ESM modules.
+- Packaging: npm with `package-lock.json`.
+- Architecture: central domain with ports and adapters.
+- Initial persistence: SQLite behind a replaceable port.
+- Textual search: SQLite FTS5.
+- Semantic search: local multilingual E5 Small, implemented as an adapter.
+- Vectors: versioned BLOB in SQLite and exact in-memory `Float32Array` index.
+- Integration: CLI and a single portable skill.
 
-El toolchain utiliza `tsc`, ESLint con información de tipos, Prettier y
-`node:test`; sus comandos están definidos en [development.md](development.md).
-La CLI administrativa usa `node:util.parseArgs` en modo estricto, sin incorporar
-un framework adicional. La decisión conserva una superficie pequeña y portable.
+The toolchain uses `tsc`, ESLint with type information, Prettier and
+`node:test`; its commands are defined in [development.md](development.md). The
+administrative CLI uses `node:util.parseArgs` in strict mode, without bringing
+in an additional framework. The decision keeps a small and portable surface.
 
-## Contrato de CLI aprobado
+## Approved CLI contract
 
-La especificación completa se encuentra en [cli-contract.md](cli-contract.md).
-La superficie pública del MVP es:
+The complete specification is in [cli-contract.md](cli-contract.md). The public
+surface of the MVP is:
 
 ```text
-auto-youtube-rag source add <ruta>
+auto-youtube-rag source add <path>
 auto-youtube-rag source list
 auto-youtube-rag sync
-auto-youtube-rag retrieve <consulta> --depth <focused|balanced|deep>
+auto-youtube-rag retrieve <query> --depth <focused|balanced|deep>
 auto-youtube-rag status
 auto-youtube-rag doctor
 auto-youtube-rag rebuild --confirm
 ```
 
-`sync` cubre indexación inicial e incremental. `retrieve` genera un bundle con
-`context.md` y `result.json`, y emite en `stdout` únicamente un recibo compacto.
-Los presets iniciales son `focused` = 12k, `balanced` = 32k y `deep` = 64k
-tokens estimados, reemplazables mediante `--max-tokens`.
+`sync` covers initial and incremental indexing. `retrieve` produces a bundle
+with `context.md` and `result.json`, and emits on `stdout` only a compact
+receipt. The initial presets are `focused` = 12k, `balanced` = 32k and `deep` =
+64k estimated tokens, replaceable through `--max-tokens`.
 
-Los comandos de desarrollo, pruebas, lint y build están definidos en
-[development.md](development.md). La CLI usa `0` para éxito,
-`1` para fallo operativo o resultado parcial, `2` para uso inválido y `130`
-para una interrupción mediante `Ctrl+C`; las causas concretas se expresan con
-códigos simbólicos en JSON.
+The development, testing, lint and build commands are defined in
+[development.md](development.md). The CLI uses `0` for success, `1` for an
+operational failure or a partial result, `2` for invalid usage and `130` for an
+interruption through `Ctrl+C`; the concrete causes are expressed with symbolic
+codes in JSON.
 
-## Arquitectura y estructura conceptual
+## Architecture and conceptual structure
 
-El dominio define el vocabulario, las invariantes y los contratos que necesitan
-los casos de uso. No conoce Transformers.js, E5 Small, SQLite, FTS5, formatos de
-archivos ni frameworks de CLI. Esos detalles se implementan como adaptadores y
-se conectan exclusivamente desde el composition root.
+The domain defines the vocabulary, the invariants and the contracts that the use
+cases need. It knows nothing about Transformers.js, E5 Small, SQLite, FTS5, file
+formats or CLI frameworks. Those details are implemented as adapters and are
+wired exclusively from the composition root.
 
 ```text
-skill/                    skill portable que enseña a usar la CLI
-src/domain/               entidades, value objects y reglas puras
-src/application/          casos de uso y puertos requeridos
-src/infrastructure/       adaptadores de modelos, búsqueda y persistencia
-src/interfaces/cli/       comandos, validación y presentación
-src/main/                 composition root y configuración
-tests/                    pruebas unitarias, contratos e integración
-evals/                    evaluaciones de calidad de recuperación
-docs/                     especificaciones, decisiones y progreso
+skill/                    portable skill that teaches how to use the CLI
+src/domain/               entities, value objects and pure rules
+src/application/          use cases and required ports
+src/infrastructure/       model, search and persistence adapters
+src/interfaces/cli/       commands, validation and presentation
+src/main/                 composition root and configuration
+tests/                    unit, contract and integration tests
+evals/                    retrieval quality evaluations
+docs/                     specifications, decisions and progress
 ```
 
-Esta estructura es conceptual y no autoriza todavía la creación de `src/`.
+This structure is conceptual and does not yet authorise the creation of `src/`.
 
-Los puertos deben permitir sustituir como mínimo el generador de embeddings, el
-repositorio persistente, la búsqueda textual y la búsqueda vectorial. Un cambio
-de adaptador puede exigir migrar o reconstruir índices, pero no puede alterar el
-dominio, los casos de uso ni el contrato público de la CLI.
+The ports must allow replacing at least the embedding generator, the persistent
+repository, the textual search and the vector search. Changing an adapter may
+require migrating or rebuilding indexes, but it cannot alter the domain, the use
+cases or the public contract of the CLI.
 
-## Estilo de código
+## Code style
 
-TypeScript estricto, nombres explícitos, tipos en todos los límites públicos y
-funciones pequeñas. Las dependencias siempre apuntan hacia el dominio: los
-adaptadores implementan puertos internos y el núcleo nunca importa paquetes de
-infraestructura ni tipos específicos de proveedores.
+Strict TypeScript, explicit names, types on every public boundary and small
+functions. Dependencies always point towards the domain: adapters implement
+internal ports and the core never imports infrastructure packages or
+provider-specific types.
 
-## Estrategia de pruebas
+## Testing strategy
 
-### Durante el desarrollo
+### During development
 
-- Pruebas unitarias del dominio y ranking.
-- Pruebas de contrato reutilizables para cada adaptador.
-- Pruebas de integración con una base SQLite temporal.
-- Pruebas de CLI.
-- Indexación repetida sin duplicados.
-- Actualización y eliminación verificables.
-- Compatibilidad del esquema de salida.
-- Recuperación determinista sobre fixtures pequeños.
+- Unit tests of the domain and the ranking.
+- Reusable contract tests for each adapter.
+- Integration tests with a temporary SQLite database.
+- CLI tests.
+- Repeated indexing without duplicates.
+- Verifiable updating and deletion.
+- Compatibility of the output schema.
+- Deterministic retrieval over small fixtures.
 
-### Al completar el MVP
+### On completing the MVP
 
-- Evaluaciones de recall, precisión y cobertura temática.
-- Consultas reales en español e inglés.
-- Comparación de modelos de embeddings pequeños.
-- Evaluación del contexto con Codex y Claude.
-- Casos sin respuesta y fuentes contradictorias.
+- Recall, precision and thematic coverage evaluations.
+- Real queries in Spanish and English.
+- Comparison of small embedding models.
+- Evaluation of the context with Codex and Claude.
+- Cases without an answer and contradictory sources.
 
-## Escala prevista
+## Expected scale
 
-- Aproximadamente 40 videos iniciales.
-- Crecimiento promedio estimado: 4 videos por día.
-- Picos estimados: hasta 10 videos por día.
-- Ejecución local y sin usuarios humanos concurrentes en el MVP.
+- Approximately 40 initial videos.
+- Estimated average growth: 4 videos per day.
+- Estimated peaks: up to 10 videos per day.
+- Local execution and no concurrent human users in the MVP.
 
-## Límites de actuación
+## Limits of action
 
-### Siempre
+### Always
 
-- Preservar los paquetes originales.
-- Mantener procedencia y esquema versionado.
-- Validar entradas y hashes.
-- Ejecutar pruebas antes de cada commit.
-- Mantener la CLI neutral respecto del agente.
-- Mantener el dominio libre de dependencias de infraestructura.
+- Preserve the original packages.
+- Keep provenance and a versioned schema.
+- Validate inputs and hashes.
+- Run the tests before every commit.
+- Keep the CLI neutral with respect to the agent.
+- Keep the domain free of infrastructure dependencies.
 
-### Preguntar antes
+### Ask first
 
-- Cambiar el esquema persistido.
-- Añadir dependencias o extensiones nativas.
-- Cambiar el modelo o dimensión de embeddings.
-- Ampliar el MVP a páginas web, MCP, API o interfaz humana.
+- Change the persisted schema.
+- Add dependencies or native extensions.
+- Change the embedding model or dimension.
+- Extend the MVP to web pages, MCP, API or a human interface.
 
-### Nunca
+### Never
 
-- Indexar secretos o archivos `.env`.
-- Sobrescribir paquetes fuente.
-- Presentar un resultado sin procedencia.
-- Acoplar el dominio a Codex, Claude, E5, SQLite o una base vectorial específica.
-- Eliminar pruebas fallidas para permitir una entrega.
+- Index secrets or `.env` files.
+- Overwrite source packages.
+- Present a result without provenance.
+- Couple the domain to Codex, Claude, E5, SQLite or a specific vector database.
+- Delete failing tests in order to allow a delivery.
 
-## Asuntos abiertos
+## Open matters
 
-Ninguno bloquea la implementación en curso.
+None blocks the implementation in progress.
 
-La política de combinación y reranking se resolvió el 11 de agosto de 2026:
-Reciprocal Rank Fusion ponderada como baseline, detrás de un puerto sustituible.
-Los pesos se calibrarán en la etapa 3.2 mediante evaluaciones reales, sin alterar
-el dominio, los casos de uso ni el contrato público de la CLI. El fundamento está
-en [decisions.md](decisions.md) y el diseño en
+The combination and reranking policy was resolved on 11 August 2026: weighted
+Reciprocal Rank Fusion as the baseline, behind a replaceable port. The weights
+will be calibrated in stage 3.2 through real evaluations, without altering the
+domain, the use cases or the public contract of the CLI. The rationale is in
+[decisions.md](decisions.md) and the design in
 [retrieval-design.md](retrieval-design.md).
