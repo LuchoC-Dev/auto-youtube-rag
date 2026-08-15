@@ -1,935 +1,927 @@
-# Registro de decisiones
+# Decision log
 
-## Confirmadas
+## Confirmed
 
-| Tema               | Decisión                                                            | Motivo                                                               |
-| ------------------ | ------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Nombre             | `auto-youtube-rag`                                                  | Identidad del proyecto                                               |
-| Ejecución          | Exclusivamente local                                                | Privacidad y ausencia de servicios externos                          |
-| Cerebro generativo | Agente consultante                                                  | Evitar duplicar razonamiento dentro del RAG                          |
-| Integración        | Skill general + CLI                                                 | Portabilidad entre proveedores                                       |
-| Ejecutable         | `auto-youtube-rag`                                                  | Nombre explícito y neutral                                           |
-| Parser CLI         | `node:util.parseArgs` estricto                                      | API estándar de Node, sin dependencia adicional                      |
-| Indexación         | Un único comando `sync`                                             | Evitar duplicar `index` y `sync`                                     |
-| Recuperación CLI   | Comando `retrieve`                                                  | Ensambla contexto, no sólo coincidencias                             |
-| Salida             | Bundle Markdown + JSON                                              | Evitar truncamiento y permitir integración                           |
-| Profundidades      | 12k / 32k / 64k                                                     | Presets ajustables por evaluación                                    |
-| Citaciones         | `[S01]` resuelto en JSON                                            | Lectura compacta con procedencia completa                            |
-| Idioma             | Contenido original; claves inglesas                                 | Neutralidad entre proveedores                                        |
-| Códigos de proceso | `0`, `1`, `2` y `130`                                               | Convención portable; detalle mediante códigos JSON                   |
-| Skills             | Una fuente canónica                                                 | Evitar variantes para Codex y Claude                                 |
-| Agentes iniciales  | Codex y Claude                                                      | Compatibilidad mínima requerida                                      |
-| Lenguaje           | TypeScript estricto                                                 | Ruta integrada y soportada para ONNX en Windows                      |
-| Toolchain          | TypeScript 6.0.3, ESLint 10, Prettier 3 y `node:test`               | Mantener análisis estricto, reproducible y oficialmente compatible   |
-| Runtime            | Node.js 24.19.0 LTS con ESM                                         | Fijar una base reproducible validada localmente                      |
-| Empaquetado        | npm + `package-lock.json`                                           | Instalación reproducible sin otro runtime                            |
-| Arquitectura       | Dominio + puertos y adaptadores                                     | Sustituir infraestructura sin alterar casos de uso                   |
-| Persistencia       | SQLite                                                              | Simplicidad local y escala suficiente                                |
-| Cliente SQLite     | `node:sqlite`                                                       | Sin binding nativo y suficiente en el benchmark local                |
-| Texto              | SQLite FTS5                                                         | Búsqueda exacta y por relevancia                                     |
-| Embeddings         | E5 Small multilingüe `q8`                                           | Mejor equilibrio del benchmark local                                 |
-| Acoplamiento       | Modelo y DB sólo en infraestructura                                 | Mantener dominio y aplicación reemplazables                          |
-| Vectores           | BLOB SQLite + índice exacto en memoria                              | Menor latencia en el benchmark local                                 |
-| Recuperación       | Híbrida y jerárquica                                                | Combinar precisión con cobertura amplia                              |
-| Fusión             | RRF ponderado tras `FusionStrategy`                                 | Combina rangos sin comparar escalas y conserva hits exclusivos       |
-| Resultado          | Contexto amplio y citado                                            | Proveer hechos suficientes al agente                                 |
-| Fuentes            | Múltiples raíces registradas                                        | Unificar `auto-design` y `catalog-design`                            |
-| Corpus principal   | `context.md`                                                        | Documento autónomo y validado                                        |
-| Reglas             | `rules.json`                                                        | Fuente estructurada de patrones                                      |
-| Metadata           | Filtros y procedencia                                               | Evitar tratar metadata como conocimiento                             |
-| Transcripción      | Respaldo opcional                                                   | Evitar duplicar VTT y texto equivalente                              |
-| Imágenes           | Referencias, sin embeddings MVP                                     | El nombre del archivo no es semántico                                |
-| Alcance MVP        | Sólo paquetes de video                                              | Reducir superficie inicial                                           |
-| UI humana          | Posterior al MVP                                                    | Primero validar recuperación para agentes                            |
-| Pruebas            | Durante todo el desarrollo                                          | Detectar regresiones funcionales                                     |
-| Evals              | Al cerrar el MVP                                                    | Medir calidad sobre el flujo completo                                |
-| Método de evals    | Métricas mecánicas + juicio de Codex y Claude sobre el mismo bundle | Sin ground truth etiquetado; el agente consumidor es el juez natural |
+| Topic            | Decision                                                           | Rationale                                                          |
+| ---------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| Name             | `auto-youtube-rag`                                                 | Project identity                                                   |
+| Execution        | Local only                                                         | Privacy and the absence of external services                       |
+| Generative brain | The querying agent                                                 | Avoid duplicating reasoning inside the RAG                         |
+| Integration      | General skill + CLI                                                | Portability across providers                                       |
+| Executable       | `auto-youtube-rag`                                                 | Explicit, neutral name                                             |
+| CLI parser       | Strict `node:util.parseArgs`                                       | Standard Node API, with no extra dependency                        |
+| Indexing         | A single `sync` command                                            | Avoid duplicating `index` and `sync`                               |
+| CLI retrieval    | The `retrieve` command                                             | It assembles context, not just matches                             |
+| Output           | Markdown + JSON bundle                                             | Avoid truncation and allow integration                             |
+| Depths           | 12k / 32k / 64k                                                    | Presets adjustable by evaluation                                   |
+| Citations        | `[S01]` resolved in the JSON                                       | Compact reading with complete provenance                           |
+| Language         | Original content; English keys                                     | Neutrality across providers                                        |
+| Process codes    | `0`, `1`, `2` and `130`                                            | Portable convention; detail through JSON codes                     |
+| Skills           | One canonical source                                               | Avoid variants for Codex and Claude                                |
+| Initial agents   | Codex and Claude                                                   | Minimum required compatibility                                     |
+| Language         | Strict TypeScript                                                  | Integrated and supported path for ONNX on Windows                  |
+| Toolchain        | TypeScript 6.0.3, ESLint 10, Prettier 3 and `node:test`            | Keep the analysis strict, reproducible and officially supported    |
+| Runtime          | Node.js 24.19.0 LTS with ESM                                       | Pin a reproducible base validated locally                          |
+| Packaging        | npm + `package-lock.json`                                          | Reproducible installation without another runtime                  |
+| Architecture     | Domain + ports and adapters                                        | Replace infrastructure without altering use cases                  |
+| Persistence      | SQLite                                                             | Local simplicity and sufficient scale                              |
+| SQLite client    | `node:sqlite`                                                      | No native binding, and sufficient in the local benchmark           |
+| Text             | SQLite FTS5                                                        | Exact search and search by relevance                               |
+| Embeddings       | Multilingual E5 Small `q8`                                         | Best balance in the local benchmark                                |
+| Coupling         | Model and DB only in infrastructure                                | Keep the domain and the application replaceable                    |
+| Vectors          | SQLite BLOB + exact in-memory index                                | Lower latency in the local benchmark                               |
+| Retrieval        | Hybrid and hierarchical                                            | Combine precision with broad coverage                              |
+| Fusion           | Weighted RRF behind `FusionStrategy`                               | Combines ranks without comparing scales and keeps exclusive hits   |
+| Result           | Broad, cited context                                               | Provide the agent with enough facts                                |
+| Sources          | Several registered roots                                           | Unify `auto-design` and `catalog-design`                           |
+| Main corpus      | `context.md`                                                       | Self-contained, validated document                                 |
+| Rules            | `rules.json`                                                       | Structured source of patterns                                      |
+| Metadata         | Filters and provenance                                             | Avoid treating metadata as knowledge                               |
+| Transcript       | Optional fallback                                                  | Avoid duplicating VTT and equivalent text                          |
+| Images           | References, with no embeddings in the MVP                          | The file name is not semantic                                      |
+| MVP scope        | Video packages only                                                | Reduce the initial surface                                         |
+| Human UI         | After the MVP                                                      | Validate retrieval for agents first                                |
+| Tests            | Throughout development                                             | Detect functional regressions                                      |
+| Evals            | On closing the MVP                                                 | Measure quality over the complete flow                             |
+| Eval method      | Mechanical metrics + Codex and Claude judgement on the same bundle | No labelled ground truth; the consuming agent is the natural judge |
 
-## Diseño de indexación aprobado
+## Approved indexing design
 
-- Identidad de paquete: `(source_name, video_id)`; el slug sólo localiza.
-- Unidad amplia `KnowledgeUnit` separada de `SearchFragment` buscable.
-- Metadata persistida mediante allowlist; no se guarda yt-dlp completo.
-- `rules.json` conserva jerarquía de documento, patrón y elementos hijos.
-- `sync` aplica cada paquete atómicamente y conserva la última versión válida.
+- Package identity: `(source_name, video_id)`; the slug only locates.
+- Broad `KnowledgeUnit` unit kept separate from the searchable `SearchFragment`.
+- Metadata persisted through an allowlist; the full yt-dlp output is not stored.
+- `rules.json` preserves the document, pattern and child-element hierarchy.
+- `sync` applies each package atomically and keeps the last valid version.
 
-## Volumen esperado
+## Expected volume
 
-- Inicio: aproximadamente 40 videos.
-- Crecimiento medio: aproximadamente 4 videos diarios.
-- Picos: hasta 10 videos diarios.
+- Start: approximately 40 videos.
+- Average growth: approximately 4 videos per day.
+- Peaks: up to 10 videos per day.
 
-## Modelo de embeddings aprobado
+## Approved embedding model
 
-El benchmark inicial sobre 18 pasajes y 16 consultas dejó a
-`multilingual-e5-small` como modelo del MVP: obtuvo `Hit@1 = 1.0` y
-`MRR = 1.0`, igual que E5 Base, con 129 MB de caché y una latencia media de
-11.5 ms frente a 29 ms de E5 Base. Puede sustituirse si las evaluaciones futuras
-lo justifican; esa sustitución afectará al adaptador y al índice, no al dominio.
+The initial benchmark over 18 passages and 16 queries left
+`multilingual-e5-small` as the MVP model: it obtained `Hit@1 = 1.0` and
+`MRR = 1.0`, the same as E5 Base, with 129 MB of cache and an average latency of
+11.5 ms against E5 Base's 29 ms. It can be replaced if future evaluations
+justify it; that replacement will affect the adapter and the index, not the
+domain.
 
-## Backend vectorial aprobado
+## Approved vector backend
 
-El MVP persistirá vectores `float32[384]` como BLOB en SQLite y construirá un
-índice contiguo en memoria para búsqueda exacta. En el benchmark fue cerca de
-cinco veces más rápido que `sqlite-vec`; su costo adicional de RAM fue pequeño
-para la escala inicial. El puerto `VectorSearchIndex` permite sustituirlo sin
-modificar el dominio ni los casos de uso.
+The MVP will persist `float32[384]` vectors as BLOBs in SQLite and will build a
+contiguous in-memory index for exact search. In the benchmark it was close to
+five times faster than `sqlite-vec`; its additional RAM cost was small for the
+initial scale. The `VectorSearchIndex` port makes it possible to replace it
+without modifying the domain or the use cases.
 
-## Cliente SQLite aprobado
+## Approved SQLite client
 
-El MVP utilizará `node:sqlite` sobre Node.js 24.19.0 LTS. El benchmark contra
-`better-sqlite3` validó transacciones, FTS5, BLOB, iteradores, reapertura,
-backup e integridad con resultados equivalentes. `node:sqlite` evita el binding
-nativo y funcionó con la configuración local que deshabilita scripts de npm.
+The MVP will use `node:sqlite` on Node.js 24.19.0 LTS. The benchmark against
+`better-sqlite3` validated transactions, FTS5, BLOBs, iterators, reopening,
+backup and integrity with equivalent results. `node:sqlite` avoids the native
+binding and worked with the local configuration that disables npm scripts.
 
-`better-sqlite3` queda únicamente como dependencia de desarrollo para reproducir
-el benchmark. El acceso a datos seguirá detrás de `KnowledgeRepository` y
-`TextSearchIndex`, por lo que cambiar de cliente no afectará al dominio.
+`better-sqlite3` remains only as a development dependency, to reproduce the
+benchmark. Data access will stay behind `KnowledgeRepository` and
+`TextSearchIndex`, so changing client will not affect the domain.
 
-## Toolchain aprobado
+## Approved toolchain
 
-El repositorio compila con `tsc`, ejecuta pruebas TypeScript con `node:test` y
-`tsx`, aplica ESLint con las configuraciones estrictas y conscientes de tipos de
-typescript-eslint, y usa Prettier como única autoridad de formato. `npm run
-check` reúne las verificaciones rápidas obligatorias.
+The repository compiles with `tsc`, runs TypeScript tests with `node:test` and
+`tsx`, applies ESLint with typescript-eslint's strict and type-aware
+configurations, and uses Prettier as the single formatting authority. `npm run
+check` gathers the mandatory fast verifications.
 
-TypeScript queda fijado temporalmente en 6.0.3. TypeScript 7.0.2 ya estaba
-disponible, pero typescript-eslint 8.67.0 declara soporte únicamente hasta
-TypeScript menor que 6.1. La actualización se hará cuando exista compatibilidad
-oficial, sin afectar la arquitectura ni los contratos del producto.
+TypeScript is temporarily pinned to 6.0.3. TypeScript 7.0.2 was already
+available, but typescript-eslint 8.67.0 declares support only up to TypeScript
+lower than 6.1. The upgrade will happen once official compatibility exists,
+without affecting the architecture or the product contracts.
 
-## Política de fusión aprobada
+## Approved fusion policy
 
-El 11 de agosto de 2026 se aprobó Reciprocal Rank Fusion ponderada como baseline
-de la búsqueda híbrida, con `k = 60` y pesos iniciales `wText = wVector = 1.0`.
+On 11 August 2026 weighted Reciprocal Rank Fusion was approved as the baseline
+for hybrid search, with `k = 60` and initial weights `wText = wVector = 1.0`.
 
-`bm25()` devuelve valores negativos sin cota estable y la similitud coseno vive
-en `0..1`; no son comparables, y normalizarlos por lote haría que el orden
-dependa de qué otros candidatos aparecieron. RRF combina únicamente posiciones,
-es determinista y conserva los hits que sólo una de las dos vías encuentra, lo
-que sostiene el criterio de cobertura amplia del producto.
+`bm25()` returns negative values with no stable bound and cosine similarity
+lives in `0..1`; they are not comparable, and normalizing them per batch would
+make the ordering depend on which other candidates happened to appear. RRF
+combines positions only, is deterministic and keeps the hits that only one of
+the two paths finds, which sustains the product's broad-coverage criterion.
 
-Se descartó la cascada —una vía filtra y la otra reordena— porque pierde esos
-hits exclusivos. A la escala real, ejecutar ambas vías completas no tiene costo
-relevante, de modo que la cascada no aporta rendimiento.
+The cascade — one path filters and the other reranks — was rejected because it
+loses those exclusive hits. At the real scale, running both paths in full has no
+relevant cost, so the cascade contributes no performance either.
 
-La estrategia queda detrás del puerto `FusionStrategy`, por lo que los pesos
-pueden calibrarse, o la estrategia sustituirse, sin modificar casos de uso ni
-adaptadores. El detalle está en [retrieval-design.md](retrieval-design.md).
+The strategy stays behind the `FusionStrategy` port, so the weights can be
+calibrated, or the strategy replaced, without modifying use cases or adapters.
+The detail is in [retrieval-design.md](retrieval-design.md).
 
-## Diseño de ensamblado de contexto aprobado
+## Approved context assembly design
 
-El 12 de agosto de 2026 se aprobaron las decisiones de diseño del punto 2.3,
-detalladas en [context-assembly-design.md](context-assembly-design.md):
+On 12 August 2026 the design decisions of point 2.3 were approved, detailed in
+[context-assembly-design.md](context-assembly-design.md):
 
-- Bucketing fijo por `unitType`: unidades de documento/sección van siempre a
-  "Highest-relevance context" y reglas/patrones siempre a "Related rules and
-  patterns", sin mezclar por puntaje puro.
-- Los ancestros producidos por la expansión jerárquica caen siempre en
-  "Additional relevant context", nunca en las dos secciones anteriores.
-- Un bloque único que por sí solo excede el presupuesto se incluye igual —el
-  bundle nunca queda vacío habiendo evidencia real— y el presupuesto se marca
-  agotado de inmediato después.
-- Deduplicación en dos niveles: por `unitId` (estructural) y por
-  `contentHash` (contenido idéntico bajo unidades distintas), ambas
-  implementadas desde el inicio de 2.3.
-- `request_id` usa el mismo generador ad-hoc que `SyncId`
-  (`Date.now().toString(36)` + aleatorio), sin añadir una dependencia de
-  ULID. Es independiente de la deduplicación por `contentHash`: una nombra el
-  directorio del bundle, la otra colapsa contenido repetido.
-- Presupuestos por profundidad confirmados sin recalibrar: `focused` = 12k,
-  `balanced` = 32k, `deep` = 64k tokens estimados.
+- Fixed bucketing by `unitType`: document/section units always go to
+  "Highest-relevance context" and rules/patterns always to "Related rules and
+  patterns", with no mixing by raw score.
+- The ancestors produced by hierarchical expansion always fall into "Additional
+  relevant context", never into the two preceding sections.
+- A single block that on its own exceeds the budget is included anyway — the
+  bundle is never empty when real evidence exists — and the budget is marked
+  exhausted immediately afterwards.
+- Deduplication at two levels: by `unitId` (structural) and by `contentHash`
+  (identical content under different units), both implemented from the start of
+  2.3.
+- `request_id` uses the same ad-hoc generator as `SyncId`
+  (`Date.now().toString(36)` + random), without adding a ULID dependency. It is
+  independent of `contentHash` deduplication: one names the bundle directory,
+  the other collapses repeated content.
+- Per-depth budgets confirmed without recalibration: `focused` = 12k,
+  `balanced` = 32k, `deep` = 64k estimated tokens.
 
-## Diseño de evaluaciones aprobado
+## Approved evaluation design
 
-El 12 de agosto de 2026 se aprobó el diseño del punto 3.2, detallado en
+On 12 August 2026 the design of point 3.2 was approved, detailed in
 [eval-design.md](eval-design.md):
 
-- Sin ground truth de relevancia etiquetado a mano: es caro, subjetivo, y el
-  criterio de éxito del producto no es una coincidencia puntual sino cobertura
-  amplia y citada.
-- Dos capas de medición independientes: mecánica (integridad de citas,
-  cobertura, estado vs. `kind` esperado, calculable sin ningún agente) y
-  juzgada (rúbrica corta que responde el agente consumidor real sobre el
-  bundle ya ensamblado).
-- Codex y Claude evalúan exactamente el mismo bundle por consulta y
-  profundidad — nunca corridas de `retrieve` independientes por agente — para
-  medir consistencia del producto entre proveedores, no comparar
-  configuraciones de recuperación distintas.
-- No se barre la grilla de pesos RRF ni de presupuestos por profundidad a
-  ciegas: sólo se ajustan si la evidencia de 3.2 muestra un problema
-  concreto, y el cambio se documenta aquí con esa evidencia.
+- No hand-labelled relevance ground truth: it is expensive, subjective, and the
+  product's success criterion is not a pinpoint match but broad, cited
+  coverage.
+- Two independent measurement layers: mechanical (citation integrity, coverage,
+  status vs. expected `kind`, computable with no agent at all) and judged (a
+  short rubric answered by the real consuming agent over the already assembled
+  bundle).
+- Codex and Claude evaluate exactly the same bundle per query and depth — never
+  independent `retrieve` runs per agent — in order to measure the product's
+  consistency across providers, not to compare different retrieval
+  configurations.
+- The grid of RRF weights and per-depth budgets is not swept blindly: they are
+  adjusted only if the evidence from 3.2 shows a concrete problem, and the
+  change is documented here with that evidence.
 
-## Decisión de calibración (O1, punto 3.2)
+## Calibration decision (O1, point 3.2)
 
-El 13 de agosto de 2026 se revisó, en conjunto, la Capa A mecánica (M3,
-`evals/results/2026-08-12/layer-a-report.md`) y la Capa B juzgada (N4,
-`evals/results/2026-08-12/report.md`) sobre los 24 bundles reales de
-`auto-design`. **Decisión: mantener los defaults actuales sin cambios** — RRF
-con `k = 60`, `wText = wVector = 1.0`, y presupuestos por profundidad
-`focused` = 12k, `balanced` = 32k, `deep` = 64k tokens estimados. No se
-encontró evidencia suficiente para justificar un cambio, según el mismo
-criterio que ya fijaba `eval-design.md`.
+On 13 August 2026 the mechanical Layer A (M3,
+`evals/results/2026-08-12/layer-a-report.md`) and the judged Layer B (N4,
+`evals/results/2026-08-12/report.md`) were reviewed together over the 24 real
+bundles from `auto-design`. **Decision: keep the current defaults unchanged** —
+RRF with `k = 60`, `wText = wVector = 1.0`, and per-depth budgets
+`focused` = 12k, `balanced` = 32k, `deep` = 64k estimated tokens. No sufficient
+evidence was found to justify a change, according to the same criterion
+`eval-design.md` already set.
 
-Evidencia considerada y por qué no cruza la barra de "evidencia clara":
+Evidence considered, and why it does not clear the "clear evidence" bar:
 
-- **Agotamiento de presupuesto casi universal** (100% en `focused` y
-  `balanced`, 88% en `deep`, ver M3). No es evidencia de presupuestos mal
-  calibrados: el diseño de 2.2/2.3 recupera deliberadamente un universo
-  amplio de candidatos (`fusedResults = 50`) para sostener cobertura, así que
-  agotar el presupuesto es el comportamiento esperado, no un síntoma de
-  subdimensionamiento. `coverage.budget_exhausted` existe precisamente para
-  que el agente consumidor sepa que hay más evidencia disponible de la que
-  entró, no para disparar un aumento automático de tokens.
-- **La cobertura juzgada (N4) generalmente mejora de `focused` a `balanced`
-  y se aplana de `balanced` a `deep`** en 5 de 8 consultas con contenido real
+- **Almost universal budget exhaustion** (100% in `focused` and `balanced`, 88%
+  in `deep`, see M3). This is not evidence of badly calibrated budgets: the
+  design of 2.2/2.3 deliberately retrieves a broad universe of candidates
+  (`fusedResults = 50`) to sustain coverage, so exhausting the budget is the
+  expected behaviour, not a symptom of undersizing. `coverage.budget_exhausted`
+  exists precisely so that the consuming agent knows there is more evidence
+  available than the amount that made it in, not to trigger an automatic token
+  increase.
+- **Judged coverage (N4) generally improves from `focused` to `balanced` and
+  flattens from `balanced` to `deep`** in 5 of the 8 queries with real content
   (`en-concept-visual-hierarchy`, `es-concept-brutalism`,
   `es-paraphrase-saturated-colors`, `es-rules-comparison-brutalism-minimalism`,
-  `multilingual-grid-systems`), y no cambia en absoluto con la profundidad en
-  `es-rare-term-kerning` porque la escasez es del corpus, no del presupuesto.
-  Este patrón es consistente con presets pensados como perfiles de uso
-  distintos (`focused` rápido y acotado, `deep` exhaustivo), no con un preset
-  roto: no hay ninguna consulta donde `deep` rinda peor que `focused`, ni
-  ninguna donde `balanced` deje fuera contenido que un preset mayor
-  recuperaría con una ponderación distinta de RRF.
-- **`es-no-answer-unrelated-topic` nunca produce `status: "no_results"`**
-  (divergencia mecánica en las tres profundidades, heredada de la ausencia de
-  piso de similitud ya documentada en `retrieval-design.md`). Pero la Capa B
-  la neutraliza: ambos jueces, sin divergencia, calificaron
-  `precision_aparente = 0.00` y `cobertura_suficiente = 1` en las tres
-  profundidades. El agente consumidor identifica correctamente, leyendo el
-  bundle, que no hay contenido relevante — la ausencia de un piso de
-  similitud no le impedía llegar a la conclusión correcta. Esto es
-  exactamente el caso que `eval-design.md` dejaba fuera de alcance "salvo
-  evidencia clara", y aquí la evidencia apunta en contra de agregar un
-  umbral: el producto ya comunica la ausencia de contenido relevante sin él.
-- **Ningún dato de 3.2 aísla la contribución de la vía textual frente a la
-  vectorial.** Las métricas de Capa A no separan candidatos por procedencia y
-  ninguna de las 9 discrepancias de N4 se atribuye a una vía dominando a la
-  otra (ver hipótesis en `report.md`): las nueve caen en severidad de
-  `precision_aparente` o ambigüedad de la rúbrica sobre "cobertura
-  suficiente"/"cruce multilingüe". No hay señal para mover `wText`/`wVector`
-  en ninguna dirección.
+  `multilingual-grid-systems`), and does not change at all with depth in
+  `es-rare-term-kerning` because the scarcity is the corpus's, not the
+  budget's. This pattern is consistent with presets conceived as distinct usage
+  profiles (`focused` fast and narrow, `deep` exhaustive), not with a broken
+  preset: there is no query where `deep` performs worse than `focused`, nor any
+  where `balanced` leaves out content that a larger preset would retrieve under
+  a different RRF weighting.
+- **`es-no-answer-unrelated-topic` never produces `status: "no_results"`**
+  (mechanical divergence at all three depths, inherited from the absence of a
+  similarity floor already documented in `retrieval-design.md`). But Layer B
+  neutralizes it: both judges, with no divergence, scored
+  `precision_aparente = 0.00` and `cobertura_suficiente = 1` at all three
+  depths. The consuming agent correctly identifies, by reading the bundle, that
+  there is no relevant content — the absence of a similarity floor did not stop
+  it from reaching the correct conclusion. This is exactly the case that
+  `eval-design.md` left out of scope "except with clear evidence", and here the
+  evidence points against adding a threshold: the product already communicates
+  the absence of relevant content without one.
+- **No data from 3.2 isolates the contribution of the textual path against the
+  vector one.** The Layer A metrics do not separate candidates by origin, and
+  none of N4's 9 discrepancies is attributed to one path dominating the other
+  (see the hypotheses in `report.md`): all nine fall under severity of
+  `precision_aparente` or ambiguity of the rubric about "sufficient
+  coverage"/"multilingual crossover". There is no signal to move
+  `wText`/`wVector` in either direction.
 
-Ninguna de las 9 discrepancias Codex/Claude de N4 señala un defecto del
-producto — ver la lectura agregada en `report.md`. Son ambigüedades del
-instrumento de evaluación (`evals/rubric-template.md`), que quedan anotadas
-como mejora para una futura pasada de evaluación, no como motivo de cambio
-de código en 3.2.
+None of N4's 9 Codex/Claude discrepancies points to a product defect — see the
+aggregate reading in `report.md`. They are ambiguities of the evaluation
+instrument (`evals/rubric-template.md`), which are noted as an improvement for a
+future evaluation pass, not as a reason to change code in 3.2.
 
-## Validación tolerante por video en el manifest
+## Per-video tolerant validation in the manifest
 
-El 13 de agosto de 2026 se resolvió la primera mitad del hallazgo de deriva
-de esquema encontrado en M4 (ver `evals/results/2026-08-12/report.md`,
-"Hallazgos accionables" — 17 de 51 videos reales de `auto-design` con
-`resources.analysis` en vez de `resources.rules`): un solo video con esquema
-inválido ya no aborta la lectura de todo el manifest.
+On 13 August 2026 the first half of the schema-drift finding from M4 was
+resolved (see `evals/results/2026-08-12/report.md`, "Hallazgos accionables" — 17
+of 51 real `auto-design` videos with `resources.analysis` instead of
+`resources.rules`): a single video with an invalid schema no longer aborts
+reading the whole manifest.
 
-- `parseManifest` (`src/infrastructure/filesystem/manifest-reader.ts`) ahora
-  distingue dos niveles de fallo: los **estructurales de raíz** (root no es
-  un objeto, `videos` no es un array, JSON inválido, archivo no legible)
-  siguen siendo fatales — no hay lista de videos que salvar. Los
-  **por-entrada** (un video con campo de esquema inválido, o un id/slug
-  duplicado) ya no tiran `ManifestReadError`: se descartan del array
-  `videos` y se acumulan como `ManifestVideoIssue` en el nuevo campo
-  `ManifestSnapshot.issues`, con identificación best-effort del video
-  (`videoId: VideoId | null`, `null` sólo cuando el propio `video_id` es lo
-  que falló).
-- `syncSource` (`src/application/indexing/sync-source.ts`) traduce cada
-  `ManifestVideoIssue` a un `SyncIssue` (`MANIFEST_ENTRY_SCHEMA_INVALID` o
-  `MANIFEST_ENTRY_DUPLICATE`) y lo cuenta en `packagesSeen`/`packagesFailed`,
-  igual que un fallo de indexación por paquete. Cuando la entrada rota
-  todavía resuelve a un `VideoId` conocido, marca visto (`markPackageSeen`)
-  cualquier paquete previamente indexado de ese video **antes** del paso de
-  borrado por "no visto en este run" — un video que retrocede a un esquema
-  inválido nunca debe parecer eliminado de la colección. Un run con al menos
-  una entrada así termina en `partial`, igual que cualquier otro fallo
-  parcial ya soportado.
-- No cambia el esquema de SQLite ni el contrato público de la CLI. El
-  cambio es enteramente de `manifest-reader.ts` y `sync-source.ts`, cubierto
-  por pruebas nuevas en ambos archivos de test.
+- `parseManifest` (`src/infrastructure/filesystem/manifest-reader.ts`) now
+  distinguishes two failure levels: **root structural** ones (the root is not an
+  object, `videos` is not an array, invalid JSON, unreadable file) are still
+  fatal — there is no list of videos to salvage. **Per-entry** ones (a video
+  with an invalid schema field, or a duplicate id/slug) no longer throw
+  `ManifestReadError`: they are dropped from the `videos` array and accumulated
+  as `ManifestVideoIssue` in the new `ManifestSnapshot.issues` field, with
+  best-effort identification of the video (`videoId: VideoId | null`, `null`
+  only when `video_id` itself is what failed).
+- `syncSource` (`src/application/indexing/sync-source.ts`) translates each
+  `ManifestVideoIssue` into a `SyncIssue` (`MANIFEST_ENTRY_SCHEMA_INVALID` or
+  `MANIFEST_ENTRY_DUPLICATE`) and counts it in `packagesSeen`/`packagesFailed`,
+  just like a per-package indexing failure. When the broken entry still resolves
+  to a known `VideoId`, it marks as seen (`markPackageSeen`) any previously
+  indexed package of that video **before** the "not seen in this run" deletion
+  step — a video that regresses to an invalid schema must never look deleted
+  from the collection. A run with at least one such entry finishes as `partial`,
+  like any other partial failure already supported.
+- Neither the SQLite schema nor the public CLI contract changes. The change is
+  entirely within `manifest-reader.ts` and `sync-source.ts`, covered by new
+  tests in both test files.
 
-Esto resuelve el efecto amplificador (un video roto bloqueaba los 51), no el
-hallazgo de fondo: los 17 videos con `resources.analysis` estuvieron
-aislados como `issue` (en vez de tumbar todo el run) hasta que se implementó
-el soporte completo de `analysis.json` — ver "Soporte de `analysis.json`
-(schema 2.0): implementado y validado" abajo.
+This resolves the amplifying effect (one broken video blocked all 51), not the
+underlying finding: the 17 videos with `resources.analysis` stayed isolated as
+an `issue` (instead of taking down the whole run) until full `analysis.json`
+support was implemented — see "`analysis.json` support (schema 2.0): implemented
+and validated" below.
 
-## Soporte de `analysis.json` (schema 2.0): implementado y validado
+## `analysis.json` support (schema 2.0): implemented and validated
 
-La skill productora `youtube-video-context` reemplazó `rules.json`/schema
-1.0 por `analysis.json`/schema 2.0 el 2 de agosto de 2026 (commit `aecdde9`
-del repositorio de esa skill, breaking change explícito: "deja de producir
-un manual de reglas de diseño para producir un análisis general").
-`auto-youtube-rag` nunca soportó schema 2.0; la forma de `analysis.json`
-(`topics`/`recommendations`/`assessment`/`evidence_boundary`) no es análoga
-a la de `rules.json` (`patterns`/`principle`/`problem`/`rules`/`avoid`/
-`acceptanceCriteria`), así que no es viable un alias de campo en el
-manifest ni reusar `rules-json-parser.ts`.
+The producing skill `youtube-video-context` replaced `rules.json`/schema 1.0
+with `analysis.json`/schema 2.0 on 2 August 2026 (commit `aecdde9` of that
+skill's repository, an explicit breaking change: "it stops producing a design
+rules manual in order to produce a general analysis"). `auto-youtube-rag` never
+supported schema 2.0; the shape of `analysis.json`
+(`topics`/`recommendations`/`assessment`/`evidence_boundary`) is not analogous
+to that of `rules.json` (`patterns`/`principle`/`problem`/`rules`/`avoid`/
+`acceptanceCriteria`), so neither a field alias in the manifest nor reusing
+`rules-json-parser.ts` is viable.
 
-El 13 de agosto de 2026 se aprobó el diseño completo en
-[analysis-schema-design.md](analysis-schema-design.md) (bloques P–T), con
-estas decisiones:
+On 13 August 2026 the full design was approved in
+[analysis-schema-design.md](analysis-schema-design.md) (blocks P–T), with these
+decisions:
 
-- **Ambos esquemas se sostienen indefinidamente.** `rules.json`/schema 1.0
-  no se congela ni se deprecia — los 34 videos existentes de `auto-design`
-  no se regeneran solos.
-- **Bucketing:** `topics`/`analysis_document`/`analysis_section` caen en
-  "Highest-relevance context"; `recommendations` cae en "Related rules and
-  patterns". Se reutilizan las dos secciones fijas ya publicadas en
-  `cli-contract.md` sin renombrarlas ni agregar una tercera, para no romper
-  el contrato de cable ya consumido por `skill/SKILL.md` y por agentes
-  reales.
-- **Migración SQLite:** se edita `001-initial.ts` in place para que el
-  `CHECK` de `source_documents.kind` incluya `'analysis'` desde el origen,
-  en vez de construir un migrador incremental. Confirmado con el usuario
-  que no existe ninguna base `.auto-youtube-rag/index.sqlite` real y
-  persistente que preservar — `auto-design` y `design-catalog` (esta
-  última, otra colección real generada por la misma skill, con algunos
-  videos más) son colecciones fuente en disco, no índices ya construidos.
-- **Validación E2E real (bloque T)** contra los videos reales con
-  `analysis.json` de `auto-design` fue incluida en este trabajo, no
-  pospuesta.
+- **Both schemas are supported indefinitely.** `rules.json`/schema 1.0 is
+  neither frozen nor deprecated — the 34 existing `auto-design` videos do not
+  regenerate themselves.
+- **Bucketing:** `topics`/`analysis_document`/`analysis_section` fall into
+  "Highest-relevance context"; `recommendations` falls into "Related rules and
+  patterns". The two fixed sections already published in `cli-contract.md` are
+  reused without renaming them or adding a third, so as not to break the wire
+  contract already consumed by `skill/SKILL.md` and by real agents.
+- **SQLite migration:** `001-initial.ts` is edited in place so that the `CHECK`
+  on `source_documents.kind` includes `'analysis'` from the origin, instead of
+  building an incremental migrator. Confirmed with the user that no real,
+  persistent `.auto-youtube-rag/index.sqlite` database exists to preserve —
+  `auto-design` and `design-catalog` (the latter another real collection
+  generated by the same skill, with a few more videos) are source collections on
+  disk, not already-built indexes.
+- **Real E2E validation (block T)** against the real videos with
+  `analysis.json` from `auto-design` was included in this work, not postponed.
 
-**Implementado y cerrado el 13 de agosto de 2026** — bloques P–T
-completos. Validación real (bloque T)
-ejecutada contra una copia temporal de la colección real `auto-design`
-(51 videos, incluidos los 17 con `analysis.json`) con el modelo E5 real:
+**Implemented and closed on 13 August 2026** — blocks P–T complete. Real
+validation (block T) run against a temporary copy of the real `auto-design`
+collection (51 videos, including the 17 with `analysis.json`) with the real E5
+model:
 
-- los 51 paquetes se indexaron sin ningún `issue` (`packagesIndexed: 51`,
-  `packagesFailed: 0`) — los 17 videos con `analysis.json` que antes
-  quedaban aislados como issue ahora se indexan como ciudadanos de primera
-  clase;
-- `doctor` reportó los cinco checks en `ok`;
-- el digest SHA-256 del árbol fuente copiado fue idéntico antes y después de
-  `sync`, confirmando que la fuente nunca se escribe;
-- una consulta semilla nueva (`es-analysis-neumorphism-accessibility` en
-  `evals/queries/seed-queries.json`), orientada específicamente a contenido
-  no alcanzable desde `rules.json`, produjo un bundle real vía `retrieve
---depth balanced` donde la cita `[S45]` resolvió a una unidad
-  `analysis_topic` real (`psyw2_j_5jk`, "Neumorphism as a middle ground, and
-  its accessibility defense") en la sección "Highest-relevance context", con
-  procedencia correcta y `context.md` legible;
-- la copia temporal se descartó al terminar; la colección real
-  `auto-design` no se modificó.
+- all 51 packages were indexed with no `issue` at all (`packagesIndexed: 51`,
+  `packagesFailed: 0`) — the 17 videos with `analysis.json` that used to stay
+  isolated as an issue are now indexed as first-class citizens;
+- `doctor` reported all five checks as `ok`;
+- the SHA-256 digest of the copied source tree was identical before and after
+  `sync`, confirming that the source is never written to;
+- a new seed query (`es-analysis-neumorphism-accessibility` in
+  `evals/queries/seed-queries.json`), aimed specifically at content unreachable
+  from `rules.json`, produced a real bundle via `retrieve --depth balanced`
+  where the citation `[S45]` resolved to a real `analysis_topic` unit
+  (`psyw2_j_5jk`, "Neumorphism as a middle ground, and its accessibility
+  defense") in the "Highest-relevance context" section, with correct provenance
+  and a readable `context.md`;
+- the temporary copy was discarded on finishing; the real `auto-design`
+  collection was not modified.
 
-`design-catalog` (la segunda colección real mencionada arriba) no se validó
-explícitamente porque su manifest no declara ningún video con
-`resources.analysis` — no ejercita este trabajo. No es un pendiente: el
-soporte de schema 2.0 no depende de esa colección en particular.
+`design-catalog` (the second real collection mentioned above) was not validated
+explicitly because its manifest declares no video with `resources.analysis` — it
+does not exercise this work. It is not an open item: schema 2.0 support does not
+depend on that collection in particular.
 
-## Skill dividida en `SKILL.md` + `skill/references/`
+## Skill split into `SKILL.md` + `skill/references/`
 
-Fecha: 13 de agosto de 2026. Origen: una corrida de verificación en frío
-sobre el estilo de diseño Swiss, con un subagente sin contexto previo del
-proyecto, contra las dos colecciones reales (`auto-design`, 51 videos, y
-`catalog-design`, 12 videos) registradas por ruta directa, sin copia.
+Date: 13 August 2026. Origin: a cold verification run on the Swiss design style,
+with a subagent that had no prior context of the project, against the two real
+collections (`auto-design`, 51 videos, and `catalog-design`, 12 videos)
+registered by direct path, with no copy.
 
-La corrida cerró bien —63 paquetes indexados, 9 bundles con integridad de
-citas perfecta, fuentes byte-idénticas antes y después— pero destapó cinco
-huecos de `skill/SKILL.md`, todos de documentación y ninguno de código:
+The run finished well — 63 packages indexed, 9 bundles with perfect citation
+integrity, sources byte-identical before and after — but it uncovered five gaps
+in `skill/SKILL.md`, all of them documentation and none of them code:
 
-1. las rutas de base y caché del modelo se resuelven relativas al `cwd`, algo
-   que la skill no mencionaba; trabajando fuera del repositorio, el primer
-   `sync` falló con 63 issues `MODEL_LOAD_FAILED`, uno por video;
-2. ese código simbólico no estaba documentado — la skill documentaba
-   `EMBEDDING_MODEL_MISSING`, que **no es sinónimo**: el primero lo emite el
-   generador de embeddings durante `sync`, el segundo es un warning de
-   degradación de la vía vectorial en `retrieve`;
-3. la afirmación "funciona sin red" convivía con la instrucción de correr
-   `npm run models:download`, que sí requiere red, sin resolver la aparente
-   contradicción;
-4. no había ninguna estimación de duración de `sync` ni estrategia de espera,
-   lo que llevó al agente a lanzar cuatro syncs, dos de ellos concurrentes;
-5. la skill describía los paquetes sólo con `rules.json` y mandaba rechazar
-   estructuras que no la tuvieran — tras el punto 4.1 eso habría hecho que un
-   agente en frío descartara una colección schema 2.0 perfectamente válida.
+1. the database and model cache paths resolve relative to the `cwd`, something
+   the skill did not mention; working outside the repository, the first `sync`
+   failed with 63 `MODEL_LOAD_FAILED` issues, one per video;
+2. that symbolic code was not documented — the skill documented
+   `EMBEDDING_MODEL_MISSING`, which is **not a synonym**: the first is emitted by
+   the embedding generator during `sync`, the second is a warning about
+   degradation of the vector path in `retrieve`;
+3. the claim "it works without network" coexisted with the instruction to run
+   `npm run models:download`, which does require network, without resolving the
+   apparent contradiction;
+4. there was no estimate of `sync` duration nor any waiting strategy, which led
+   the agent to launch four syncs, two of them concurrent;
+5. the skill described packages with `rules.json` only and ordered the agent to
+   reject structures lacking it — after point 4.1 that would have made a cold
+   agent discard a perfectly valid schema 2.0 collection.
 
-Corregidos los cinco, `SKILL.md` había crecido a 283 líneas (~14,5 KB), que
-se cargan enteras cada vez que la skill se dispara.
+With all five corrected, `SKILL.md` had grown to 283 lines (~14.5 KB), which are
+loaded in full every time the skill fires.
 
-**Decisión: separar por frecuencia de uso, no por tema.** `SKILL.md` conserva
-lo que hace falta en cada corrida (cuándo usar, flujo, `sync`, `retrieve`,
-lectura del bundle, citas, reglas de oro) y baja a 198 líneas (~9,4 KB), un
-35% menos de carga por invocación. Lo que sólo hace falta de vez en cuando se
-muda a dos archivos:
+**Decision: separate by frequency of use, not by topic.** `SKILL.md` keeps what
+is needed on every run (when to use it, the flow, `sync`, `retrieve`, reading
+the bundle, citations, golden rules) and drops to 198 lines (~9.4 KB), 35% less
+load per invocation. What is needed only from time to time moves into two files:
 
-- `skill/references/setup.md`: invocación alternativa de la CLI, rutas y
-  variables de entorno, procedimiento del caché del modelo, `init`, y las dos
-  causas del error de apertura de base.
-- `skill/references/troubleshooting.md`: códigos de salida, interpretación de
-  `status`, códigos simbólicos, fallo parcial de `sync` y `doctor`.
+- `skill/references/setup.md`: the alternative CLI invocation, paths and
+  environment variables, the model cache procedure, `init`, and the two causes
+  of the database-open error.
+- `skill/references/troubleshooting.md`: exit codes, interpreting `status`,
+  symbolic codes, partial `sync` failure and `doctor`.
 
-**Esto no contradice la autocontención que fijó el punto 2.4.** Aquella
-decisión prohibió que la skill dependiera de archivos _fuera_ de sí misma
-—en particular, referenciar `docs/` por ruta relativa— para poder instalarse
-o enlazarse fuera de este repositorio. El directorio `skill/` viaja completo,
-así que el bundle sigue siendo autónomo. Tener más de un archivo adentro
-nunca estuvo prohibido. Si una lectura futura interpreta la separación como
-una regresión de 2.4, está equivocada.
+**This does not contradict the self-containment that point 2.4 established.**
+That decision forbade the skill from depending on files _outside_ itself — in
+particular, referencing `docs/` by relative path — so that it could be installed
+or linked outside this repository. The `skill/` directory travels whole, so the
+bundle is still self-contained. Having more than one file inside it was never
+forbidden. If a future reading interprets the split as a regression of 2.4, that
+reading is wrong.
 
-Invariante que la separación introduce: **en `SKILL.md` se quedan los
-disparadores, se van los procedimientos.** Cada condición que exige leer una
-referencia está nombrada en `SKILL.md` por su síntoma (`ERR_SQLITE_ERROR`,
-`status` distinto de `ok`, comando ausente del PATH), más una tabla de
-referencias al inicio. La verificación de 2.4 ya había demostrado que un
-agente en frío se saltea un paso que no está a la vista; mover contenido sin
-dejar el reflejo reproduciría ese fallo.
+The invariant the split introduces: **the triggers stay in `SKILL.md`, the
+procedures leave.** Every condition that requires reading a reference is named
+in `SKILL.md` by its symptom (`ERR_SQLITE_ERROR`, `status` other than `ok`, the
+command missing from PATH), plus a reference table at the start. The 2.4
+verification had already shown that a cold agent skips a step that is not in
+sight; moving content without leaving the reflex behind would reproduce that
+failure.
 
-Dos cosas se mantuvieron deliberadamente en `SKILL.md` aunque por tema
-parecerían candidatas a mudarse, porque por frecuencia no lo son: la guía de
-espera de `sync` y la coexistencia `rules.json`/`analysis.json`. Ambas se
-necesitan en el momento de ejecutar, no después de fallar.
+Two things were deliberately kept in `SKILL.md` even though by topic they would
+look like candidates to move, because by frequency they are not: the `sync`
+waiting guidance and the `rules.json`/`analysis.json` coexistence. Both are
+needed at the moment of running, not after failing.
 
-La separación **todavía no se validó en frío**; queda pendiente repetir el
-mismo tipo de corrida con la skill ya dividida.
+The split has **not been validated cold yet**; repeating the same kind of run
+with the already split skill remains pending.
 
-## Instalación: hogar de usuario, `init` instalador y preflight (punto 4.2)
+## Installation: user home, `init` as installer, and preflight (point 4.2)
 
-Implementado el 13 y 14 de agosto de 2026. Diseño completo en
-`docs/install-design.md`. Cierra el pendiente "Default del caché del modelo"
-que había abierto la corrida en frío.
+Implemented on 13 and 14 August 2026. Full design in `docs/install-design.md`.
+It closes the open item "Default del caché del modelo" that the cold run had
+opened.
 
-La investigación arrancó por un síntoma —63 issues `MODEL_LOAD_FAILED`— y
-llegó a una causa mucho más profunda: **nunca se había decidido cómo se
-instala el producto**. `package.json` declaraba `private: true` junto a un
-`bin`, ninguna especificación cubría la distribución, y el único instalador
-era `npm run models:download`, que es el arnés de benchmarks
-(`tsx benchmarks/embeddings/run.ts`) y no existe para nadie sin el
-repositorio clonado. La auditoría encontró **cuatro lugares** calculando la
-ruta del modelo, tres de ellos duplicando un default relativo al `cwd`.
+The investigation started from a symptom — 63 `MODEL_LOAD_FAILED` issues — and
+arrived at a much deeper cause: **it had never been decided how the product is
+installed**. `package.json` declared `private: true` alongside a `bin`, no
+specification covered distribution, and the only installer was
+`npm run models:download`, which is the benchmark harness
+(`tsx benchmarks/embeddings/run.ts`) and does not exist for anyone without the
+repository cloned. The audit found **four places** computing the model path,
+three of them duplicating a default relative to the `cwd`.
 
-Decisiones cerradas, todas confirmadas por el usuario:
+Closed decisions, all confirmed by the user:
 
-- **Distribución como comando global tipo npm, sin `postinstall`.** Hay
-  instalaciones con scripts deshabilitados; el proyecto ya había elegido
-  `node:sqlite` sobre `better-sqlite3` en parte por eso mismo
-  (`docs/benchmarks/sqlite-client.md`), y un hook de 130 MB contradiría esa
-  decisión.
-- **Hogar único de usuario** `~/.auto-youtube-rag/`, con `index.sqlite` y
-  `models/` adentro. Reemplaza los defaults relativos al `cwd`, que rompían
-  el caso de uso principal —un agente consultando desde otro proyecto— y
-  fallaban en silencio: `status` informaba cero fuentes y aparentaba pérdida
-  de datos.
-- **El directorio se llama `models/`, no `cache/`,** y la variable pasó de
-  `AUTO_YOUTUBE_RAG_MODEL_CACHE` a `AUTO_YOUTUBE_RAG_MODELS_DIR`. Un caché es
-  dato derivado que se regenera solo; este modelo no se repone jamás por sí
-  mismo, porque el invariante prohíbe descargar implícitamente y el adaptador
-  fuerza `allowRemoteModels = false`. Es estado instalado. El nombre viejo
-  venía del vocabulario de Transformers.js, que sí descarga solo.
-- **Un solo resolutor compartido** (`resolve-paths.ts`), usado por lector y
-  escritor. Los tres defaults duplicados se eliminaron:
-  `E5EmbeddingGenerator` ahora exige `cacheDir` y `evals/run-seed-queries.ts`
-  resuelve por el mismo camino. `benchmarks/embeddings/run.ts` se conserva
-  intacto: es herramienta de investigación y trabaja legítimamente contra el
-  repositorio.
-- **`init` instala el sistema completo** (hogar, base y modelo), con
-  `--skip-model` para CI. Deja de ser instantáneo, y eso se documenta con la
-  misma prominencia que la duración de `sync`.
-- **Un modelo ya presente en disco se reutiliza sólo con `--from` explícito.**
-  Se descartó la detección automática del repositorio: le daría al producto
-  conocimiento de la estructura del repo, y el principio acordado es el
-  opuesto —el repo es código fuente, y el producto no debe poder correr desde
-  él sin haberse instalado. Se copia, nunca se mueve: vaciar el origen
-  rompería los benchmarks y el smoke de E5.
-- **Preflight de requisitos una vez por comando.** Cada comando declara qué
-  necesita y la CLI lo verifica antes de construir nada. El caso que lo
-  motivó: `sync` descubría el modelo ausente una vez por video, procesando 63
-  paquetes para llegar a una conclusión disponible en el primer milisegundo.
-  `test/interfaces/cli/` fija esa regresión.
-- **Recibo `models/.install.json`** con el tamaño esperado de cada archivo,
-  para distinguir `absent`, `incomplete` e `installed`. Detecta la descarga
-  truncada —que deja los cuatro archivos presentes con el tamaño equivocado—
-  sin leer 130 MB en cada `doctor`. Se comparan tamaños, nunca hashes.
-- **La base vieja relativa al `cwd` se avisa (`LEGACY_LIBRARY_FOUND`), no se
-  migra sola.** Mover datos del usuario sin pedirlo excede el mandato de
-  `init`.
+- **Distribution as an npm-style global command, with no `postinstall`.** There
+  are installations with scripts disabled; the project had already chosen
+  `node:sqlite` over `better-sqlite3` partly for that very reason
+  (`docs/benchmarks/sqlite-client.md`), and a 130 MB hook would contradict that
+  decision.
+- **A single user home** `~/.auto-youtube-rag/`, with `index.sqlite` and
+  `models/` inside it. It replaces the `cwd`-relative defaults, which broke the
+  main use case — an agent querying from another project — and failed silently:
+  `status` reported zero sources and looked like data loss.
+- **The directory is called `models/`, not `cache/`,** and the variable went
+  from `AUTO_YOUTUBE_RAG_MODEL_CACHE` to `AUTO_YOUTUBE_RAG_MODELS_DIR`. A cache
+  is derived data that regenerates itself; this model never restores itself,
+  because the invariant forbids downloading implicitly and the adapter forces
+  `allowRemoteModels = false`. It is installed state. The old name came from the
+  Transformers.js vocabulary, where downloading does happen on its own.
+- **A single shared resolver** (`resolve-paths.ts`), used by reader and writer.
+  The three duplicated defaults were removed: `E5EmbeddingGenerator` now
+  requires `cacheDir` and `evals/run-seed-queries.ts` resolves through the same
+  path. `benchmarks/embeddings/run.ts` is kept intact: it is a research tool and
+  legitimately works against the repository.
+- **`init` installs the complete system** (home, database and model), with
+  `--skip-model` for CI. It stops being instantaneous, and that is documented
+  with the same prominence as the duration of `sync`.
+- **A model already present on disk is reused only with an explicit `--from`.**
+  Automatic detection of the repository was rejected: it would give the product
+  knowledge of the repo structure, and the agreed principle is the opposite —
+  the repo is source code, and the product must not be able to run from it
+  without having been installed. It copies, never moves: emptying the origin
+  would break the benchmarks and the E5 smoke test.
+- **Requirement preflight once per command.** Every command declares what it
+  needs and the CLI verifies it before building anything. The case that
+  motivated it: `sync` discovered the missing model once per video, processing
+  63 packages to reach a conclusion available in the first millisecond.
+  `test/interfaces/cli/` pins that regression.
+- **A `models/.install.json` receipt** with the expected size of each file, in
+  order to distinguish `absent`, `incomplete` and `installed`. It detects the
+  truncated download — which leaves the four files present with the wrong size —
+  without reading 130 MB on every `doctor`. Sizes are compared, never hashes.
+- **The old `cwd`-relative database is reported (`LEGACY_LIBRARY_FOUND`), not
+  migrated automatically.** Moving the user's data without being asked exceeds
+  the mandate of `init`.
 
-Bug encontrado y corregido durante la verificación: `doctor` seguía
-detectando el modelo con `readdir(...).length > 0` —"¿hay algo en la
-carpeta?"— aunque su mensaje ya apuntaba a `models install`. Con un modelo
-truncado, `models status` decía `incomplete` y `sync` se negaba a correr,
-pero `doctor`, que es el comando de diagnóstico, daba `ok`. `runDoctor` ahora
-recibe el estado ya resuelto en vez de inspeccionar el filesystem, lo que
-además saca un `readdir` de la capa de aplicación.
+A bug found and fixed during verification: `doctor` was still detecting the
+model with `readdir(...).length > 0` — "is there anything in the folder?" — even
+though its message already pointed at `models install`. With a truncated model,
+`models status` said `incomplete` and `sync` refused to run, but `doctor`, which
+is the diagnostic command, returned `ok`. `runDoctor` now receives the already
+resolved state instead of inspecting the filesystem, which additionally removes
+a `readdir` from the application layer.
 
-El modelo por defecto y su dimensión **no cambiaron**. Lo que haría falta
-para soportar otro modelo quedó registrado en `docs/install-design.md`,
-sección "Nota: qué haría falta para soportar otro modelo": la dimensión y la
-reindexación automática ya funcionan; los prefijos E5 hardcodeados y la
-imposibilidad de que dos modelos convivan, no.
+The default model and its dimension **did not change**. What would be needed to
+support another model was recorded in `docs/install-design.md`, section "Nota:
+qué haría falta para soportar otro modelo": the dimension and automatic
+reindexing already work; the hardcoded E5 prefixes and the impossibility of two
+models coexisting do not.
 
-## El marcador de cita abre el bloque, dentro del encabezado
+## The citation marker opens the block, inside the heading
 
-Corregido el 14 de agosto de 2026, el mismo día en que se descubrió durante
-la validación en frío de 4.2.
+Fixed on 14 August 2026, the same day it was discovered during the cold
+validation of 4.2.
 
-**El problema.** El marcador `[S0N]` cerraba su bloque, solo en su propia
-línea, lo que lo dejaba a una línea en blanco del encabezado **siguiente**.
-El agente en frío lo interpretó como marcador de apertura y atribuyó a cada
-ID el contenido que venía después, produciendo un resumen con procedencia
-equivocada: afirmó que `S21` documentaba el estilo Suizo (era `S22`) y que
-`S18` trataba brutalismo (era contenido sobre minimalismo).
+**The problem.** The `[S0N]` marker closed its block, alone on its own line,
+which left it one blank line away from the **following** heading. The cold agent
+interpreted it as an opening marker and attributed to each ID the content that
+came afterwards, producing a summary with the wrong provenance: it claimed that
+`S21` documented the Swiss style (it was `S22`) and that `S18` dealt with
+brutalism (it was content about minimalism).
 
-**El producto no tenía un bug de datos**: `result.json` coincidía exactamente
-con la interpretación de cierre, las 54 unidades resolvían y había cero citas
-huérfanas. Era un problema de legibilidad del formato.
+**The product did not have a data bug**: `result.json` matched the closing
+interpretation exactly, all 54 units resolved and there were zero orphan
+citations. It was a problem of format readability.
 
-Es el peor tipo de fallo posible: **pasaba toda verificación mecánica y aun
-así producía atribuciones falsas en la respuesta final**. La Capa A de 3.2 lo
-daba por bueno, y la Capa B no lo detectó porque sus jueces evaluaban
-bundles, no producían citas a partir de ellos. Ninguna de las dos capas
-medía al agente citando.
+It is the worst possible kind of failure: **it passed every mechanical
+verification and still produced false attributions in the final answer**. Layer
+A of 3.2 gave it a pass, and Layer B did not detect it because its judges
+evaluated bundles, they did not produce citations from them. Neither of the two
+layers measured the agent citing.
 
-**Se reprodujo dos veces**, con el mismo agente y dos lecturas distintas del
-mismo bundle: la primera leyendo `context.md` en dos tandas por tamaño
-(2.322 líneas), la segunda entero de una sola vez. No era un artefacto de
-paginación. El desplazamiento era de un bloque hacia atrás y **no uniforme**
-—algunas citas salían correctas (`S03`, `S09`), probablemente localizadas por
-contenido y no por posición—, lo que producía un resumen parcialmente bien
-atribuido y por lo tanto más difícil de detectar que uno corrido parejo.
+**It was reproduced twice**, with the same agent and two different readings of
+the same bundle: the first reading `context.md` in two batches because of its
+size (2,322 lines), the second one whole in a single pass. It was not a
+pagination artefact. The shift was of one block backwards and **not uniform** —
+some citations came out correct (`S03`, `S09`), probably located by content and
+not by position — which produced a summary that was partially well attributed
+and therefore harder to detect than one shifted evenly.
 
-**La corrección.** El ID pasa a formar parte del encabezado del bloque:
+**The fix.** The ID becomes part of the block's heading:
 
 ```text
 ### [S01] Método completo de la fuente > Brutalismo
 ```
 
-Un ID no puede aparecer fuera de una línea de encabezado, así que la
-asociación es estructural en vez de posicional. Se descartaron las
-alternativas de marcador doble (apertura y cierre) por duplicar ruido en un
-archivo que ya ronda las 2.300 líneas, y de dejar el formato advirtiendo en
-la skill, porque deja la trampa en pie y depende de que cada consumidor lea
-y recuerde la advertencia.
+An ID cannot appear outside a heading line, so the association is structural
+instead of positional. The alternatives of a double marker (opening and closing)
+were rejected for duplicating noise in a file that already runs to about 2,300
+lines, and so was leaving the format as it was and warning about it in the
+skill, because that leaves the trap standing and depends on every consumer
+reading and remembering the warning.
 
-**No rompe el contrato**: `cli-contract.md` fijaba la forma `[S01]`, nunca su
-posición. Tampoco rompió nada mecánico — el verificador de integridad usa
-`matchAll` con regex, independiente de la posición. Verificado sobre un
-bundle real: 34 unidades, 34 marcadores, cero huérfanas, y los 34 con
-encabezado propio.
+**It does not break the contract**: `cli-contract.md` fixed the `[S01]` shape,
+never its position. It did not break anything mechanical either — the integrity
+verifier uses `matchAll` with a regex, independent of position. Verified over a
+real bundle: 34 units, 34 markers, zero orphans, and all 34 with their own
+heading.
 
-## Seguridad de `sync` y tamaño de lote (punto 4.3)
+## `sync` safety and batch size (point 4.3)
 
-Implementado el 14 de agosto de 2026. Diseño en `docs/sync-safety-design.md`.
-Cierra el pendiente "Guard de concurrencia en `sync`".
+Implemented on 14 August 2026. Design in `docs/sync-safety-design.md`. It closes
+the open item "Guard de concurrencia en `sync`".
 
-**El borrado cruzado quedó confirmado, no supuesto.** La reproducción
-determinista muestra que dos runs solapados sobre una fuente la dejan
-completamente vacía: cada run borra los paquetes que no reclamó él
-(`DELETE ... WHERE last_seen_sync_id <> ?`), así que lo que el otro ya
-reclamó parece no visto. Los dos terminan sin error y cada video fue visto
-por alguno. Explica lo observado el 13 de agosto, cuando `status` reportó 13
-videos habiendo 53.
+**Cross-deletion was confirmed, not assumed.** The deterministic reproduction
+shows that two overlapping runs over one source leave it completely empty: each
+run deletes the packages it did not claim
+(`DELETE ... WHERE last_seen_sync_id <> ?`), so whatever the other one already
+claimed looks unseen. Both finish without error and every video was seen by one
+of them. It explains what was observed on 13 August, when `status` reported 13
+videos when there were 53.
 
-Decisiones cerradas:
+Closed decisions:
 
-- **El guard vive en el store, no en el caso de uso.** Es invariante de
-  persistencia: `recordRun` rechaza registrar un run `running` para una
-  fuente que ya tiene otro. Sólo aplica al alta, nunca al cierre de un run.
-- **Sin heurística de antigüedad.** Se descartó "un run de más de N minutos
-  está muerto": no hay N defendible cuando un sync de 60 videos tarda
-  minutos y uno de 500 tardaría más de una hora. Cualquier umbral mata syncs
-  vivos o deja pasar fantasmas.
-- **Dos salidas explícitas para los runs fantasma**: `sync --force`, que
-  marca el run activo como `failed` y deja un `SyncIssue` `RUN_SUPERSEDED`
-  como constancia de que fue abandonado y no completado; y un check
-  `STALE_SYNC_RUN` en `doctor` que los lista con su antigüedad. **Nada se
-  abandona solo**: marcar como fallido el trabajo de otro proceso sin que
-  nadie lo pida es la clase de decisión que el resto del producto evita.
-- **`defaultBatchSize` de 16 a 1.** El relleno dentro del lote dominaba el
-  costo: los fragmentos van de 13 a 511 tokens y todos se rellenaban hasta el
-  más largo. Medido de punta a punta: 12 videos pasaron de 3 min 54 s a
-  1 min 45 s, **2,23x**, muy cerca del 2,27x que predecía el micro-benchmark.
-- **Paralelizar se descartó con medición, no por intuición.** Concurrencia 2
-  → 0,99x, concurrencia 4 → 1,00x sobre contenido real: ONNX ya satura los
-  ocho núcleos internamente, así que repartir videos entre tareas competiría
-  por la misma CPU.
+- **The guard lives in the store, not in the use case.** It is a persistence
+  invariant: `recordRun` refuses to record a `running` run for a source that
+  already has another. It applies only on creation, never on closing a run.
+- **No age heuristic.** "A run older than N minutes is dead" was rejected: there
+  is no defensible N when a sync of 60 videos takes minutes and one of 500 would
+  take more than an hour. Any threshold either kills live syncs or lets ghosts
+  through.
+- **Two explicit exits for ghost runs**: `sync --force`, which marks the active
+  run as `failed` and leaves a `RUN_SUPERSEDED` `SyncIssue` as a record that it
+  was abandoned and not completed; and a `STALE_SYNC_RUN` check in `doctor` that
+  lists them with their age. **Nothing is abandoned on its own**: marking
+  another process's work as failed without anyone asking is the kind of decision
+  the rest of the product avoids.
+- **`defaultBatchSize` from 16 to 1.** Padding within the batch dominated the
+  cost: fragments range from 13 to 511 tokens and all of them were padded up to
+  the longest one. Measured end to end: 12 videos went from 3 min 54 s to
+  1 min 45 s, **2.23x**, very close to the 2.27x the micro-benchmark predicted.
+- **Parallelizing was rejected with a measurement, not on intuition.**
+  Concurrency 2 → 0.99x, concurrency 4 → 1.00x over real content: ONNX already
+  saturates the eight cores internally, so spreading videos across tasks would
+  compete for the same CPU.
 
-Limitaciones declaradas, no ocultas:
+Declared, not hidden, limitations:
 
-- ~~El guard no elimina la carrera entre dos procesos del sistema
-  operativo.~~ **Cerrado el 14 de agosto de 2026**, ver "Cierre de la carrera
-  entre procesos" más abajo. La versión original comprobaba y después
-  insertaba sin atomicidad, así que dos procesos podían leer "no hay run
-  activo" antes de que ninguno escribiera.
-- `supersedeActiveRun` hace un `UPDATE` directo en vez de reconstruir un
-  `SyncRun` y pasarlo por `recordRun`, así que no atraviesa la máquina de
-  estados del dominio. Fija `status` y `finished_at` juntos, de modo que la
-  invariante `finishedAt >= startedAt` se sostiene igual. Es una operación de
-  reparación acotada y deliberada; si en el futuro las invariantes de
-  `SyncRun` se vuelven críticas en más caminos, conviene revisarlo.
-- **Los vectores cambian levemente con el tamaño de lote** (desviación de
-  coseno 4,8×10⁻³ entre lote 1 y lote 16 para el mismo texto): el modelo no
-  enmascara el relleno de forma perfecta. Está muy por debajo de lo que
-  separa dos fragmentos distintos, así que no debería mover rankings.
-  `unchanged()` no lo detecta, porque el tamaño de lote no forma parte de la
-  identidad del modelo, así que una biblioteca existente conserva sus
-  vectores viejos y queda mezclada. **Reindexar es recomendable, no
-  obligatorio**; no se agregó el lote a la identidad del modelo porque haría
-  que cualquier ajuste de rendimiento invalidara la biblioteca entera.
+- ~~The guard does not eliminate the race between two operating system
+  processes.~~ **Closed on 14 August 2026**, see "Closing the cross-process
+  race" further below. The original version checked and then inserted without
+  atomicity, so two processes could read "there is no active run" before either
+  of them had written.
+- `supersedeActiveRun` does a direct `UPDATE` instead of rebuilding a `SyncRun`
+  and passing it through `recordRun`, so it does not go through the domain state
+  machine. It sets `status` and `finished_at` together, so the
+  `finishedAt >= startedAt` invariant holds all the same. It is a bounded and
+  deliberate repair operation; if the `SyncRun` invariants become critical on
+  more paths in the future, it is worth revisiting.
+- **The vectors change slightly with the batch size** (cosine deviation of
+  4.8×10⁻³ between batch 1 and batch 16 for the same text): the model does not
+  mask the padding perfectly. It is far below what separates two different
+  fragments, so it should not move rankings. `unchanged()` does not detect it,
+  because the batch size is not part of the model identity, so an existing
+  library keeps its old vectors and ends up mixed. **Reindexing is advisable,
+  not mandatory**; the batch was not added to the model identity because that
+  would make any performance tweak invalidate the entire library.
 
-## Degradación silenciosa de la vía vectorial
+## Silent degradation of the vector path
 
-Corregido el 14 de agosto de 2026. Cierra el hueco que había quedado anotado
-en `docs/install-design.md` al investigar el soporte de otros modelos.
+Fixed on 14 August 2026. It closes the gap that had been noted in
+`docs/install-design.md` while investigating support for other models.
 
-**El defecto.** `sqlite-vector-loader.ts` consulta
-`WHERE model_key = ? AND model_version = ?`. Si el modelo activo cambió y
-todavía no se reindexó, esa consulta no devuelve filas, el índice queda vacío
-y `retrieve` respondía `status: "ok"` armado **sólo con búsqueda textual, sin
-ningún aviso**. La mitad semántica del producto desaparecía en silencio.
+**The defect.** `sqlite-vector-loader.ts` queries
+`WHERE model_key = ? AND model_version = ?`. If the active model changed and
+reindexing has not happened yet, that query returns no rows, the index stays
+empty and `retrieve` answered `status: "ok"` built **from textual search alone,
+with no warning at all**. The semantic half of the product disappeared
+silently.
 
-`VECTOR_SEARCH_UNAVAILABLE` no lo cubría: sólo se emite cuando la vía
-vectorial lanza una excepción. Un índice vacío no lanza, devuelve cero
-resultados, que es indistinguible de "no hubo coincidencias".
+`VECTOR_SEARCH_UNAVAILABLE` did not cover it: it is emitted only when the vector
+path throws an exception. An empty index does not throw, it returns zero
+results, which is indistinguishable from "there were no matches".
 
-**La corrección.** `VectorSearchIndex.load()` pasa de `Promise<void>` a
-devolver la cantidad de vectores disponibles para el modelo activo — dato que
-el loader ya tenía. `retrieveCandidates` emite el warning nuevo
-`VECTORS_STALE` cuando se cumplen tres condiciones a la vez:
+**The fix.** `VectorSearchIndex.load()` goes from `Promise<void>` to returning
+the number of vectors available for the active model — data the loader already
+had. `retrieveCandidates` emits the new `VECTORS_STALE` warning when three
+conditions hold at once:
 
-1. la carga **no** falló (si lanzó, ya hay `VECTOR_SEARCH_UNAVAILABLE` con
-   causa desconocida y no corresponde reportar además obsolescencia);
-2. cargó **cero** vectores;
-3. la vía textual **sí** devolvió hits.
+1. the load did **not** fail (if it threw, there is already
+   `VECTOR_SEARCH_UNAVAILABLE` with an unknown cause and it is not appropriate
+   to also report staleness);
+2. it loaded **zero** vectors;
+3. the textual path **did** return hits.
 
-La tercera es la que evita falsos positivos. Sola, la segunda dispararía en
-una biblioteca vacía o recién creada, o cuando un filtro `--source` deja el
-universo sin candidatos; en esos casos el texto tampoco devuelve nada y
-`no_results` ya lo explica. Que el texto encuentre contenido y los vectores
-no es la señal inequívoca de obsolescencia.
+The third is the one that avoids false positives. On its own, the second would
+fire on an empty or newly created library, or when a `--source` filter leaves
+the universe with no candidates; in those cases the text returns nothing either
+and `no_results` already explains it. Text finding content while vectors do not
+is the unambiguous signal of staleness.
 
-El mensaje **no afirma la causa**: dice que la búsqueda semántica no
-participó, que los resultados vienen sólo de la vía léxica, y que `sync`
-regenera los vectores. Que el modelo haya cambiado es una hipótesis que el
-código no puede verificar.
+The message **does not assert the cause**: it says that semantic search did not
+take part, that the results come from the lexical path only, and that `sync`
+regenerates the vectors. That the model has changed is a hypothesis the code
+cannot verify.
 
-El warning ya llegaba al bundle sin cableado extra: `outcome.warnings` fluye
-a `renderContextResult` y a "Coverage and limitations" de `context.md`, y
-`run-cli` degrada el estado a `partial` con salida `1` ante cualquier warning.
+The warning already reached the bundle with no extra wiring: `outcome.warnings`
+flows to `renderContextResult` and to "Coverage and limitations" in
+`context.md`, and `run-cli` degrades the status to `partial` with exit `1` on
+any warning.
 
-**Un segundo defecto que tapaba al primero.** El camino rápido de
-`InMemoryVectorSearchIndex.load()` comparaba sólo `model.key`, que es
-`e5-small` y no cambia nunca; lo que cambia es `version`, que codifica
-repositorio, revisión y cuantización
-(`Xenova/multilingual-e5-small@main:q8`). Un cambio de revisión reutilizaba
-la matriz cacheada en vez de recargar, y **una matriz reutilizada tiene
-conteo mayor que cero, así que `VECTORS_STALE` nunca habría disparado**. Los
-dos defectos se cubrían mutuamente: corregir sólo el warning no alcanzaba.
+**A second defect that masked the first.** The fast path of
+`InMemoryVectorSearchIndex.load()` compared only `model.key`, which is
+`e5-small` and never changes; what changes is `version`, which encodes
+repository, revision and quantization
+(`Xenova/multilingual-e5-small@main:q8`). A change of revision reused the cached
+matrix instead of reloading, and **a reused matrix has a count greater than
+zero, so `VECTORS_STALE` would never have fired**. The two defects covered for
+each other: fixing only the warning was not enough.
 
-Ahora compara clave, versión y dimensión. En la práctica el CLI corre un
-comando por proceso, así que el snapshot obsoleto sólo afecta a una
-aplicación de vida larga —los tests hoy, un servidor o un host MCP más
-adelante—, pero la corrección vale igual.
+It now compares key, version and dimension. In practice the CLI runs one command
+per process, so the stale snapshot only affects a long-lived application — the
+tests today, a server or an MCP host later on — but the fix is worth it all the
+same.
 
-Fue detectado por el agente que implementaba `VECTORS_STALE`, que lo
-**reportó en vez de arreglarlo en silencio** por estar fuera de su alcance.
-Ese reporte es lo que evitó cerrar el punto con un warning que no podía
-dispararse.
+It was detected by the agent implementing `VECTORS_STALE`, which **reported it
+instead of fixing it silently** because it was outside its scope. That report is
+what prevented closing the point with a warning that could not fire.
 
-## Cierre de la carrera entre procesos en `recordRun`
+## Closing the cross-process race in `recordRun`
 
-Corregido el 14 de agosto de 2026. Cierra la limitación que 4.3 había
-declarado explícitamente como no resuelta.
+Fixed on 14 August 2026. It closes the limitation that 4.3 had explicitly
+declared unresolved.
 
-**El problema.** El guard comprobaba con un `SELECT` y después insertaba, sin
-atomicidad. Dos procesos del sistema operativo podían leer "no hay run
-activo" antes de que ninguno escribiera, y arrancar los dos — que es
-exactamente el escenario cuyo daño 4.3 confirmó: dos runs solapados dejan la
-fuente vacía.
+**The problem.** The guard checked with a `SELECT` and then inserted, with no
+atomicity. Two operating system processes could read "there is no active run"
+before either of them had written, and both start — which is exactly the
+scenario whose damage 4.3 confirmed: two overlapping runs leave the source
+empty.
 
-**La corrección.** El chequeo y la escritura ocurren dentro de un único
-`BEGIN IMMEDIATE`. Ese modo toma el lock de escritura **antes** de leer, así
-que el segundo proceso espera (hasta los 5 s de `busy_timeout` que
-`open-database.ts` ya configuraba) y luego ve el run del primero y es
-rechazado. El guard deja de ser indicativo y pasa a ser una garantía.
+**The fix.** The check and the write happen inside a single `BEGIN IMMEDIATE`.
+That mode takes the write lock **before** reading, so the second process waits
+(up to the 5 s of `busy_timeout` that `open-database.ts` already configured) and
+then sees the first one's run and is rejected. The guard stops being indicative
+and becomes a guarantee.
 
-**Se descartó un índice único parcial** (`CREATE UNIQUE INDEX ... WHERE
-status = 'running'`), que también resolvería el problema. Motivos: exige
-cambiar el esquema, y `open-database.ts` no tiene camino de migración
-incremental —compara la versión y rechaza cualquier diferencia—, así que
-habría obligado a construir ese mecanismo o a invalidar bibliotecas
-existentes. Además fallaría al crearse si una base ya tuviera dos runs
-`running`, un estado posible antes de 4.3. `BEGIN IMMEDIATE` da la misma
-garantía sin tocar el esquema y reutiliza un patrón que el propio
-`migrateEmptyDatabase` ya usaba.
+**A partial unique index was rejected** (`CREATE UNIQUE INDEX ... WHERE
+status = 'running'`), which would also solve the problem. Reasons: it requires
+changing the schema, and `open-database.ts` has no incremental migration path —
+it compares the version and rejects any difference — so it would have forced
+building that mechanism or invalidating existing libraries. It would also fail
+on creation if a database already had two `running` runs, a state that was
+possible before 4.3. `BEGIN IMMEDIATE` gives the same guarantee without touching
+the schema and reuses a pattern that `migrateEmptyDatabase` itself already used.
 
-**Un bug propio, encontrado por el test.** La primera versión dejaba el
-`BEGIN IMMEDIATE` fuera del `try`, de modo que no poder tomar el lock lanzaba
-de forma **síncrona** en un método tipado `Promise<void>`: un llamador con
-`.catch()` no lo habría visto. El test de contención lo detectó de inmediato.
-Ahora la apertura de la transacción está dentro del `try`, y el `ROLLBACK`
-sólo corre si la transacción llegó a abrirse.
+**A bug of its own, found by the test.** The first version left the
+`BEGIN IMMEDIATE` outside the `try`, so failing to take the lock threw
+**synchronously** in a method typed `Promise<void>`: a caller with `.catch()`
+would not have seen it. The contention test caught it immediately. The
+transaction opening is now inside the `try`, and the `ROLLBACK` only runs if the
+transaction actually got opened.
 
-**Cómo se prueba.** Dos conexiones al mismo archivo, que es el caso real de
-dos procesos: mientras una mantiene el lock, la otra debe ser rechazada en
-vez de caer al `INSERT`, no debe dejar transacción abierta —una escritura
-posterior sobre esa misma conexión tiene que funcionar— y el run en disputa
-no debe haberse escrito.
+**How it is tested.** Two connections to the same file, which is the real case
+of two processes: while one holds the lock, the other must be rejected instead
+of falling through to the `INSERT`, must not leave a transaction open — a later
+write over that same connection has to work — and the disputed run must not have
+been written.
 
-## Perfil de modelo y política de prefijos
+## Model profile and prefix policy
 
-Implementado el 14 de agosto de 2026. Diseño en `docs/model-profile-design.md`
-(punto 4.5). Cierra el frente número 1 del orden de prioridad fijado el 14 de
-agosto en `docs/agent-handoff.md`.
+Implemented on 14 August 2026. Design in `docs/model-profile-design.md`
+(point 4.5). It closes front number 1 of the priority order set on 14 August in
+`docs/agent-handoff.md`.
 
-**El problema.** Los prefijos `passage: ` y `query: ` se aplicaban **siempre**,
-en dos funciones de módulo de lo que era `e5-embedding-generator.ts`. Son
-específicos de la familia E5: con MiniLM, BGE o Jina no son neutros, el modelo
-embebe literalmente las palabras "passage" y "query" como contenido y degrada
-la calidad **sin producir ningún error**. Nada fallaba, nada avisaba; sólo los
-resultados empeoraban. El arnés de benchmarks ya lo contemplaba con un flag
-`e5Prefixes: boolean` en su `ModelDefinition`; el producto no. Quedó anotado
-como el trabajo real de "modelo configurable" al investigar el punto 4.2, ver
-`docs/install-design.md` → "Nota: qué haría falta para soportar otro modelo".
+**The problem.** The `passage: ` and `query: ` prefixes were applied **always**,
+in two module functions of what used to be `e5-embedding-generator.ts`. They are
+specific to the E5 family: with MiniLM, BGE or Jina they are not neutral, the
+model literally embeds the words "passage" and "query" as content and degrades
+quality **without producing any error**. Nothing failed, nothing warned; only
+the results got worse. The benchmark harness already accounted for it with an
+`e5Prefixes: boolean` flag in its `ModelDefinition`; the product did not. It was
+noted as the real work behind "configurable model" while investigating point
+4.2, see `docs/install-design.md` → "Nota: qué haría falta para soportar otro
+modelo".
 
-**La solución.** Nace `src/infrastructure/embeddings/model-profile.ts`, que
-no importa nada de Transformers.js, `node:fs` ni otro módulo del proyecto: es
-puro dato. Define `EmbeddingModelProfile` (repositorio, revisión, `dtype`,
-dimensiones, `maxInputTokens`, `requiredFiles` e `inputPrefixes:
-EmbeddingInputPrefixes | null`, donde `null` significa explícitamente "este
-modelo no lleva prefijos", no "todavía no se decidió") y el perfil activo
-congelado `activeModelProfile`, hoy con los mismos valores que estaban
-hardcodeados para E5 Small. El generador de embeddings y el instalador dejan
-de tener constantes propias y reciben el perfil por inyección, con
-`activeModelProfile` como default — nadie que construya con `{ cacheDir }`
-nota el cambio. `countTokens` y `embedDocuments` comparten la misma función de
-prefijado, así que el presupuesto de 512 tokens siempre mide el texto tal como
-entra al modelo, prefijo incluido.
+**The solution.** `src/infrastructure/embeddings/model-profile.ts` is born, and
+it imports nothing from Transformers.js, `node:fs` or any other module of the
+project: it is pure data. It defines `EmbeddingModelProfile` (repository,
+revision, `dtype`, dimensions, `maxInputTokens`, `requiredFiles` and
+`inputPrefixes: EmbeddingInputPrefixes | null`, where `null` explicitly means
+"this model takes no prefixes", not "it has not been decided yet") and the
+frozen active profile `activeModelProfile`, today with the same values that were
+hardcoded for E5 Small. The embedding generator and the installer stop having
+constants of their own and receive the profile by injection, with
+`activeModelProfile` as the default — nobody constructing with `{ cacheDir }`
+notices the change. `countTokens` and `embedDocuments` share the same prefixing
+function, so the 512-token budget always measures the text exactly as it enters
+the model, prefix included.
 
-Consecuencia mecánica: `"Xenova/multilingual-e5-small"` pasó de estar escrito
-tres veces en `src/` (el generador, el instalador y el estado de instalación,
-cada uno con su propia copia de `modelDirectory`) a aparecer una sola vez, en
-`model-profile.ts`. Los otros dos módulos derivan el directorio de
+Mechanical consequence: `"Xenova/multilingual-e5-small"` went from being written
+three times in `src/` (the generator, the installer and the installation state,
+each with its own copy of `modelDirectory`) to appearing only once, in
+`model-profile.ts`. The other two modules derive the directory from
 `profile.repository`.
 
-Se aprovechó para renombrar el adaptador: `E5EmbeddingGenerator` que ya no
-sabe nada de E5 —ahora es un consumidor genérico de un perfil— era un nombre
-que reintroducía la confusión que este punto vino a borrar.
-`TransformersEmbeddingGenerator` y `TransformersModelInstaller` reemplazan a
-`E5EmbeddingGenerator` y `E5ModelInstaller`, junto con sus tipos
+The occasion was used to rename the adapter: `E5EmbeddingGenerator`, which no
+longer knows anything about E5 — it is now a generic consumer of a profile —
+was a name that reintroduced the very confusion this point came to erase.
+`TransformersEmbeddingGenerator` and `TransformersModelInstaller` replace
+`E5EmbeddingGenerator` and `E5ModelInstaller`, along with their types
 (`EmbeddingAdapterError`, `EmbeddingSession`, `EmbeddingRuntime`,
-`ModelDownloadRuntime`, etc.). **Los valores de los códigos de error no
-cambiaron** — `MODEL_LOAD_FAILED`, `INPUT_TOO_LONG`, `MODEL_SOURCE_INVALID` y
-el resto son contrato público documentado en `cli-contract.md` y
-`skill/SKILL.md`; sólo cambió el nombre de la clase que los lleva. De paso se
-corrigió que el mensaje de `MODEL_LOAD_FAILED` nombraba "E5 Small" a mano; hoy
-lo toma de `profile.repository`.
+`ModelDownloadRuntime`, etc.). **The values of the error codes did not change** —
+`MODEL_LOAD_FAILED`, `INPUT_TOO_LONG`, `MODEL_SOURCE_INVALID` and the rest are
+public contract documented in `cli-contract.md` and `skill/SKILL.md`; only the
+name of the class carrying them changed. While at it, the `MODEL_LOAD_FAILED`
+message naming "E5 Small" by hand was fixed; today it takes it from
+`profile.repository`.
 
-**Por qué la política de prefijos se pliega en `version`, y por qué eso no
-reindexa hoy.** Es la decisión con más consecuencias del punto. `unchanged()`
-en `sync-source.ts` incluye `key`, `version` y `dimensions` del modelo activo
-en su criterio: cambiar cualquiera de los tres invalida todos los paquetes y
-el `sync` siguiente reindexa. Si alguien apagara los prefijos sin cambiar de
-modelo y `version` no se moviera, `unchanged()` diría "sin cambios" y la
-biblioteca serviría vectores viejos con prefijo contra consultas nuevas sin
-prefijo — silencioso, y peor que el bug original que este punto corrige.
+**Why the prefix policy folds into `version`, and why that does not reindex
+today.** It is the decision with the most consequences in this point.
+`unchanged()` in `sync-source.ts` includes the active model's `key`, `version`
+and `dimensions` in its criterion: changing any of the three invalidates all
+packages and the next `sync` reindexes. If someone turned the prefixes off
+without changing model and `version` did not move, `unchanged()` would say "no
+changes" and the library would serve old prefixed vectors against new
+unprefixed queries — silent, and worse than the original bug this point fixes.
 
-Por eso `modelVersion(profile)` deriva el string y la política de prefijos
-participa de la derivación: sin prefijos agrega el sufijo `+noprefix` al
-literal base `repository@revision:dtype`. Con el perfil activo —que sí lleva
-prefijos— esto produce, carácter por carácter, el mismo literal que existía
-antes de este punto: `"Xenova/multilingual-e5-small@main:q8"`. Ninguna base
-existente se invalida y nada se reindexa hoy; un test de regresión fija ese
-literal exacto porque si alguien lo rompe sin querer, invalida en silencio
-todas las bibliotecas instaladas. Cualquier perfil futuro con una política de
-prefijos distinta sí produce un `version` distinto y dispara la reindexación
-automática que ya existía.
+That is why `modelVersion(profile)` derives the string and the prefix policy
+takes part in the derivation: with no prefixes it appends the suffix
+`+noprefix` to the base literal `repository@revision:dtype`. With the active
+profile — which does carry prefixes — this produces, character by character, the
+same literal that existed before this point:
+`"Xenova/multilingual-e5-small@main:q8"`. No existing database is invalidated
+and nothing is reindexed today; a regression test pins that exact literal
+because if someone breaks it by accident, it silently invalidates every
+installed library. Any future profile with a different prefix policy does
+produce a different `version` and triggers the automatic reindexing that already
+existed.
 
-Se descartó agregar un campo `prefixPolicy` al `EmbeddingModelDescriptor` del
-puerto y comparar eso en `unchanged()`: obliga a cambiar el puerto de
-aplicación, la tabla `embeddings` no tiene columna donde persistirlo, y
-`version` ya es exactamente el lugar donde el proyecto decidió codificar
-"todo lo que hace incomparables dos vectores" — revisión y cuantización ya
-viven ahí.
+Adding a `prefixPolicy` field to the port's `EmbeddingModelDescriptor` and
+comparing that in `unchanged()` was rejected: it forces changing the application
+port, the `embeddings` table has no column to persist it in, and `version` is
+already exactly the place where the project decided to encode "everything that
+makes two vectors incomparable" — revision and quantization already live there.
 
-**Validación real (AD3).** Sobre una copia temporal con sólo los recursos
-indexables de 3 videos reales de `auto-design` (2,22 MB, uno con
-`analysis.json` schema 2.0), nunca la colección original:
+**Real validation (AD3).** Over a temporary copy with only the indexable
+resources of 3 real `auto-design` videos (2.22 MB, one of them with
+`analysis.json` schema 2.0), never the original collection:
 
-- con el código anterior a 4.5 (commit `be4ebff`), `init --from` adoptó el
-  modelo real (135.392.016 bytes, `version`
-  `Xenova/multilingual-e5-small@main:q8`) y `sync` indexó los 3 paquetes
+- with the code prior to 4.5 (commit `be4ebff`), `init --from` adopted the real
+  model (135,392,016 bytes, `version`
+  `Xenova/multilingual-e5-small@main:q8`) and `sync` indexed the 3 packages
   (`status: "ok"`, `packagesIndexed: 3`);
-- con el código de 4.5 sobre esa misma base, `sync` devolvió `status:
-"no_changes"`, `packagesUnchanged: 3`, `packagesIndexed: 0` — nada se
-  reindexó, que es la propiedad que el punto tenía que garantizar;
-- `retrieve "neumorfismo accesibilidad contraste" --depth balanced` devolvió
-  `status: "ok"`, 19.354 tokens estimados, 3 fuentes y **sin warnings**, en
-  particular sin `VECTORS_STALE` — confirma que los vectores generados por el
-  código viejo siguen siendo válidos para el modelo activo. El bundle abre
-  con una unidad `analysis` schema 2.0 y sus 18 unidades citadas resuelven
-  1:1 contra los 18 marcadores `[S01]`–`[S18]` de `context.md`;
-- `doctor` reportó los seis checks en `ok` (`SQLITE_INTEGRITY`,
+- with the 4.5 code over that same database, `sync` returned `status:
+"no_changes"`, `packagesUnchanged: 3`, `packagesIndexed: 0` — nothing was
+  reindexed, which is the property the point had to guarantee;
+- `retrieve "neumorfismo accesibilidad contraste" --depth balanced` returned
+  `status: "ok"`, 19,354 estimated tokens, 3 sources and **no warnings**, in
+  particular no `VECTORS_STALE` — confirming that the vectors generated by the
+  old code are still valid for the active model. The bundle opens with an
+  `analysis` schema 2.0 unit and its 18 cited units resolve 1:1 against the 18
+  `[S01]`–`[S18]` markers of `context.md`;
+- `doctor` reported all six checks as `ok` (`SQLITE_INTEGRITY`,
   `SQLITE_FOREIGN_KEYS`, `SQLITE_FTS`, `SOURCE_READABLE`, `STALE_SYNC_RUN`,
   `EMBEDDING_MODEL`);
-- el digest SHA-256 del árbol fuente fue idéntico antes y después. La copia y
-  la base temporal se borraron al terminar.
+- the SHA-256 digest of the source tree was identical before and after. The copy
+  and the temporary database were deleted on finishing.
 
-**Hallazgo colateral, anotado como nota, no como pendiente abierto.**
-Durante la preparación de la copia temporal para AD3, `parseManifest` rechazó
-un `manifest.json` con BOM UTF-8 con `MANIFEST_JSON_INVALID`. Apareció porque
-PowerShell escribió el manifest de prueba con BOM por defecto. Los manifests
-reales los produce la skill `youtube-video-context` sin BOM, así que esto no
-bloquea a nadie hoy; queda anotado por si alguien edita un manifest a mano en
-Windows y se encuentra con el mismo error.
+**A collateral finding, recorded as a note, not as an open item.** While
+preparing the temporary copy for AD3, `parseManifest` rejected a `manifest.json`
+with a UTF-8 BOM with `MANIFEST_JSON_INVALID`. It appeared because PowerShell
+wrote the test manifest with a BOM by default. The real manifests are produced
+by the `youtube-video-context` skill without a BOM, so this blocks nobody today;
+it is recorded in case somebody edits a manifest by hand on Windows and runs
+into the same error.
 
-**Qué no cambió:** el modelo activo, su dimensión, revisión y cuantización; el
-`version` persistido en `embeddings`; los códigos de error públicos y la forma
-de los recibos JSON; `models/.install.json`; el puerto `EmbeddingGenerator` y
-`EmbeddingModelDescriptor`; el esquema SQLite (cero migraciones);
-`cli-contract.md` (ningún comando ni flag nuevo); `skill/SKILL.md` (nada
-observable cambió para un agente consumidor).
+**What did not change:** the active model, its dimension, revision and
+quantization; the `version` persisted in `embeddings`; the public error codes
+and the shape of the JSON receipts; `models/.install.json`; the
+`EmbeddingGenerator` port and `EmbeddingModelDescriptor`; the SQLite schema
+(zero migrations); `cli-contract.md` (no new command or flag); `skill/SKILL.md`
+(nothing observable changed for a consuming agent).
 
-## `rebuild` regenera en vez de sólo purgar (punto 4.6)
+## `rebuild` regenerates instead of only purging (point 4.6)
 
-Decidido e implementado el 14 de agosto de 2026. Diseño completo en
+Decided and implemented on 14 August 2026. Full design in
 `docs/rebuild-design.md`.
 
-El contrato aprobado desde el MVP decía apenas dos frases: "regenera el índice
-derivado y exige confirmación explícita". Las decisiones que hubo que tomar
-para implementarlo:
+The contract approved since the MVP said barely two sentences: "it regenerates
+the derived index and requires explicit confirmation". The decisions that had to
+be taken in order to implement it:
 
-- **Purga y re-sincroniza, no sólo purga.** El contrato dice "regenera". Una
-  purga seca dejaría la biblioteca vacía y silenciosamente inservible hasta
-  que alguien se acuerde de correr `sync`: el peor estado posible para un
-  comando cuyo propósito es reparar.
-- **Preserva `sources`, `schema_meta`, `sync_runs` y `sync_issues`.** Sólo
-  `video_packages` y su cascada son derivados. Preservar el historial no es
-  una preferencia nueva: `source remove` ya deja historial desprendido y
-  `sync_runs.source_id` es `ON DELETE SET NULL` justamente para permitirlo.
-  Un rebuild que borrara el historial destruiría la única evidencia de por
-  qué alguien tuvo que reconstruir.
-- **El guard de `sync` activo vive dentro de la transacción de la purga**, no
-  en el caso de uso. Comprobar en la aplicación y borrar después reabre la
-  misma ventana que 4.3 cerró en `recordRun`. Un rebuild abarca todas las
-  fuentes, así que un run activo en cualquiera lo bloquea.
-- **No acepta `--force`.** Destrabar un run fantasma y reconstruir la
-  biblioteca entera son dos decisiones distintas.
-- **Sólo la purga es transaccional.** Envolver también la re-sincronización
-  dejaría un `BEGIN IMMEDIATE` abierto durante el embedding de la biblioteca
-  entera. Se acepta que un proceso muerto a mitad deje la biblioteca
-  parcialmente reconstruida; el remedio es repetir el comando, que es
-  idempotente, y tanto `cli-contract.md` como `SKILL.md` lo declaran.
-- **Recorre las fuentes secuencialmente**, a diferencia del `Promise.all` de
-  `sync`: un rebuild es el caso de máxima carga y 4.3 midió que paralelizar la
-  indexación rinde 1,00x porque ONNX ya satura los núcleos.
+- **It purges and re-syncs, it does not only purge.** The contract says
+  "regenerates". A dry purge would leave the library empty and silently useless
+  until somebody remembered to run `sync`: the worst possible state for a
+  command whose purpose is to repair.
+- **It preserves `sources`, `schema_meta`, `sync_runs` and `sync_issues`.** Only
+  `video_packages` and its cascade are derived. Preserving the history is not a
+  new preference: `source remove` already leaves detached history and
+  `sync_runs.source_id` is `ON DELETE SET NULL` precisely to allow it. A rebuild
+  that deleted the history would destroy the only evidence of why somebody had
+  to rebuild.
+- **The active-`sync` guard lives inside the purge transaction**, not in the use
+  case. Checking in the application and deleting afterwards reopens the same
+  window that 4.3 closed in `recordRun`. A rebuild spans every source, so an
+  active run in any of them blocks it.
+- **It does not accept `--force`.** Unblocking a ghost run and rebuilding the
+  entire library are two different decisions.
+- **Only the purge is transactional.** Wrapping the re-sync as well would leave
+  a `BEGIN IMMEDIATE` open during the embedding of the entire library. It is
+  accepted that a process killed halfway leaves the library partially rebuilt;
+  the remedy is to repeat the command, which is idempotent, and both
+  `cli-contract.md` and `SKILL.md` state so.
+- **It walks the sources sequentially**, unlike the `Promise.all` of `sync`: a
+  rebuild is the maximum-load case and 4.3 measured that parallelizing indexing
+  yields 1.00x because ONNX already saturates the cores.
 
-### El defecto que encontró el test del índice vectorial
+### The defect found by the vector index test
 
-El diseño afirmaba que no hacía falta ningún mecanismo nuevo para el índice en
-memoria, porque ya invalida su snapshot en `apply`. **Era falso.** La purga
-borra filas por SQL, y SQL no publica nada; un rebuild que termina sin ningún
-paquete no publica ni un cambio, así que el snapshot sobrevive entero. Medido:
-2 vectores servidos sobre una biblioteca con cero embeddings.
+The design claimed that no new mechanism was needed for the in-memory index,
+because it already invalidates its snapshot on `apply`. **That was false.** The
+purge deletes rows through SQL, and SQL publishes nothing; a rebuild that ends
+with no packages at all publishes not a single change, so the snapshot survives
+whole. Measured: 2 vectors served over a library with zero embeddings.
 
-Es el mismo defecto que 4.4 corrigió —snapshot obsoleto tapando
-`VECTORS_STALE`— llegando por un camino nuevo. `rebuildIndex` ahora publica un
-`remove_packages` con los `PackageRef` que había, después de que la purga
-commitea y nunca antes, respetando el invariante de no publicar vectores antes
-del commit SQLite.
+It is the same defect 4.4 fixed — a stale snapshot masking `VECTORS_STALE` —
+arriving by a new route. `rebuildIndex` now publishes a `remove_packages` with
+the `PackageRef`s that were there, after the purge commits and never before,
+respecting the invariant of not publishing vectors before the SQLite commit.
 
-## Ordenar fragmentos por longitud: medido y descartado
+## Sorting fragments by length: measured and rejected
 
-Cerrado el 14 de agosto de 2026 **sin escribir código**, tras verificarlo
-contra el código y no contra el documento. Era el punto 1 del orden de
-prioridad del usuario.
+Closed on 14 August 2026 **without writing code**, after verifying it against
+the code and not against the document. It was point 1 of the user's priority
+order.
 
-El ordenamiento por longitud amortiza el padding dentro de un lote: todos los
-textos de un lote se rellenan hasta el más largo. Con `batchSize = 1` —el
-default que adoptó 4.3— cada llamada recibe un solo texto y no hay padding
-posible, así que ordenar la entrada no cambia una sola operación del runtime.
+Sorting by length amortizes the padding within a batch: every text in a batch is
+padded up to the longest one. With `batchSize = 1` — the default 4.3 adopted —
+each call receives a single text and no padding is possible, so sorting the
+input does not change a single runtime operation.
 
-- `defaultBatchSize` es `1` y ningún llamador de producto lo sobrescribe.
-- `embedDocuments` se invoca **por paquete**, dentro del bucle de videos de
-  `syncSource`, así que el universo ordenable serían los fragmentos de un
-  video, no el corpus con el que se midió el 1,93x.
-- La medición de 4.3 ya lo decía: lote 16 ordenado rinde 1,93x contra 2,27x
-  del lote 1. No era una mejora sobre el lote 1; era la alternativa que el
-  lote 1 le ganó.
-- Reintroducirlo costaría el determinismo que 4.3 celebró: el vector de un
-  fragmento pasaría a depender de qué otros fragmentos del mismo video tienen
-  longitud parecida.
+- `defaultBatchSize` is `1` and no product caller overrides it.
+- `embedDocuments` is invoked **per package**, inside the video loop of
+  `syncSource`, so the sortable universe would be the fragments of one video,
+  not the corpus against which the 1.93x was measured.
+- The 4.3 measurement already said it: sorted batch 16 yields 1.93x against
+  2.27x for batch 1. It was not an improvement over batch 1; it was the
+  alternative that batch 1 beat.
+- Reintroducing it would cost the determinism 4.3 celebrated: a fragment's
+  vector would come to depend on which other fragments of the same video have a
+  similar length.
 
-Sólo reabrir si aparece un motivo independiente para volver a un lote mayor
-que 1.
+Only reopen it if an independent reason appears to go back to a batch larger
+than 1.
 
-## Aviso de baja relevancia en vez de piso de similitud (punto 4.7)
+## Low-relevance warning instead of a similarity floor (point 4.7)
 
-Decidido e implementado el 14 de agosto de 2026. Diseño completo en
+Decided and implemented on 14 August 2026. Full design in
 `docs/low-relevance-design.md`.
 
-Desde 2.2 quedaba abierto un "piso mínimo de similitud vectorial, salvo
-evidencia clara"; 3.2 buscó esa evidencia y no la encontró. Apareció el 14 de
-agosto, probando la biblioteca real: una consulta sobre síntomas de diabetes
-tipo 2 devolvió `status: "ok"` con 31.982 tokens sobre diseño web y
+Since 2.2 a "minimum vector similarity floor, except with clear evidence" had
+stayed open; 3.2 looked for that evidence and did not find it. It appeared on 14
+August, testing the real library: a query about type 2 diabetes symptoms
+returned `status: "ok"` with 31,982 tokens about web design and
 `warnings: []`.
 
-- **`fusedScore` no sirve para medir relevancia.** RRF asigna `1/(k + rank)`:
-  codifica posición, no similitud, así que el primer candidato de una consulta
-  perfecta y el de una absurda reciben el mismo valor. La única señal con
-  significado absoluto es el coseno de la vía vectorial.
-- **El umbral se midió, no se eligió.** 24 consultas clasificadas a mano
-  contra los 51 videos: en dominio 0,8657–0,9012; técnicas no cubiertas
-  0,8428–0,8600; fuera de dominio 0,8149–0,8389. Sin solapamiento, pero con
-  márgenes de milésimas. `0.84` es el corte conservador.
-- **El aviso informa y no filtra**, precisamente porque el umbral es frágil:
-  demasiado alto sólo molesta, demasiado bajo calla. Ninguno de los dos
-  errores puede ocultar evidencia. Un piso que descartara candidatos tendría
-  el riesgo opuesto, y se sigue descartando igual que en 2.2 y 3.2.
-- **El umbral es inyectable y vive junto a su tabla de mediciones**
-  (`retrieval-thresholds.ts`), porque está calibrado sobre una sola colección
-  de diseño en español: otro corpus, idioma o modelo lo invalidan.
-- **Una advertencia informativa no degrada el resultado.** `run-cli.ts`
-  trataba cualquier warning como degradación, lo que convirtió una consulta
-  sana en `partial` con código `1`. `informationalWarningCodes` separa "algo
-  falló" de "esto es un dato sobre la respuesta"; `LOW_RELEVANCE` mantiene
-  `ok` y exit `0`.
+- **`fusedScore` is no good for measuring relevance.** RRF assigns
+  `1/(k + rank)`: it encodes position, not similarity, so the top candidate of a
+  perfect query and that of an absurd one receive the same value. The only
+  signal with absolute meaning is the cosine of the vector path.
+- **The threshold was measured, not chosen.** 24 queries classified by hand
+  against the 51 videos: in-domain 0.8657–0.9012; uncovered techniques
+  0.8428–0.8600; out of domain 0.8149–0.8389. No overlap, but with margins of
+  thousandths. `0.84` is the conservative cut.
+- **The warning informs and does not filter**, precisely because the threshold
+  is fragile: too high is merely annoying, too low stays silent. Neither of the
+  two errors can hide evidence. A floor that discarded candidates would have the
+  opposite risk, and it is still rejected just as in 2.2 and 3.2.
+- **The threshold is injectable and lives next to its table of measurements**
+  (`retrieval-thresholds.ts`), because it is calibrated over a single Spanish
+  design collection: another corpus, language or model invalidates it.
+- **An informational warning does not degrade the result.** `run-cli.ts` treated
+  any warning as degradation, which turned a healthy query into `partial` with
+  code `1`. `informationalWarningCodes` separates "something failed" from "this
+  is a fact about the answer"; `LOW_RELEVANCE` keeps `ok` and exit `0`.
 
-Lo encontró la verificación contra el binario real, no la suite: los 348 tests
-pasaban con el defecto presente.
+It was found by verification against the real binary, not by the suite: the 348
+tests passed with the defect present.
 
-**El número se reporta siempre, no sólo el juicio.**
-`metrics.top_vector_similarity` lleva el coseno del mejor hit vectorial en cada
-consulta (`null` si la vía no corrió). Decidido al revisar el punto: un aviso
-binario con umbral discutible, entregado solo, crea **falsa confianza por
-ausencia** —"no hay warning, entonces es relevante"— y contradice la premisa
-del producto de que el agente consultante es el único cerebro. Juzgar
-relevancia con un número calibrado sobre una colección es exactamente el tipo
-de decisión que el diseño le delega a él. Con el dato crudo puede aplicar su
-propio criterio.
+**The number is always reported, not just the judgement.**
+`metrics.top_vector_similarity` carries the cosine of the best vector hit on
+every query (`null` if the path did not run). Decided while reviewing the point:
+a binary warning with a debatable threshold, delivered on its own, creates
+**false confidence by absence** — "there is no warning, therefore it is
+relevant" — and contradicts the product's premise that the querying agent is the
+only brain. Judging relevance with a number calibrated over one collection is
+exactly the kind of decision the design delegates to it. With the raw figure it
+can apply its own criterion.
 
-La primera corrida real tras implementarlo lo justificó sola: "síntomas de la
-diabetes tipo 2" midió **0,8399** contra el piso de 0,84 — una diezmilésima
-más y no habría avisado, con el contenido igual de irrelevante.
+The first real run after implementing it justified the choice on its own:
+"síntomas de la diabetes tipo 2" measured **0.8399** against the floor of 0.84 —
+one ten-thousandth more and it would not have warned, with the content just as
+irrelevant.
 
-**Limitación conocida:** el juicio usa sólo el coseno vectorial, así que una
-coincidencia léxica exacta con coseno bajo produciría un falso positivo. Está
-acotado porque el aviso no filtra, pero el criterio no lo cubre.
+**Known limitation:** the judgement uses only the vector cosine, so an exact
+lexical match with a low cosine would produce a false positive. It is bounded
+because the warning does not filter, but the criterion does not cover it.
 
-## Pendientes de decisión
+## Pending decisions
 
-Ninguno.
+None.
 
-## Trabajo posterior anotado, sin decisión pendiente
+## Follow-up work noted, with no pending decision
 
-- **Verificar `skill/SKILL.md` desde Codex real.** El punto 2.4 se cerró sólo
-  con verificación en Claude, por decisión explícita del usuario.
+- **Verify `skill/SKILL.md` from a real Codex.** Point 2.4 was closed with
+  verification on Claude only, by explicit decision of the user.
 
-Descripción histórica del pendiente que 4.3 cerró:
+Historical description of the open item that 4.3 closed:
 
-- **Guard de concurrencia en `sync`.** No existía ningún bloqueo que impidiera
-  dos `sync` simultáneos sobre la misma base. La corrida en frío los produjo
-  y observó conteos inconsistentes mientras corrían (`status` llegó a
-  reportar 13 videos habiendo 53); el `sync` completo posterior reconstruyó
-  el estado correcto y `doctor` nunca reportó daño, así que **no hay pérdida
-  permanente confirmada**. La hipótesis de que dos runs solapados se borran
-  paquetes entre sí —vía la lógica de eliminar los no vistos por el run
-  propio— es plausible por los timestamps observados pero **no está
-  confirmada**: haría falta reproducirla de forma aislada y deliberada antes
-  de tratarla como bug. Por ahora la skill lo advierte.
+- **Concurrency guard in `sync`.** There was no lock at all preventing two
+  simultaneous `sync` runs over the same database. The cold run produced them
+  and observed inconsistent counts while they ran (`status` went as far as
+  reporting 13 videos when there were 53); the later full `sync` rebuilt the
+  correct state and `doctor` never reported damage, so **there is no confirmed
+  permanent loss**. The hypothesis that two overlapping runs delete each other's
+  packages — via the logic of removing those not seen by the run itself — is
+  plausible given the observed timestamps but **is not confirmed**: it would
+  need to be reproduced in an isolated and deliberate way before being treated
+  as a bug. For now the skill warns about it.
 
-Se reprodujo el 14 de agosto y resultó cierta, y peor de lo descrito: no
-sólo corrompe conteos, deja la fuente vacía. La cautela de no tratarla como
-bug hasta reproducirla fue correcta —la conclusión podría haber sido la
-opuesta— pero la duda ya está resuelta.
+It was reproduced on 14 August and turned out to be true, and worse than
+described: it does not just corrupt counts, it leaves the source empty. The
+caution of not treating it as a bug until reproducing it was right — the
+conclusion could have been the opposite — but the doubt is now settled.
