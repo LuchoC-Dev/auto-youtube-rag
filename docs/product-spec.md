@@ -2,8 +2,12 @@
 
 ## Status
 
-`SPECIFY` phase. The confirmed decisions are the source of truth; the matters
-marked as pending must not be resolved during implementation without first
+Shipped. This document was written before implementation started; the product
+it specifies is now complete and in use — the MVP and the points that followed,
+up to the low-relevance warning, are closed.
+
+The scope, the limits and the confirmed decisions below remain the source of
+truth and are still authoritative: none of them may be changed without first
 updating this specification.
 
 ## Goal
@@ -151,12 +155,12 @@ src/application/          use cases and required ports
 src/infrastructure/       model, search and persistence adapters
 src/interfaces/cli/       commands, validation and presentation
 src/main/                 composition root and configuration
-tests/                    unit, contract and integration tests
+test/                     unit, contract and integration tests
 evals/                    retrieval quality evaluations
 docs/                     specifications, decisions and progress
 ```
 
-This structure is conceptual and does not yet authorise the creation of `src/`.
+This is the structure the repository implements.
 
 The ports must allow replacing at least the embedding generator, the persistent
 repository, the textual search and the vector search. Changing an adapter may
