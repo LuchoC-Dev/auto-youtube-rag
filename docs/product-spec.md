@@ -101,7 +101,12 @@ files inside those packages.
 ## Confirmed stack
 
 - Language: strict TypeScript 6.0.3.
-- Runtime: Node.js 24 or higher, ESM modules.
+- Runtime: Node.js 24.19.0, ESM modules. `package.json` pins
+  `>=24.19.0 <25` and `.node-version` fixes the exact version: 24 is the
+  active LTS line (supported until April 2028), while 25 is an odd line that
+  never became LTS and reached end of life in June 2026. Moving to a newer
+  line is a deliberate decision, not an automatic one — `node:sqlite` is a
+  young API and Transformers.js ships native binaries.
 - Packaging: npm with `package-lock.json`.
 - Architecture: central domain with ports and adapters.
 - Initial persistence: SQLite behind a replaceable port.

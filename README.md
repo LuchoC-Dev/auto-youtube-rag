@@ -152,7 +152,7 @@ immutable; a single portable skill instead of one per provider.
 
 ## License
 
-[MIT](LICENSE) © 2026 Luciano.
+[MIT](LICENSE) © 2026 LuchoC-Dev.
 
 The grant covers this repository's own source and documentation. It does not
 relicense the embedding model that `init` downloads (`Xenova/multilingual-e5-small`,
