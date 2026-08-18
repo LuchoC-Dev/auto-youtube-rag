@@ -131,8 +131,8 @@ and how to cite with real provenance.
   rejected, with their rationale.
 - [`docs/build.md`](docs/build.md) — progress point by point.
 
-The `*-design.md` and `*-tasks.md` files in `docs/` document the design and the
-checklist of every point already closed.
+The `*-design.md` files in `docs/` document the design of every point already
+closed.
 
 ## How it is built
 
@@ -149,3 +149,12 @@ checklist of every point already closed.
 Deliberate decisions: broad, deduplicated context instead of a small `top-k`;
 provenance preserved down to the section and evidence level; source packages are
 immutable; a single portable skill instead of one per provider.
+
+## License
+
+[MIT](LICENSE) © 2026 Luciano.
+
+The grant covers this repository's own source and documentation. It does not
+relicense the embedding model that `init` downloads (`Xenova/multilingual-e5-small`,
+which carries its own terms) or the runtime dependencies, each under its own
+license.
