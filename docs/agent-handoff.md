@@ -1290,19 +1290,20 @@ rejected".
 ~~2. **`rebuild --confirm` command.**~~ **Closed on 14 August 2026 as point
 4.6.** See `docs/rebuild-design.md`.
 
-**The priority order of 14 August is exhausted.** The only thing still standing
-from that list is what the user explicitly left for the end (below). After
-that: **MCP, web interface and support for web page packages**, out of scope
-since the original `product-spec.md`.
+**The priority order of 14 August is exhausted**, and so are the two items the
+user explicitly left for the end (below). What remains beyond them: **MCP, web
+interface and support for web page packages**, out of scope since the original
+`product-spec.md`.
 
 Explicitly **for the end**, by decision of the user:
 
-- **Verify `skill/SKILL.md` from a real Codex.** It is the only unchecked box
-  in `docs/build.md` (point 2.4). It gains value because the skill changed a
-  lot on 13 and 14 August —it was split into three files, the installation
-  model changed, it gained `models`, `--force` and new codes— and all of that
-  was validated cold **only with Claude agents**. It requires the user to run
-  it: a Claude agent cannot invoke Codex.
+- ~~**Verify `skill/SKILL.md` from a real Codex.**~~ **Done on 15 August 2026.**
+  The maintainer ran it and it worked, so the box of point 2.4 is checked and
+  `docs/build.md` has no unchecked box left. It gained value because the skill
+  changed a lot on 13 and 14 August —it was split into three files, the
+  installation model changed, it gained `models`, `--force` and new codes— and
+  all of that had been validated cold **only with Claude agents**. It required
+  the user to run it: a Claude agent cannot invoke Codex.
 - ~~**Repository hygiene.**~~ **Done on 14 August 2026.** The three dead local
   branches were deleted and `.cache/` was cleaned from 2110 MB down to **129
   MB**: `sqlite-client-benchmark` (995 MB), `vector-benchmark` (418 MB) and the
