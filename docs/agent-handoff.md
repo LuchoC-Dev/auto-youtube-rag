@@ -1196,9 +1196,8 @@ new seed query `es-analysis-neumorphism-accessibility`
 a real citation (`[S45]`) resolved to an `analysis_topic` unit of the real
 video `psyw2_j_5jk`, in the "Highest-relevance context" section, with correct
 provenance and a readable `context.md`. The temporary copy was deleted when
-finished. `design-catalog` (mentioned in previous designs as a second candidate
-real collection; on disk it lives as `catalog-design` under
-`ai-transcripcion/`) was not used for this validation: its manifest declares no
+finished. `catalog-design` (mentioned in previous designs as a second candidate
+real collection) was not used for this validation: its manifest declares no
 video with `resources.analysis`.
 
 ## Point 4.5 completed — embedding model profile

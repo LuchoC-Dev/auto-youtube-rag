@@ -187,7 +187,7 @@ single `issue`, `doctor` reported the five checks as `ok`, and the SHA-256
 digest of the source tree was identical before and after `sync`. A new seed
 query (`es-analysis-neumorphism-accessibility`) aimed specifically at
 `analysis.json` content produced a real bundle where a citation resolved to an
-`analysis_topic` unit with correct provenance. `design-catalog` was not
+`analysis_topic` unit with correct provenance. `catalog-design` was not
 validated explicitly: its manifest declares no video with `resources.analysis`,
 so it does not exercise this work. Full detail in `docs/decisions.md`, section
 "`analysis.json` support (schema 2.0): implemented and validated".
