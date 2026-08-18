@@ -21,7 +21,7 @@ of impact:
    directory**. They live in `~/.auto-youtube-rag/`, they are installed with
    `auto-youtube-rag init`, and `AUTO_YOUTUBE_RAG_MODEL_CACHE` was renamed to
    `AUTO_YOUTUBE_RAG_MODELS_DIR`.
-2. The branch is **`main`**, with a private remote, not
+2. The branch is **`main`**, with a public remote, not
    `feat/sqlite-vec-benchmark`.
 3. **You cannot launch two `sync` runs at once** over one source: the product
    rejects them with `SYNC_ALREADY_RUNNING`. `sync --force` exists to unblock
@@ -59,7 +59,7 @@ pending item.
 | Project                | `auto-youtube-rag`                                                                       |
 | Repository             | `<repo>` (root of the local checkout)                                                    |
 | Current branch         | `main`                                                                                   |
-| Remote                 | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (private)                            |
+| Remote                 | `origin` → `github.com/LuchoC-Dev/auto-youtube-rag` (public, MIT)                        |
 | Last documented commit | see `git log --oneline -1`; the work of this document closes point 4.6                   |
 | Git state at closing   | Clean worktree; `main` pushed and in sync with `origin/main` (0 difference); only branch |
 | Runtime                | Node.js 24.19.0 LTS, ESM                                                                 |
@@ -76,7 +76,8 @@ pending item.
 branch called `feat/sqlite-vec-benchmark` —a name inherited from a discarded
 benchmark— with no `main` branch and no remote. `main` was created on the tip
 of that branch, so it contains the 128 commits since the first one with no need
-for a merge, and it was published to a private repository. If an old session
+for a merge, and it was published to a repository that stayed private until
+16 August 2026, when it was opened to the public. If an old session
 memory mentions `feat/sqlite-vec-benchmark` as the working branch, it is out of
 date.
 
@@ -905,8 +906,9 @@ without recreating this same isolation.
   diff to choose type and scope. Detail in `docs/development.md` → "How to
   commit".
 - Never push, rewrite history or force anything without an explicit request:
-  `main` is published in a private repository and pushing makes it visible
-  outside this machine.
+  the repository is **public**, so anything pushed is visible to everyone
+  immediately. `main` is branch-protected — it only takes changes through a
+  pull request with CI green — and force-pushes and deletions are blocked.
 - Before each commit run at least the specific test, `npm run check` and
   `npm run build`, according to the risk.
 - Preserve JSON on stdout and stderr for progress.
@@ -1435,8 +1437,8 @@ green.
 ## Recommended first turn for the next agent
 
 1. Confirm that `git status --short` is empty and review the latest commits.
-   The branch is `main` and it has a private remote: **do not push without an
-   explicit request**.
+   The branch is `main`, its remote is public and the branch is protected:
+   work on a branch and open a pull request; **never push to `main`**.
 2. Run `npm.cmd run check` and `npm.cmd run build`. The reference at the
    closure of point 4.6, on 14 August: **342 tests, 0 failures**.
 3. Read the documents of the reading order, including the post-MVP designs:
