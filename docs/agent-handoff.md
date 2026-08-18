@@ -1486,17 +1486,18 @@ Suggested prompt for resuming:
 
 > Pick `auto-youtube-rag` back up from `docs/agent-handoff.md`. First verify
 > the state of the repository and the tests. The MVP is complete, and so are
-> points 4.1 to 4.6: `analysis.json` support, installation with a user home,
+> points 4.1 to 4.7: `analysis.json` support, installation with a user home,
 > `sync` safety with a concurrency guard, the stale vector warning, the
-> embedding model profile (prefixes are no longer hardcoded) and the
-> `rebuild --confirm` command. There are no pending decisions and no command
-> of the contract left unimplemented, and the priority order of 14 August is
-> exhausted. Ask me what to prioritize before starting, and propose a design
+> embedding model profile (prefixes are no longer hardcoded), the
+> `rebuild --confirm` command and the `LOW_RELEVANCE` warning. There are no
+> pending decisions and no command of the contract left unimplemented, and the
+> priority order of 14 August is exhausted. Ask me what to prioritize before starting, and propose a design
 > and a checklist before implementing anything.
 
 ## Recent relevant history
 
-The most recent commits.
+The most recent commits as of the reference state of this document (14 August
+2026). For the current tip, run `git log --oneline`.
 
 ```text
 7ee0a9b build(repo): check every file out with LF so format:check survives a checkout
@@ -1545,7 +1546,7 @@ An agent is correctly situated when it can explain, before writing code:
 3. how `sync` preserves valid packages in the face of failures;
 4. why source packages are strictly read-only;
 5. how SQLite, FTS5 and embeddings are kept aligned;
-6. why the initial vector search will be exact and replaceable;
+6. why the vector search is exact and replaceable;
 7. what each point delivered — 2.1 indexing, 2.2 retrieval, 2.3 assembly and
    `retrieve`, 2.4 the portable skill, 3.2 the two-layer evaluation — and why
    the complete MVP is already closed, not in progress;

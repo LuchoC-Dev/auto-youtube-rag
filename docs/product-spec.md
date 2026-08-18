@@ -233,8 +233,9 @@ provider-specific types.
 None blocks the implementation in progress.
 
 The combination and reranking policy was resolved on 11 August 2026: weighted
-Reciprocal Rank Fusion as the baseline, behind a replaceable port. The weights
-will be calibrated in stage 3.2 through real evaluations, without altering the
-domain, the use cases or the public contract of the CLI. The rationale is in
+Reciprocal Rank Fusion as the baseline, behind a replaceable port. Stage 3.2
+reviewed the weights against real evaluations and decided on 13 August 2026 to
+keep the defaults unchanged; the port keeps them replaceable without altering
+the domain, the use cases or the public contract of the CLI. The rationale is in
 [decisions.md](decisions.md) and the design in
 [retrieval-design.md](retrieval-design.md).

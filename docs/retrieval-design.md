@@ -52,8 +52,9 @@ so the cascade contributes no performance and only reduces recall.
 
 Known and accepted limitation: RRF discards the distance between scores. Two
 fragments with cosine 0.95 and 0.40 are treated as first and second. That is why
-the strategy stays behind `FusionStrategy` and the weights get calibrated in
-stage 3.2 with real queries, without modifying use cases or adapters.
+the strategy stays behind `FusionStrategy`: stage 3.2 reviewed the weights with
+real queries and kept them, and any later change happens there, without
+modifying use cases or adapters.
 
 ## Retrieval model
 

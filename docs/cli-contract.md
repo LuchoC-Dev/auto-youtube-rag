@@ -2,9 +2,12 @@
 
 ## Status
 
-Contract approved and complete for the MVP, extended on 13 August 2026 with
-point 4.2 (user home and model installation). Design in
-`docs/install-design.md`.
+Contract approved and complete for the MVP, and extended afterwards by point
+4.2 (user home and model installation, `docs/install-design.md`), 4.3
+(`sync --force` and the concurrency codes, `docs/sync-safety-design.md`), 4.6
+(`rebuild --confirm`, `docs/rebuild-design.md`) and 4.7 (the `LOW_RELEVANCE`
+warning, `docs/low-relevance-design.md`). Every command it declares is
+implemented.
 
 ## Principles
 
@@ -322,8 +325,9 @@ candidates: the bundle is assembled just the same, with the same citations.
 | `deep`     |           64,000 | Extensive research         |
 
 The budgets are maximums, not filling targets. If there is not enough relevant
-evidence, the bundle must be smaller. The figures will be adjusted through
-evaluations without changing the public names of the presets.
+evidence, the bundle must be smaller. The evaluations of point 3.2 reviewed
+these figures and kept them unchanged; any later adjustment happens without
+changing the public names of the presets.
 
 ## Output bundle
 
