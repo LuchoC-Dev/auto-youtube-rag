@@ -2,6 +2,7 @@
   "name": "auto-youtube-rag",
   "version": "0.1.0",
   "description": "Local-first RAG library that turns knowledge packages produced from YouTube videos into wide, ordered, cited context for an AI agent to reason over.",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "repository": {
