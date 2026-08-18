@@ -75,7 +75,7 @@ Example:
 
 ```powershell
 auto-youtube-rag source add `
-  "C:\Users\<user>\ai-transcripcion\auto-design\videos" `
+  "C:\Users\<user>\auto-design\videos" `
   --name auto-design
 ```
 
