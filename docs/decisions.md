@@ -220,7 +220,7 @@ future evaluation pass, not as a reason to change code in 3.2.
 ## Per-video tolerant validation in the manifest
 
 On 13 August 2026 the first half of the schema-drift finding from M4 was
-resolved (see `evals/results/2026-08-12/report.md`, "Hallazgos accionables" — 17
+resolved (see `evals/results/2026-08-12/report.md`, "Actionable findings" — 17
 of 51 real `auto-design` videos with `resources.analysis` instead of
 `resources.rules`): a single video with an invalid schema no longer aborts
 reading the whole manifest.
