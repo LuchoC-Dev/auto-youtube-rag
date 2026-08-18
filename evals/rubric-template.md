@@ -1,38 +1,45 @@
-# Plantilla de rúbrica — Capa B (juicio de relevancia)
+# Rubric template — Layer B (relevance judgment)
 
-## Estado
+## Status
 
-Redactada y aprobada el 12 de agosto de 2026 para N1 de
-[`docs/eval-design.md`](../docs/eval-design.md). Ancla en `expected.notes` de
-cada consulta semilla ([`evals/queries/seed-queries.json`](queries/seed-queries.json))
-para no inventar un criterio nuevo, tal como especifica
-[`docs/eval-design.md`](../docs/eval-design.md#layer-b--relevance-judged-by-codex-and-by-claude).
+Written and approved on 12 August 2026 for N1 of
+[`docs/eval-design.md`](../docs/eval-design.md). It anchors on the
+`expected.notes` of each seed query
+([`evals/queries/seed-queries.json`](queries/seed-queries.json)) so as not to
+invent a new criterion, exactly as
+[`docs/eval-design.md`](../docs/eval-design.md#layer-b--relevance-judged-by-codex-and-by-claude)
+specifies.
 
-## Por qué existe este documento
+## Why this document exists
 
-Codex y Claude tienen que responder **exactamente el mismo prompt**, palabra
-por palabra, sobre **exactamente el mismo bundle**. El objetivo no es
-comparar dos configuraciones de recuperación — el producto es neutral
-respecto del proveedor por diseño — sino medir consistencia del producto
-entre agentes consumidores. Si el prompt varía entre jueces, cualquier
-diferencia en las respuestas deja de ser señal sobre el producto y pasa a
-ser ruido de instrucciones. Ver `docs/eval-design.md`, "Por qué el mismo
-bundle para los dos jueces".
+Codex and Claude have to answer **exactly the same prompt**, word for word,
+over **exactly the same bundle**. The goal is not to compare two retrieval
+configurations — the product is provider-neutral by design — but to measure the
+product's consistency across consuming agents. If the prompt varies between
+judges, any difference in the answers stops being signal about the product and
+becomes instruction noise. See `docs/eval-design.md`, "Why the same bundle for
+both judges".
 
-El juez lee `context.md` (el artefacto pensado para consumo del agente); el
-`request_id` (recibo compacto de `retrieve`) opcionalmente para contexto de
-metadatos; `result.json` sólo si necesita verificar una cita puntual, nunca
-como lectura principal. El juez **no** ve la colección completa de videos ni
-las respuestas del otro juez.
+The judge reads `context.md` (the artefact meant for agent consumption); the
+`request_id` (the compact receipt from `retrieve`) optionally, for metadata
+context; `result.json` only if a specific citation needs verifying, never as the
+main reading. The judge does **not** see the full video collection nor the other
+judge's answers.
 
-## El prompt (reutilizable literalmente para N2 y N3)
+## The prompt (reusable verbatim for N2 and N3)
 
-Cada bundle real ya vive en
-`evals/results/<fecha>/<query-id>/<depth>/{context.md,result.json}`. Para
-cada uno de los 24, completar las variables `<QUERY_ID>`, `<QUERY_TEXT>`,
-`<DEPTH>`, `<EXPECTED_NOTES>` y `<CONTEXT_MD_PATH>` (los tres primeros y
-`expected.notes` salen de `evals/queries/seed-queries.json`; el path, de la
-convención de M2) y enviar el bloque completo tal cual al juez:
+Each real bundle already lives at
+`evals/results/<date>/<query-id>/<depth>/{context.md,result.json}`. For each of
+the 24, fill in the variables `<QUERY_ID>`, `<QUERY_TEXT>`, `<DEPTH>`,
+`<EXPECTED_NOTES>` and `<CONTEXT_MD_PATH>` (the first three and
+`expected.notes` come from `evals/queries/seed-queries.json`; the path, from the
+M2 convention) and send the whole block to the judge exactly as it is.
+
+The prompt below is reproduced in Spanish, the language in which it was actually
+sent to both judges. It is the literal instrument of the evaluation, not
+documentation: translating it would mean the 48 judgments under
+`evals/results/2026-08-12/judgments/` no longer correspond to the prompt that
+produced them.
 
 ```text
 Sos un juez de calidad para un sistema de recuperación de contexto (RAG)
@@ -81,12 +88,24 @@ expected.notes no describe nada verificable contra este bundle en
 particular, y explicá por qué en una frase.
 ```
 
-## Formato de salida por bundle
+In English, the four fields the judge has to answer are: `precision_aparente`,
+the fraction of the units included in `context.md` that the judge considers
+relevant to the query (a number between 0.0 and 1.0, one decimal);
+`cobertura_suficiente`, an integer from 1 to 5 where 1 means clearly
+insufficient to answer without rereading the original videos and 5 means
+sufficient and well organised; `brecha_percibida`, free text of 1–3 sentences
+(or `ninguna`) on whether something obvious appears to be missing; and
+`coincidencia_expected_notes`, one of `si`, `no`, `parcial` or `no_aplica`,
+stating whether the bundle satisfies what `expected.notes` describes. The field
+names and the accepted values stay in Spanish because they are keys: the 48
+judgments already recorded use them literally.
 
-Una rúbrica completada por archivo, guardada como
-`evals/results/<fecha>/judgments/<juez>/<query-id>--<depth>.md`
-(`<juez>` es `claude` o `codex`), con este encabezado y las cuatro
-respuestas debajo:
+## Output format per bundle
+
+One completed rubric per file, saved as
+`evals/results/<date>/judgments/<judge>/<query-id>--<depth>.md`
+(`<judge>` is `claude` or `codex`), with this heading and the four answers
+below it:
 
 ```markdown
 # <query-id> — <depth> — juez: <claude|codex>
@@ -97,20 +116,21 @@ respuestas debajo:
 **coincidencia_expected_notes**: parcial — ...
 ```
 
-24 archivos por juez, 48 en total entre `judgments/claude/` y
+24 files per judge, 48 in total across `judgments/claude/` and
 `judgments/codex/`.
 
-## Ejemplo resuelto sobre un bundle real
+## Worked example over a real bundle
 
-Consulta `es-concept-brutalism`, profundidad `balanced`
+Query `es-concept-brutalism`, depth `balanced`
 (`evals/results/2026-08-12/es-concept-brutalism/balanced/context.md`,
-20 fuentes, 63 unidades, ~29.7k tokens estimados).
+20 sources, 63 units, ~29.7k estimated tokens).
 
 - `expected.notes`: "Debe recuperar contexto conceptual amplio sobre
   brutalismo (definición, rasgos visuales, uso de tipografía y contraste),
   no una única coincidencia puntual. Se espera aporte de ambas vías."
 
-Respuesta de ejemplo (leída íntegramente para este documento):
+Example answer (read in full for this document, and kept in the Spanish it was
+given in):
 
 ```markdown
 # es-concept-brutalism — balanced — juez: claude
@@ -134,21 +154,21 @@ una fracción grande del presupuesto de balanced (~29.7k tokens) se fue en
 contenido de otros estilos y principios de diseño no relacionados.
 ```
 
-Esta lectura ilustra por qué **precisión aparente** y **cobertura
-suficiente** pueden divergir en el mismo bundle: el núcleo brutalista
-alcanza y sobra (`cobertura_suficiente: 4`), pero una fracción visible de
-lo incluido es ruido temático (`precision_aparente: 0.4`) — exactamente el
-tipo de señal que N4 tiene que poder detectar comparando ambos jueces.
+This reading illustrates why **apparent precision** and **sufficient coverage**
+can diverge over the same bundle: the brutalist core is more than enough
+(`cobertura_suficiente: 4`), but a visible fraction of what is included is
+thematic noise (`precision_aparente: 0.4`) — exactly the kind of signal N4 has
+to be able to detect by comparing both judges.
 
-## Procedimiento (N2 y N3)
+## Procedure (N2 and N3)
 
-1. El juez recibe el prompt de arriba, ya completado, una vez por cada uno
-   de los 24 bundles — nunca los 24 bundles de una sola vez en un mismo
-   turno, para que cada juicio sea independiente del anterior.
-2. N2 (Claude) y N3 (Codex) corren por separado. Codex no ve las
-   respuestas de Claude antes de responder, ni viceversa.
-3. Cada rúbrica se guarda en el archivo correspondiente bajo
-   `evals/results/<fecha>/judgments/<juez>/`.
-4. N4 compara las 24 parejas: discrepancia si `precision_aparente` difiere
-   en más de ±0.2, `cobertura_suficiente` en más de ±1, o
-   `coincidencia_expected_notes` diverge.
+1. The judge receives the prompt above, already filled in, once for each of the
+   24 bundles — never all 24 bundles at once in the same turn, so that each
+   judgment is independent of the previous one.
+2. N2 (Claude) and N3 (Codex) run separately. Codex does not see Claude's
+   answers before answering, nor the other way round.
+3. Each rubric is saved to the corresponding file under
+   `evals/results/<date>/judgments/<judge>/`.
+4. N4 compares the 24 pairs: a discrepancy if `precision_aparente` differs by
+   more than ±0.2, `cobertura_suficiente` by more than ±1, or
+   `coincidencia_expected_notes` diverges.
