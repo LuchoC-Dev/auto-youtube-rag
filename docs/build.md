@@ -117,9 +117,9 @@ of the skill) against a temporary copy of two real `auto-design` videos: the
 first run detected that `init` was not documented as a mandatory previous step;
 once corrected, the second run completed the whole flow (`init` → `status` →
 `source add` → `sync` → `retrieve`) and produced a correctly cited bundle
-without inspecting `src/`. Closed with verification only on Claude by explicit
-decision of the user; see `docs/agent-handoff.md` for the verification procedure
-on Codex should it be needed later on.
+without inspecting `src/`. It closed with verification only on Claude, by
+explicit decision of the user; the Codex verification followed on 15 August
+2026 and also worked. The procedure is in `docs/agent-handoff.md`.
 
 ### Stage 3 — Quality
 
@@ -187,7 +187,7 @@ single `issue`, `doctor` reported the five checks as `ok`, and the SHA-256
 digest of the source tree was identical before and after `sync`. A new seed
 query (`es-analysis-neumorphism-accessibility`) aimed specifically at
 `analysis.json` content produced a real bundle where a citation resolved to an
-`analysis_topic` unit with correct provenance. `design-catalog` was not
+`analysis_topic` unit with correct provenance. `catalog-design` was not
 validated explicitly: its manifest declares no video with `resources.analysis`,
 so it does not exercise this work. Full detail in `docs/decisions.md`, section
 "`analysis.json` support (schema 2.0): implemented and validated".
@@ -226,9 +226,10 @@ Two findings from the run:
 2. **The citation marker of `context.md` is misread.** It is a closing marker
    and the agent interpreted it as an opening one, producing a summary with the
    wrong provenance even though the 54 citations resolve and there are no
-   orphans. It reproduced twice, even reading the whole bundle in one go. It is
-   recorded as pending a decision: changing it touches the contract of
-   `cli-contract.md`.
+   orphans. It reproduced twice, even reading the whole bundle in one go.
+   **Resolved on 14 August 2026**: the citation id now opens the block, inside
+   the heading (`### [S01] ...`), in commit `3969d2b`. `cli-contract.md`,
+   `skill/SKILL.md` and `docs/decisions.md` record the new marker.
 
 #### 4.3 `sync` safety and indexing performance
 

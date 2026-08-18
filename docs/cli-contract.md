@@ -2,9 +2,12 @@
 
 ## Status
 
-Contract approved and complete for the MVP, extended on 13 August 2026 with
-point 4.2 (user home and model installation). Design in
-`docs/install-design.md`.
+Contract approved and complete for the MVP, and extended afterwards by point
+4.2 (user home and model installation, `docs/install-design.md`), 4.3
+(`sync --force` and the concurrency codes, `docs/sync-safety-design.md`), 4.6
+(`rebuild --confirm`, `docs/rebuild-design.md`) and 4.7 (the `LOW_RELEVANCE`
+warning, `docs/low-relevance-design.md`). Every command it declares is
+implemented.
 
 ## Principles
 
@@ -75,7 +78,7 @@ Example:
 
 ```powershell
 auto-youtube-rag source add `
-  "C:\Users\<user>\ai-transcripcion\auto-design\videos" `
+  "C:\Users\<user>\auto-design\videos" `
   --name auto-design
 ```
 
@@ -217,28 +220,6 @@ when `status` is `incomplete`, listing each required file that is absent
 (`reason: "missing"`) or of a size different from the receipt (`reason:
 "size_mismatch"`) — it never hashes the ~130 MB.
 
-#### `top_vector_similarity` metric
-
-`result.json` includes in `metrics` the cosine of the best result of the
-semantic path, on **every** query, or `null` if that path did not run. It is the
-raw datum behind `LOW_RELEVANCE`: it is reported whether or not the warning
-fires, so that the agent judges relevance with its own criterion instead of
-inheriting a threshold calibrated over a particular collection.
-
-It is not a relevance percentage: it is distance in the embedding space, and E5
-compresses everything between 0.81 and 0.90.
-
-#### `LOW_RELEVANCE` warning
-
-`retrieve` emits it when the best similarity score of the vector path stays
-below the calibrated floor (`0.84` by default, see
-`docs/low-relevance-design.md`). It means that the library has no content on the
-topic, not that something has failed.
-
-**It does not degrade the result**: `status` stays `"ok"` and the exit code is
-`0`, unlike the warnings that report a downed path. Nor does it filter
-candidates: the bundle is assembled just the same, with the same citations.
-
 ### `rebuild`
 
 Regenerates the derived index and demands explicit confirmation. It never
@@ -313,6 +294,28 @@ preset. `--source` can be repeated to limit the query to particular roots.
 `--out` keeps the bundle in a chosen location; without it, a temporary directory
 identified by `request_id` is used.
 
+#### `top_vector_similarity` metric
+
+`result.json` includes in `metrics` the cosine of the best result of the
+semantic path, on **every** query, or `null` if that path did not run. It is the
+raw datum behind `LOW_RELEVANCE`: it is reported whether or not the warning
+fires, so that the agent judges relevance with its own criterion instead of
+inheriting a threshold calibrated over a particular collection.
+
+It is not a relevance percentage: it is distance in the embedding space, and E5
+compresses everything between 0.81 and 0.90.
+
+#### `LOW_RELEVANCE` warning
+
+`retrieve` emits it when the best similarity score of the vector path stays
+below the calibrated floor (`0.84` by default, see
+`docs/low-relevance-design.md`). It means that the library has no content on the
+topic, not that something has failed.
+
+**It does not degrade the result**: `status` stays `"ok"` and the exit code is
+`0`, unlike the warnings that report a downed path. Nor does it filter
+candidates: the bundle is assembled just the same, with the same citations.
+
 ### Initial budgets
 
 | Depth      | Estimated tokens | Purpose                    |
@@ -322,8 +325,9 @@ identified by `request_id` is used.
 | `deep`     |           64,000 | Extensive research         |
 
 The budgets are maximums, not filling targets. If there is not enough relevant
-evidence, the bundle must be smaller. The figures will be adjusted through
-evaluations without changing the public names of the presets.
+evidence, the bundle must be smaller. The evaluations of point 3.2 reviewed
+these figures and kept them unchanged; any later adjustment happens without
+changing the public names of the presets.
 
 ## Output bundle
 
@@ -471,8 +475,9 @@ it produced before the failure.
 
 The numeric codes do not describe each concrete cause. The JSON outputs include
 a stable symbolic code, for example `SOURCE_NOT_FOUND`, `PACKAGE_INVALID`,
-`DATABASE_BUSY`, `SCHEMA_INCOMPATIBLE`, `EMBEDDING_MODEL_MISSING` or
-`OUTPUT_WRITE_FAILED`, as well as `retryable` where appropriate.
+`DATABASE_INTEGRITY_ERROR`, `INCOMPATIBLE_SCHEMA_VERSION`,
+`EMBEDDING_MODEL_MISSING` or `LIBRARY_NOT_FOUND`, as well as `retryable` where
+appropriate.
 
 Codes from point 4.2 (requirements preflight and installation, see
 `docs/install-design.md`):

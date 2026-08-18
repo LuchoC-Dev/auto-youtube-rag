@@ -8,11 +8,16 @@ follow a plan and tasks reviewed before starting.
 
 ## Evidence inspected
 
-The real `auto-design` collection contains 33 videos and one web entry. All 33
-`video_id`s and slugs are unique. Every video has `context.md`, `rules.json` and
-`metadata.json`; together they contain 243 patterns. The `rules.json` files
-share the same shape and the pattern IDs are unique once combined with their
-video.
+Snapshot of 10 August 2026, the day this specification was approved. The figures
+record what was inspected then, not the present size of the collection:
+`auto-design` has grown since, and the current figures are in `decisions.md` and
+`build.md`.
+
+At that date the real `auto-design` collection contained 33 videos and one web
+entry. All 33 `video_id`s and slugs were unique. Every video had `context.md`,
+`rules.json` and `metadata.json`; together they contained 243 patterns. The
+`rules.json` files shared the same shape and the pattern IDs were unique once
+combined with their video.
 
 The frontmatters of `context.md` vary slightly, but they share identity,
 languages and provenance. `metadata.json` is an extensive and volatile yt-dlp

@@ -28,9 +28,9 @@ concrete adapters.
 | Main | configuration and composition root | new business rules |
 
 The minimum ports foreseen are `EmbeddingGenerator`, `KnowledgeRepository`,
-`TextSearchIndex` and `VectorSearchIndex`. Their final names and signatures will
-be specified before implementing, but their responsibility and dependency
-direction are approved requirements.
+`TextSearchIndex` and `VectorSearchIndex`. Those are the four the implementation
+declares; their responsibility and dependency direction are approved
+requirements.
 
 ## Overall flow
 
@@ -104,9 +104,8 @@ units. No intermediate documents are created in the source folders.
 ## Persistence and portability
 
 SQLite is the confirmed persistence for the MVP. FTS5 constitutes the initial
-textual layer. The initial adapter will use `node:sqlite` on Node.js 24.19.0
-LTS; the client will not cross the application ports. Embeddings are stored
-together with:
+textual layer. The adapter uses `node:sqlite` on Node.js 24.19.0 LTS; the client
+does not cross the application ports. Embeddings are stored together with:
 
 - model identifier;
 - version;

@@ -1196,9 +1196,8 @@ new seed query `es-analysis-neumorphism-accessibility`
 a real citation (`[S45]`) resolved to an `analysis_topic` unit of the real
 video `psyw2_j_5jk`, in the "Highest-relevance context" section, with correct
 provenance and a readable `context.md`. The temporary copy was deleted when
-finished. `design-catalog` (mentioned in previous designs as a second candidate
-real collection; on disk it lives as `catalog-design` under
-`ai-transcripcion/`) was not used for this validation: its manifest declares no
+finished. `catalog-design` (mentioned in previous designs as a second candidate
+real collection) was not used for this validation: its manifest declares no
 video with `resources.analysis`.
 
 ## Point 4.5 completed — embedding model profile
@@ -1291,19 +1290,20 @@ rejected".
 ~~2. **`rebuild --confirm` command.**~~ **Closed on 14 August 2026 as point
 4.6.** See `docs/rebuild-design.md`.
 
-**The priority order of 14 August is exhausted.** The only thing still standing
-from that list is what the user explicitly left for the end (below). After
-that: **MCP, web interface and support for web page packages**, out of scope
-since the original `product-spec.md`.
+**The priority order of 14 August is exhausted**, and so are the two items the
+user explicitly left for the end (below). What remains beyond them: **MCP, web
+interface and support for web page packages**, out of scope since the original
+`product-spec.md`.
 
 Explicitly **for the end**, by decision of the user:
 
-- **Verify `skill/SKILL.md` from a real Codex.** It is the only unchecked box
-  in `docs/build.md` (point 2.4). It gains value because the skill changed a
-  lot on 13 and 14 August —it was split into three files, the installation
-  model changed, it gained `models`, `--force` and new codes— and all of that
-  was validated cold **only with Claude agents**. It requires the user to run
-  it: a Claude agent cannot invoke Codex.
+- ~~**Verify `skill/SKILL.md` from a real Codex.**~~ **Done on 15 August 2026.**
+  The maintainer ran it and it worked, so the box of point 2.4 is checked and
+  `docs/build.md` has no unchecked box left. It gained value because the skill
+  changed a lot on 13 and 14 August —it was split into three files, the
+  installation model changed, it gained `models`, `--force` and new codes— and
+  all of that had been validated cold **only with Claude agents**. It required
+  the user to run it: a Claude agent cannot invoke Codex.
 - ~~**Repository hygiene.**~~ **Done on 14 August 2026.** The three dead local
   branches were deleted and `.cache/` was cleaned from 2110 MB down to **129
   MB**: `sqlite-client-benchmark` (995 MB), `vector-benchmark` (418 MB) and the
@@ -1486,17 +1486,18 @@ Suggested prompt for resuming:
 
 > Pick `auto-youtube-rag` back up from `docs/agent-handoff.md`. First verify
 > the state of the repository and the tests. The MVP is complete, and so are
-> points 4.1 to 4.6: `analysis.json` support, installation with a user home,
+> points 4.1 to 4.7: `analysis.json` support, installation with a user home,
 > `sync` safety with a concurrency guard, the stale vector warning, the
-> embedding model profile (prefixes are no longer hardcoded) and the
-> `rebuild --confirm` command. There are no pending decisions and no command
-> of the contract left unimplemented, and the priority order of 14 August is
-> exhausted. Ask me what to prioritize before starting, and propose a design
+> embedding model profile (prefixes are no longer hardcoded), the
+> `rebuild --confirm` command and the `LOW_RELEVANCE` warning. There are no
+> pending decisions and no command of the contract left unimplemented, and the
+> priority order of 14 August is exhausted. Ask me what to prioritize before starting, and propose a design
 > and a checklist before implementing anything.
 
 ## Recent relevant history
 
-The most recent commits.
+The most recent commits as of the reference state of this document (14 August
+2026). For the current tip, run `git log --oneline`.
 
 ```text
 7ee0a9b build(repo): check every file out with LF so format:check survives a checkout
@@ -1545,7 +1546,7 @@ An agent is correctly situated when it can explain, before writing code:
 3. how `sync` preserves valid packages in the face of failures;
 4. why source packages are strictly read-only;
 5. how SQLite, FTS5 and embeddings are kept aligned;
-6. why the initial vector search will be exact and replaceable;
+6. why the vector search is exact and replaceable;
 7. what each point delivered — 2.1 indexing, 2.2 retrieval, 2.3 assembly and
    `retrieve`, 2.4 the portable skill, 3.2 the two-layer evaluation — and why
    the complete MVP is already closed, not in progress;

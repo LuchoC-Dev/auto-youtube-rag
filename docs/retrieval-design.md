@@ -52,8 +52,9 @@ so the cascade contributes no performance and only reduces recall.
 
 Known and accepted limitation: RRF discards the distance between scores. Two
 fragments with cosine 0.95 and 0.40 are treated as first and second. That is why
-the strategy stays behind `FusionStrategy` and the weights get calibrated in
-stage 3.2 with real queries, without modifying use cases or adapters.
+the strategy stays behind `FusionStrategy`: stage 3.2 reviewed the weights with
+real queries and kept them, and any later change happens there, without
+modifying use cases or adapters.
 
 ## Retrieval model
 
@@ -296,9 +297,11 @@ similarity is low. The retrieval E2E confirms it: verifying that a deletion
 just repeating the original query, because the rest of the library still appears
 through the vector path.
 
-A minimum similarity threshold — or a configurable quality limit — remains a
-calibration candidate for stage 3.2, along with the RRF weights; it is not
-introduced now without real evaluations justifying it.
+The question of a minimum similarity threshold was settled in point 4.7. The
+floor exists — `0.84`, calibrated over 24 hand-classified queries — but it only
+raises the `LOW_RELEVANCE` warning and reports `top_vector_similarity`: it never
+discards candidates, so the statement above still holds in full. The rationale
+and the calibration are in [low-relevance-design.md](low-relevance-design.md).
 
 ## Determinism
 
