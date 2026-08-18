@@ -130,13 +130,14 @@ way round.
 
 The first complete validation over `auto-design` with the real E5 model,
 something that 2.1, 2.2 and 2.3 explicitly deferred (see
-[agent-handoff.md](agent-handoff.md), "Última validación conocida"). The same
+[agent-handoff.md](agent-handoff.md), "Last known validation"). The same
 pattern already documented:
 
 1. Copy `auto-design/videos` to a temporary directory outside the repo.
 2. Compute and store the SHA-256 digest of the tree before touching it.
-3. `init` + `source add` + `sync` over the copy, with the model already cached
-   in `.cache/models`.
+3. `init` + `source add` + `sync` over the copy, with the model already
+   installed in `~/.auto-youtube-rag/models/` (point 4.2; `.cache/models`
+   belongs to the benchmarks and the product never reads it).
 4. Run `retrieve` for the eight queries of `seed-queries.json`, at
    `--depth focused|balanced|deep` (24 bundles in total), dumping each one under
    `evals/results/<date>/<query-id>/<depth>/`.

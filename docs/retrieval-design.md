@@ -296,9 +296,11 @@ similarity is low. The retrieval E2E confirms it: verifying that a deletion
 just repeating the original query, because the rest of the library still appears
 through the vector path.
 
-A minimum similarity threshold — or a configurable quality limit — remains a
-calibration candidate for stage 3.2, along with the RRF weights; it is not
-introduced now without real evaluations justifying it.
+The question of a minimum similarity threshold was settled in point 4.7. The
+floor exists — `0.84`, calibrated over 24 hand-classified queries — but it only
+raises the `LOW_RELEVANCE` warning and reports `top_vector_similarity`: it never
+discards candidates, so the statement above still holds in full. The rationale
+and the calibration are in [low-relevance-design.md](low-relevance-design.md).
 
 ## Determinism
 
